@@ -1,21 +1,29 @@
-
-import { createRoot } from 'react-dom/client';
-
-// Import statement to indicate that you need to bundle `./index.scss`
+import React, { useState, useEffect } from 'react';
+import { createRoot } from 'react-dom';
 import "./index.scss";
+import { MainView } from './components/main-view/main-view';
 
-// Main component (will eventually use all the others)
-const MyFlixApplication = () => {
+const MyFlixApp = () => {
+  const [movies, setMovies] = useState([]);
+
+  useEffect(() => {
+    // Fetch your movies here, set them with setMovies
+    // This is just a placeholder, replace with your actual fetch call
+    fetch('/api/movies')
+      .then(response => response.json())
+      .then(data => setMovies(data))
+      .catch(error => console.error('Error:', error));
+  }, []);
+
   return (
     <div className="my-flix">
-      <div>Good morning</div>
+      <div>Welcome to myFlix app!</div>
+      <MainView movies={movies} />
     </div>
   );
 };
 
-// Finds the root of your app
 const container = document.querySelector("#root");
 const root = createRoot(container);
 
-// Tells React to render your app in the root DOM element
-root.render(<MyFlixApplication />);
+root.render(<MyFlixApp />);

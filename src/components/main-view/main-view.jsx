@@ -1,29 +1,37 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { MovieCard } from "../movie-card/movie-card";
 import { MovieView } from "../movie-view/movie-view";
 
-const MainView = () => {
+export const MainView = () => {
     const [movies, setMovies] = useState([
         // Your array of movie objects goes here
-    ]);
+        { Title: "The Dark Knight", Description: "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.", Director: "Christopher Nolan", Genre: { Name: "Action" }, Image: "https://upload.wikimedia.org/wikipedia/en/8/8a/Dark_Knight.jpg", },
+        { Title: "Guardians of the Galaxy", Description: "A group of intergalactic criminals must pull together to stop a fanatical warrior with plans to purge the universe.", Director: "James Gunn", Genre: { Name: "Science Fiction" }, Image: "https://upload.wikimedia.org/wikipedia/en/8/8f/GOTG-poster.jpg" },
+        { Title: "Saving Private Ryan", Description: "Following the Normandy Landings, a group of U.S. soldiers go behind enemy lines to retrieve a paratrooper whose brothers have been killed in action.", Director: "Steven Spielberg", Genre: { Name: "Action" }, Image: "https://upload.wikimedia.org/wikipedia/en/a/ac/Saving_Private_Ryan_poster.jpg" }
+    ]); // Added closing bracket here
 
     const [selectedMovie, setSelectedMovie] = useState(null);
-    if(selectedMovie){
-        return <MovieView movieData={selectedMovie} onBackClick={()=>{setSelectedMovie(null)}} />
-    }
 
-    if(movies.length === 0){
-        return <div>The list is empty</div>
+    if (selectedMovie) {
+      return (
+        <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} />
+      );
     }
-    return(
-        <div>
-            {movies.map((movie)=>(
-                <MovieCard key = {movie.movieId} movieData = {movie} onMovieClick ={ (newSelectedMovie)=>{
-                    setSelectedMovie(newSelectedMovie);
-                }} />
-            ))}
-        </div>
-    )
-};
-
-export {MainView};
+  
+    if (movies.length === 0) {
+      return <div>The list is empty!</div>;
+    }
+  
+    return (
+      <div>
+        {movies.map((movie) => (
+          <MovieCard
+            key={movie._id}
+            movie={movie}
+            onMovieClick={(newSelectedMovie) => {
+              setSelectedMovie(newSelectedMovie);
+            }}
+          />
+        ))}
+      </div>
+    )};
