@@ -1,37 +1,73 @@
-import { useState } from "react";
+import React, { useState, useEffect } from 'react';
 import { MovieCard } from "../movie-card/movie-card";
 import { MovieView } from "../movie-view/movie-view";
 
 export const MainView = () => {
-    const [movies, setMovies] = useState([
-        // Your array of movie objects goes here
-        { Title: "The Dark Knight", Description: "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.", Director: "Christopher Nolan", Genre: { Name: "Action" }, Image: "https://m.media-amazon.com/images/I/81CLFQwU-WL.__AC_SX300_SY300_QL70_FMwebp_.jpg", },
-        { Title: "Guardians of the Galaxy", Description: "A group of intergalactic criminals must pull together to stop a fanatical warrior with plans to purge the universe.", Director: "James Gunn", Genre: { Name: "Science Fiction" }, Image: "https://upload.wikimedia.org/wikipedia/en/3/33/Guardians_of_the_Galaxy_%28film%29_poster.jpg" },
-        { Title: "Saving Private Ryan", Description: "Following the Normandy Landings, a group of U.S. soldiers go behind enemy lines to retrieve a paratrooper whose brothers have been killed in action.", Director: "Steven Spielberg", Genre: { Name: "Action" }, Image: "https://upload.wikimedia.org/wikipedia/en/a/ac/Saving_Private_Ryan_poster.jpg" }
-    ]); // Added closing bracket here
-
+    const [movies, setMovies] = useState([]);
     const [selectedMovie, setSelectedMovie] = useState(null);
 
+    useEffect(() => {
+        fetch('https://myflix-movies.herokuapp.com/movies\\')
+            .then(response => response.json())
+            .then(data => {
+                const moviesFromApi = data.map(movie => ({
+                    _id: movie._id,
+                    Title: movie.Title,
+                    Description: movie.Description,
+                    Image: movie.Image,
+                    Genre: {
+                        Name: movie.Genre.Name,
+                        Description: movie.Genre.Description
+                    },
+                    Director: {
+                        Name: movie.Director.Name,
+                        Bio: movie.Director.Bio,
+                        Birth: movie.Director.Birth,
+                        Death: movie.Director.Death
+                    }
+                }));
+                setMovies(moviesFromApi);
+            });
+    }, []);
+
+    let similarMovies = [];
     if (selectedMovie) {
-      return (
-        <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} />
-      );
+        similarMovies = movies.filter(movie => movie._id !== selectedMovie._id && movie.Genre.Name === selectedMovie.Genre.Name);
     }
-  
+
+    if (selectedMovie) {
+        return (
+            <>
+                <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} /><br />
+                <h2>Similar Movies</h2>
+                {similarMovies.length === 0 ? (
+                    <p>There are no similar movies.</p>
+                ) : (
+                    similarMovies.map(movie => (
+                        <MovieCard
+                            key={movie._id}
+                            movie={movie}
+                            onMovieClick={newSelectedMovie => setSelectedMovie(newSelectedMovie)}
+                        />
+                    ))
+                )}
+            </>
+        );
+    }
+
     if (movies.length === 0) {
-      return <div>The list is empty!</div>;
+        return <div>The list is empty!</div>;
     }
-  
+
     return (
-      <div>
-        {movies.map((movie) => (
-          <MovieCard
-            key={movie._id}
-            movie={movie}
-            onMovieClick={(newSelectedMovie) => {
-              setSelectedMovie(newSelectedMovie);
-            }}
-          />
-        ))}
-      </div>
-    )};
+        <div>
+            {movies.map(movie => (
+                <MovieCard
+                    key={movie._id}
+                    movie={movie}
+                    onMovieClick={newSelectedMovie => setSelectedMovie(newSelectedMovie)}
+                />
+            ))}
+        </div>
+    );
+};
