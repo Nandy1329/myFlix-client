@@ -20,7 +20,6 @@ export const MainView = () => {
                     Description: movie.Description,
                     Release: movie.Release,
                     Genre: movie.Genre.Name,
-                    Director: movie.Director.Name,
                     }
                 ));
                 setMovies(moviesFromApi);
