@@ -7,26 +7,26 @@ export const MainView = () => {
     const [selectedMovie, setSelectedMovie] = useState(null);
 
     useEffect(() => {
-        fetch('https://myflix-movies.herokuapp.com/movies\\')
-            .then(response => response.json())
+        fetch('https://myflix-movies.herokuapp.com/movies')
+            .then(response => {
+              console.log(response);
+              return response.json();
+            })
             .then(data => {
                 const moviesFromApi = data.map(movie => ({
-                    _id: movie._id,
+                    id: movie._id,
                     Title: movie.Title,
+                    ImagePath: movie.ImagePath,
                     Description: movie.Description,
-                    Image: movie.Image,
-                    Genre: {
-                        Name: movie.Genre.Name,
-                        Description: movie.Genre.Description
-                    },
-                    Director: {
-                        Name: movie.Director.Name,
-                        Bio: movie.Director.Bio,
-                        Birth: movie.Director.Birth,
-                        Death: movie.Director.Death
+                    Release: movie.Release,
+                    Genre: movie.Genre.Name,
+                    Director: movie.Director.Name,
                     }
-                }));
+                ));
                 setMovies(moviesFromApi);
+            })
+            .catch(error => {
+                console.error("Error fetching data: ", error);
             });
     }, []);
 
