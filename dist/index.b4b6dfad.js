@@ -2960,7 +2960,7 @@ const MyFlixApp = ()=>{
     (0, _react.useEffect)(()=>{
         // Fetch your movies here, set them with setMovies
         // This is just a placeholder, replace with your actual fetch call
-        fetch("/api/movies").then((response)=>response.json()).then((data)=>setMovies(data)).catch((error)=>console.error("Error:", error));
+        fetch("/MyFlixApp/movies").then((response)=>response.json()).then((data)=>setMovies(data)).catch((error)=>console.error("Error:", error));
     }, []);
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
         className: "my-flix",

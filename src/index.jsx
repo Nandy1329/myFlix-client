@@ -9,7 +9,7 @@ const MyFlixApp = () => {
   useEffect(() => {
     // Fetch your movies here, set them with setMovies
     // This is just a placeholder, replace with your actual fetch call
-    fetch('/api/movies')
+    fetch('/MyFlixApp/movies')
       .then(response => response.json())
       .then(data => setMovies(data))
       .catch(error => console.error('Error:', error));

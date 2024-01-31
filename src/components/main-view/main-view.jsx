@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { MovieCard } from "../movie-card/movie-card";
-import { MovieView } from "../movie-view/movie-view";
+import { MovieCard } from '../movie-card/movie-card';
+import { MovieView } from '../movie-view/movie-view';
 
 export const MainView = () => {
     const [movies, setMovies] = useState([]);
     const [selectedMovie, setSelectedMovie] = useState(null);
 
     useEffect(() => {
-        fetch('https://myflix-movies.herokuapp.com/movies')
+        fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies')
             .then(response => {
               console.log(response);
               return response.json();
@@ -29,29 +29,36 @@ export const MainView = () => {
             });
     }, []);
 
-    let similarMovies = [];
     if (selectedMovie) {
-        similarMovies = movies.filter(movie => movie._id !== selectedMovie._id && movie.Genre.Name === selectedMovie.Genre.Name);
-    }
-
-    if (selectedMovie) {
-        return (
-            <>
-                <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} /><br />
-                <h2>Similar Movies</h2>
-                {similarMovies.length === 0 ? (
+        let similarMovies = movies.filter((movie) => 
+        {
+            return movie._id !== selectedMovie._id && movie.Genre.Name === selectedMovie.Genre.Name;
+        });
+        if(similarMovies.length === 0) {
+            return (
+                <>
+                    <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} /><br />
+                    <h2>Similar Movies</h2>
                     <p>There are no similar movies.</p>
-                ) : (
-                    similarMovies.map(movie => (
+                </>
+            );
+        } else {
+            return (
+                <>
+                    <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} /><br />
+                    <h2>Similar Movies</h2>
+                    {similarMovies.map((movie) => (
                         <MovieCard
                             key={movie._id}
                             movie={movie}
-                            onMovieClick={newSelectedMovie => setSelectedMovie(newSelectedMovie)}
+                            onMovieClick={(newSelectedMovie) => {
+                                setSelectedMovie(newSelectedMovie);
+                            }}
                         />
-                    ))
-                )}
-            </>
-        );
+                    ))}
+                </>
+            );
+        }
     }
 
     if (movies.length === 0) {
