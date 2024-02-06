@@ -27209,7 +27209,12 @@ const MainView = ()=>{
     _s();
     const [movies, setMovies] = (0, _react.useState)([]);
     (0, _react.useEffect)(()=>{
-        fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies").then((response)=>response.json()).then((data)=>{
+        fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies").then((response)=>{
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) throw new TypeError("Oops, we haven't got JSON!");
+            return response.json();
+        }).then((data)=>{
             console.log(data);
             const moviesFromApi = data.map((movie)=>{
                 return {
@@ -27227,6 +27232,8 @@ const MainView = ()=>{
                 };
             });
             setMovies(moviesFromApi);
+        }).catch((error)=>{
+            console.error("There was an error!", error);
         });
     }, []);
     const [selectedMovie, setSelectedMovie] = (0, _react.useState)(null);
@@ -27241,26 +27248,26 @@ const MainView = ()=>{
                     onBackClick: ()=>setSelectedMovie(null)
                 }, void 0, false, {
                     fileName: "src/components/main-view/mainview.jsx",
-                    lineNumber: 41,
+                    lineNumber: 53,
                     columnNumber: 21
                 }, undefined),
                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("br", {}, void 0, false, {
                     fileName: "src/components/main-view/mainview.jsx",
-                    lineNumber: 41,
+                    lineNumber: 53,
                     columnNumber: 99
                 }, undefined),
                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("h2", {
                     children: "Similar Movies"
                 }, void 0, false, {
                     fileName: "src/components/main-view/mainview.jsx",
-                    lineNumber: 42,
+                    lineNumber: 54,
                     columnNumber: 21
                 }, undefined),
                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
                     children: "There are no similar movies."
                 }, void 0, false, {
                     fileName: "src/components/main-view/mainview.jsx",
-                    lineNumber: 43,
+                    lineNumber: 55,
                     columnNumber: 21
                 }, undefined)
             ]
@@ -27272,19 +27279,19 @@ const MainView = ()=>{
                     onBackClick: ()=>setSelectedMovie(null)
                 }, void 0, false, {
                     fileName: "src/components/main-view/mainview.jsx",
-                    lineNumber: 49,
+                    lineNumber: 61,
                     columnNumber: 21
                 }, undefined),
                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("br", {}, void 0, false, {
                     fileName: "src/components/main-view/mainview.jsx",
-                    lineNumber: 49,
+                    lineNumber: 61,
                     columnNumber: 99
                 }, undefined),
                 /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("h2", {
                     children: "Similar Movies"
                 }, void 0, false, {
                     fileName: "src/components/main-view/mainview.jsx",
-                    lineNumber: 50,
+                    lineNumber: 62,
                     columnNumber: 21
                 }, undefined),
                 similarMovies.map((movie)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _moviecardJsx.MovieCard), {
@@ -27294,7 +27301,7 @@ const MainView = ()=>{
                         }
                     }, movie._id, false, {
                         fileName: "src/components/main-view/mainview.jsx",
-                        lineNumber: 52,
+                        lineNumber: 64,
                         columnNumber: 25
                     }, undefined))
             ]
@@ -27304,7 +27311,7 @@ const MainView = ()=>{
         children: "The list is empty!"
     }, void 0, false, {
         fileName: "src/components/main-view/mainview.jsx",
-        lineNumber: 66,
+        lineNumber: 78,
         columnNumber: 16
     }, undefined);
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -27315,12 +27322,12 @@ const MainView = ()=>{
                 }
             }, movie._id, false, {
                 fileName: "src/components/main-view/mainview.jsx",
-                lineNumber: 72,
+                lineNumber: 84,
                 columnNumber: 17
             }, undefined))
     }, void 0, false, {
         fileName: "src/components/main-view/mainview.jsx",
-        lineNumber: 70,
+        lineNumber: 82,
         columnNumber: 9
     }, undefined);
 };

@@ -6,26 +6,38 @@ export const MainView = () => {
 
     useEffect(() => {
         fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies")
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-                const moviesFromApi = data.map((movie) => {
-                    return {
-                        _id: movie._id,
-                        Title: movie.Title,
-                        ImagePath: movie.ImagePath,
-                        Description: movie.Description,
-                        Year: movie.Year,
-                        Genre: {
-                            Name: movie.Genre.Name
-                        },
-                        Director: {
-                            Name: movie.Director.Name
-                        }
-                    };
-                });
-                setMovies(moviesFromApi);
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                throw new TypeError("Oops, we haven't got JSON!");
+            }
+            return response.json();
+        })
+        .then((data) => {
+            console.log(data);
+            const moviesFromApi = data.map((movie) => {
+                return {
+                    _id: movie._id,
+                    Title: movie.Title,
+                    ImagePath: movie.ImagePath,
+                    Description: movie.Description,
+                    Year: movie.Year,
+                    Genre: {
+                        Name: movie.Genre.Name
+                    },
+                    Director: {
+                        Name: movie.Director.Name
+                    }
+                };
             });
+            setMovies(moviesFromApi);
+        })
+        .catch((error) => {
+            console.error('There was an error!', error);
+        });
     }, []);
 
     const [selectedMovie, setSelectedMovie] = useState(null);
