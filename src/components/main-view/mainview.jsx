@@ -1,33 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { MovieCard } from '../movie-card/movie-card';
-import { MovieView } from '../movie-view/movie-view';
-
+import { useState, useEffect } from "react";
+import { MovieCard } from "../movie-card/moviecard.jsx";
+import { MovieView } from "../movie-view/movieview.jsx";
 export const MainView = () => {
     const [movies, setMovies] = useState([]);
-    const [selectedMovie, setSelectedMovie] = useState(null);
 
     useEffect(() => {
-        fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies')
-            .then(response => {
-              console.log(response);
-              return response.json();
-            })
-            .then(data => {
-                const moviesFromApi = data.map(movie => ({
-                    id: movie._id,
-                    Title: movie.Title,
-                    ImagePath: movie.ImagePath,
-                    Description: movie.Description,
-                    Release: movie.Release,
-                    Genre: movie.Genre.Name,
-                    }
-                ));
+        fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies")
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                const moviesFromApi = data.map((movie) => {
+                    return {
+                        _id: movie._id,
+                        Title: movie.Title,
+                        ImagePath: movie.ImagePath,
+                        Description: movie.Description,
+                        Year: movie.Year,
+                        Genre: {
+                            Name: movie.Genre.Name
+                        },
+                        Director: {
+                            Name: movie.Director.Name
+                        }
+                    };
+                });
                 setMovies(moviesFromApi);
-            })
-            .catch(error => {
-                console.error("Error fetching data: ", error);
             });
     }, []);
+
+    const [selectedMovie, setSelectedMovie] = useState(null);
 
     if (selectedMovie) {
         let similarMovies = movies.filter((movie) => 
@@ -67,11 +68,13 @@ export const MainView = () => {
 
     return (
         <div>
-            {movies.map(movie => (
+            {movies.map((movie) => (
                 <MovieCard
                     key={movie._id}
                     movie={movie}
-                    onMovieClick={newSelectedMovie => setSelectedMovie(newSelectedMovie)}
+                    onMovieClick={(newSelectedMovie) => {
+                        setSelectedMovie(newSelectedMovie);
+                    }}
                 />
             ))}
         </div>

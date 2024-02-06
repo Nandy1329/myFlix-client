@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import "./index.scss";
-import { MainView } from './components/main-view/main-view';
-
-const MyFlixApp = () => {
+import { MainView } from './components/main-view/mainview.jsx';const MyFlixApp = () => {
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
