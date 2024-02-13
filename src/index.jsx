@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { createRoot } from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import "./index.scss";
-import { MainView } from './components/main-view/mainview.jsx';const MyFlixApp = () => {
+import { MainView } from './components/main-view/mainview.jsx';
+
+const MyFlixApp = () => {
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
-    // Fetch your movies here, set them with setMovies
-    // This is just a placeholder, replace with your actual fetch call
-    fetch('/MyFlixApp/movies')
+    fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies')
       .then(response => response.json())
       .then(data => setMovies(data))
       .catch(error => console.error('Error:', error));
@@ -20,8 +20,3 @@ import { MainView } from './components/main-view/mainview.jsx';const MyFlixApp =
     </div>
   );
 };
-
-const container = document.querySelector("#root");
-const root = createRoot(container);
-
-root.render(<MyFlixApp />);
