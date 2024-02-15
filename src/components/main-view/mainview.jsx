@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import "./index.scss";
+import "../../index.scss";
 
 export const MainView = () => {
   const [movies, setMovies] = useState([]);
@@ -19,10 +19,10 @@ export const MainView = () => {
             Description: movie.Description,
             Year: movie.Year,
             Genre: {
-              Name: movie.Genre.Name
+              Name: movie.Genre ? movie.Genre.Name : 'N/A'
             },
             Director: {
-              Name: movie.Director.Name
+              Name: movie.Director ? movie.Director.Name : 'N/A'
             }
           };
         });
@@ -45,4 +45,5 @@ export const MainView = () => {
   );
 };
 
-ReactDOM.render(<MainView />, document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<MainView />);
