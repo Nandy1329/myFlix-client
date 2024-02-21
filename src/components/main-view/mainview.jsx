@@ -38,6 +38,7 @@ export const MainView = () => {
       {movies.map(movie => (
         <div key={movie._id}>
           <h2>{movie.Title}</h2>
+          <img src={movie.ImagePath} alt={movie.Title} /> {/* This line will render the image */}
           <p>{movie.Description}</p>
         </div>
       ))}

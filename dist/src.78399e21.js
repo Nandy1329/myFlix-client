@@ -28973,7 +28973,10 @@ var MainView = exports.MainView = function MainView() {
   return /*#__PURE__*/_react.default.createElement("div", null, movies.map(function (movie) {
     return /*#__PURE__*/_react.default.createElement("div", {
       key: movie._id
-    }, /*#__PURE__*/_react.default.createElement("h2", null, movie.Title), /*#__PURE__*/_react.default.createElement("p", null, movie.Description));
+    }, /*#__PURE__*/_react.default.createElement("h2", null, movie.Title), /*#__PURE__*/_react.default.createElement("img", {
+      src: movie.ImagePath,
+      alt: movie.Title
+    }), " ", /*#__PURE__*/_react.default.createElement("p", null, movie.Description));
   }));
 };
 var root = (0, _client.createRoot)(document.getElementById('root'));
