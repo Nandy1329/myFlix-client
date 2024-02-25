@@ -12,12 +12,7 @@ export const MainView = () => {
       .then(response => response.json())
       .then((data) => {
         console.log(data);
-        const moviesFromApi = data.map((movie) => {
-       
-          };
-        });
-
-        setMovies(moviesFromApi);
+        setMovies(data);
       })
       .catch((error) => {
         console.error('There was an error!', error);

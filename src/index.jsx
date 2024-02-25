@@ -20,3 +20,6 @@ const MyFlixApp = () => {
     </div>
   );
 };
+
+// Render the MyFlixApp component in the 'root' div
+ReactDOM.render(<MyFlixApp />, document.getElementById('root'));
