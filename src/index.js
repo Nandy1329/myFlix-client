@@ -28,9 +28,7 @@ var MyFlixApp = function MyFlixApp() {
       return console.error('Error:', error);
     });
   }, []);
-  return /*#__PURE__*/_react["default"].createElement("div", {
-    className: "my-flix"
-  }, /*#__PURE__*/_react["default"].createElement("div", null, "Welcome to myFlix app!"), /*#__PURE__*/_react["default"].createElement(_mainview.MainView, {
-    movies: movies
-  }));
-};
+  return _react["default"].createElement("div", { className: "my-flix" }, 
+  _react["default"].createElement("div", null, "Welcome to myFlix app!"), 
+  _react["default"].createElement(_mainview.MainView, { movies: movies }));
+}

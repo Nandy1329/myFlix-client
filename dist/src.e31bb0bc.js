@@ -30042,9 +30042,9 @@ var MyFlixApp = function MyFlixApp() {
       return console.error('Error:', error);
     });
   }, []);
-  return /*#__PURE__*/_react["default"].createElement("div", {
+  return _react["default"].createElement("div", {
     className: "my-flix"
-  }, /*#__PURE__*/_react["default"].createElement("div", null, "Welcome to myFlix app!"), /*#__PURE__*/_react["default"].createElement(_mainview.MainView, {
+  }, _react["default"].createElement("div", null, "Welcome to myFlix app!"), _react["default"].createElement(_mainview.MainView, {
     movies: movies
   }));
 };
@@ -30073,7 +30073,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55860" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50447" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

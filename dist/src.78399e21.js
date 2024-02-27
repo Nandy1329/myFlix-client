@@ -29909,18 +29909,7 @@ var MainView = exports.MainView = function MainView() {
       return response.json();
     }).then(function (data) {
       console.log(data);
-      var moviesFromApi = data.map(function (movie) {
-        return {
-          id: movie._id,
-          title: movie.Title,
-          image: movie.ImagePath,
-          description: movie.Description,
-          year: movie.Year,
-          genre: movie.Genre ? movie.Genre.Name : 'N/A',
-          director: movie.Director ? movie.Director.Name : 'N/A'
-        };
-      });
-      setMovies(moviesFromApi);
+      setMovies(data);
     }).catch(function (error) {
       console.error('There was an error!', error);
     });
@@ -29980,6 +29969,9 @@ var MyFlixApp = function MyFlixApp() {
     movies: movies
   }));
 };
+
+// Render the MyFlixApp component in the 'root' div
+_reactDom.default.render( /*#__PURE__*/_react.default.createElement(MyFlixApp, null), document.getElementById('root'));
 },{"react":"../node_modules/react/index.js","react-dom":"../node_modules/react-dom/index.js","./index.scss":"index.scss","./components/main-view/mainview.jsx":"components/main-view/mainview.jsx"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -30005,7 +29997,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64773" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50447" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
