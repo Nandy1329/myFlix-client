@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import { MainView } from './components/main-view/main-view.jsx';
 import "./index.scss";
-import { MainView } from './components/main-view/mainview.jsx';
 
 const MyFlixApp = () => {
   const [movies, setMovies] = useState([]);
