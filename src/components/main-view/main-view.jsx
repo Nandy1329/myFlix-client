@@ -1,31 +1,22 @@
+import React from "react";
 import { useState, useEffect } from "react";
-<<<<<<<< Updated upstream:src/components/main-view/mainview.jsx
-import { MovieCard } from "../movie-card/moviecard";
-import { MovieView } from "../movie-view/movieview";
-========
 import { MovieCard } from "../movie-card/movie-card.jsx";
 import { MovieView } from "../movie-view/movie-view.jsx";
->>>>>>>> Stashed changes:src/components/main-view/main-view.jsx
+import { LoginView } from "../login-view/login-view.jsx";
 
 export const MainView = () => {
   const [movies, setMovies] = useState([]);
-
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies")
       .then(response => response.json())
       .then((data) => {
-<<<<<<<< Updated upstream:src/components/main-view/mainview.jsx
-        console.log(data);
-        setMovies(data);
-      })
-      .catch((error) => {
-        console.error('There was an error!', error);
-========
-        let moviesFromAPI = data.map((movie) => {
+        // Assign the result to the state
+        const moviesFromAPI = data.doc.map((doc) => {
           return {
-            _id: movie._id,
+            id: movie.id,
             Title: movie.Title,
             Description: movie.Description,
             Genre: {
@@ -37,11 +28,14 @@ export const MainView = () => {
           };
         });
         
-        console.log(moviesFromAPI);
+
         setMovies(moviesFromAPI);
->>>>>>>> Stashed changes:src/components/main-view/main-view.jsx
       });
-  }, []); // Added closing brackets for useEffect
+  }, []); 
+
+  if (!user) {
+    return <LoginView />;
+  }
 
   if (selectedMovie) {
     return (
@@ -54,7 +48,7 @@ export const MainView = () => {
     <div>
       {movies.map((movie) => (
         <MovieCard
-          key={movie._id}
+          key={movie.id}
           movie={movie}
           onMovieClick={(newSelectedMovie) => {
             setSelectedMovie(newSelectedMovie);
