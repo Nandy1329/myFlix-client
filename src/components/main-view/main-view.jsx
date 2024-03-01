@@ -1,4 +1,3 @@
-import React from "react";
 import { useState, useEffect } from "react";
 import { MovieCard } from "../movie-card/movie-card.jsx";
 import { MovieView } from "../movie-view/movie-view.jsx";
@@ -16,46 +15,77 @@ export const MainView = () => {
         // Assign the result to the state
         const moviesFromAPI = data.doc.map((doc) => {
           return {
-            id: movie.id,
-            Title: movie.Title,
-            Description: movie.Description,
+            _id: movies._id,
+            Title: movies.Title,
+            Description: movies.Description,
             Genre: {
-                Name: movie.Genre ? movie.Genre.Name : 'N/A' // Check if movie.Genre is not null or undefined
+                Name: movies.Genre ? movies.Genre.Name : 'N/A' // Check if movie.Genre is not null or undefined
             },
             Director: {
-                Name: movie.Director ? movie.Director.Name : 'N/A' // Check if movie.Director is not null or undefined
+                Name: movies.Director ? movies.Director.Name : 'N/A' // Check if movie.Director is not null or undefined
             }
           };
         });
-        
-
         setMovies(moviesFromAPI);
       });
   }, []); 
 
-  if (!user) {
-    return <LoginView />;
-  }
+ if (!user) {
+        return <LoginView  onLoggedIn={(user) => setUser(user)} />;
+    }
 
-  if (selectedMovie) {
+    // Show Movie Info (MovieView) with similar Movies 
+    if (selectedMovie) {
+        let similarMovies = movies.filter((movie) => 
+        {
+            return movie._id !== selectedMovie._id && movie.Genre.Name === selectedMovie.Genre.Name;
+        });
+        if(similarMovies.length === 0) {
+            return (
+                <>
+                    <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} /><br />
+                    <h2>Similar Movies</h2>
+                    <p>There are no similar movies.</p>
+                </>
+            );
+        } else {
+            return (
+                <>
+                    <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} /><br />
+                    <h2>Similar Movies</h2>
+                    {similarMovies.map((movie) => (
+                        <MovieCard
+                            key={movie._id}
+                            movie={movie}
+                            onMovieClick={(newSelectedMovie) => {
+                                setSelectedMovie(newSelectedMovie);
+                            }}
+                        />
+                    ))}
+                </>
+            );
+        }
+    }
+
+    if (movies.length === 0) {
+        return <div>
+            <p>The list is empty!</p>
+            <button onClick={() => { setUser(null); }}>Logout</button>
+        </div>;
+    }
+
     return (
-      <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} />
+        <div>
+            {movies.map((movie) => (
+                <MovieCard
+                    key={movie._id}
+                    movie={movie}
+                    onMovieClick={(newSelectedMovie) => {
+                        setSelectedMovie(newSelectedMovie);
+                    }}
+                />
+            ))}
+            <button onClick={() => { setUser(null); }}>Logout</button>
+        </div>
     );
-  }
-  if (movies.length === 0) return <div> The list is empty! </div>;
-
-  return (
-    <div>
-      {movies.map((movie) => (
-        <MovieCard
-          key={movie.id}
-          movie={movie}
-          onMovieClick={(newSelectedMovie) => {
-            setSelectedMovie(newSelectedMovie);
-          }}
-        />
-      ))}
-    </div>
-
-  );
-}
+};
