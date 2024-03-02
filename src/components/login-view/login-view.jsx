@@ -22,13 +22,16 @@ export const LoginView = ({ onLoggedIn }) => {
     })
     .then((response) => response.json())
     .then((data) => {
-            console.log("Login response", data);
-            onLoggedIn(data, user, data.token);
+        if (data.user) {
+            onLoggedIn(data.user, data.token);
+        } else {
+            alert("No such user");
+        }
     })
-    .catch((error) => {
-        console.log("Login failed");
+    .catch((e) => {
+        alert("Something went wrong");
     });
-  }
+};
 
   return (
     <form onSubmit={handleSubmit}>
@@ -55,4 +58,4 @@ export const LoginView = ({ onLoggedIn }) => {
       <button type="submit">Submit</button>
     </form>
     );
-}
+};
