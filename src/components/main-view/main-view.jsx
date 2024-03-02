@@ -11,9 +11,14 @@ export const MainView = () => {
   
   
   useEffect(() => {
-  fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies")
-    .then(response => response.json())
-    .then((data) => {
+    if (!token) return;
+
+    fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+
+      .then(response => response.json())
+      .then((data) => {
     // Assign the result to the state
     const moviesFromAPI = data.doc.map((doc) => {
       return {
@@ -30,12 +35,13 @@ export const MainView = () => {
     });
     setMovies(moviesFromAPI);
     });
-  }, []); 
+  }, [token]);
+
 
  if (!user) {
       return (
-        <>
-      <LoginView  onLoggedIn={(user) => {
+      <>
+      <LoginView  onLoggedIn={(user, token) => {
         setUser(user);
         setToken(token);
       }
@@ -95,7 +101,7 @@ export const MainView = () => {
           }}
         />
       ))}
-      <button onClick={() => { setUser(null); }}>Logout</button>
+      <button onClick={() => { setUser(null); setToken(null); }}>Logout</button>
     </div>
   );
 };  
