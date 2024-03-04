@@ -24,18 +24,17 @@ export const MainView = () => {
     // Assign the result to the state
     const moviesFromAPI = data.doc.map((doc) => {
       return {
-      _id: movies._id,
-      Title: movies.Title,
-      Description: movies.Description,
-      Genre: {
-        Name: movies.Genre ? movies.Genre.Name : 'N/A' // Check if movie.Genre is not null or undefined
-      },
-      Director: {
-        Name: movies.Director ? movies.Director.Name : 'N/A' // Check if movie.Director is not null or undefined
-      }
+        _id: doc._id,
+        Title: doc.Title,
+        Description: doc.Description,
+        Genre: {
+          Name: doc.Genre ? doc.Genre.Name : 'N/A' // Check if doc.Genre is not null or undefined
+        },
+        Director: {
+          Name: doc.Director ? doc.Director.Name : 'N/A' // Check if doc.Director is not null or undefined
+        }
       };
-    });
-    setMovies(moviesFromAPI);
+    });;
     });
   }, [token]);
 
