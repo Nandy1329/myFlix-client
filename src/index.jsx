@@ -1,12 +1,15 @@
-import { createRoot } from "react-dom/client";
-import { MainView } from "./components/main-view/main-view";
+
+import { createRoot } from 'react-dom/client';
+import { MainView } from './components/main-view/main-view.jsx';
 
 import "./index.scss";
 
 const MyFlixApp = () => {
-  return <main-view />;
+return <MainView />;
 };
+
 
 const container = document.querySelector("#root");
 const root = createRoot(container);
+
 root.render(<MyFlixApp />);
