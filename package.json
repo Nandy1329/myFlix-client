@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel src/index.html"
+    "start": "npx parcel src/index.html"
   },
   "author": "",
   "license": "ISC",
@@ -14,11 +14,9 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.23.9",
-    "@babel/core": "^7.23.9",
-    "@babel/preset-env": "^7.23.9",
-    "@babel/preset-react": "^7.23.3",
-    "@parcel/transformer-sass": "^2.11.0",
+    "@parcel/reporter-dev-server": "^2.12.0",
+    "@parcel/transformer-sass": "^2.12.0",
+    "parcel": "^2.12.0",
     "process": "^0.11.10"
   }
 }
