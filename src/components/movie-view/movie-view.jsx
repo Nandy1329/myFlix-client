@@ -17,7 +17,7 @@ export const MovieView = ({ movie, onBackClick }) => {
             <div>
                 <span>Director: </span>
                 <span>{movie.Director.Name}</span> {/* Access the director's name */}
-            </div>
+                                                                                       </div>
             <div>
                 <span>Genre: </span>
                 <span>{movie.Genre.Name}</span> {/* Access the genre's name */}
