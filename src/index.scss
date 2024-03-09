@@ -3,3 +3,11 @@ $color: #4682b4;
 .my-flix {
   color: $color;
 }
+
+.movie-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: auto;
+}

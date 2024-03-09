@@ -2,4 +2,12 @@
   color: #4682b4;
 }
 
+.movie-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: auto;
+}
+
 /*# sourceMappingURL=/src.78399e21.css.map */

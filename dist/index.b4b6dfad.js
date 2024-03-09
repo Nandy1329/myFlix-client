@@ -27174,6 +27174,7 @@ var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _react = require("react");
 var _reactDefault = parcelHelpers.interopDefault(_react);
 var _movieCardJsx = require("../movie-card/movie-card.jsx");
+var _movieCardJsxDefault = parcelHelpers.interopDefault(_movieCardJsx);
 var _s = $RefreshSig$();
 const MainView = ()=>{
     _s();
@@ -27181,15 +27182,19 @@ const MainView = ()=>{
     const [selectedMovie, setSelectedMovie] = (0, _react.useState)(null);
     (0, _react.useEffect)(()=>{
         fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies").then((response)=>response.json()).then((movies)=>{
-            // Ensure every movie has a Genre property
-            const moviesWithGenres = movies.map((movie)=>({
+            const moviesWithGenresAndDirectors = movies.map((movie)=>({
                     ...movie,
                     Genre: movie.Genre || {
                         Name: "Unknown",
                         Description: "No description available"
+                    },
+                    Director: movie.Director || {
+                        Name: "Unknown",
+                        Bio: "No bio available",
+                        Birth: "Unknown"
                     }
                 }));
-            setMovies(moviesWithGenres);
+            setMovies(moviesWithGenresAndDirectors);
         });
     }, []);
     const onMovieClick = (movie)=>{
@@ -27200,8 +27205,9 @@ const MainView = ()=>{
     };
     if (selectedMovie) return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
         children: [
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieCardJsx.MovieCard), {
-                movie: selectedMovie
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieCardJsxDefault.default), {
+                movie: selectedMovie,
+                onMovieClick: onMovieClick
             }, void 0, false, {
                 fileName: "src/components/main-view/main-view.jsx",
                 lineNumber: 34,
@@ -27228,17 +27234,17 @@ const MainView = ()=>{
                     children: movie.Title
                 }, void 0, false, {
                     fileName: "src/components/main-view/main-view.jsx",
-                    lineNumber: 44,
+                    lineNumber: 43,
                     columnNumber: 11
                 }, undefined)
             }, movie._id, false, {
                 fileName: "src/components/main-view/main-view.jsx",
-                lineNumber: 43,
+                lineNumber: 42,
                 columnNumber: 9
             }, undefined))
     }, void 0, false, {
         fileName: "src/components/main-view/main-view.jsx",
-        lineNumber: 41,
+        lineNumber: 40,
         columnNumber: 5
     }, undefined);
 };
@@ -27261,13 +27267,12 @@ $parcel$ReactRefreshHelpers$67b2.prelude(module);
 try {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "MovieCard", ()=>MovieCard);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _react = require("react");
 var _reactDefault = parcelHelpers.interopDefault(_react);
 var _propTypes = require("prop-types");
 var _propTypesDefault = parcelHelpers.interopDefault(_propTypes);
-const MovieCard = ({ movie, onMovieClick })=>{
+function MovieCard({ movie, onMovieClick }) {
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
         onClick: ()=>onMovieClick(movie),
         children: [
@@ -27277,22 +27282,34 @@ const MovieCard = ({ movie, onMovieClick })=>{
                 fileName: "src/components/movie-card/movie-card.jsx",
                 lineNumber: 7,
                 columnNumber: 7
-            }, undefined),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("img", {
-                src: movie.ImageURL,
-                alt: movie.Title
+            }, this),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                className: "movie-image",
+                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("img", {
+                    src: movie.ImageUrl,
+                    alt: "movie cover",
+                    style: {
+                        width: "100%",
+                        height: "auto"
+                    }
+                }, void 0, false, {
+                    fileName: "src/components/movie-card/movie-card.jsx",
+                    lineNumber: 9,
+                    columnNumber: 3
+                }, this)
             }, void 0, false, {
                 fileName: "src/components/movie-card/movie-card.jsx",
                 lineNumber: 8,
                 columnNumber: 7
-            }, undefined),
+            }, this),
+            "      ",
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
                 children: movie.Description
             }, void 0, false, {
                 fileName: "src/components/movie-card/movie-card.jsx",
-                lineNumber: 9,
-                columnNumber: 7
-            }, undefined),
+                lineNumber: 10,
+                columnNumber: 13
+            }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
                 children: [
                     "Genre: ",
@@ -27300,48 +27317,30 @@ const MovieCard = ({ movie, onMovieClick })=>{
                 ]
             }, void 0, true, {
                 fileName: "src/components/movie-card/movie-card.jsx",
-                lineNumber: 10,
+                lineNumber: 11,
                 columnNumber: 7
-            }, undefined),
+            }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
                 children: [
                     "Director: ",
-                    movie.Name
+                    movie.Director.Name
                 ]
             }, void 0, true, {
-                fileName: "src/components/movie-card/movie-card.jsx",
-                lineNumber: 11,
-                columnNumber: 7
-            }, undefined),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
-                children: movie.Bio
-            }, void 0, false, {
                 fileName: "src/components/movie-card/movie-card.jsx",
                 lineNumber: 12,
                 columnNumber: 7
-            }, undefined),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
-                children: [
-                    "Birth: ",
-                    movie.Birth
-                ]
-            }, void 0, true, {
-                fileName: "src/components/movie-card/movie-card.jsx",
-                lineNumber: 13,
-                columnNumber: 7
-            }, undefined)
+            }, this)
         ]
     }, void 0, true, {
         fileName: "src/components/movie-card/movie-card.jsx",
         lineNumber: 6,
         columnNumber: 5
-    }, undefined);
-};
+    }, this);
+}
 _c = MovieCard;
 MovieCard.propTypes = {
     movie: (0, _propTypesDefault.default).shape({
         Title: (0, _propTypesDefault.default).string.isRequired,
-        ImageURL: (0, _propTypesDefault.default).string.isRequired,
         Description: (0, _propTypesDefault.default).string.isRequired,
         Genre: (0, _propTypesDefault.default).shape({
             Name: (0, _propTypesDefault.default).string.isRequired
@@ -27351,9 +27350,9 @@ MovieCard.propTypes = {
             Bio: (0, _propTypesDefault.default).string.isRequired,
             Birth: (0, _propTypesDefault.default).string.isRequired
         }).isRequired
-    }).isRequired,
-    onMovieClick: (0, _propTypesDefault.default).func.isRequired
+    }).isRequired
 };
+exports.default = MovieCard;
 var _c;
 $RefreshReg$(_c, "MovieCard");
 
@@ -27362,7 +27361,7 @@ $RefreshReg$(_c, "MovieCard");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react":"21dqq","prop-types":"7wKI2","@parcel/transformer-js/src/esmodule-helpers.js":"dobAp","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"2gcd5","react/jsx-dev-runtime":"iTorj"}],"7wKI2":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","prop-types":"7wKI2","@parcel/transformer-js/src/esmodule-helpers.js":"dobAp","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"2gcd5"}],"7wKI2":[function(require,module,exports) {
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  *

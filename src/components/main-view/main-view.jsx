@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MovieCard } from '../movie-card/movie-card.jsx';
+import MovieCard from '../movie-card/movie-card.jsx';
 
 export const MainView = () => {
   const [movies, setMovies] = useState([]);
@@ -9,15 +9,15 @@ export const MainView = () => {
     fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies')
     .then(response => response.json())
     .then(movies => {
-      // Ensure every movie has a Genre property
-      const moviesWithGenres = movies.map(movie => ({
+      const moviesWithGenresAndDirectors = movies.map(movie => ({
         ...movie,
         Genre: movie.Genre || { Name: 'Unknown', Description: 'No description available' },
+        Director: movie.Director || { Name: 'Unknown', Bio: 'No bio available', Birth: 'Unknown' },
       }));
-
-      setMovies(moviesWithGenres);
+  
+      setMovies(moviesWithGenresAndDirectors);
     });
-}, []);
+  }, []);
 
   
   const onMovieClick = (movie) => {
@@ -31,12 +31,11 @@ export const MainView = () => {
   if (selectedMovie) {
     return (
       <div>
-        <MovieCard movie={selectedMovie} />
+        <MovieCard movie={selectedMovie} onMovieClick={onMovieClick} />
         <button onClick={onBackClick}>Back</button>
       </div>
     );
   }
-
   return (
     <div>
       {movies.map(movie => (

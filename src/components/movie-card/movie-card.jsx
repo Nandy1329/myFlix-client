@@ -1,24 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export const MovieCard = ({ movie, onMovieClick }) => {
+function MovieCard({ movie, onMovieClick }) {
   return (
     <div onClick={() => onMovieClick(movie)}>
       <h2>{movie.Title}</h2>
-      <img src={movie.ImageURL} alt={movie.Title} />
-      <p>{movie.Description}</p>
+      <div className="movie-image">
+  <img src={movie.ImageUrl} alt="movie cover" style={{ width: '100%', height: 'auto' }} />
+</div>      <p>{movie.Description}</p>
       <p>Genre: {movie.Genre.Name}</p>
-      <p>Director: {movie.Name}</p>
-      <p>{movie.Bio}</p>
-      <p>Birth: {movie.Birth}</p>
+      <p>Director: {movie.Director.Name}</p>
     </div>
   );
-};
+}
+
 
 MovieCard.propTypes = {
   movie: PropTypes.shape({
     Title: PropTypes.string.isRequired,
-    ImageURL: PropTypes.string.isRequired,
     Description: PropTypes.string.isRequired,
     Genre: PropTypes.shape({
       Name: PropTypes.string.isRequired,
@@ -26,8 +25,10 @@ MovieCard.propTypes = {
     Director: PropTypes.shape({
       Name: PropTypes.string.isRequired,
       Bio: PropTypes.string.isRequired,
-      Birth: PropTypes.string.isRequired,  
+      Birth: PropTypes.string.isRequired,
     }).isRequired,
+    ImageURL: PropTypes.string.isRequired,  
+    Featured: PropTypes.bool.isRequired, 
   }).isRequired,
-  onMovieClick: PropTypes.func.isRequired,
 };
+export default MovieCard;

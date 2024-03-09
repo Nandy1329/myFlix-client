@@ -28837,62 +28837,33 @@ if ("development" === 'production') {
 } else {
   module.exports = require('./cjs/react-dom.development.js');
 }
-},{"./cjs/react-dom.development.js":"../node_modules/react-dom/cjs/react-dom.development.js"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
-var bundleURL = null;
-function getBundleURLCached() {
-  if (!bundleURL) {
-    bundleURL = getBundleURL();
-  }
-  return bundleURL;
-}
-function getBundleURL() {
-  // Attempt to find the URL of the current script and use that as the base URL
-  try {
-    throw new Error();
-  } catch (err) {
-    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
-    if (matches) {
-      return getBaseURL(matches[0]);
+},{"./cjs/react-dom.development.js":"../node_modules/react-dom/cjs/react-dom.development.js"}],"../node_modules/react-dom/client.js":[function(require,module,exports) {
+'use strict';
+
+var m = require('react-dom');
+if ("development" === 'production') {
+  exports.createRoot = m.createRoot;
+  exports.hydrateRoot = m.hydrateRoot;
+} else {
+  var i = m.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+  exports.createRoot = function (c, o) {
+    i.usingClientEntryPoint = true;
+    try {
+      return m.createRoot(c, o);
+    } finally {
+      i.usingClientEntryPoint = false;
     }
-  }
-  return '/';
-}
-function getBaseURL(url) {
-  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)?\/[^/]+(?:\?.*)?$/, '$1') + '/';
-}
-exports.getBundleURL = getBundleURLCached;
-exports.getBaseURL = getBaseURL;
-},{}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
-var bundle = require('./bundle-url');
-function updateLink(link) {
-  var newLink = link.cloneNode();
-  newLink.onload = function () {
-    link.remove();
   };
-  newLink.href = link.href.split('?')[0] + '?' + Date.now();
-  link.parentNode.insertBefore(newLink, link.nextSibling);
-}
-var cssTimeout = null;
-function reloadCSS() {
-  if (cssTimeout) {
-    return;
-  }
-  cssTimeout = setTimeout(function () {
-    var links = document.querySelectorAll('link[rel="stylesheet"]');
-    for (var i = 0; i < links.length; i++) {
-      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
-        updateLink(links[i]);
-      }
+  exports.hydrateRoot = function (c, h, o) {
+    i.usingClientEntryPoint = true;
+    try {
+      return m.hydrateRoot(c, h, o);
+    } finally {
+      i.usingClientEntryPoint = false;
     }
-    cssTimeout = null;
-  }, 50);
+  };
 }
-module.exports = reloadCSS;
-},{"./bundle-url":"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"index.scss":[function(require,module,exports) {
-var reloadCSS = require('_css_loader');
-module.hot.dispose(reloadCSS);
-module.hot.accept(reloadCSS);
-},{"_css_loader":"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"../node_modules/react-is/cjs/react-is.development.js":[function(require,module,exports) {
+},{"react-dom":"../node_modules/react-dom/index.js"}],"../node_modules/react-is/cjs/react-is.development.js":[function(require,module,exports) {
 /** @license React v16.13.1
  * react-is.development.js
  *
@@ -29823,72 +29794,69 @@ if ("development" !== 'production') {
   // http://fb.me/prop-types-in-prod
   module.exports = require('./factoryWithThrowingShims')();
 }
-},{"react-is":"../node_modules/react-is/index.js","./factoryWithTypeCheckers":"../node_modules/prop-types/factoryWithTypeCheckers.js"}],"components/movie-card/moviecard.jsx":[function(require,module,exports) {
+},{"react-is":"../node_modules/react-is/index.js","./factoryWithTypeCheckers":"../node_modules/prop-types/factoryWithTypeCheckers.js"}],"components/movie-card/movie-card.jsx":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.MovieCard = void 0;
+exports.default = void 0;
+var _react = _interopRequireDefault(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-var MovieCard = exports.MovieCard = function MovieCard(_ref) {
+function MovieCard(_ref) {
   var movie = _ref.movie,
     onMovieClick = _ref.onMovieClick;
-  return /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/_react.default.createElement("div", {
     onClick: function onClick() {
-      onMovieClick(movie);
+      return onMovieClick(movie);
     }
-  }, movie.Title);
-};
-
-// define all the props constraints for the MovieCard
+  }, /*#__PURE__*/_react.default.createElement("h2", null, movie.Title), /*#__PURE__*/_react.default.createElement("div", {
+    className: "movie-image"
+  }, /*#__PURE__*/_react.default.createElement("img", {
+    src: movie.ImageUrl,
+    alt: "movie cover",
+    style: {
+      width: '100%',
+      height: 'auto'
+    }
+  })), "      ", /*#__PURE__*/_react.default.createElement("p", null, movie.Description), /*#__PURE__*/_react.default.createElement("p", null, "Genre: ", movie.Genre.Name), /*#__PURE__*/_react.default.createElement("p", null, "Director: ", movie.Director.Name));
+}
 MovieCard.propTypes = {
   movie: _propTypes.default.shape({
-    Title: _propTypes.default.string.isRequired
-  }).isRequired,
-  onMovieClick: _propTypes.default.func.isRequired
+    Title: _propTypes.default.string.isRequired,
+    Description: _propTypes.default.string.isRequired,
+    Genre: _propTypes.default.shape({
+      Name: _propTypes.default.string.isRequired
+    }).isRequired,
+    Director: _propTypes.default.shape({
+      Name: _propTypes.default.string.isRequired,
+      Bio: _propTypes.default.string.isRequired,
+      Birth: _propTypes.default.string.isRequired
+    }).isRequired,
+    ImageURL: _propTypes.default.string.isRequired,
+    Featured: _propTypes.default.bool.isRequired
+  }).isRequired
 };
-},{"prop-types":"../node_modules/prop-types/index.js"}],"components/movie-view/movieview.jsx":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.MovieView = void 0;
-var _propTypes = _interopRequireDefault(require("prop-types"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-var MovieView = exports.MovieView = function MovieView(_ref) {
-  var movie = _ref.movie,
-    onBackClick = _ref.onBackClick;
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("img", {
-    height: 300,
-    src: movie.image
-  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", null, "Title: "), /*#__PURE__*/React.createElement("span", null, movie.title)), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", null, "Description: "), /*#__PURE__*/React.createElement("span", null, movie.description)), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", null, "Genre: "), /*#__PURE__*/React.createElement("span", null, movie.genre)), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", null, "Director: "), /*#__PURE__*/React.createElement("span", null, movie.director)), /*#__PURE__*/React.createElement("button", {
-    onClick: onBackClick
-  }, " Back "));
-};
-MovieView.propTypes = {
-  movie: _propTypes.default.shape({
-    id: _propTypes.default.string.isRequired,
-    title: _propTypes.default.string.isRequired,
-    description: _propTypes.default.string.isRequired,
-    image: _propTypes.default.string.isRequired,
-    genre: _propTypes.default.string.isRequired,
-    director: _propTypes.default.string.isRequired
-  }).isRequired,
-  onBackClick: _propTypes.default.func.isRequired
-};
-},{"prop-types":"../node_modules/prop-types/index.js"}],"components/main-view/mainview.jsx":[function(require,module,exports) {
+var _default = exports.default = MovieCard;
+},{"react":"../node_modules/react/index.js","prop-types":"../node_modules/prop-types/index.js"}],"components/main-view/main-view.jsx":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.MainView = void 0;
-var _react = require("react");
-var _moviecard = require("../movie-card/moviecard");
-var _movieview = require("../movie-view/movieview");
+var _react = _interopRequireWildcard(require("react"));
+var _movieCard = _interopRequireDefault(require("../movie-card/movie-card.jsx"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : String(i); }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -29905,82 +29873,116 @@ var MainView = exports.MainView = function MainView() {
     selectedMovie = _useState4[0],
     setSelectedMovie = _useState4[1];
   (0, _react.useEffect)(function () {
-    fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies").then(function (response) {
-      return response.json();
-    }).then(function (data) {
-      console.log(data);
-      var moviesFromApi = data.map(function (movie) {
-        return {
-          id: movie._id,
-          title: movie.Title,
-          image: movie.ImagePath,
-          description: movie.Description,
-          year: movie.Year,
-          genre: movie.Genre ? movie.Genre.Name : 'N/A',
-          director: movie.Director ? movie.Director.Name : 'N/A'
-        };
-      });
-      setMovies(moviesFromApi);
-    }).catch(function (error) {
-      console.error('There was an error!', error);
-    });
-  }, []);
-  if (selectedMovie) {
-    return /*#__PURE__*/React.createElement(_movieview.MovieView, {
-      movie: selectedMovie,
-      onBackClick: function onBackClick() {
-        return setSelectedMovie(null);
-      }
-    });
-  }
-  if (movies.length === 0) return /*#__PURE__*/React.createElement("div", null, " The list is empty! ");
-  return /*#__PURE__*/React.createElement("div", null, movies.map(function (movie) {
-    return /*#__PURE__*/React.createElement(_moviecard.MovieCard, {
-      key: movie._id,
-      movie: movie,
-      onMovieClick: function onMovieClick(newSelectedMovie) {
-        setSelectedMovie(newSelectedMovie);
-      }
-    });
-  }));
-};
-},{"react":"../node_modules/react/index.js","../movie-card/moviecard":"components/movie-card/moviecard.jsx","../movie-view/movieview":"components/movie-view/movieview.jsx"}],"index.jsx":[function(require,module,exports) {
-"use strict";
-
-var _react = _interopRequireWildcard(require("react"));
-var _reactDom = _interopRequireDefault(require("react-dom"));
-require("./index.scss");
-var _mainview = require("./components/main-view/mainview.jsx");
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
-function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
-function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-var MyFlixApp = function MyFlixApp() {
-  var _useState = (0, _react.useState)([]),
-    _useState2 = _slicedToArray(_useState, 2),
-    movies = _useState2[0],
-    setMovies = _useState2[1];
-  (0, _react.useEffect)(function () {
     fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies').then(function (response) {
       return response.json();
-    }).then(function (data) {
-      return setMovies(data);
-    }).catch(function (error) {
-      return console.error('Error:', error);
+    }).then(function (movies) {
+      var moviesWithGenresAndDirectors = movies.map(function (movie) {
+        return _objectSpread(_objectSpread({}, movie), {}, {
+          Genre: movie.Genre || {
+            Name: 'Unknown',
+            Description: 'No description available'
+          },
+          Director: movie.Director || {
+            Name: 'Unknown',
+            Bio: 'No bio available',
+            Birth: 'Unknown'
+          }
+        });
+      });
+      setMovies(moviesWithGenresAndDirectors);
     });
   }, []);
-  return /*#__PURE__*/_react.default.createElement("div", {
-    className: "my-flix"
-  }, /*#__PURE__*/_react.default.createElement("div", null, "Welcome to myFlix app!"), /*#__PURE__*/_react.default.createElement(_mainview.MainView, {
-    movies: movies
+  var onMovieClick = function onMovieClick(movie) {
+    setSelectedMovie(movie);
+  };
+  var onBackClick = function onBackClick() {
+    setSelectedMovie(null);
+  };
+  if (selectedMovie) {
+    return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(_movieCard.default, {
+      movie: selectedMovie,
+      onMovieClick: onMovieClick
+    }), /*#__PURE__*/_react.default.createElement("button", {
+      onClick: onBackClick
+    }, "Back"));
+  }
+  return /*#__PURE__*/_react.default.createElement("div", null, movies.map(function (movie) {
+    return /*#__PURE__*/_react.default.createElement("div", {
+      key: movie._id,
+      onClick: function onClick() {
+        return onMovieClick(movie);
+      }
+    }, /*#__PURE__*/_react.default.createElement("h2", null, movie.Title));
   }));
 };
-},{"react":"../node_modules/react/index.js","react-dom":"../node_modules/react-dom/index.js","./index.scss":"index.scss","./components/main-view/mainview.jsx":"components/main-view/mainview.jsx"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","../movie-card/movie-card.jsx":"components/movie-card/movie-card.jsx"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+var bundleURL = null;
+function getBundleURLCached() {
+  if (!bundleURL) {
+    bundleURL = getBundleURL();
+  }
+  return bundleURL;
+}
+function getBundleURL() {
+  // Attempt to find the URL of the current script and use that as the base URL
+  try {
+    throw new Error();
+  } catch (err) {
+    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
+    if (matches) {
+      return getBaseURL(matches[0]);
+    }
+  }
+  return '/';
+}
+function getBaseURL(url) {
+  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)?\/[^/]+(?:\?.*)?$/, '$1') + '/';
+}
+exports.getBundleURL = getBundleURLCached;
+exports.getBaseURL = getBaseURL;
+},{}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
+var bundle = require('./bundle-url');
+function updateLink(link) {
+  var newLink = link.cloneNode();
+  newLink.onload = function () {
+    link.remove();
+  };
+  newLink.href = link.href.split('?')[0] + '?' + Date.now();
+  link.parentNode.insertBefore(newLink, link.nextSibling);
+}
+var cssTimeout = null;
+function reloadCSS() {
+  if (cssTimeout) {
+    return;
+  }
+  cssTimeout = setTimeout(function () {
+    var links = document.querySelectorAll('link[rel="stylesheet"]');
+    for (var i = 0; i < links.length; i++) {
+      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
+        updateLink(links[i]);
+      }
+    }
+    cssTimeout = null;
+  }, 50);
+}
+module.exports = reloadCSS;
+},{"./bundle-url":"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"index.scss":[function(require,module,exports) {
+var reloadCSS = require('_css_loader');
+module.hot.dispose(reloadCSS);
+module.hot.accept(reloadCSS);
+},{"_css_loader":"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"index.jsx":[function(require,module,exports) {
+"use strict";
+
+var _client = require("react-dom/client");
+var _mainView = require("./components/main-view/main-view.jsx");
+require("./index.scss");
+var MyFlixApp = function MyFlixApp() {
+  return /*#__PURE__*/React.createElement(_mainView.MainView, null);
+};
+var container = document.querySelector("#root");
+var root = (0, _client.createRoot)(container);
+root.render( /*#__PURE__*/React.createElement(MyFlixApp, null));
+},{"react-dom/client":"../node_modules/react-dom/client.js","./components/main-view/main-view.jsx":"components/main-view/main-view.jsx","./index.scss":"index.scss"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -30005,7 +30007,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64773" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60261" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
