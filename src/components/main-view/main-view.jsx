@@ -3,7 +3,12 @@ import PropTypes from 'prop-types';
 import { MovieCard } from '../movie-card/movie-card.jsx';
 
 export const MainView = () => {
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const storedToken = localStorage.getItem("token");
+  const [user, setUser] = useState(storedUser ? storedUser : null);
+  const [token, setToken] = useState(storedToken ? storedToken : null);
   const [movies, setMovies] = useState([]);
+  const [selectedMovie, setSelectedMovie] = useState(null)
 
   const onMovieClick = (movie) => {
     console.log(movie);
