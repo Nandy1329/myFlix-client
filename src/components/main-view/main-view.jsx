@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { MovieCard } from '../movie-card/movie-card.jsx';
+import { MovieView } from '../movie-view/movie-view.jsx';
+import { LoginView } from '../login-view/login-view.jsx';
+import { SignupView } from '../signup-view/signup-view.jsx';
 
 export const MainView = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -11,19 +13,22 @@ export const MainView = () => {
   const [selectedMovie, setSelectedMovie] = useState(null)
 
   const onMovieClick = (movie) => {
-    console.log(movie);
+    setSelectedMovie(movie);
   };
 
   useEffect(() => {
-    fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies')
+    if (!token) {
+      return;
+    }
+  
+    fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
       .then(response => response.json())
       .then((data) => {
         setMovies(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching data: ", error);
       });
-  }, []);
+  }, [token]); // Dependency array moved here
 
   return (
     <div>
@@ -39,20 +44,4 @@ export const MainView = () => {
       ))}
     </div>
   );
-};
-
-MovieCard.propTypes = {
-  movie: PropTypes.shape({
-    Title: PropTypes.string.isRequired,
-    ImageURL: PropTypes.string.isRequired,
-    Description: PropTypes.string.isRequired,
-    Genre: PropTypes.shape({
-      Name: PropTypes.string.isRequired,
-    Director: PropTypes.shape({
-      Name: PropTypes.string.isRequired,
-      Bio: PropTypes.string.isRequired,
-      Birth: PropTypes.string.isRequired,  
-    }).isRequired,
-  }).isRequired,
-})
 };
