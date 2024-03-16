@@ -5,19 +5,18 @@ import { LoginView } from '../login-view/login-view.jsx';
 import { SignupView } from '../signup-view/signup-view.jsx';
 
 export const MainView = () => {
-  const storedUser = localStorage.getItem("user");
+  const storedUser = JSON.parse(localStorage.getItem("user"));
   const storedToken = localStorage.getItem("token");
+  const [user, setUser] = useState(storedUser? storedUser:null);
+  const [token, setToken] = useState(storedToken? storedToken:null);
+  const [movies, setMovies] = useState ([]);
+  const [selectedMovie, setSelectedMovie] = useState(null);
 
-  const [user, setUser] = useState(storedUser? storedUser : null);
-  const [token, setToken] = useState(storedToken? storedToken : null);
-  const [movies, setMovies] = useState([]);
-  const [selectedMovie, setSelectedMovie] = useState(null)
 
-
-  useEffect(() => {
-    if (!token) {
+useEffect(() => {
+  if (!token) {
       return;
-    }
+  }
     // fetch movies
     fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies', {
       headers: {Authorization: `Bearer ${token}` },
