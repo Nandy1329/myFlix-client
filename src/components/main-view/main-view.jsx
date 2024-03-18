@@ -86,15 +86,8 @@ return (
       />
     ))}
 
-      <button
-        onClick={() => {
-          setUser(null);
-          setToken(null);
-          localStorage.clear();
-        }}
-        >
-        Logout
-        </button>
+    <button onClick={() => { setUser(null); setToken(null); }}>Logout</button>
+
   </div>
 );
 };
