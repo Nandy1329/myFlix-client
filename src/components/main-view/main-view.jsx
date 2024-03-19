@@ -4,6 +4,7 @@ import { MovieView } from '../movie-view/movie-view.jsx';
 import { LoginView } from '../login-view/login-view.jsx';
 import { SignupView } from '../signup-view/signup-view.jsx';
 
+
 export const MainView = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const storedToken = localStorage.getItem("token");
@@ -64,9 +65,9 @@ or
       <hr />
       <h2>Similar Movies</h2>
       {similarMovies.map((movie) => (<MovieCard key={movie.id} movie={movie}
-       onMovieClick={(setSelectedMovie) => {
-          setSelectedMovie(newSelectedMovie);
-        }} /> ))}
+       oonMovieClick={(newSelectedMovie) => {
+  setSelectedMovie(newSelectedMovie);
+}}/> ))}
       </>
       );
     }
@@ -74,20 +75,18 @@ or
       if (movies.length === 0) {
         return <div>Loading movies...</div>;
 }
+
 return (
   <div>
     {movies.map((movie) => (
       <MovieCard
-      key={movie.id}
-      movie={movie}
-      onMovieClick={(newSelectedMovie) => {
-        setSelectedMovie(newSelectedMovie);
-      }}
+        key={movie.id}
+        movie={movie}
+        onMovieClick={(newSelectedMovie) => {
+          setSelectedMovie(newSelectedMovie);
+        }}
       />
     ))}
-
-    <button onClick={() => { setUser(null); setToken(null); }}>Logout</button>
-
   </div>
 );
 };
