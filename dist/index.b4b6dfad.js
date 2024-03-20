@@ -28411,26 +28411,30 @@ const LoginView = ({ onLoggedIn })=>{
     const [username, setUsername] = (0, _react.useState)("");
     const [password, setPassword] = (0, _react.useState)("");
     const handleSubmit = (event)=>{
-        // this prevents the default behavior of the form which is to reload the entire page
+        console.log("handleSubmit called");
         event.preventDefault();
         const data = {
-            access: username,
-            secret: password
+            Username: username,
+            Password: password
         };
-        fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/login", {
+        console.log(username, password);
+        fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(data)
-        }).then((response)=>response.json()).then((data)=>{
+        }).then((response)=>{
+            if (!response.ok) throw new Error("Network response was not ok");
+            return response.json();
+        }).then((data)=>{
             if (data.user) {
                 localStorage.setItem("user", JSON.stringify(data.user));
                 localStorage.setItem("token", data.token);
                 onLoggedIn(data.user, data.token);
             } else alert("No such user");
-        }).catch((e)=>{
-            alert("Something went wrong");
+        }).catch((error)=>{
+            console.error("There has been a problem with your fetch operation:", error);
         });
     };
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("form", {
@@ -28447,13 +28451,13 @@ const LoginView = ({ onLoggedIn })=>{
                         minLength: "5"
                     }, void 0, false, {
                         fileName: "src/components/login-view/login-view.jsx",
-                        lineNumber: 42,
+                        lineNumber: 48,
                         columnNumber: 9
                     }, undefined)
                 ]
             }, void 0, true, {
                 fileName: "src/components/login-view/login-view.jsx",
-                lineNumber: 40,
+                lineNumber: 46,
                 columnNumber: 7
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("label", {
@@ -28466,13 +28470,13 @@ const LoginView = ({ onLoggedIn })=>{
                         required: true
                     }, void 0, false, {
                         fileName: "src/components/login-view/login-view.jsx",
-                        lineNumber: 52,
+                        lineNumber: 58,
                         columnNumber: 9
                     }, undefined)
                 ]
             }, void 0, true, {
                 fileName: "src/components/login-view/login-view.jsx",
-                lineNumber: 50,
+                lineNumber: 56,
                 columnNumber: 7
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
@@ -28480,13 +28484,13 @@ const LoginView = ({ onLoggedIn })=>{
                 children: "Submit"
             }, void 0, false, {
                 fileName: "src/components/login-view/login-view.jsx",
-                lineNumber: 60,
+                lineNumber: 65,
                 columnNumber: 7
             }, undefined)
         ]
     }, void 0, true, {
         fileName: "src/components/login-view/login-view.jsx",
-        lineNumber: 39,
+        lineNumber: 45,
         columnNumber: 5
     }, undefined);
 };
