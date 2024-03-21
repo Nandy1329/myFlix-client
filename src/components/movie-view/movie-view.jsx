@@ -1,28 +1,34 @@
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export const MovieView = ({ movie, onBackClick }) => {
-    return (
-        <div>
-            <h2>{movie.Title}</h2>
-            <img src={movie.Image} alt="movie cover"/>
-            <div>
-                <span>Title: </span>
-                <span>{movie.Title}</span>
-            </div>
-            <div>
-                <span>Description: </span>
-                <span>{movie.Description}</span>
-            </div>
-            <div>
-                <span>Director: </span>
-                <span>{movie.Director.Name}</span> {/* Access the director's name */}
-                                                                                       </div>
-            <div>
-                <span>Genre: </span>
-                <span>{movie.Genre.Name}</span> {/* Access the genre's name */}
-            </div>
-            <button onClick={onBackClick}>Back</button>
-        </div>
-    );
+  return (
+    <div>
+      <h2>{movie.Title}</h2>
+      <p>{movie.Description}</p>
+      <p>Genre: {movie.Genre.Name}</p>
+      <p>Director: {movie.Director.Name}</p>
+      <p>Bio: {movie.Director.Bio}</p>
+      <p>Birthday: {movie.Director.Birth}</p>
+      <img src={movie.Image} alt={movie.Title} style={{ width: '200px', height: 'auto' }} />
+      <button onClick={onBackClick}>Back</button>
+    </div>
+  );
+};
+
+MovieView.propTypes = {
+  movie: PropTypes.shape({
+    Title: PropTypes.string.isRequired,
+    Description: PropTypes.string.isRequired,
+    Genre: PropTypes.shape({
+      Name: PropTypes.string.isRequired,
+    }).isRequired,
+    Director: PropTypes.shape({
+      Name: PropTypes.string.isRequired,
+      Bio: PropTypes.string.isRequired,
+      Birth: PropTypes.string.isRequired,
+    }).isRequired,
+    Image: PropTypes.string.isRequired,
+  }).isRequired,
+  onBackClick: PropTypes.func.isRequired,
 };

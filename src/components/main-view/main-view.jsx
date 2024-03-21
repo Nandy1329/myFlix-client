@@ -1,48 +1,92 @@
-import React, { useState, useEffect } from 'react';
-import MovieCard from '../movie-card/movie-card.jsx';
+import { useState, useEffect } from 'react';
+import { MovieCard } from '../movie-card/movie-card.jsx';
+import { MovieView } from '../movie-view/movie-view.jsx';
+import { LoginView } from '../login-view/login-view.jsx';
+import { SignupView } from '../signup-view/signup-view.jsx';
+
 
 export const MainView = () => {
-  const [movies, setMovies] = useState([]);
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const storedToken = localStorage.getItem("token");
+  const [user, setUser] = useState(storedUser? storedUser:null);
+  const [token, setToken] = useState(storedToken? storedToken:null);
+  const [movies, setMovies] = useState ([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
 
-  useEffect(() => {
-    fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies')
-    .then(response => response.json())
-    .then(movies => {
-      const moviesWithGenresAndDirectors = movies.map(movie => ({
-        ...movie,
-        Genre: movie.Genre || { Name: 'Unknown', Description: 'No description available' },
-        Director: movie.Director || { Name: 'Unknown', Bio: 'No bio available', Birth: 'Unknown' },
-      }));
-  
-      setMovies(moviesWithGenresAndDirectors);
-    });
-  }, []);
 
-  
-  const onMovieClick = (movie) => {
-    setSelectedMovie(movie);
-  };
+useEffect(() => {
+  if (!token) {
+      return;
+  }
+    // fetch movies
+    fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies', {
+      headers: {Authorization: `Bearer ${token}` },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const moviesFromApi = data.map((movie) => {
+          return {
+            id: movie.id,
+            Title: movie.Title,
+            Description: movie.Description,
+            Genre: movie.Genre,
+            Director: movie.Director,
+            ImageUrl: movie.ImageUrl
+          };
+        });
 
-  const onBackClick = () => {
-    setSelectedMovie(null);
-  };
+        setMovies(moviesFromApi);
+      });
+  }, [token]);
 
-  if (selectedMovie) {
+  if (!user) {
     return (
-      <div>
-        <MovieCard movie={selectedMovie} onMovieClick={onMovieClick} />
-        <button onClick={onBackClick}>Back</button>
-      </div>
+      <>
+        <LoginView onLoggedIn={(user, token) => {
+          setUser(user);
+          setToken(token);
+        }}
+        />
+or  
+        <SignupView />
+      </>
     );
   }
-  return (
-    <div>
-      {movies.map(movie => (
-        <div key={movie._id} onClick={() => onMovieClick(movie)}>
-          <h2>{movie.Title}</h2>
-        </div>
-      ))}
-    </div>
-  );
+
+  if (selectedMovie) {
+    let similarMovies = movies.filter((movie) => {
+      return movie.id !== selectedMovie.id &&
+        movie.genre.some(genre => selectedMovie.genre.includes(genre));
+    })
+    return (
+        <>
+          <MovieView key={movies.id} movie={selectedMovie} onBackClick={() => 
+      {setSelectedMovie(null); }} />
+      <hr />
+      <h2>Similar Movies</h2>
+      {similarMovies.map((movie) => (<MovieCard key={movie.id} movie={movie}
+       oonMovieClick={(newSelectedMovie) => {
+  setSelectedMovie(newSelectedMovie);
+}}/> ))}
+      </>
+      );
+    }
+
+      if (movies.length === 0) {
+        return <div>Loading movies...</div>;
+}
+
+return (
+  <div>
+    {movies.map((movie) => (
+      <MovieCard
+        key={movie.id}
+        movie={movie}
+        onMovieClick={(newSelectedMovie) => {
+          setSelectedMovie(newSelectedMovie);
+        }}
+      />
+    ))}
+  </div>
+);
 };
