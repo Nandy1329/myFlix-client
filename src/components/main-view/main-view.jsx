@@ -60,8 +60,8 @@ export const MainView = () => {
               localStorage.setItem("user", JSON.stringify(user));
             }}
           />
-
-          <p>or create a new user account</p>
+          <br />
+          <p>Don't have an account? Create a new user account here</p>
 
           <SignupView />
         </Col>

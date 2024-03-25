@@ -3,32 +3,39 @@ import PropTypes from 'prop-types';
 
 export const MovieView = ({ movie, onBackClick }) => {
   return (
-    <div>
-      <h2>{movie.Title}</h2>
-      <p>{movie.Description}</p>
-      <p>Genre: {movie.Genre.Name}</p>
-      <p>Director: {movie.Director.Name}</p>
-      <p>Bio: {movie.Director.Bio}</p>
-      <p>Birthday: {movie.Director.Birth}</p>
-      <img src={movie.Image} alt={movie.Title} style={{ width: '200px', height: 'auto' }} />
-      <button onClick={onBackClick}>Back</button>
-    </div>
+    <Row className="mt-5" justify-content-center>
+      <Col md={5} >
+        <img src={movie.Image} alt="movie-poster" className="img-fluid"/>
+      </Col>
+      <Col md={3}>
+        <div className="movie-view">
+          <div className="movie-title">
+            <span className="label">Title: </span>
+            <span className="value">{movie.Title}</span>
+          </div>
+          <div className="movie-description">
+            <span className="label">Description: </span>
+            <span className="value">{movie.Description}</span>
+          </div>
+          <div className="movie-genre">
+            <span className="label">Genre: </span>
+            <span className="value">{movie.Genre.Name}</span>
+          </div>
+          <div className="movie-director">
+            <span className="label">Director: </span>
+            <span className="value">{movie.Director.Name}</span>
+          </div>
+          <div className="movie-bio">
+            <span className="label">Bio: </span>
+            <span className="value">{movie.Director.Bio}</span>
+          </div>
+          <div className="movie-birth">
+            <span className="label">Born: </span>
+            <span className="value">{movie.Director.Birth}</span>
+          </div>
+          <Button onClick={() => { onBackClick(null); }}>Back</Button>
+        </div>
+      </Col>
+    </Row>
   );
-};
-
-MovieView.propTypes = {
-  movie: PropTypes.shape({
-    Title: PropTypes.string.isRequired,
-    Description: PropTypes.string.isRequired,
-    Genre: PropTypes.shape({
-      Name: PropTypes.string.isRequired,
-    }).isRequired,
-    Director: PropTypes.shape({
-      Name: PropTypes.string.isRequired,
-      Bio: PropTypes.string.isRequired,
-      Birth: PropTypes.string.isRequired,
-    }).isRequired,
-    Image: PropTypes.string.isRequired,
-  }).isRequired,
-  onBackClick: PropTypes.func.isRequired,
-};
+}
