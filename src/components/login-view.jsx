@@ -11,16 +11,15 @@ export const LoginView = ({ onLoggedIn }) => {
       username: username,
       password: password
     };
-
-    fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/login", {
+    fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username: username,
         password: password,
-     
       })
     })
+    
       .then((response) => response.json())
       .then((data) => {
         console.log("Login Response:", data)

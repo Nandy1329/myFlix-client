@@ -24,6 +24,7 @@ export const LoginView = ({ onLoggedIn }) => {
       },
       body: JSON.stringify(data),
     })
+      .then((response) => response.json())
       .then((data) => {
         if (data.user) {
           localStorage.setItem("user", JSON.stringify(data.user));
@@ -38,11 +39,10 @@ export const LoginView = ({ onLoggedIn }) => {
       });
   };
 
-
   return (
     <Form onSubmit={handleSubmit}>
-    <h1>Login</h1>
-      <Form.Group controlId="formUsername">
+      <h1>Login</h1>
+      <Form.Group controlId="loginFormUsername">
         <Form.Label>Username:</Form.Label>
         <Form.Control
           type="text"
@@ -53,17 +53,16 @@ export const LoginView = ({ onLoggedIn }) => {
         />
       </Form.Group>
       <br />
-      <Form.Group controlId="formPassword">
-        <Form.Label>Password:</Form.Label>
-        <Form.Control
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </Form.Group>
+      <Form.Group controlId="loginFormPassword">
+  <Form.Label>Password:</Form.Label>
+  <Form.Control
+    type="password"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    required
+  />
+</Form.Group>
       <br />
-<Button type="submit">Login</Button>
+      <Button type="submit">Login</Button>
     </Form>
-  );
-}
+  );};
