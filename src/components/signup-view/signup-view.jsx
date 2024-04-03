@@ -3,8 +3,8 @@ import { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
-export const SignupView = ({ token }) => {
-        const [username, setUsername] = useState("");
+export const SignupView = ({ token, id }) => {
+    const [username, setUsername] = useState("");
         const [password, setPassword] = useState("");
         const [email, setEmail] = useState ("");
         const [birthday, setBirthday] = useState("");
@@ -38,10 +38,11 @@ export const SignupView = ({ token }) => {
                 });
         };
 
-        return (
-                <Form onSubmit={handleSubmit}>
-                    <h1>Create an account</h1>
-                    <Form.Group controlId="formUsername">
+     
+  return (
+    <Form onSubmit={handleSubmit}>
+      <h1>Create an account</h1>
+      <Form.Group controlId={`formUsername${id}`}>
                         <Form.Label>Username:</Form.Label>
                         <Form.Control
                             type="text"
@@ -52,7 +53,8 @@ export const SignupView = ({ token }) => {
                         />
                     </Form.Group>
             
-                    <Form.Group controlId="formPassword">
+                 
+      <Form.Group controlId={`formPassword${id}`}>
                         <Form.Label>Password:</Form.Label>
                         <Form.Control
                             type="password"
@@ -63,7 +65,7 @@ export const SignupView = ({ token }) => {
                         />
                     </Form.Group>
             
-                    <Form.Group controlId="formEmail">
+                    <Form.Group controlId={`formEmail${id}`}>
                         <Form.Label>Email:</Form.Label>
                         <Form.Control
                             type="email"
@@ -73,7 +75,7 @@ export const SignupView = ({ token }) => {
                         />
                     </Form.Group>
             
-                    <Form.Group controlId="formBirthday">
+                    <Form.Group controlId={`formBirthday${id}`}>
                         <Form.Label>Birthday:</Form.Label>
                         <Form.Control
                             type="date"

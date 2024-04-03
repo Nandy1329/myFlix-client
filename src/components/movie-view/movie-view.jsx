@@ -1,7 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
 
 export const MovieView = ({ movie, onBackClick }) => {
+  // Check if movie is null or undefined
+  if (!movie) {
+    return <div>Loading...</div>;
+  }
+
+  // Now it's safe to access properties of movie
   return (
     <Row className="mt-5" justify-content-center>
       <Col md={5} >
