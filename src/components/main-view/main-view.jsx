@@ -20,7 +20,8 @@ export const MainView = () => {
       return;
     }
 
-    fetch('https://cine-verse-b8832aa84c3e.herokuapp.com/movies', { headers: { Authorization: 'Bearer${token}' } })
+    fetch('https://cine-verse-b8832aa84c3e.herokuapp.com/movies',
+     { headers: { Authorization: 'Bearer${token}' } })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
@@ -38,26 +39,33 @@ export const MainView = () => {
   return (
     <Row className='justify-content-md-center'>
       {!user ? (
-        <Col md={5}>
-          <LoginView onLoggedIn={(user, token) => {
-            setUser(user);
-            setToken(token);
-          }}
-          />
-          or Sign Up as a New User
-          <SignupView />
-        </Col>
+        <>
+          <Col md={5}>
+            <LoginView onLoggedIn={(user, token) => {
+              setUser(user);
+              setToken(token);
+            }}
+            />
+          </Col>
+          or
+          <Col md={5}>
+            <div>or Sign Up as a New User</div>
+            <SignupView />
+          </Col>
+        </>
       ) : selectedMovie ? (
-        <Col>
-          <MovieView
-            movieData={selectedMovie}
-            onBackClick={() => setSelectedMovie(null)}
-          />
-        </Col>
+  <Col md={8}>
+    <MovieView
+      style={{ border: "1px solid green"}}
+      movie={selectedMovie}
+      onBackClick={() => setSelectedMovie(null)}
+    />
+  </Col>
       ) : movies.length === 0 ? (
         <div>There are no movies!</div>
       ) : (
-        <>{movies.map((movie) => (
+        <>
+        {movies.map((movie) => (
           <Col key={movie._id} md={4} className='mb-5'>
             <MovieCard
               movieData={movie}

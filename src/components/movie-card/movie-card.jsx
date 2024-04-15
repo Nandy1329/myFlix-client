@@ -5,17 +5,16 @@ export const MovieCard = ({ movieData, onMovieClick }) => {
     return (
         <Card className='h-100'>
             <Card.Body>
-                <Card.Title>{movieData.title}</Card.Title>
+                <Card.Title>{movieData.Title}</Card.Title>
                 <Button onClick={() => onMovieClick(movieData)} variant="primary" className='back-button'> Open </Button>
             </Card.Body>
         </Card>
-
     )
 };
 
 MovieCard.propTypes = {
     movieData: PropTypes.shape({
-        title: PropTypes.string
+        Title: PropTypes.string
     }).isRequired,
     onMovieClick: PropTypes.func.isRequired
 };
