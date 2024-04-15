@@ -1,82 +1,86 @@
-import { useState, useEffect } from 'react';
-import { MovieCard } from '../movie-card/movie-card';
-import { MovieView } from '../movie-view/movie-view';
-import { LoginView } from '../login-view/login-view';
-import { SignupView } from '../signup-view/signup-view';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import React, { useState, useEffect } from 'react';
+import { Row, Col } from 'react-bootstrap';
+import { MovieCard } from '../movie-card/movie-card.jsx';
+import { MovieView } from '../movie-view/movie-view.jsx';
+import { LoginView } from '../login-view/login-view.jsx';
+import { SignupView } from '../signup-view/signup-view.jsx';
 
 export const MainView = () => {
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const storedToken = localStorage.getItem("token");
-  const [user, setUser] = useState(storedUser ? storedUser : null);
-  const [token, setToken] = useState(storedToken ? storedToken : null);
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
 
-
+  // Load user and token from local storage when component mounts
   useEffect(() => {
-    if (!token) {
-      return;
+    const token = localStorage.getItem('token');
+    if (token) {
+      setUser(localStorage.getItem('user'));
+      setToken(token);
     }
+  }, []);
 
-    fetch('https://cine-verse-b8832aa84c3e.herokuapp.com/movies',
-     { headers: { Authorization: 'Bearer${token}' } })
-      .then((response) => response.json())
+  // Fetch movies from API when component mounts
+  useEffect(() => {
+    fetch('https://cine-verse-b8832aa84c3e.herokuapp.com/movies')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
       .then((data) => {
-        console.log(data);
-        const moviesFromApi = data.map((doc) => {
-          return {
-            _id: doc.key,
-            title: doc.Title,
-            description: doc.Description
-          };
-        });
+        const moviesFromApi = data.docs.map((doc) => ({
+          id: doc.key,
+          title: doc.Title,
+          description: doc.Description
+        }));
         setMovies(moviesFromApi);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
       });
-  }, [token]);
+  }, []);
+
+  if (!user) {
+    return (
+      <>
+        <LoginView
+          onLoggedIn={(user, token) => {
+            setUser(user);
+            setToken(token);
+          }}
+        />
+        <p>Or please sign up as a new user below:</p>
+        <SignupView />
+      </>
+    );
+  }
+  
 
   return (
-    <Row className='justify-content-md-center'>
-      {!user ? (
-        <>
-          <Col md={5}>
-            <LoginView onLoggedIn={(user, token) => {
-              setUser(user);
-              setToken(token);
-            }}
-            />
-          </Col>
-          or
-          <Col md={5}>
-            <div>or Sign Up as a New User</div>
-            <SignupView />
-          </Col>
-        </>
-      ) : selectedMovie ? (
-  <Col md={8}>
-    <MovieView
-      style={{ border: "1px solid green"}}
-      movie={selectedMovie}
-      onBackClick={() => setSelectedMovie(null)}
-    />
-  </Col>
-      ) : movies.length === 0 ? (
-        <div>There are no movies!</div>
+    <Row className="main-view justify-content-md-center">
+      {selectedMovie ? (
+        <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} />
       ) : (
         <>
-        {movies.map((movie) => (
-          <Col key={movie._id} md={4} className='mb-5'>
-            <MovieCard
-              movieData={movie}
-              onMovieClick={(newSelectedMovie) => {
-                setSelectedMovie(newSelectedMovie);
-              }} />
-          </Col>
-        ))}
-          <button onClick={() => { setUser(null); setToken(null); localStorage.clear(); }}>Logout</button>
+          {movies.map((movie) => (
+            <Col md={3} key={movie.id}>
+              <MovieCard movie={movie} onMovieClick={(movie) => setSelectedMovie(movie)} />
+            </Col>
+          ))}
+        </>
+      )}
+      <p>Or please sign up as a new user below:</p>
+      <SignupView />
+      {user && (
+        <>
+          <span>Logged in as: {user}</span>
+          <br />
+          <br />
+          <button onClick={() => { setUser(null); localStorage.removeItem('token'); localStorage.removeItem('user'); }}>Log Out</button>
         </>
       )}
     </Row>
-  )
-};
+    );
+  } 
