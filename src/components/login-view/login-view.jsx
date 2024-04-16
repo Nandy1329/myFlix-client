@@ -1,3 +1,4 @@
+import React from "react";
 import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -20,27 +21,17 @@ export const LoginView = ({ onLoggedIn }) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Login response: ", data);
-        if (data.user) {
-          localStorage.setItem("user", JSON.stringify(data.user));
-          localStorage.setItem("token", data.token);
-          onLoggedIn(data.user, data.token);
-        } else {
-          alert("No such user");
-        }
-      })
-      .catch((e) => {
-        alert("Something went wrong");
-      });
-
-  };
+    }).then((response) => {
+      if (response.ok) {
+        onLoggedIn(username);
+      } else {
+        alert("Incorrect username or password");
+      }
+    });
 
   return (
     <form onSubmit={handleSubmit}>
-      <Form.Label>Login:</Form.Label>
+      <h1>Login</h1>
       <Form.Group controlId='formUsername'>
        <Form.Label>Username:</Form.Label> 
         <Form.Control
@@ -51,8 +42,6 @@ export const LoginView = ({ onLoggedIn }) => {
           minLength={3}
         />
       </Form.Group>
-
-
      <Form.Group controlId='formPassword'>
         <Form.Label>Password:</Form.Label>
         <Form.Control
@@ -67,4 +56,4 @@ export const LoginView = ({ onLoggedIn }) => {
       </Button>
     </form>
   );
-}
+}};
