@@ -70,26 +70,23 @@ export const MainView = () => {
                 <hr />
                 <h3> SimilarMovies </h3>
                 <Row>
-                  {movies
-                    .filter((movie) => {
-                      return (
-                        movie.id !== selectedMovie.id &&
-                        movie.genre.some((genre) =>
-                          selectedMovie.genre.includes(genre)
-                        )
-                      );
-                    })
-                    .map((movie) => (
-                      <Col key={movie.id} md={4}>
-                        <MovieCard
-                          // key={movie.id}
-                          movie={movie}
-                          onMovieClick={(newSelectedMovie) => {
-                            setSelectedMovie(newSelectedMovie);
-                          }}
-                        />
-                      </Col>
-                    ))}
+                {movies
+  .filter((movie) => {
+    return (
+      movie._id !== selectedMovie._id &&
+      movie.Genre.Name === selectedMovie.Genre.Name
+    );
+  })
+  .map((movie) => (
+    <Col key={movie._id} md={4}>
+      <MovieCard
+        movie={movie}
+        onMovieClick={(newSelectedMovie) => {
+          setSelectedMovie(newSelectedMovie);
+        }}
+      />
+    </Col>
+  ))}
                 </Row>
               </Col>
             </Row>
