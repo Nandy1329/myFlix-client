@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Button, Form } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 
 export const SignupView = () => {
   const [username, setUsername] = useState("");
@@ -17,19 +18,18 @@ export const SignupView = () => {
       Birthday: birthday
     };
 
-    fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users", {
+    fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users', {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      }
+      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json" }
     }).then((response) => {
       if (response.ok) {
-        alert("Signup successful");
+        alert("Signup Successful");
         window.location.reload();
       } else {
-        alert("Signup failed");
+        alert("Signup failed, try again");
       }
-    });
+    })
   };
 
   return (

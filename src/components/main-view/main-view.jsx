@@ -8,118 +8,118 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 
 export const MainView = () => {
-    const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("token");
-    const [user, setUser] = useState(storedUser ? storedUser : null);
-    const [token, setToken] = useState(storedToken ? storedToken : null);
-    const [movies, setMovies] = useState([]);
-    const [selectedMovie, setSelectedMovie] = useState(null);
+  const storedUser = localStorage.getItem("user");
+  const storedToken = localStorage.getItem("token");
 
-    useEffect(() => {
-        if (!token) {
-            return;
-        }
-        fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/Movies", {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                const moviesFromApi = data.map((movie) => {
-                    return {
-                        _id: movie._id,
-                        Title: movie.Title,
-                        ImagePath: movie.ImagePath,
-                        Description: movie.Description,
-                        Genre: {
-                            Name: movie.Genre.Name,
-                        },
-                        Director: {
-                            Name: movie.Director.Name,
-                        },
-                    };
-
-                setMovies(moviesFromApi);
+  const [user, setUser] = useState(storedUser ? storedUser : null);
+  const [token, setToken] = useState(storedToken ? storedToken : null);
+  const [movies, setMovies] = useState([]);
+  const [selectedMovie, setSelectedMovie] = useState(null);
+    
+  useEffect(() => {
+    if (!token) {
+        return;
+    }
+    fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies", {
+        headers: { Authorization: `Bearer ${token}` },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            const moviesFromApi = data.map((movie) => {
+                return {
+                    _id: movie._id,
+                    Title: movie.Title,
+                    ImagePath: movie.ImagePath,
+                    Description: movie.Description,
+                    Genre: {
+                        Name: movie.Genre.Name,
+                    },
+                    Director: {
+                        Name: movie.Director.Name,
+                    },
+                };
             });
-    }, [token]);
+            setMovies(moviesFromApi);
+        });
+  }, [token]);
 
-    return (
-        <Row>
-          <Row className="justify-content-md-center">
-            {!user ? (
-              <Col md={4}>
-                <LoginView
-                  onLoggedIn={(user, token) => {
-                    setUser(user);
-                    setToken(token);
-                  }}
-                />
-                <br />
+  return (
+    <Row>
+      <Row className="justify-content-md-center">
+        {!user ? (
+          <Col md={4}>
+            <LoginView
+              onLoggedIn={(user, token) => {
+                setUser(user);
+                setToken(token);
+              }}
+            />
+            <br />
+            <hr />
+            <SignupView />
+          </Col>
+        ) : selectedMovie ? (
+          <Col md={8}>
+            <MovieView
+              key={movies.id}
+              movie={selectedMovie}
+              onBackClick={() => setSelectedMovie(null)}
+            />
+            <Row>
+              <Col className="mb-5">
                 <hr />
-                <SignupView />
-              </Col>
-            ) : selectedMovie ? (
-              <Col md={8}>
-                <MovieView
-                  key={movies.id}
-                  movie={selectedMovie}
-                  onBackClick={() => setSelectedMovie(null)}
-                />
+                <h3> SimilarMovies </h3>
                 <Row>
-                  <Col className="mb-5">
-                    <hr />
-                    <h3> SimilarMovies </h3>
-                    <Row>
-                      {movies
-                        .filter((movie) => {
-                          return (
-                            movie.id !== selectedMovie.id &&
-                            movie.genre.some((genre) =>
-                              selectedMovie.genre.includes(genre)
-                            )
-                          );
-                        })
-                        .map((movie) => (
-                          <Col key={movie.id} md={4}>
-                            <MovieCard
-                              // key={movie.id}
-                              movie={movie}
-                              onMovieClick={(newSelectedMovie) => {
-                                setSelectedMovie(newSelectedMovie);
-                              }}
-                            />
-                          </Col>
-                        ))}
-                    </Row>
-                  </Col>
+                  {movies
+                    .filter((movie) => {
+                      return (
+                        movie.id !== selectedMovie.id &&
+                        movie.genre.some((genre) =>
+                          selectedMovie.genre.includes(genre)
+                        )
+                      );
+                    })
+                    .map((movie) => (
+                      <Col key={movie.id} md={4}>
+                        <MovieCard
+                          // key={movie.id}
+                          movie={movie}
+                          onMovieClick={(newSelectedMovie) => {
+                            setSelectedMovie(newSelectedMovie);
+                          }}
+                        />
+                      </Col>
+                    ))}
                 </Row>
               </Col>
-            ) : movies.length === 0 ? (
-              <div>The list is empty!</div>
-            ) : (
-              <>
-                {movies.map((movie) => (
-                  <Col className="mb-5" key={movie.id} md={3}>
-                    <MovieCard
-                      movie={movie}
-                      onMovieClick={(newSelectedMovie) => {
-                        setSelectedMovie(newSelectedMovie);
-                      }}
-                    />
-                  </Col>
-                ))}
-                <Button
-                  onClick={() => {
-                    setUser(null);
-                    setToken(null);
-                    localStorage.clear();
+            </Row>
+          </Col>
+        ) : movies.length === 0 ? (
+          <div>The list is empty!</div>
+        ) : (
+          <>
+            {movies.map((movie) => (
+              <Col className="mb-5" key={movie.id} md={3}>
+                <MovieCard
+                  movie={movie}
+                  onMovieClick={(newSelectedMovie) => {
+                    setSelectedMovie(newSelectedMovie);
                   }}
-                >
-                  Logout
-                </Button>
-              </>
-            )}
-          </Row>
-        </Row>
-      );
-    });
+                />
+              </Col>
+            ))}
+            <Button
+              onClick={() => {
+                setUser(null);
+                setToken(null);
+                localStorage.clear();
+              }}
+            >
+              Logout
+            </Button>
+          </>
+        )}
+      </Row>
+    </Row>
+  );
 };
