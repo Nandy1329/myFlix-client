@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
+import { Button, Col, Row } from 'react-bootstrap';
+import { useParams } from 'react-router";
+import { Link } from 'react-router-dom';
+import './movie-view.scss';
 
 export const MovieView = ({ movie, onBackClick }) => {
   // Check if movie is null or undefined
