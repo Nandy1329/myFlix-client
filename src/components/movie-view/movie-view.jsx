@@ -1,22 +1,20 @@
 import PropTypes from 'prop-types';
 import { Button, Col, Row } from 'react-bootstrap';
-import { useParams } from 'react-router";
+import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import './movie-view.scss';
 
-export const MovieView = ({ movie, onBackClick }) => {
-  // Check if movie is null or undefined
-  if (!movie) {
-    return <div>Loading...</div>;
-  }
+export const MovieView = ({ movies }) => {
+  const { movieId } = useParams();
+  const movie = movies.find((movie) => movie.id === movieId);
 
   return (
     <Row className="my-5 justify-content-center">
       <Col md={5}>
-        <img src={movie.ImagePath} alt="movie cover" className="img-fluid" />
+      <img src={movie.ImagePath} alt="movie cover" className="img-fluid" />
       </Col>
       <Col md={3}>
-        <div className="my-1">
+        <div className="my-1" m-3 mt-3>
           <span className="h1">{movie.Title}</span>
         </div>
         <div className="my-1">
@@ -35,8 +33,8 @@ export const MovieView = ({ movie, onBackClick }) => {
           <span className="h6">Year: </span>
           <span>{movie.Year}</span>
         </div>
-        <Button onClick={onBackClick} variant="link">Back</Button>
-      </Col>
+<button className="back-button" >Back</button>    
+  </Col>
     </Row>
   );
 }
