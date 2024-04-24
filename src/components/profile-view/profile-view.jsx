@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button, Row, Col, Card } from "react-bootstrap";
 import { MovieCard } from "../movie-card/movie-card";
-import "./profile-view.scss";
+
 
 
 export const ProfileView = ({ token, user, movies }) => {

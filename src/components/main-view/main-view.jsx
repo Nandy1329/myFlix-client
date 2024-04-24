@@ -15,7 +15,7 @@ export const MainView = () => {
   const [movies, setMovies] = useState([]);
   const [user, setUser] = useState(storedUser ? storedUser : null);
   const [token, setToken] = useState(storedToken ? storedToken : null);
-  
+
   const handleOnLoggedIn = (user, token) => {
     setUser(user);
     setToken(token);
@@ -50,14 +50,15 @@ export const MainView = () => {
   }, [token]);
 
   return (
-    <BrowserRouter>
-    <NavigationBar user={user}
-     onLoggedOut={() => {
+<BrowserRouter>
+  <NavigationBar 
+    user={user}
+    onLoggedOut={() => {
       setUser(null);
       setToken(null);
       localStorage.clear();
     }}
-    />
+  />
       <Row className="justify-content-md-center">
         <Routes>
           <Route
@@ -102,9 +103,9 @@ export const MainView = () => {
                   <>
                     {movies.map((movie) => (
                       <Col className="mb-4" key={movie.id} md={3} sm={12}>
-                        <MovieCard 
-                        movie={movie} 
-                        isFavorite={user.favoriteMovies.includes(movie.title)}
+                        <MovieCard
+                          movie={movie}
+                          isFavorite={user?.favoriteMovies?.includes(movie.title)}
                         />
                       </Col>
                     ))}
@@ -121,11 +122,7 @@ export const MainView = () => {
                   <Navigate to="/login" replace />
                 ) : (
                   <Col md={8}>
-                    <ProfileView
-                      localUser={user}
-                      movies={movies}
-                      token={token}
-                    />
+                    <ProfileView localUser={user} movies={movies} token={token} />
                   </Col>
                 )}
               </>
@@ -134,5 +131,4 @@ export const MainView = () => {
         </Routes>
       </Row>
     </BrowserRouter>
-  );
-}
+  )};
