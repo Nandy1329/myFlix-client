@@ -2,13 +2,10 @@ import PropTypes from "prop-types";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
 import { Button, Row, Col } from 'react-bootstrap';
-import { useNavigate } from "react-router-dom";
 
 export const MovieView = ({ movies }) => {
   const { movieId } = useParams();
   const movie = movies.find((movie) => movie.id === Number(movieId));
-
-  const navigate= useNavigate();
 
   return (
     movie ? (
@@ -17,7 +14,7 @@ export const MovieView = ({ movies }) => {
           <img src={movie.ImagePath} alt="movie cover" className="img-fluid" />
         </Col>
         <Col md={3}>
-          <div className="my-1" m-3 mt-3>
+          <div className="my-1 m-3 mt-3">
             <span className="h1">{movie.Title}</span>
           </div>
           <div className="my-1">
@@ -37,13 +34,11 @@ export const MovieView = ({ movies }) => {
             <span>{movie.Year}</span>
           </div>
           <Link to={`/`}>
-          <Button className="mt-3 w-100 primaryButton" variant="primary" onClick={() => navigate(-1)}>Back</Button> 
+            <button className="back-button">Back</button> 
           </Link>
         </Col>
       </Row>
-    ) : (
-      <div>Movie not found</div>
-    )
+    ) : null
   );
 }
 
