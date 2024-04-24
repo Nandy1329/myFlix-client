@@ -8,7 +8,7 @@ export const NavigationBar = ({ user, onLoggedOut }) => {
             <Container>
                 <Navbar.Brand as={Link} to="/">MyFlix</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Nav className="me-auto"> {/* Fix: Added equal sign after className */}
+                <Nav className="me-auto"> 
                     {!user && ( 
                         <>
                             <Nav.Link as={Link} to="/login">Login</Nav.Link>

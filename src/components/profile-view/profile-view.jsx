@@ -1,10 +1,8 @@
-import React from "react";
-import { useEffect, useState } from "react";
-import { Button, Card, Container } from "react-bootstrap";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import { FavoriteMovies } from "./favorite-movies";
-import { UpdateUser } from "./update-user";
+import { useState, useEffect } from "react";
+import { Button, Row, Col, Card } from "react-bootstrap";
+import { MovieCard } from "../movie-card/movie-card";
+import "./profile-view.scss";
+
 
 export const ProfileView = ({ token, user, movies }) => {
     const storedUser = JSON.parse(localStorage.getItem("user"));

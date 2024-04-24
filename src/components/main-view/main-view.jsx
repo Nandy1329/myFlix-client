@@ -6,7 +6,7 @@ import { SignupView } from "../signup-view/signup-view";
 import { NavigationBar } from "../navigation-bar/navigation-bar";
 import { Row, Col } from "react-bootstrap";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-
+import { ProfileView } from "../profile-view/profile-view";
 
 
 export const MainView = () => {
@@ -15,7 +15,7 @@ export const MainView = () => {
   const [movies, setMovies] = useState([]);
   const [user, setUser] = useState(storedUser ? storedUser : null);
   const [token, setToken] = useState(storedToken ? storedToken : null);
-  const baseUrl = 'https://myflix-ghibli-7c8d5913b80b.herokuapp.com';
+  
   const handleOnLoggedIn = (user, token) => {
     setUser(user);
     setToken(token);
@@ -51,7 +51,8 @@ export const MainView = () => {
 
   return (
     <BrowserRouter>
-    <NavigationBar user={user} onLoggedOut={() => {
+    <NavigationBar user={user}
+     onLoggedOut={() => {
       setUser(null);
       setToken(null);
       localStorage.clear();
@@ -66,37 +67,23 @@ export const MainView = () => {
                 {user ? (
                   <Navigate to="/" />
                 ) : (
-                  <Col md={6}>
-                    <SignupView />
+                  <Col md={5}>
+                    <LoginView onLoggedIn={(user) => setUser(user)} />
                   </Col>
                 )}
               </>
             }
           />
           <Route
-            path="/login"
-            element={
-              <>
-                {user ? (
-                  <Navigate to="/" />
-                ) : (
-                  <Col md={6}>
-                    <LoginView onLoggedIn={handleOnLoggedIn} />
-                  </Col>
-                )}
-              </>
-            }
-          />
-          <Route
-            path="/"
+            path="/movies/:movieId"
             element={
               <>
                 {!user ? (
                   <Navigate to="/login" replace />
                 ) : movies.length === 0 ? (
-                  <Col>The list is empty</Col>
+                  <Col>The list is empty!</Col>
                 ) : (
-                  <Col md={10}>
+                  <Col md={8}>
                     <MovieView movies={movies} />
                   </Col>
                 )}
@@ -110,15 +97,36 @@ export const MainView = () => {
                 {!user ? (
                   <Navigate to="/login" replace />
                 ) : movies.length === 0 ? (
-                  <Col>The list is empty</Col>
+                  <Col>The list is empty!</Col>
                 ) : (
                   <>
                     {movies.map((movie) => (
-                      <Col className="mb-4" key={'${movie.id}_movie_'} md={4}>
-                        <MovieCard movie={movie} />
+                      <Col className="mb-4" key={movie.id} md={3} sm={12}>
+                        <MovieCard 
+                        movie={movie} 
+                        isFavorite={user.favoriteMovies.includes(movie.title)}
+                        />
                       </Col>
                     ))}
                   </>
+                )}
+              </>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <>
+                {!user ? (
+                  <Navigate to="/login" replace />
+                ) : (
+                  <Col md={8}>
+                    <ProfileView
+                      localUser={user}
+                      movies={movies}
+                      token={token}
+                    />
+                  </Col>
                 )}
               </>
             }
@@ -127,4 +135,4 @@ export const MainView = () => {
       </Row>
     </BrowserRouter>
   );
-};
+}
