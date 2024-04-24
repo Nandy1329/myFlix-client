@@ -1,9 +1,10 @@
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import './navigation-bar.scss';
 
 export const NavigationBar = ({ user, onLoggedOut }) => {
     return (
-        <Navbar bg="light" expand="lg">
+        <Navbar bg="(57, 99, 64)" expand="lg">
             <Container>
                 <Navbar.Brand as={Link} to="/">MyFlix</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
