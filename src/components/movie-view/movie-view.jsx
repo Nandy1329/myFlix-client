@@ -1,17 +1,17 @@
-import PropTypes from "prop-types";
-import { useParams } from "react-router";
-import { Link } from "react-router-dom";
-import { Button, Row, Col } from 'react-bootstrap';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { useParams } from 'react-router';
+import { Row, Col } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
 export const MovieView = ({ movies }) => {
   const { movieId } = useParams();
-  const movie = movies.find((movie) => movie.id === Number(movieId));
-
+  const movie = movies.find((movie) => movie.id === movieId);
   return (
     movie ? (
       <Row className="my-5 justify-content-center">
         <Col md={5}>
-          <img src={movie.ImagePath} alt="movie cover" className="img-fluid" />
+          <img src={movie.ImagePath} alt="movie poster" className="img-fluid" />
         </Col>
         <Col md={3}>
           <div className="my-1 m-3 mt-3">

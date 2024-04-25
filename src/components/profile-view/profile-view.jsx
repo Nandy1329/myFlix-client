@@ -11,9 +11,7 @@ export const ProfileView = ({ token, user, movies }) => {
     const [email, setEmail] = useState(user.email);
     const [birthday, setBirthday] = useState(user.Birthday);
     const [password, setPassword] = useState("null");
-
-    const favoriteMovies = movies.filter(m => user.FavoriteMovies.includes(m.title));
-
+    const updateUser = (e) => {
     const formData = {
         Username: username,
         Password: password,
@@ -98,4 +96,4 @@ export const ProfileView = ({ token, user, movies }) => {
             </Row>
         </>
     );
-}
+}}

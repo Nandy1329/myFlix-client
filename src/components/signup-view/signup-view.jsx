@@ -28,8 +28,9 @@ export const SignupView = () => {
       } else {
         alert("Signup failed, try again");
       }
-    })
-  };
+    }).catch((error) => {
+      alert("An error occurred, please try again");
+    });
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -80,4 +81,5 @@ export const SignupView = () => {
       <Button variant="primary" type="submit"> Sign up </Button>
     </Form>
   );
-}
+}};
+// Path: src/components/login-view/login-view.jsx
