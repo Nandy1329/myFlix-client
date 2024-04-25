@@ -4,12 +4,14 @@ import Button  from 'react-bootstrap/Button'
 import  Form  from 'react-bootstrap/Form'
 import Row  from 'react-bootstrap/Row'
 
-export const UpdateUser = ({formData, handleUpdate, handleSubmit, handleDeleteAccount}) => {
-  return (
+export const UpdateUser = ({formData, handleUpdate, handleSubmit }) => {
+  
+    return (
     <Row>
         <Form onSubmit={handleSubmit}>
+        <br />
             <h3>Update profile information</h3>
-            <Form.Group className='mb-2'>
+            <Form.Group controlId="formUsername">
                 <Form.Label>Username:</Form.Label>
                 <Form.Control
                 type="text"
@@ -18,8 +20,10 @@ export const UpdateUser = ({formData, handleUpdate, handleSubmit, handleDeleteAc
                 onChange={(e) => handleUpdate(e)}
                 required
                 />
+                <br />
             </Form.Group>
-            <Form.Group className='mb-2'>
+            <br />
+            <Form.Group controlId='formPassword'>
                 <Form.Label>Password:
                 <p>Your new password must be at least 8 characters long.</p>
                 </Form.Label>
@@ -30,8 +34,9 @@ export const UpdateUser = ({formData, handleUpdate, handleSubmit, handleDeleteAc
                 onChange={(e) => handleUpdate(e)}
                 required
                 />
-            </Form.Group >
-            <Form.Group className='mb-2'>
+            </Form.Group>
+            <br />
+            <Form.Group controlId='formEmail'>
             <Form.Label> Email: </Form.Label>
             <Form.Control
                 type="email"
@@ -40,7 +45,7 @@ export const UpdateUser = ({formData, handleUpdate, handleSubmit, handleDeleteAc
                 required
             />
             </Form.Group>
-            <Form.Group className='mb-4'>
+            <Form.Group controlId="formBirthday">
                 <Form.Label>Birthday:</Form.Label>
                 <Form.Control
                 type="date"
@@ -49,20 +54,18 @@ export const UpdateUser = ({formData, handleUpdate, handleSubmit, handleDeleteAc
                 required
                 />
             </Form.Group>
-            <Button variant="primary" type="submit" >Submit Changes</Button>
-            <Button
-            onClick={() => handleDeleteAccount()}
-            variant="outline-secondary"
-            className="mx-3" >
-             Delete account
-            </Button>
-        </Form>
-    </Row>
+            <br />
+            <Button variant="primary" type="submit">
+          {" "}
+          Submit changes{" "}
+        </Button> 
+        </Form>  
+      <br /> 
+     </Row>   
   )
 }
 UpdateUser.propTypes = {
     formData: PropTypes.object.isRequired,
     handleUpdate: PropTypes.func.isRequired,
     handleSubmit: PropTypes.func.isRequired,
-    handleDeleteAccount: PropTypes.func.isRequired
   };

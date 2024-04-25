@@ -1,25 +1,33 @@
-import { useState, useEffect } from "react";
-import { Button, Row, Col, Card } from "react-bootstrap";
-import { MovieCard } from "../movie-card/movie-card";
+import React from 'react';
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 
+import { useEffect, useState } from "react";
+import { FavoriteMovies } from './favorite-movies';
+import { UpdateUser } from './update-user';
+import { Card, Button, ImagePath } from 'react-bootstrap';
+import "./profile-view.scss"
 
-
-export const ProfileView = ({ token, user, movies }) => {
+export const ProfileView = ({ token, user, movies, onSubmit }) => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
 
     const [username, setUsername] = useState(user.userName);
     const [email, setEmail] = useState(user.email);
     const [birthday, setBirthday] = useState(user.Birthday);
     const [password, setPassword] = useState("null");
-    const updateUser = (e) => {
+   
     const formData = {
         Username: username,
         Password: password,
         Email: email,
-        Birthday: birthday
     };
+
+    formData.Birthday = birthday ? new Date(birthday).toISOString().substring(0, 10) : null;
+
     const handleSubmit = (event) => {
         event.preventDefault(event);
+
+
         fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${storedUser.UserName}`, {
             method: "PUT",
             body: JSON.stringify(formData),
@@ -32,18 +40,15 @@ export const ProfileView = ({ token, user, movies }) => {
             .then((response) => {
                 if (response.ok) {
                     alert("Changes saved successfully");
-                    localStorage.setItem("user", JSON.stringify(formData));
-                    window.location.reload();
                     return response.json()
                 }
                 alert("Changes failed, try again");
             })
             .then((user) => {
-                if (user) {
                     localStorage.setItem('user', JSON.stringify(user));
-                    setUser(user)
-                }
-            })
+                    onSubmit(data);
+                })
+            
             .catch((error) => {
                 console.error(error);
             });
@@ -67,6 +72,24 @@ export const ProfileView = ({ token, user, movies }) => {
             default:
         }
     }
+
+    const handleDeleteAccount = (id) => {
+        fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+        }).then((response) => {
+            if (response.ok) {
+                alert("Account deleted successfully");
+                localStorage.clear();
+                window.location.reload();
+            } else {
+                alert("Account deletion failed, try again");
+}
+        });
+    };
+
     return (
         <>
             <Row>
@@ -96,4 +119,4 @@ export const ProfileView = ({ token, user, movies }) => {
             </Row>
         </>
     );
-}}
+}
