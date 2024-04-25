@@ -9,7 +9,7 @@ import { NavigationBar } from "../navigation-bar/navigation-bar";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Nav } from "react-bootstrap";
+
 
 
 export const MainView = () => {
@@ -19,6 +19,7 @@ export const MainView = () => {
   const [movies, setMovies] = useState([]);
   const [user, setUser] = useState(storedUser ? storedUser : null);
   const [token, setToken] = useState(storedToken ? storedToken : null);
+  const [favoriteMovies, setFavoriteMovies] = useState([]);
 
 
   useEffect(() => {
@@ -26,7 +27,8 @@ export const MainView = () => {
       return;
     }
     fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies", {
-      headers: { Authorization: `Bearer ${token}` },
+      method: "GET",  
+    headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => response.json())
       .then((data) => {
@@ -41,19 +43,23 @@ export const MainView = () => {
             Year: movie.Year,
           };
         });
+        
         setMovies(moviesFromApi);
       });
   }, [token]);
 
   return (
     <BrowserRouter>
-      <NavigationBar
-        user={user}
-        onLoggedOut={() => {
-          setUser(null);
-          setToken(null);
-          localStorage.clear();
-        }}
+  <NavigationBar
+    user ={user}
+    query={query}
+    handleSearch={handleSearch}
+    movies={movies}
+    onLoggedOut={() => {
+      setUser(null);
+      setToken(null);
+      localStorage.clear();
+     }}
       />
       <Row className="justify-content-center">
         <Routes>
@@ -138,7 +144,7 @@ export const MainView = () => {
                       ) : (
                         <>
                           {movies.map((movie) => (
-                            <Col className="mb-5" key={movie.id} sm={6} md={4} lg}{3}>
+                            <Col className="mb-5" key={movie.id} sm={6} md={4} lg={3}>
                               <MovieCard 
                               isFavorite={user.FavoriteMovies.includes(movie.Title)}
                               movie={movie}

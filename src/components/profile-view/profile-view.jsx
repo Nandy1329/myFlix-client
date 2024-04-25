@@ -1,26 +1,25 @@
 import React from 'react';
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import PropTypes from "prop-types";
+import { FavoriteMovies } from "./favorite-movies";
 
-import { useEffect, useState } from "react";
-import { FavoriteMovies } from './favorite-movies';
-import { UpdateUser } from './update-user';
-import { Card, Button, ImagePath } from 'react-bootstrap';
-import "./profile-view.scss"
 
-export const ProfileView = ({ token, user, movies, onSubmit }) => {
+export const ProfileView = ({ user, isFavorite, addFavorite, removeFavorite }) => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
-
+  
     const [username, setUsername] = useState(user.userName);
     const [email, setEmail] = useState(user.email);
     const [birthday, setBirthday] = useState(user.Birthday);
     const [password, setPassword] = useState("null");
-   
+  
     const formData = {
-        Username: username,
-        Password: password,
-        Email: email,
+      Username: username,
+      Password: password,
+      Email: email,
+      Birthday: birthday
     };
+  
 
     formData.Birthday = birthday ? new Date(birthday).toISOString().substring(0, 10) : null;
 
@@ -53,6 +52,7 @@ export const ProfileView = ({ token, user, movies, onSubmit }) => {
                 console.error(error);
             });
     };
+    const favoriteMovies = movies.filter(m => user.FavoriteMovies.includes(m._id));
 
 
     const handleUpdate = (e) => {
@@ -91,32 +91,19 @@ export const ProfileView = ({ token, user, movies, onSubmit }) => {
     };
 
     return (
-        <>
-            <Row>
-                <Card>
-                    <Card.Body>
-                        <Card.Title><h2> My Profile </h2></Card.Title>
-                        <Card.Text>
-                            <h6>{username}</h6>
-                            <h6>{email}</h6>
-                        </Card.Text>
-                    </Card.Body>
-                </Card>
-                <Col>
-                    <UpdateUser
-                        formData={formData}
-                        handleUpdate={handleUpdate}
-                        handleSubmit={handleSubmit}
-                    />
-                </Col>
-                <br />
-            </Row>
-            <hr />
-            <Row>
-                <Col className="mb-5" xs={12} md={9}>
-                    <FavoriteMovies user={user} favoriteMovies={favoriteMovies} />
-                </Col>
-            </Row>
-        </>
-    );
+        <Row>
+          <Col className="mb-5" xs={12} md={9}>
+            <FavoriteMovies 
+              user={user} 
+              favoriteMovies={favoriteMovies} 
+              isFavorite={isFavorite} 
+              addFavorite={addFavorite} 
+              removeFavorite={removeFavorite} 
+            />
+          </Col>
+        </Row>
+      );
+    }
+ProfileView.propTypes = {
+    movies: PropTypes.array.isRequired,
 }
