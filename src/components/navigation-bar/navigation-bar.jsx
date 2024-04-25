@@ -9,7 +9,7 @@ export const NavigationBar = ({ user, onLoggedOut }) => {
     return (
       <Navbar bg="light" expand="lg">
         <Container>
-          <Navbar.Brand as={Link} to="/">
+          <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
             myFlix App
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
