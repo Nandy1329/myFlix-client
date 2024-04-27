@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
-import Logo from "../../img/cine-verse-logo.svg";
-import { SearchBar } from "../search-bar/search-bar"
+import { SearchBar } from "../search-bar/search-bar";
+import Logo from "../../../img/logo.png";
 import {Container, Navbar, Nav, Form, Row, Col } from "react-bootstrap";
 import {Routes, Route } from "react-router-dom";
 
