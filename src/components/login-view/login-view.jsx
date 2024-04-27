@@ -10,8 +10,8 @@ export const LoginView = ({ onLoggedIn }) => {
     event.preventDefault();
 
     const data = {
-      username: username,
-      password: password
+      Username: username,
+      Password: password
     };
 
     fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/login", {
@@ -23,8 +23,8 @@ export const LoginView = ({ onLoggedIn }) => {
       .then((data) => {
         console.log("Login Response:", data)
         if (data.user) {
-          localStorage.setItem("user", JSON.stringify(data.user));
           localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
           onLoggedIn(data.user, data.token);
         } else {
           alert("No Such User");
@@ -49,6 +49,7 @@ export const LoginView = ({ onLoggedIn }) => {
           minLength={5}
         />
       </Form.Group>
+      <br />
       <Form.Group controlId='formPassword'>
         <Form.Label>Password:</Form.Label>
         <Form.Control

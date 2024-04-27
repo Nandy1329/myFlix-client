@@ -4,7 +4,7 @@ import Button  from 'react-bootstrap/Button'
 import  Form  from 'react-bootstrap/Form'
 import Row  from 'react-bootstrap/Row'
 
-export const UpdateUser = ({formData, handleUpdate, handleSubmit }) => {
+export const UpdateUser = ({ formData, handleUpdate, handleSubmit }) => {
   
     return (
     <Row>
@@ -16,7 +16,7 @@ export const UpdateUser = ({formData, handleUpdate, handleSubmit }) => {
                 <Form.Control
                 type="text"
                 minLength={4}
-                value={formData.username}
+                value={formData.UserName} 
                 onChange={(e) => handleUpdate(e)}
                 required
                 />
@@ -30,7 +30,7 @@ export const UpdateUser = ({formData, handleUpdate, handleSubmit }) => {
                 <Form.Control
                 type="password"
                 minLength={8}
-                value={formData.password}
+                value={formData.Password} 
                 onChange={(e) => handleUpdate(e)}
                 required
                 />
@@ -40,7 +40,7 @@ export const UpdateUser = ({formData, handleUpdate, handleSubmit }) => {
             <Form.Label> Email: </Form.Label>
             <Form.Control
                 type="email"
-                value={formData.email}
+                value={formData.Email} 
                 onChange={(e) => handleUpdate(e)}
                 required
             />
@@ -49,7 +49,7 @@ export const UpdateUser = ({formData, handleUpdate, handleSubmit }) => {
                 <Form.Label>Birthday:</Form.Label>
                 <Form.Control
                 type="date"
-                value={formData.birthDate.slice(0, 10)}
+                value={formData.Birthday}
                 onChange={(e) => handleUpdate(e)}
                 required
                 />
@@ -64,8 +64,3 @@ export const UpdateUser = ({formData, handleUpdate, handleSubmit }) => {
      </Row>   
   )
 }
-UpdateUser.propTypes = {
-    formData: PropTypes.object.isRequired,
-    handleUpdate: PropTypes.func.isRequired,
-    handleSubmit: PropTypes.func.isRequired,
-  };
