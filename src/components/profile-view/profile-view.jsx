@@ -50,22 +50,23 @@ export const ProfileView = ({ user, movies, token }) => {
             default:
         }
     };
-
     return (
-        <>
+        <div>
             <Row>
-                <Card>
-                    {/* Placeholder image */}
-                    <Card.Img src="holder.js/171x180" /> 
-                    <Card.Body>
-                        <Card.Title><h2>My Profile</h2></Card.Title>
-                        <Card.Text>
-                            <h4>{username}</h4>
-                            <h4>{email}</h4>
-                        </Card.Text>
-                    </Card.Body>
-                </Card>
-                <Col>
+                <Col xs={12} md={4}>
+                    <Card>
+                        {/* Placeholder image */}
+                        <Card.Img src="holder.js/171x180" /> 
+                        <Card.Body>
+                            <Card.Title><h2>My Profile</h2></Card.Title>
+                            <Card.Text>
+                                <h4>{username}</h4>
+                                <h4>{email}</h4>
+                            </Card.Text>
+                        </Card.Body>
+                    </Card>
+                </Col>
+                <Col xs={12} md={8}>
                     <UpdateUser
                         formData={formData}
                         handleUpdate={handleUpdate}
@@ -86,12 +87,6 @@ export const ProfileView = ({ user, movies, token }) => {
                     />
                 </Col>
             </Row>
-        </>
+        </div>
     );
-};
-
-ProfileView.propTypes = {
-    user: PropTypes.object.isRequired,
-    movies: PropTypes.array.isRequired,
-    token: PropTypes.string.isRequired
 };

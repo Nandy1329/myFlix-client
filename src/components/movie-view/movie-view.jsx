@@ -1,27 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { useParams } from "react-router";
-import { Link } from "react-router-dom"
-import { MovieCard } from "../movie-card/movie-card";
-
+import { useParams, Link } from "react-router-dom";
 import Button from "react-bootstrap/Button";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import "./movie-view.scss";
+import { MovieCard } from "../movie-card/movie-card";
 
 export const MovieView = ({ movies }) => {
   const { movieId } = useParams();
+  const [movie, setMovie] = useState(null);
 
-  const movie = movies.find((m) => m.id === movieId);
+  useEffect(() => {
+    const foundMovie = movies.find((m) => m.id === movieId);
+    setMovie(foundMovie);
+  }, [movies, movieId]);
 
-  if (!movies) {
-    return <div>Loading...</div>; // Placeholder for loading state
+  if (!movie) {
+    return <div>Loading...</div>;
   }
 
   const similarMovies = movies.filter((m) => {
     return (
       m.id !== movie.id &&
-      (Array.isArray(m.genre) 
+      (Array.isArray(m.genre)
         ? m.genre.some((genre) => movie.genre.includes(genre))
         : m.genre === movie.genre)
     );
@@ -29,17 +28,17 @@ export const MovieView = ({ movies }) => {
 
   return (
     <div>
-     <div> 
-        <img height={300} src={movie.image} />
+      <div>
+        <img height={300} src={movie.image} alt={movie.title} />
       </div>
       <div>
         <h4>{movie.title}</h4>
       </div>
       <div>
-        <p>{movie.description}</p>
+        <div>{movie.description}</div> {/* Change <p> to <div> */}
       </div>
       <div>
-      <h6>Genre: {Array.isArray(movie.genre) ? movie.genre.join(", ") : movie.genre.Name}</h6>    
+        <h6>Genre: {movie.genre}</h6>
       </div>
       <div>
         <h6>Director: {movie.director}</h6>
@@ -47,20 +46,20 @@ export const MovieView = ({ movies }) => {
       <div>
         <h6>Year: {movie.year}</h6>
       </div>
-      <Link to={"/"}>
-        <Button className="back-button"> Back </Button>
+      <Link to="/">
+        <Button className="back-button">Back</Button>
       </Link>
-      <Col className="mb-5">
-        <hr />
-        <h3 className="title"> Similar movies </h3>
-        <Row>
-          {similarMovies.map((movie) => (
-            <Col key={movie.id} xs={6} sm={6} md={6}>
-              <MovieCard movie={movie} />
-            </Col>
+      <hr />
+      <h3 className="title">Similar movies</h3>
+      {similarMovies.length > 0 ? (
+        <div>
+          {similarMovies.map((similarMovie) => (
+            <MovieCard key={similarMovie.id} movie={similarMovie} />
           ))}
-        </Row>
-      </Col>
+        </div>
+      ) : (
+        <div>No similar movies found</div>
+      )}
     </div>
   );
 };
@@ -74,16 +73,11 @@ MovieView.propTypes = {
       genre: PropTypes.oneOfType([
         PropTypes.arrayOf(PropTypes.string),
         PropTypes.string,
-        PropTypes.shape({
-          Name: PropTypes.string
-        })
       ]).isRequired,
       director: PropTypes.string.isRequired,
-      year: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.number
-      ]).isRequired,
+      year: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+        .isRequired,
       image: PropTypes.string.isRequired,
-    }).isRequired
-  )
+    })
+  ).isRequired,
 };

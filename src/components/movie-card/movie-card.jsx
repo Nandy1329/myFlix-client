@@ -10,9 +10,9 @@ const MovieCard = ({ movie }) => {
       <Card.Body>
         <Card.Title>{movie.Title}</Card.Title>
         <Card.Text>{movie.Director && movie.Director.Name}</Card.Text>
-        <Link to={`/movies/${movie.id}`}>
-          <Button variant="primary" className="w-100 primaryButton">Details</Button>
-        </Link>
+        <Link to={`/movies/${movie._id}`}>
+  <Button variant="primary" className="w-100 primaryButton">Details</Button>
+</Link>
       </Card.Body>
     </Card>
   );
