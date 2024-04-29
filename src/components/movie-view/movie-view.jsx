@@ -27,30 +27,35 @@ export const MovieView = ({ movies }) => {
   });
 
   return (
-    <div>
+    <div className="movie-view">
       <div>
-        <img height={300} src={movie.image} alt={movie.title} />
+        <img className="w-100" src={movie.imagePath} alt={movie.title} />
+        <div>
+          <span>Title: </span>
+          <span>{movie.title}</span>
+        </div>
+        <div>
+          <span>Description: </span>
+          <span>{movie.description}</span>
+        </div>
+        <div>
+          <span>Genre: </span>
+          <span>{movie.genre}</span>
+        </div>
+        <div>
+          <span>Director: </span>
+          <span>{movie.director}</span>
+        </div>
+        <div>
+          <span>Year: </span>
+          <span>{movie.year}</span>
+        </div>
+        <Link to="/">
+          <Button className="back-button">Back</Button>
+        </Link>
+        <hr />
+        <h3 className="title">Similar movies</h3>
       </div>
-      <div>
-        <h4>{movie.title}</h4>
-      </div>
-      <div>
-        <div>{movie.description}</div> {/* Change <p> to <div> */}
-      </div>
-      <div>
-        <h6>Genre: {movie.genre}</h6>
-      </div>
-      <div>
-        <h6>Director: {movie.director}</h6>
-      </div>
-      <div>
-        <h6>Year: {movie.year}</h6>
-      </div>
-      <Link to="/">
-        <Button className="back-button">Back</Button>
-      </Link>
-      <hr />
-      <h3 className="title">Similar movies</h3>
       {similarMovies.length > 0 ? (
         <div>
           {similarMovies.map((similarMovie) => (
@@ -77,7 +82,9 @@ MovieView.propTypes = {
       director: PropTypes.string.isRequired,
       year: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
         .isRequired,
-      image: PropTypes.string.isRequired,
+      imagePath: PropTypes.string.isRequired,
     })
   ).isRequired,
 };
+
+export default MovieView;

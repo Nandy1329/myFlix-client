@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Card, Row, Col } from 'react-bootstrap';
 import { UpdateUser } from './update-user';
 import { FavoriteMovies } from './favorite-movies';
-import { PiUserSquareDuotone } from "react-icons/pi";
+
 
 export const ProfileView = ({ user, movies, token }) => {
     const [username, setUsername] = useState(user.Username);
@@ -60,8 +60,11 @@ export const ProfileView = ({ user, movies, token }) => {
                         <Card.Body>
                             <Card.Title><h2>My Profile</h2></Card.Title>
                             <Card.Text>
+                            <div>
                                 <h4>{username}</h4>
                                 <h4>{email}</h4>
+                                <h4>{birthday}</h4>
+                            </div>
                             </Card.Text>
                         </Card.Body>
                     </Card>
