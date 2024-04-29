@@ -1,5 +1,6 @@
 $primary: rgb(8, 91, 97);
 $body-bg: rgb(14, 231, 242);
+$complementary: rgb(255, 178, 127);
 
 @import '~bootstrap/scss/bootstrap.scss';
 
@@ -30,6 +31,16 @@ $body-bg: rgb(14, 231, 242);
 .deleteButton {
   margin-top: 10px;
 };
+
+.complementaryButton {
+  background-color: $complementary;
+  color: $primary;
+};
+
+.complementaryButton:hover {
+  background-color: darken($complementary, 10%);
+};
+
 
 .warning {
   letter-spacing: 2px;

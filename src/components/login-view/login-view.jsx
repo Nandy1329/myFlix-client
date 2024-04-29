@@ -33,8 +33,7 @@ export const LoginView = ({ onLoggedIn }) => {
       .catch((e) => {
         alert("Something went wrong");
       });
-
-  }
+  }; 
 
   return (
     <Form onSubmit={handleSubmit}>

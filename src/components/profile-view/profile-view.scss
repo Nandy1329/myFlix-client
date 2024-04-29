@@ -4,10 +4,7 @@
     align-items: center;
 }
 
-.card-title {
-    text-align: center;
-}   
-
+.card-title,
 .card-text {
     text-align: center;
 }
@@ -18,9 +15,9 @@
 
 .profile-img {
     display: block;
-    margin: 24px auto;
+    margin: 1.5rem auto; 
 }
 
 .card {
-    background-color: #19cf35 !important;
+    background-color: #19cf35; 
 }

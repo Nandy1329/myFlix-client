@@ -1,6 +1,3 @@
-import { useState } from "react";
-import { Form, Button } from "react-bootstrap";
-
 export const SignupView = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -24,13 +21,14 @@ export const SignupView = () => {
     }).then((response) => {
       if (response.ok) {
         alert("Signup Successful");
-        window.location.reload();
+        // Update state or perform any other action after successful signup
       } else {
         alert("Signup failed, try again");
       }
     }).catch((error) => {
       alert("An error occurred, please try again");
     });
+  }; 
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -81,5 +79,5 @@ export const SignupView = () => {
       <Button variant="primary" type="submit"> Sign up </Button>
     </Form>
   );
-}};
+};
 // Path: src/components/login-view/login-view.jsx

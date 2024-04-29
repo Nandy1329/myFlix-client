@@ -28,37 +28,38 @@ export const MainView = () => {
 
     fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies", {
       headers: {
-        Authorization: `Bearer ${token}` },
-      })
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
-        const moviesFromApi = data.map((movie) => {
-         return {
-          id: movie._id,
-          title: movie.Title,
-          description: movie.Description,
-          genre: movie.Genre.Name,
-          director: movie.Director.Name,
-          year: movie.Year,
-        };
-      });
+        if (Array.isArray(data)) {
+          const moviesFromApi = data.map((movie) => ({
+            id: movie._id,
+            title: movie.Title,
+            description: movie.Description,
+            genre: movie.Genre.Name,
+            director: movie.Director.Name,
+            year: movie.Year,
+          }));
 
-        const storedMovies = JSON.parse(localStorage.getItem("movies"));
+          const storedMovies = JSON.parse(localStorage.getItem("movies"));
 
-        let filteredMovies = [];
-        if (Array.isArray(storedMovies)) {
-          filteredMovies = storedMovies.filter((movie) => {
-            return (
-              movie.title.toLowerCase().includes(query.toLowerCase()) ||
-              (movie.genre &&
-                movie.genre
-                  .map((g) => g.toLowerCase())
-                  .includes(query.toLowerCase()))
-            );
-          });
+          let filteredMovies = [];
+          if (Array.isArray(storedMovies)) {
+            filteredMovies = storedMovies.filter((movie) => {
+              return (
+                movie.title.toLowerCase().includes(query.toLowerCase()) ||
+                (movie.genre &&
+                  movie.genre
+                    .map((g) => g.toLowerCase())
+                    .includes(query.toLowerCase()))
+              );
+            });
+          }
+
+          setMovies([...moviesFromApi, ...filteredMovies]);
         }
-
-        setMovies([...moviesFromApi, ...filteredMovies]);
       });
   }, [token, query]);
 
@@ -67,18 +68,16 @@ export const MainView = () => {
 
   const renderMovies = () => (
     <Row>
-      {movies.map((movie) => (
-        <Col className="mb-5" key={movie.id} sm={6} md={4} lg={3}>
-          <MovieCard
-            isFavorite={user && user.FavoriteMovies.includes(movie.Title)}
-            movie={movie}
-            key={movie.id} 
-          />
-        </Col>
+  {movies.map((movie) => (
+  <Col className="mb-5" sm={6} md={4} lg={3} key={movie.id}>
+    <MovieCard
+      isFavorite={user && user.FavoriteMovies.includes(movie.Title)}
+      movie={movie}
+    />
+  </Col>
       ))}
     </Row>
   );
-  
 
   return (
     <BrowserRouter>
@@ -96,7 +95,10 @@ export const MainView = () => {
       <br />
       <Row className="justify-content-center">
         <Routes>
-          <Route path="/users" element={isLoggedIn ? <Navigate to="/" /> : <SignupView />} />
+          <Route
+            path="/users"
+            element={isLoggedIn ? <Navigate to="/" /> : <SignupView />}
+          />
           <Route
             path="/login"
             element={
@@ -116,7 +118,12 @@ export const MainView = () => {
             path="/profile"
             element={
               isLoggedIn ? (
-                <ProfileView token={token} user={user} movies={movies} onSubmit={setUser} />
+                <ProfileView
+                  token={token}
+                  user={user}
+                  movies={movies}
+                  onSubmit={setUser}
+                />
               ) : (
                 <Navigate to="/login" />
               )

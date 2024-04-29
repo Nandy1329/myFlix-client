@@ -1,30 +1,3 @@
-.title {
-  margin: 24px 0 16px;
-}
-
-card-body {
-  flex-direction: column;
-  align-items: center;
-  display: flex;
-}
-
-.card-title, .card-text {
-  text-align: center;
-}
-
-.button-delete {
-  align-self: flex-end;
-}
-
-.profile-img {
-  margin: 24px auto;
-  display: block;
-}
-
-.card {
-  background-color: #fefeff !important;
-}
-
 *, :after, :before {
   box-sizing: border-box;
 }
@@ -20568,6 +20541,15 @@ textarea.form-control-lg {
 
 .deleteButton {
   margin-top: 10px;
+}
+
+.complementaryButton {
+  color: #085b61;
+  background-color: #ffb27f;
+}
+
+.complementaryButton:hover {
+  background-color: #ff934c;
 }
 
 .warning {

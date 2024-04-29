@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import { MovieCard } from "../movie-card/movie-card";
 
@@ -17,45 +18,17 @@ export const MovieView = ({ movies }) => {
     return <div>Loading...</div>;
   }
 
-  const similarMovies = movies.filter((m) => {
-    return (
-      m.id !== movie.id &&
-      (Array.isArray(m.genre)
-        ? m.genre.some((genre) => movie.genre.includes(genre))
-        : m.genre === movie.genre)
-    );
-  });
+  const similarMovies = movies.filter((m) => (
+    m.id !== movie.id &&
+    (m.genre.some((genre) => movie.genre.includes(genre)) || // Check genre similarity
+    m.director === movie.director || // Check director similarity
+    m.year === movie.year) // Check release year similarity
+  ));
 
   return (
-    <div className="movie-view">
-      <div>
-        <img className="w-100" src={movie.imagePath} alt={movie.title} />
-        <div>
-          <span>Title: </span>
-          <span>{movie.title}</span>
-        </div>
-        <div>
-          <span>Description: </span>
-          <span>{movie.description}</span>
-        </div>
-        <div>
-          <span>Genre: </span>
-          <span>{movie.genre}</span>
-        </div>
-        <div>
-          <span>Director: </span>
-          <span>{movie.director}</span>
-        </div>
-        <div>
-          <span>Year: </span>
-          <span>{movie.year}</span>
-        </div>
-        <Link to="/">
-          <Button className="back-button">Back</Button>
-        </Link>
-        <hr />
-        <h3 className="title">Similar movies</h3>
-      </div>
+    <div>
+      {/* Movie details rendering */}
+      <h3 className="title">Similar movies</h3>
       {similarMovies.length > 0 ? (
         <div>
           {similarMovies.map((similarMovie) => (
@@ -69,6 +42,7 @@ export const MovieView = ({ movies }) => {
   );
 };
 
+
 MovieView.propTypes = {
   movies: PropTypes.arrayOf(
     PropTypes.shape({
@@ -80,8 +54,7 @@ MovieView.propTypes = {
         PropTypes.string,
       ]).isRequired,
       director: PropTypes.string.isRequired,
-      year: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-        .isRequired,
+      year: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
       imagePath: PropTypes.string.isRequired,
     })
   ).isRequired,

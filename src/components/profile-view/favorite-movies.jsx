@@ -1,33 +1,23 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
+import React from "react";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Button from "react-bootstrap/Button";
+import { Link } from "react-router-dom";
+import { MovieCard } from '../movie-card/movie-card';
 
-import { MovieCard } from '../movie-card/movie-card'
-import { Link } from 'react-router-dom'
-import "./favorite-movies.scss"
-
-export const FavoriteMovies = ({ user, favoriteMovies }) => {
+export const FavoriteMovies = ({ favoriteMovies, removeFav }) => {
   return (
-    <Col className="mb-5">
-      <h3 className="title">List of favorite movies</h3>
-      <Row>
-        {favoriteMovies.map((movie) => (
-          <Col key={movie._id} md={6}>
-            <Link to={`/movies/${movie._id}`}>
-              <MovieCard
-                key={movie._id}
-                isFavorite={user.FavoriteMovies.includes(movie._id)}
-                movie={movie}
-              />
-            </Link>
-          </Col>
-        ))}
-      </Row>
-    </Col>
-  );
+    <Row>
+      <h3>My favorite movies</h3>
+      {favoriteMovies.map((movie) => (
+        <Col key={movie.id} md={4}>
+          <Link to={`/movies/${movie._id}`}>
+            {/* Move MovieCard inside Link */}
+            <MovieCard movie={movie} />
+          </Link>
+          <Button variant="secondary" onClick={() => removeFav(movie._id)}>Remove</Button>
+        </Col>
+      ))}
+    </Row>
+  )
 }
-FavoriteMovies.propTypes = {
-  favoriteMovies: PropTypes.array.isRequired,
-  user: PropTypes.object.isRequired
-};
