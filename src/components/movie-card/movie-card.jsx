@@ -1,18 +1,34 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Card } from 'react-bootstrap';
+import { Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-const MovieCard = ({ movie }) => {
+const MovieCard = ({ movie, isFavorite, handleAddToFavorites, handleRemoveFromFavorites }) => {{
+    console.log(movie);
+  };
+
+
+
   return (
-    <Card className="h-100 moviecard">
-      <Card.Img variant="top" src={movie.ImagePath} />
+    <Card className="mb-3">
+      <Link to={`/movies/${encodeURIComponent(movie.id)}`} className="movie-view">
+        <Card.Img variant="top" src={movie.imagePath} className="object-fit-cover" />
+      </Link>
       <Card.Body>
-        <Card.Title>{movie.Title}</Card.Title>
-        <Card.Text>{movie.Director && movie.Director.Name}</Card.Text>
-        <Link to={`/movies/${movie.id}`}>
-          <Button variant="primary" className="w-100 primaryButton">Details</Button>
-        </Link>
+        <Card.Title>{movie.title}</Card.Title>
+        <Card.Text>{movie.genre}</Card.Text>
+        <Card.Text>{movie.director}</Card.Text>
+        <Card.Text>{movie.releaseDate}</Card.Text>
+        <Card.Text>{movie.imagePath}</Card.Text>
+        {isFavorite ? (
+          <Button variant="primary" onClick={() => handleRemoveFromFavorites(movie)}>
+            Remove from Favorites
+          </Button>
+        ) : (
+          <Button variant="primary" onClick={() => handleAddToFavorites(movie)}>
+            Add to Favorites
+          </Button>
+        )}
       </Card.Body>
     </Card>
   );
@@ -20,11 +36,14 @@ const MovieCard = ({ movie }) => {
 
 MovieCard.propTypes = {
   movie: PropTypes.shape({
-    Title: PropTypes.string.isRequired,
-    Director: PropTypes.shape({
-      Name: PropTypes.string.isRequired,
-    }).isRequired,
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    imagePath: PropTypes.string.isRequired,
+    genre: PropTypes.string,
   }).isRequired,
+  isFavorite: PropTypes.bool.isRequired,
+  handleAddToFavorites: PropTypes.func.isRequired,
+  handleRemoveFromFavorites: PropTypes.func.isRequired,
 };
 
-export { MovieCard };
+export default MovieCard;

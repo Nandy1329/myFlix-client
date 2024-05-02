@@ -1,24 +1,30 @@
-$primary-color: dodgerblue;
-$secondary-color: #f4ff1a;
-
-.movie-view {
+/* Define CSS variables */
+:root {
+    --primary-color: dodgerblue;
+    --secondary-color: #f4ff1a;
+  }
+  
+  /* Styles for .movie-view class */
+  .movie-view {
     padding: 20px 10px;
-    background-color: $primary-color;
+    background-color: var(--primary-color); /* Use CSS variable */
     color: whitesmoke;
     border-radius: 10px;
-};
-
-.movieTitle {
+  }
+  
+  /* Styles for .movieTitle class */
+  .movieTitle {
     text-align: center;
     padding: 10px 15px;
-    background-color: $secondary-color;
-};
-
-.back-button {
+    background-color: var(--secondary-color); /* Use CSS variable */
+  }
+  
+  /* Styles for .back-button class */
+  .back-button {
     padding: 4px 12px;
     color: whitesmoke;
-    background-color: $primary-color;
-    
+    background-color: var(--primary-color); /* Use CSS variable */
     border: none;
     border-radius: 4px;
-}
+  }
+  
