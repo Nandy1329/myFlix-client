@@ -1,7 +1,3 @@
-import { React, useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-
 export const SignupView = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -78,9 +74,8 @@ export const SignupView = () => {
       </Form.Group>
       <br />
    
-      <Button variant='primary' type='submit'>
-                Submit
-            </Button>
-        </Form>
-    );
+      <Button variant="primary" type="submit"> Sign up </Button>
+    </Form>
+  );
 };
+// Path: src/components/login-view/login-view.jsx

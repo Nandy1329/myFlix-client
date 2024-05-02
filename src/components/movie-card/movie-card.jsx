@@ -1,31 +1,59 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Card, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import { Button, Card } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
-const MovieCard = ({ movie, isFavorite, handleAddToFavorites, handleRemoveFromFavorites }) => {{
-    console.log(movie);
+export const MovieCard = ({ movie, isFavorite }) => {
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || null);
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
+
+  const addToFavorites = () => {
+    if (!user || !token) {
+      // User is not logged in, handle accordingly
+      return;
+    }
+    // Implement the logic to add the movie to favorites here
+    // For example:
+    // setAddTitle(movie.title);
   };
 
+  const removeFromFavorites = () => {
+    if (!user || !token) {
+      // User is not logged in, handle accordingly
+      return;
+    }
+    // Implement the logic to remove the movie from favorites here
+    // For example:
+    // setDelTitle(movie.title);
+  };
 
+  useEffect(() => {
+    // Call the function to add movie to favorites when addTitle changes
+    // addToFavorites();
+  }, [user, token]);
+
+  useEffect(() => {
+    // Call the function to remove movie from favorites when delTitle changes
+    // removeFromFavorites();
+  }, [user, token]);
 
   return (
-    <Card className="mb-3">
-      <Link to={`/movies/${encodeURIComponent(movie.id)}`} className="movie-view">
-        <Card.Img variant="top" src={movie.imagePath} className="object-fit-cover" />
-      </Link>
+    <Card>
+      <Card.Img variant="top" src={movie.imagePath} />
       <Card.Body>
         <Card.Title>{movie.title}</Card.Title>
-        <Card.Text>{movie.genre}</Card.Text>
-        <Card.Text>{movie.director}</Card.Text>
-        <Card.Text>{movie.releaseDate}</Card.Text>
-        <Card.Text>{movie.imagePath}</Card.Text>
+        <Card.Text>{movie.director && movie.director.name}</Card.Text>
+        <Link to={`/movies/${movie.id}`}>
+          <Button variant="primary" className="w-100 primaryButton">
+            Details
+          </Button>
+        </Link>
         {isFavorite ? (
-          <Button variant="primary" onClick={() => handleRemoveFromFavorites(movie)}>
+          <Button onClick={removeFromFavorites} className="w-100 mt-2">
             Remove from Favorites
           </Button>
         ) : (
-          <Button variant="primary" onClick={() => handleAddToFavorites(movie)}>
+          <Button onClick={addToFavorites} className="w-100 mt-2">
             Add to Favorites
           </Button>
         )}
@@ -38,12 +66,10 @@ MovieCard.propTypes = {
   movie: PropTypes.shape({
     id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
+    director: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+    }),
     imagePath: PropTypes.string.isRequired,
-    genre: PropTypes.string,
   }).isRequired,
   isFavorite: PropTypes.bool.isRequired,
-  handleAddToFavorites: PropTypes.func.isRequired,
-  handleRemoveFromFavorites: PropTypes.func.isRequired,
 };
-
-export default MovieCard;
