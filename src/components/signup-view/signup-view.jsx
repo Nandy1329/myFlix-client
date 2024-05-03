@@ -49,12 +49,14 @@ export const SignupView = ({ onLoggedIn }) => {
         required
       />
       </Form.Group>
-      <Form.Group controlId="formBirthday">
-      <Form.Label> Birthday: </Form.Label>
+      <br />
+      <Form.Group controlId="formPassword">
+      <Form.Label>Password:</Form.Label>
       <Form.Control
-        type="date"
-        value={birthday}
-        onChange={(e) => setBirthday(e.target.value)}
+        type="password"
+        minLength={8}
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
         required
       />
       </Form.Group>
@@ -69,17 +71,17 @@ export const SignupView = ({ onLoggedIn }) => {
       />
       </Form.Group>
       <br />
-      <Form.Group controlId="formPassword">
-      <Form.Label>Password:</Form.Label>
+      <Form.Group controlId="formBirthDate">
+      <Form.Label> Birthday: </Form.Label>
       <Form.Control
-        type="password"
-        minLength={8}
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        type="date"
+        value={birthday}
+        onChange={(e) => setBirth_date(e.target.value)}
         required
       />
       </Form.Group>
       <br />
+      
       <Button variant="primary" type="submit"> Sign up </Button>
     </Form>
   );

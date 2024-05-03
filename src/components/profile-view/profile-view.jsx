@@ -69,7 +69,7 @@ export const ProfileView = ({ user }) => {
             <Row>
                 <h3>Update User Information</h3>
                 <Form onSubmit={updateUserInfo}>
-                    <Form.Group>
+                    <Form.Group controlId='formUsername'>
                         <Form.Label>Username: </Form.Label>
                         <Form.Control
                             type='text'
@@ -80,7 +80,7 @@ export const ProfileView = ({ user }) => {
                         />
                     </Form.Group>
 
-                    <Form.Group>
+                    <Form.Group controlId='formPassword'>
                         <Form.Label>Password: </Form.Label>
                         <Form.Control
                             type='password'
@@ -90,7 +90,7 @@ export const ProfileView = ({ user }) => {
                         />
                     </Form.Group>
 
-                    <Form.Group>
+                    <Form.Group controlId='formEmail'>
                         <Form.Label>Email: </Form.Label>
                         <Form.Control
                             type='email'
@@ -100,7 +100,7 @@ export const ProfileView = ({ user }) => {
                         />
                     </Form.Group>
 
-                    <Form.Group>
+                    <Form.Group controlId='formBirth_date'>
                         <Form.Label>Birthday: </Form.Label>
                         <Form.Control
                             type='date'
