@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
 
 export const ProfileView = ({ user }) => {
-    const [username, setUsername] = useState(user ? user.username : '');
-    const [password, setPassword] = useState('');
-    const [email, setEmail] = useState(user ? user.email : '');
-    const [birth_date, setBirth_date] = useState(user ? user.birth_date : '');
+    const [Username, setUsername] = useState(user ? user.username : '');
+    const [Password, setPassword] = useState('');
+    const [Email, setEmail] = useState(user ? user.email : '');
+    const [Birth_date, setBirth_date] = useState(user ? user.birth_date : '');
     const [error, setError] = useState('');
 
-    const handleSubmit = (event) => {
+    const updateUserInfo = (event) => {
         event.preventDefault();
 
         // Validate form fields
@@ -20,10 +21,10 @@ export const ProfileView = ({ user }) => {
         }
 
         const data = {
-            Username: username,
-            Password: password,
-            Email: email,
-            Birth_Date: birth_date
+            Username: Username,
+            Password: Password,
+            Email: Email,
+            Birth_Date: Birth_Date
         };
 
         fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}`, {
@@ -40,45 +41,83 @@ export const ProfileView = ({ user }) => {
             } else {
                 setError('Update failed. Please try again.');
             }
-        }).catch((error) => {
-            console.error('Error updating user:', error);
-            setError('An unexpected error occurred. Please try again later.');
+        }).then((data) => {
+            console.log('user updated:', data);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('token', data.token);
+            onUserUpdate(data.user, data.token);
         });
     };
 
     return (
-        <>
-            <Col>
+        <Col>
+            <Row>
+                <h3>User Profile</h3>
                 <div>
                     <span>Username: </span>
-                    <span>{username}</span>
-                </div>
-                <div>
-                    <span>Password: </span>
-                    <span>********</span> {/* Consider adding an option to show/hide password */}
+                    <span>{user.Username}</span>
                 </div>
                 <div>
                     <span>Email: </span>
-                    <span>{email}</span>
+                    <span>{user.Email}</span>
                 </div>
                 <div>
-                    <span>Birthday: </span>
-                    <span>{birth_date}</span>
+                    <span>Date of Birth: </span>
+                    <span>{user.Birth_Date}</span>
                 </div>
-                <div>
-                    <span>Favorite Movies: </span>
-                    <span>{user ? user.favorite_movies : ''}</span>
-                </div>
-            </Col>
-            <Col>
-                <Form onSubmit={handleSubmit}>
-                    {/* Your form controls */}
+            </Row>
+            <Row>
+                <h3>Update User Information</h3>
+                <Form onSubmit={updateUserInfo}>
+                    <Form.Group>
+                        <Form.Label>Username: </Form.Label>
+                        <Form.Control
+                            type='text'
+                            value={Username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                            minLength='5'
+                        />
+                    </Form.Group>
+
+                    <Form.Group>
+                        <Form.Label>Password: </Form.Label>
+                        <Form.Control
+                            type='password'
+                            value={Password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </Form.Group>
+
+                    <Form.Group>
+                        <Form.Label>Email: </Form.Label>
+                        <Form.Control
+                            type='email'
+                            value={Email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </Form.Group>
+
+                    <Form.Group>
+                        <Form.Label>Birthday: </Form.Label>
+                        <Form.Control
+                            type='date'
+                            value={Birth_Date}
+                            onChange={(e) => setBirth_date(e.target.value)}
+                            required
+                        />
+                    </Form.Group>
+
                     <Button variant='primary' type='submit'>
                         Submit
                     </Button>
-                    {error && <div className="text-danger mt-2">{error}</div>}
                 </Form>
-            </Col>
-        </>
+            </Row>
+            <Row>
+                <h3>Favorite Movies</h3>
+            </Row>
+        </Col>
     );
 };
