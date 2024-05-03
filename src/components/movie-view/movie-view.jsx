@@ -1,57 +1,46 @@
-import PropTypes from 'prop-types';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
+import { useParams } from 'react-router';
+import { Link } from 'react-router-dom';
+import './movie-view.scss';
 
-export const MovieView = ({ movie, onBackClick }) => {
-  // Check if movie is null or undefined
-  if (!movie) {
-    return <div>Loading...</div>;
-  }
+export const MovieView = ({ movie }) => {
+    const { movieId } = useParams();
+
+    const movie = movies.find((movie) => movie._id === movieId);
+
 
   return (
-    <Row className="my-5 justify-content-center">
-      <Col md={5}>
-        <img src={movie.ImagePath} alt="movie cover" className="img-fluid" />
-      </Col>
-      <Col md={3}>
-        <div className="my-1">
-          <span className="h1">{movie.Title}</span>
+    <div>
+      <div>
+        <img src={movie.ImagePath} alt="movie cover" className="w-100" />
+      </div>
+      <div>
+         <span> Title: </span>
+          <span>{movie.Title}</span>
         </div>
-        <div className="my-1">
-          <span className="h6">Description: </span>
+        <div>
+          <span>Description: </span>
           <span>{movie.Description}</span>
         </div>
-        <div className="my-1">
-          <span className="h6">Director: </span>
+        <div>
+          <span> Director: </span>
           <span>{movie.Director.Name}</span>
         </div>
-        <div className="my-1">
-          <span className="h6">Genre: </span>
+        <div>
+          <span> Genre: </span>
           <span>{movie.Genre.Name}</span>
         </div>
-        <div className="my-1">
-          <span className="h6">Year: </span>
+        <div>
+          <span> Year: </span>
           <span>{movie.Year}</span>
         </div>
-        <Button onClick={onBackClick} variant="link">Back</Button>
-      </Col>
-    </Row>
-  );
-}
-
-MovieView.propTypes = {
-  movie: PropTypes.shape({
-    ImagePath: PropTypes.string,
-    Title: PropTypes.string,
-    Description: PropTypes.string,
-    Director: PropTypes.shape({
-      Name: PropTypes.string
-    }),
-    Genre: PropTypes.shape({
-      Name: PropTypes.string
-    }),
-    Year: PropTypes.number
-  }),
-  onBackClick: PropTypes.func.isRequired
+        <Link to={'/'}>
+                <button
+                    className='back-button'
+                    style={{ cursor: 'pointer' }}
+                >
+                    Back
+                </button>
+            </Link>
+        </div>
+    );
 };
