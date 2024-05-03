@@ -1,8 +1,10 @@
-$primary: rgb(8, 91, 97);
-$body-bg: rgb(14, 231, 242);
-$complementary: rgb(255, 178, 127);
-
-@import '~bootstrap/scss/bootstrap.scss';
+$primary: rgb(57, 99, 64);
+$color_1: red;
+$color_2: $primary;
+$color_3: black;
+$background-color_1: ghostwhite;
+$background-color_2: lighten($primary, 10%);
+$background-color_3: darken($primary, 10%);
 
 .primaryButton, .deleteButton {
   font-size: 15px;
@@ -10,37 +12,30 @@ $complementary: rgb(255, 178, 127);
   font-variant: all-small-caps;
   border-radius: 10px;
   transition: all 0.9s;
-};
+}
 
 .primaryButton:hover {
-  background-color: ghostwhite;
+  background-color: $background-color_1;
   letter-spacing: 5px;
   box-shadow: thistle 0px 0px 10px 2px;
-  transition: all 0.9s;
-};
+}
 
 .deleteButton:hover {
-  color: red;
+  color: $color_1;
   font-weight: 700;
-  background-color: ghostwhite;
+  background-color: $background-color_1;
   letter-spacing: 4px;
   box-shadow: red 0px 0px 10px 2px;
-  transition: all 0.9s;
-};
-
-.deleteButton {
-  margin-top: 10px;
-};
+}
 
 .complementaryButton {
-  background-color: $complementary;
-  color: $primary;
-};
+  background-color: $background-color_2;
+  color: $color_2;
+}
 
 .complementaryButton:hover {
-  background-color: darken($complementary, 10%);
-};
-
+  background-color: $background-color_3;
+}
 
 .warning {
   letter-spacing: 2px;
@@ -50,21 +45,16 @@ $complementary: rgb(255, 178, 127);
   font-weight: 700;
   padding: 10px;
   border: 2px dashed red;
-  color: black;
+  color: $color_3;
   border-radius: 10px;
 }
 
 .formLabel {
   font-size: 15px;
   font-variant: all-small-caps;
-};
+}
 
 .formInput {
   font-style: italic;
-  font-size: 13px;
-};
-
-.formInput {
-  font-style: none;
   font-size: 13px;
 }

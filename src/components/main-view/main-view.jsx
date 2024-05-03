@@ -1,177 +1,127 @@
-import React, { useEffect, useState } from "react";
-import { MovieCard } from "../movie-card/movie-card";
-import { LoginView } from "../login-view/login-view";
-import { SignupView } from "../signup-view/signup-view";
-import { ProfileView } from "../profile-view/profile-view";
-import { NavigationBar } from "../navigation-bar/navigation-bar";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Row, Col } from "react-bootstrap";
+import { useState, useEffect } from 'react';
+import { MovieCard } from '../movie-card/movie-card.jsx';
+import { MovieView } from '../movie-view/movie-view.jsx';
+import { LoginView } from '../login-view/login-view.jsx';
+import { SignupView } from '../signup-view/signup-view.jsx';
+import { NavigationBar } from '../navigation-bar/navigation-bar.jsx';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 export const MainView = () => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     const storedToken = localStorage.getItem('token');
 
-  const [user, setUser] = useState(storedUser || null);
-  const [token, setToken] = useState(storedToken || null);
-  const [movies, setMovies] = useState([]);
-  const [query, setQuery] = useState("");
+    const [user, setUser] = useState(storedUser ? storedUser : null);
+    const [token, setToken] = useState(storedToken ? storedToken : null);
 
-  const handleSearch = (e) => {
-    const query = e.target.value;
-    setQuery(query);
-  };
+    const [movies, setMovies] = useState([]);
+    // const [selectedMovie, setSelectedMovie] = useState(null);
 
-  useEffect(() => {
-    if (!token) {
-      return;
-    }
+    useEffect(() => {
+        if (!token) {
+            return;
+        }
 
-    fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+        fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies', {
+            headers: { Authorization: `Bearer ${token}` }
+        })
         .then((response) => response.json())
         .then((data) => {
             const moviesFromApi = data.map((doc) => {
                 return {
-                    id: doc._id,
-                    title: doc.Title,
-                    release_date: doc.Release_Date,
-                    rating: doc.Rating,
-                    genre: doc.Genre.Name,
-                    director: doc.Director.Name,
-                    image: doc.Image_Url,
-                    description: doc.Description
+                    _id: doc._id,
+                    Title: doc.Title,
+                    Description: doc.Description,
+                    Genre: doc.Genre.Name,
+                    Director: doc.Director.Name,
+                    ImagePath: doc.ImagePath,
+                    Featured: doc.Featured
                 };
             });
-
             setMovies(moviesFromApi);
         })
-        .catch((err) => {
-            console.error(err);
+        .catch((error) => {
+            console.error(error);
         });
-}, [token]);
+    }, [token]);
 
-
-
-
-const handleSearch =(e) => {
-    
-    const query = e.target.value;
-    setQuery(query);
-      .then((response) => response.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          const moviesFromApi = data.map((movie) => ({
-            id: movie._id,
-            title: movie.Title,
-            description: movie.Description,
-            genre: movie.Genre.Name,
-            director: movie.Director.Name,
-            year: movie.Year,
-          }));
-
-          const storedMovies = JSON.parse(localStorage.getItem("movies"));
-
-          let filteredMovies = [];
-          if (Array.isArray(storedMovies)) {
-            filteredMovies = storedMovies.filter((movie) => {
-              return (
-                movie.title.toLowerCase().includes(query.toLowerCase()) ||
-                (movie.genre &&
-                  movie.genre
-                    .map((g) => g.toLowerCase())
-                    .includes(query.toLowerCase()))
-              );
-            });
-          }
-
-          setMovies([...moviesFromApi, ...filteredMovies]);
-        }
-      });
-  }, [token, query]);
-
-  const isLoggedIn = Boolean(user);
-  const hasMovies = Boolean(movies && movies.length > 0);
-
-  const renderMovies = () => (
-    <Row>
-  {movies.map((movie) => (
-  <Col className="mb-5" sm={6} md={4} lg={3} key={movie.id}>
-    <MovieCard
-      isFavorite={user && user.FavoriteMovies.includes(movie.Title)}
-      movie={movie}
-    />
-  </Col>
-      ))}
-    </Row>
-  );
-
-  return (
-    <BrowserRouter>
-      <NavigationBar
-        user={user}
-        query={query}
-        handleSearch={handleSearch}
-        movies={movies}
-        onLoggedOut={() => {
-          setUser(null);
-          setToken(null);
-          localStorage.clear();
-        }}
-      />
-      <br />
-      <Row className="justify-content-center">
-        <Routes>
-          <Route
-            path="/users"
-            element={isLoggedIn ? <Navigate to="/" /> : <SignupView />}
-          />
-          <Route
-            path="/login"
-            element={
-              isLoggedIn ? (
-                <Navigate to="/" />
-              ) : (
-                <LoginView
-                  onLoggedIn={(user, token) => {
-                    setUser(user);
-                    setToken(token);
-                  }}
-                />
-              )
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              isLoggedIn ? (
-                <ProfileView
-                  token={token}
-                  user={user}
-                  movies={movies}
-                  onSubmit={setUser}
-                />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-          <Route
-            path="/"
-            element={
-              isLoggedIn ? (
-                !hasMovies ? (
-                  <Col>The list is empty!</Col>
-                ) : (
-                  renderMovies()
-                )
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-        </Routes>
-      </Row>
-    </BrowserRouter>
-  );
+    return (
+        <BrowserRouter>
+            <NavigationBar
+                user={user}
+                onLoggedOut={() => {
+                    setUser(null);
+                }}
+            />
+            <Row className='justify-content-md-center'>
+                <Routes>
+                    <Route
+                        path='/signup'
+                        element={
+                            <>
+                                {user ? (
+                                    <Navigate to='/' />
+                                ) : (
+                                    <Col md={5}>
+                                        <SignupView />
+                                    </Col>
+                                )}
+                            </>
+                        }
+                    />
+                    <Route
+                        path='/login'
+                        element={
+                            <>
+                                {user ? (
+                                    <Navigate to='/' />
+                                ) : (
+                                    <Col md={5}>
+                                        <LoginView onLoggedIn={(user) => setUser(user)} />
+                                    </Col>
+                                )}
+                            </>
+                        }
+                    />
+                    <Route
+                        path='/movies/:movieId'
+                        element={
+                            <>
+                                {!user ? (
+                                    <Navigate to='/login' replace />
+                                ) : movies.length === 0 ? (
+                                    <Col>The list is empty!</Col>
+                                ) : (
+                                    <Col md={8}>
+                                        <MovieView movies={movies} />
+                                    </Col>
+                                )}
+                            </>
+                        }
+                    />
+                    <Route
+                        path="/"
+                        element={
+                            <>
+                                {!user ? (
+                                    <Navigate to="/login" replace />
+                                ) : movies.length === 0 ? (
+                                    <Col>The list is empty!</Col>
+                                ) : (
+                                    <>
+                                        {movies.map((movie) => (
+                                            <Col className="mb-4" key={movie.id} md={3}>
+                                                <MovieCard movie={movie} />
+                                            </Col>
+                                        ))}
+                                    </>
+                                )}
+                            </>
+                        }
+                    />
+                </Routes>
+            </Row>
+        </BrowserRouter>
+    );
 };

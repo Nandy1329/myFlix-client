@@ -1,35 +1,38 @@
-$primary: rgb(57, 99, 64);
-$body-bg: #f4f4f4;
+$color_1: #fff;
+$color_2: #fff;
+$color_3: rgba(255, 255, 255, 0.8);
+$color_4: rgba(255, 255, 255, 0.5);
+$background-color_1: var(--primary-color);
+$background-color_2: transparent;
+$border-color_1: #fff;
 
-// Navbar styles
+/* Define variables */
+/* Navbar styles */
+&:root {
+	--primary-color: rgb(57, 99, 64);
+}
 .navbar {
-  background-color: $primary;
-  border-bottom: 2px solid darken($primary, 10%);
-  padding: 10px 0;
+	background-color: $background-color_1;
+	border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+	padding: 10px 0;
 }
-
 .navbar-brand {
-  color: #fff; // White color for the brand text
-  font-weight: bold;
+	color: $color_1;
 }
-
-.nav-link {
-  color: #fff; // White color for the navigation links
-  font-weight: bold;
-  transition: color 0.3s ease; // Smooth transition for link color change
-}
-
-.nav-link:hover {
-  color: lighten($primary, 20%); // Lighten link color on hover
-}
+.na-link {
+	color: $color_2;
+	font-weight: bold;
+	transition: color 0.3s ease;
+	&:hover {
+		color: $color_3;
+	}
 
 .form-control {
-  background-color: transparent;
-  border-color: #fff; // White border for form controls
-  color: #fff; // White color for form control text
+	background-color: $background-color_2;
+	border-color: $border-color_1;
+	color: $color_2;
+	&::placeholder {
+		color: $color_4;
+	}
 }
-
-.form-control::placeholder {
-  color: rgba(255, 255, 255, 0.5); // Semi-transparent white for placeholder text
 }
-

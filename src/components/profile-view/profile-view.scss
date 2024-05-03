@@ -1,23 +1,23 @@
+$background-color_1: #19cf35;
+
 .card-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }
-
-.card-title,
+.card-title {
+	text-align: center;
+}
 .card-text {
-    text-align: center;
+	text-align: center;
 }
-
 .button-delete {
-    align-self: flex-end;
+	align-self: flex-end;
 }
-
 .profile-img {
-    display: block;
-    margin: 1.5rem auto; 
+	display: block;
+	margin: 1.5rem auto;
 }
-
 .card {
-    background-color: #19cf35; 
+	background-color: $background-color_1;
 }
