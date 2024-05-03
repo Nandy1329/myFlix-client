@@ -1,95 +1,117 @@
-import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import { FavoriteMovies } from "./favorite-movies";
-import { UpdateUser } from "./update-user";
 
-export const ProfileView = ({ movies }) => {
-  const [user, setUser] = useState(null);
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [birthday, setBirthday] = useState("");
+import { React, useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import Col from 'react-bootstrap/Col';
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const isoDate = new Date(birthday);
+export const ProfileView = ({ user }) => {
+    var userInfo = user;
 
-    const updatedUserData = {
-      UserName: username,
-      Email: email,
-      Birthday: isoDate,
-      Password: password
-    };
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('');
+    const [birth_date, setBirth_date] = useState('');
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        const data = {
+            Username: username,
+            Password: password,
+            Email: email,
+            Birth_Date: birth_date
+        };
     
     fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user._id}`, {
       method: "PUT",
-      body: JSON.stringify(updatedUserData),
+      body: JSON.stringify(data),
       headers: {
-        "Content-Type": "application/json"
-      }
-    });
-  };
-
-  let favoriteMovies = [];
-  if (user) {
-    favoriteMovies = movies.filter((m) => user.FavoriteMovies.includes(m._id));
-  }
-
-  useEffect(() => {
-    fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          alert('Failed to fetch user data');
-        }
-      }) 
-      .then((data) => {
-        setUser(data);
-        setUsername(data.Username);
-        setEmail(data.Email);
-        // Set other state variables as needed
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
-
-  return (
-    <Row>
-      <Col>
-        <h2> My Profile </h2>
-        <p>User: {user && user.Username}</p>
-        <p>Email: {user && user.Email}</p>
-      </Col>
-      <Col md={4}>
-        <FavoriteMovies favoriteMovies={favoriteMovies} />
-      </Col>
-      <Col>
-        <UpdateUser 
-          username={username} 
-          email={email} 
-          password={password} 
-          birthday={birthday} 
-          setUsername={setUsername} 
-          setEmail={setEmail} 
-          setPassword={setPassword} 
-          setBirthday={setBirthday} 
-          handleSubmit={handleSubmit} 
-        />
-      </Col>
-    </Row>
-  ); 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    }
+}).then((response) => {
+    if (response.ok) {
+        alert('Update successful.');
+        window.location.reload();
+    } else {
+        alert('Update failed.');
+    }
+});
 };
 
-ProfileView.propTypes = {
-  movies: PropTypes.array.isRequired
-};
-export default ProfileView;
+
+return (
+  <>
+      <Col>
+          <div>
+              <span>Username: </span>
+              <span>{userInfo.username}</span>
+          </div>
+          <div>
+              <span>Password: </span>
+              <span>********</span>
+          </div>
+          <div>
+              <span>Email: </span>
+              <span>{userInfo.email}</span>
+          </div>
+          <div>
+              <span>Birthday: </span>
+              <span>{userInfo.birth_date}</span>
+          </div>
+          <div>
+              <span>Favorite Movies: </span>
+              <span>{userInfo.favorite_movies}</span>
+          </div>
+      </Col>
+      <Col>
+          <Form onSubmit={handleSubmit}>
+              <Form.Group>
+                  <Form.Label>Username: </Form.Label>
+                  <Form.Control
+                      type='text'
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      required
+                      minLength='5'
+                  />
+              </Form.Group>
+
+              <Form.Group>
+                  <Form.Label>Password: </Form.Label>
+                  <Form.Control
+                      type='password'
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                  />
+              </Form.Group>
+
+              <Form.Group>
+                  <Form.Label>Email: </Form.Label>
+                  <Form.Control
+                      type='email'
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                  />
+              </Form.Group>
+
+              <Form.Group>
+                  <Form.Label>Birthday: </Form.Label>
+                  <Form.Control
+                      type='date'
+                      value={birth_date}
+                      onChange={(e) => setBirth_date(e.target.value)}
+                      required
+                  />
+              </Form.Group>
+
+              <Button variant='primary' type='submit'>
+                  Submit
+              </Button>
+          </Form>
+      </Col>
+  </>
+)
+}
