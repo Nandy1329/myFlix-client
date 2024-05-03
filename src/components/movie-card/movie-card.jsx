@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { Card, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-export const MovieCard = ({ movie }) => {
+export const MovieCard = ({ movie, onMovieClick }) => {
     return (
         <Card className="h-100 shadow-1g">
             <Card.Img variant="top" src={movie.ImagePath} />
