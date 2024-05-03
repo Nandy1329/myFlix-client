@@ -27244,7 +27244,7 @@ const MainView = ()=>{
                     Director: {
                         Name: movie.Director.Name
                     },
-                    Year: movie.Year
+                    ReleaseDate: movie.ReleaseDate
                 };
             });
             setMovies(moviesFromApi);
@@ -27377,53 +27377,26 @@ const MainView = ()=>{
                                 }, void 0, false, {
                                     fileName: "src/components/main-view/main-view.jsx",
                                     lineNumber: 140,
-                                    columnNumber: 19
+                                    columnNumber: 37
                                 }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _colDefault.default), {
-                                    children: [
-                                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _rowDefault.default), {
-                                            children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(ProfileView, {
-                                                user: user,
-                                                token: token,
-                                                onUserUpdated: (user, token)=>{
-                                                    setUser(user);
-                                                    setToken(token);
-                                                }
-                                            }, void 0, false, {
-                                                fileName: "src/components/main-view/main-view.jsx",
-                                                lineNumber: 144,
-                                                columnNumber: 23
-                                            }, void 0)
+                                    children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _rowDefault.default), {
+                                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(ProfileView, {
+                                            user: user,
+                                            token: token
                                         }, void 0, false, {
                                             fileName: "src/components/main-view/main-view.jsx",
-                                            lineNumber: 143,
-                                            columnNumber: 21
-                                        }, void 0),
-                                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _rowDefault.default), {
-                                            children: movies.map((movie)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _colDefault.default), {
-                                                    className: "mb-4",
-                                                    md: 3,
-                                                    children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieCard.MovieCard), {
-                                                        movie: movie
-                                                    }, void 0, false, {
-                                                        fileName: "src/components/main-view/main-view.jsx",
-                                                        lineNumber: 152,
-                                                        columnNumber: 27
-                                                    }, void 0)
-                                                }, movie.id, false, {
-                                                    fileName: "src/components/main-view/main-view.jsx",
-                                                    lineNumber: 151,
-                                                    columnNumber: 25
-                                                }, void 0))
-                                        }, void 0, false, {
-                                            fileName: "src/components/main-view/main-view.jsx",
-                                            lineNumber: 149,
-                                            columnNumber: 21
+                                            lineNumber: 144,
+                                            columnNumber: 45
                                         }, void 0)
-                                    ]
-                                }, void 0, true, {
+                                    }, void 0, false, {
+                                        fileName: "src/components/main-view/main-view.jsx",
+                                        lineNumber: 143,
+                                        columnNumber: 41
+                                    }, void 0)
+                                }, void 0, false, {
                                     fileName: "src/components/main-view/main-view.jsx",
                                     lineNumber: 142,
-                                    columnNumber: 19
+                                    columnNumber: 37
                                 }, void 0)
                             }, void 0, false)
                         }, void 0, false, {

@@ -21,7 +21,7 @@ export const MainView = () => {
   useEffect(() => {
     if (!token) {
       return;
-    }
+    };
 
     fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user}', {
       method: 'GET',
@@ -65,7 +65,7 @@ export const MainView = () => {
             Director: {
               Name: movie.Director.Name,
             },
-            Year: movie.Year,
+           ReleaseDate: movie.ReleaseDate,
           };
         });
         setMovies(moviesFromApi);
@@ -133,33 +133,30 @@ export const MainView = () => {
             }
           />
           <Route
-            path="/profile"
-            element={
-              <>
-                {!user ? (
-                  <Navigate to='/login' replace />
-                ) : (
-                  <Col>
-                    <Row>
-                      <ProfileView user={user} token={token} onUserUpdated={(user, token) => {
-                        setUser(user);
-                        setToken(token);
-                      }} />
-                    </Row>
-                    <Row>
-                      {movies.map((movie) => (
-                        <Col className='mb-4' key={movie.id} md={3}>
-                          <MovieCard movie={movie} />
-                        </Col>
-                      ))}
-                    </Row>
-                  </Col>
-                )}
-              </>
-            }
-          />
-        </Routes>
-      </Row>
-    </BrowserRouter>
-  );
+                        path='/profile'
+                        element={
+                            <>
+                                {!user ? (
+                                    <Navigate to='/login' replace />
+                                ) : (
+                                    <Col>
+                                        <Row>
+                                            <ProfileView user={user} token={token} />
+                                        </Row>
+                                        {/* <Row>
+                                            {movies.map((movie) => (
+                                                <Col className='mb-4' key={movie.id} md={3}>
+                                                    <MovieCard movie={movie} />
+                                                </Col>
+                                            ))}
+                                        </Row> */}
+                                    </Col>
+                                )}
+                            </>
+                        }
+                    />
+                </Routes>
+            </Row>
+        </BrowserRouter>
+    );
 };
