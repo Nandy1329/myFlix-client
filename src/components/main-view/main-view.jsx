@@ -78,6 +78,7 @@ export const MainView = () => {
         user={user}
         onLoggedOut={() => {
           setUser(null);
+          localStorage.clear();
         }}
       />
       <Row className='justify-content-md-center'>
@@ -141,16 +142,21 @@ export const MainView = () => {
                                 ) : (
                                     <Col>
                                         <Row>
-                                            <ProfileView user={user} token={token} />
-                                        </Row>
-                                        {/* <Row>
-                                            {movies.map((movie) => (
-                                                <Col className='mb-4' key={movie.id} md={3}>
+                                                <ProfileView 
+                                                onDelete={() => {
+                                                  setUser(null);
+                                                  setToken(null);
+                                                  localStorage.clear();
+                                                }} />
+                                              </Row>
+                                              {/* <Row>
+                                                {movies.map((movie) => (
+                                                  <Col className='mb-4' key={movie.id} md={3}>
                                                     <MovieCard movie={movie} />
-                                                </Col>
-                                            ))}
-                                        </Row> */}
-                                    </Col>
+                                                  </Col>
+                                                ))}
+                                              </Row> */}
+                                            </Col>
                                 )}
                             </>
                         }

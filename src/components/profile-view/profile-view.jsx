@@ -5,7 +5,9 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { FavoriteMovies } from './favorite-movies';
 
-export const ProfileView = ({ user, token }) => {
+export const ProfileView = ({ onDelete }) => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const storedToken = localStorage.getItem('token');
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -21,46 +23,67 @@ export const ProfileView = ({ user, token }) => {
             return;
         }
 
-        const data = {
+        const inputData = {
             Username: username,
             Password: password,
             Email: email,
             Birth_Date: birth_date
         };
+        console.log('inputData: ', inputData);
 
-        fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}`, {
+        fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${storedUser.Username}`, 
+        {
             method: 'PUT',
-            body: JSON.stringify(data),
+            body: JSON.stringify(inputData),
             headers: {
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${storedToken}`,
                 'Content-Type': 'application/json'
             }
         }).then((response) => {
             if (response.ok) {
-                alert('User update successful.');
-                console.log('User updated: ', data);
-                window.location.reload();
+                alert('User information updated successfully.');
+                console.log('User information updated: ', inputData);
+                fetchUpdatedUser(inputData.Username);
             } else {
-                alert('User update failed.');
+                alert('User information update failed.');
             }
         });
     };
 
+
+      const  fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/$(newUsername}`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${storedToken}`,
+            'Content-Type': 'application/json'
+        }
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data) {
+                localStorage.setItem('user', JSON.stringify(data));
+                console.log('Local storage updated: ', data);
+                window.location.reload();
+            } else {
+                alert('Local storage update failed.');
+            }
+        });
+}
     return (
         <Col>
             <Row>  {/* Display user information */}
                 <h3>User Profile</h3>
                 <div>
                     <span>Username: </span>
-                    <span>{username}</span>
+                    <span>{storedUser.Username}</span>
                 </div>
                 <div>
                     <span>Email: </span>
-                    <span>{email}</span>
+                    <span>{storedUser.Email}</span>
                 </div>
                 <div>
                     <span>Date of Birth: </span>
-                    <span>{birth_date.slice(0,10)}</span>
+                    <span>{storedUser.Birth_Date.slice(0,10)}</span>
                 </div>
             </Row>
             <Row>{/* Update user info */}
