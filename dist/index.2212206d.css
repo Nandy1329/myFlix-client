@@ -13384,4 +13384,92 @@ textarea.form-control-lg {
   font-size: 13px;
   font-style: italic;
 }
+
+:root {
+  --primary-color: #396340;
+  --secondary-color: #f4ff1a;
+}
+
+.navbar {
+  background-color: var(--primary-color);
+  border-bottom: 2px solid #2d4e32;
+  padding: 10px 0;
+}
+
+.navbar-brand {
+  color: #fff;
+  font-weight: bold;
+}
+
+.nav-link {
+  color: #fff;
+  font-weight: bold;
+  transition: color .3s;
+}
+
+.nav-link:hover {
+  color: #c9ffcf;
+}
+
+.form-control {
+  color: #fff;
+  background-color: #0000;
+  border-color: #fff;
+}
+
+.form-control::placeholder {
+  color: #ffffff80;
+}
+
+.title {
+  margin: 24px 0 16px;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.card {
+  background-color: #fefeff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: box-shadow .3s;
+  box-shadow: 0 2px 4px #0000001a;
+}
+
+.card:hover {
+  box-shadow: 0 4px 8px #0003;
+}
+
+.card-body {
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  display: flex;
+}
+
+.card-title {
+  text-align: center;
+  margin-bottom: .5rem;
+  font-size: 1.2rem;
+}
+
+.card-text {
+  text-align: center;
+  color: #6c757d;
+}
+
+.button-delete {
+  color: #fff;
+  cursor: pointer;
+  background-color: #dc3545;
+  border: none;
+  border-radius: 4px;
+  align-self: flex-end;
+  margin-top: auto;
+  padding: .5rem 1rem;
+  transition: background-color .3s;
+}
+
+.button-delete:hover {
+  background-color: #c82333;
+}
 /*# sourceMappingURL=index.2212206d.css.map */
