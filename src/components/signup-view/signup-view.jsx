@@ -1,11 +1,33 @@
+import React, { useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import { Row, Col, Card } from 'react-bootstrap';
+
+
 export const SignupView = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
   const [birthday, setBirthday] = useState("");
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+       // Perform validation checks before submitting the form
+       if (UserName.length < 5) {
+        alert("Username must be at least 5 characters long");
+        return;
+      }
+  
+      if (password.length < 8) {
+        alert("Password must be at least 8 characters long");
+        return;
+      }
+  
+      if (!/\S+@\S+\.\S+/.test(email)) {
+        alert("Invalid email address");
+        return;
+      }
 
     const formData = {
       Username: username,
@@ -28,54 +50,32 @@ export const SignupView = () => {
     }).catch((error) => {
       alert("An error occurred, please try again");
     });
-  }; 
+  };
 
   return (
-    <Form onSubmit={handleSubmit}>
-        <Form.Group controlId='formUsername'>
-            <Form.Label>Username: </Form.Label>
-            <Form.Control
-                type='text'
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                minLength='5'
-            />
-        </Form.Group>
+    <Row>
+      <Col>
+        <Card>
+          <Card.Body>
+            <Card.Title>Sign Up</Card.Title>
+            <Card.Text>
+              Please fill in the form below to sign up.
+            </Card.Text>
+            {signupForm}
+          </Card.Body>
+        </Card>
+      </Col>
 
-        <Form.Group controlId='formPassword'>
-            <Form.Label>Password: </Form.Label>
-            <Form.Control
-                type='password'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-            />
-        </Form.Group>
-
-        <Form.Group controlId='formEmail'>
-            <Form.Label>Email: </Form.Label>
-            <Form.Control
-                type='email'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-            />
-        </Form.Group>
-
-        <Form.Group controlId='formBirthDate'>
-            <Form.Label>Birthday: </Form.Label>
-            <Form.Control
-                type='date'
-        value={birthday}
-        onChange={(e) => setBirthday(e.target.value)}
-        required
-      />
-      </Form.Group>
-      <br />
-   
-      <Button variant="primary" type="submit"> Sign up </Button>
-    </Form>
+      <Col>
+        <Card>
+          <Card.Body>
+            <Card.Text>
+              Already have an account? <Link to={`/`}>Login here</Link>
+            </Card.Text>
+          </Card.Body>
+        </Card>
+      </Col>
+    </Row>
+  
   );
-};
-// Path: src/components/login-view/login-view.jsx
+}

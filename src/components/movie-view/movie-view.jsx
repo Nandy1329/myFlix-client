@@ -1,45 +1,42 @@
-import { useParams } from 'react-router';
-import { Link } from 'react-router-dom';
-import './movie-view.scss';
+import React from "react";
+import PropTypes from "prop-types";
+import { Button, Form } from "react-bootstrap";
 
-export const MovieView = ({ movies }) => {
-    const { movieId } = useParams();
 
-    const movie = movies.find((m) => m.id === movieId);
+export const MovieView = ({ movie, onBackClick }) => {
+  return (
+    <div className="movie-view">
+      <div className="movie-title">
+        <span className="label">Title: </span>
+        <span className="value">{movie.Title}</span>
+      </div>
+      <div className="movie-description">
+        <span className="label">Description: </span>
+        <span className="value">{movie.Description}</span>
+      </div>
+      <div className="movie-genre">
+        <span className="label">Genre: </span>
+        <span className="value">{movie.Genre.Name}</span>
+      </div>
+      <div className="movie-director">
+        <span className="label">Director: </span>
+        <span className="value">{movie.Director.Name}</span>
+      </div>
+      <Button variant="primary" onClick={() => { onBackClick(null); }}>Back</Button>
+    </div>
+  );
+};
 
-    return (
-        <div>
-            <div>
-                <img src={movie.image} className='w-100' />
-            </div>
-            <div>
-                <span>Title: </span>
-                <span>{movie.title}</span>
-            </div>
-            <div>
-                <span>Release Date: </span>
-                <span>{movie.release_date}</span>
-            </div>
-            <div>
-                <span>Genre: </span>
-                <span>{movie.genre}</span>
-            </div>
-            <div>
-                <span>Director: </span>
-                <span>{movie.director}</span>
-            </div>
-            <div>
-                <span>Description: </span>
-                <span>{movie.description}</span>
-            </div>
-            <Link to={'/'}>
-                <button
-                    className='back-button'
-                    style={{ cursor: 'pointer' }}
-                >
-                    Back
-                </button>
-            </Link>
-        </div>
-    );
+MovieView.propTypes = {
+  movie: PropTypes.shape({
+    Title: PropTypes.string,
+    Description: PropTypes.string,
+    Genre: PropTypes.shape({
+      Name: PropTypes.string
+    }),
+    Director: PropTypes.shape({
+      Name: PropTypes.string
+    })
+  }).isRequired,
+  onBackClick: PropTypes.func.isRequired
 };
