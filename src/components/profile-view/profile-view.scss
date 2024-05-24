@@ -1,23 +1,9 @@
-$background-color_1: #19cf35;
+.profile-card {
+	border: 3px solid darkseagreen;
+	padding: 1rem;
+	margin-bottom: 2rem;
+}
 
-.card-body {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-.card-title {
-	text-align: center;
-}
-.card-text {
-	text-align: center;
-}
-.button-delete {
-	align-self: flex-end;
-}
-.profile-img {
-	display: block;
-	margin: 1.5rem auto;
-}
-.card {
-	background-color: $background-color_1;
+.back-button {
+	margin-top: 1rem;
 }

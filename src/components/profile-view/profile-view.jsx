@@ -1,48 +1,71 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { Button, Form } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Container, Row, Col, Button } from "react-bootstrap";
+import { UserInfo } from "./user-info";
+import { FavoriteMovies } from "./favorite-movies";
+import UpdateUser from "./update-user";
+import "./profile-view.scss";
 
-import { useEffect, useState } from "react";
-import { FavoriteMovies } from "../favorite-movies/favorite-movies";
-import { UpdateUser } from "../update-user/update-user";
-import { Card, Button, ImagePath } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import { MovieCard } from "../movie-card/movie-card";
+export const ProfileView = ({user, movies, favoritesMovies, addToFavorites, removeFromFavorites}) => {
 
-export const ProfileView = ({ user, movies, onMovieClick }) => {
-  const [favoriteMovies, setFavoriteMovies] = useState([]);
-  const [userProfile, setUserProfile] = useState(user);
-  const [userUpdate, setUserUpdate] = useState(false);
+  const updateUser = (updatedUser) => {
+    fetch(`/users/${user.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: updatedUser.email,
+        name: updatedUser.name,
+        birthday: updatedUser.birthday,
+        UserName: updatedUser.UserName,
+        password: updatedUser.password,
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error("Network response was not ok.");
+      })
+      .then((data) => {
+        setUser(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
-  useEffect(() => {
-    setFavoriteMovies(user.FavoriteMovies);
-  }, [user]);
-
-  const handleUpdate = () => {
-    setUserUpdate(true);
+  const handleUserInfoChange = (updatedUser) => {
+    setUser((prevUser) => ({ ...prevUser, ...updatedUser }));
   };
 
   return (
-    <div className="profile-view">
-      <h1>Profile</h1>
-      <div className="username">
-        <span className="label">Username: </span>
-        <span className="value">{userProfile.Username}</span>
-      </div>
-      <div className="email">
-        <span className="label">Email: </span>
-        <span className="value">{userProfile.Email}</span>
-      </div>
-      <div className="birthday">
-        <span className="label">Birthday: </span>
-        <span className="value">{userProfile.Birthday}</span>
-      </div>
-      <div className="favorite-movies">
-        <span className="label">Favorite Movies: </span>
-        <FavoriteMovies movies={movies} favoriteMovies={favoriteMovies} />
-      </div>
-      <Button variant="primary" onClick={handleUpdate}>Update Profile</Button>
-      {userUpdate && <UpdateUser user={userProfile} />}
-    </div>
+    <>
+      <h1 style={{ color: 'DarkSlateGray' }}>Profile</h1>
+      <Container>
+        <Row>
+          <Col md={4}>
+            {user && (
+              <>
+                <div className="profile-card">
+                  <UserInfo
+                    user={user}
+                  />
+                </div>
+                <UpdateUser user={user} handleSubmit={updateUser} />
+              </>
+            )}
+          </Col>
+          <Col md={8}>
+            <FavoriteMovies
+              movies={movies}
+              favoritesMovies={favoritesMovies}
+              onAddFavorite={addToFavorites}
+              onRemoveFavorite={removeFromFavorites}
+            />
+          </Col>
+        </Row>
+      </Container>
+    </>
   );
-}
+};

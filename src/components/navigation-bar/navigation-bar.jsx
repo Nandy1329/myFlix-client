@@ -1,39 +1,55 @@
-import React from "react";  
-import PropTypes from "prop-types";
-import { Button, Form } from "react-bootstrap";
-import { MovieCard } from "../movie-card/movie-card";
+import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
-import { SearchBar } from "../search-bar/search-bar";
-import { Container, Navbar, Nav, Form, Row, Col } from "react-bootstrap";
-import { Routes, Route } from "react-router-dom";
+import { Navbar, Container, Nav } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
+import "./navigation-bar.scss";
 
-export const NavigationBar = ({user, query, movies, handleSearch, onLoggedIn, onLoggedOut}) => {
+export const NavigationBar = ({ user, onLoggedOut }) => {
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setLoggedIn(true);
+    } else {
+      setLoggedIn(false);
+    }
+  }, [user]);
+
   return (
-    <Navbar bg="light" expand="lg">
-      <Navbar.Brand href="/">MyFlix</Navbar.Brand>
-      <Navbar.Toggle aria-controls="basic-navbar-nav" />
-      <Navbar.Collapse id="basic-navbar-nav">
-        <Nav className="mr-auto">
-          <Nav.Link href="/movies">Movies</Nav.Link>
-          <Nav.Link href="/profile">Profile</Nav.Link>
-          <Nav.Link href="/login">Login</Nav.Link>
-          <Nav.Link href="/register">Register</Nav.Link>
-        </Nav>
-        <Form inline>
-          <SearchBar query={query} handleSearch={handleSearch} />
-          {user ? (
-            <Button variant="primary" onClick={onLoggedOut}>
-              Logout
+    <Navbar className="custom-navbar" expand="lg">
+      <Container>
+        <Navbar.Brand as={Link} to="/">
+          Movies App
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="me-auto">
+            <Nav.Link as={Link} to="/">
+              Home
+            </Nav.Link>
+            {loggedIn && (
+              <Nav.Link as={Link} to={`/users/${user?.UserName}`}>
+                Profile
+              </Nav.Link>
+            )}
+            {!loggedIn && (
+              <>
+                <Nav.Link as={Link} to="/signup">
+                  Sign up
+                </Nav.Link>
+                <Nav.Link as={Link} to="/login">
+                  Log in
+                </Nav.Link>
+              </>
+            )}
+          </Nav>
+          {loggedIn && (
+            <Button variant="outline-secondary" onClick={onLoggedOut}>
+              Log out
             </Button>
-          ) : (
-            <Link to="/login">
-              <Button variant="primary">Login</Button>
-            </Link>
           )}
-        </Form>
-      </Navbar.Collapse>
+        </Navbar.Collapse>
+      </Container>
     </Navbar>
-
-    
   );
-}
+};

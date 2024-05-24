@@ -1,67 +1,28 @@
-$color_1: #6c757d;
-$color_2: #fff;
-$background-color_1: #fefeff;
-$background-color_2: #dc3545;
-$background-color_3: #c82333;
-
-/* Typography */
-/* Card */
-/* Buttons */
-/* Profile Image */
-/* Responsive adjustments */
-.title {
-	margin: 24px 0 16px;
-	font-size: 1.5rem;
-	font-weight: bold;
-}
-.card {
-	background-color: $background-color_1;
-	border: 1px solid #ccc;
-	border-radius: 8px;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	transition: box-shadow 0.3s ease;
-	&:hover {
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-	}
-}
-.card-body {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	padding: 1.5rem;
-}
-.card-title {
-	text-align: center;
-	font-size: 1.2rem;
-	margin-bottom: 0.5rem;
-}
-.card-text {
-	text-align: center;
-	color: $color_1;
-}
-.button-delete {
-	align-self: flex-end;
-	margin-top: auto;
-	background-color: $background-color_2;
-	color: $color_2;
-	border: none;
-	padding: 0.5rem 1rem;
-	border-radius: 4px;
+.movie-card-img {
+	max-width: 200px;
+	max-height: 300px;
+	margin: 10px;
+	border-radius: 5px;
+	box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
 	cursor: pointer;
-	transition: background-color 0.3s ease;
-	&:hover {
-		background-color: $background-color_3;
-	}
 }
-.profile-img {
-	display: block;
-	margin: 24px auto;
-	border-radius: 50%;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+.card {
+	background-color: rgba(255, 255, 255, 0.8);
+	border-radius: 5px;
+	box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
 }
-@media (max-width: 576px) {
-	.card {
-		width: 100%;
-		margin-bottom: 1rem;
-	}
+
+.fav-movie-container {
+	max-height: 100%;
+	padding: 2rem;
+
 }
+
+.card-buttons {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 1rem
+}
+

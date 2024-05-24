@@ -1,38 +1,27 @@
-$color_1: #fff;
-$color_2: #fff;
-$color_3: rgba(255, 255, 255, 0.8);
-$color_4: rgba(255, 255, 255, 0.5);
-$background-color_1: var(--primary-color);
-$background-color_2: transparent;
-$border-color_1: #fff;
+.custom-navbar {
+	background-color: darkseagreen;
+	font-size: 20px;
+	margin-bottom: 5%;
+}
 
-/* Define variables */
-/* Navbar styles */
-&:root {
-	--primary-color: rgb(57, 99, 64);
-}
-.navbar {
-	background-color: $background-color_1;
-	border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-	padding: 10px 0;
-}
 .navbar-brand {
-	color: $color_1;
+	color: sienna;
 }
-.na-link {
-	color: $color_2;
-	font-weight: bold;
-	transition: color 0.3s ease;
-	&:hover {
-		color: $color_3;
-	}
 
-.form-control {
-	background-color: $background-color_2;
-	border-color: $border-color_1;
-	color: $color_2;
-	&::placeholder {
-		color: $color_4;
-	}
+.nav-link {
+	color: sienna
 }
+
+&:hover {
+	background-color: lightseagreen;
+}
+
+.btn-outline-secondary {
+	color: sienna;
+	border-color: lightseagreen;
+}
+
+&:hover {
+	background-color: lightseagreen;	
+	color: slategray;
 }

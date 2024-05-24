@@ -67,15 +67,15 @@ const validateForm = () => {
               <Card.Title>Please Login</Card.Title>
               <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="formUserLogin">
-                  <Form.Label>userName:</Form.Label>
+                  <Form.Label>UserName:</Form.Label>
                   <Form.Control
                     type="text"
-                    value={userName}
+                    value={UserName}
                     onChange={(e) => setUserName(e.target.value)}
                     required
                     minLength="5"
                   />
-                  {formErrors.userName && <div>{formErrors.userName}</div>}
+                  {formErrors.UserName && <div>{formErrors.UserName}</div>}
                 </Form.Group>
 
                 <Form.Group controlId="formPassword">

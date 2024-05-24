@@ -1,74 +1,85 @@
-import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import { Button, Card } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { Button, Card } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import './movie-card.scss';
 
-export const MovieCard = ({ movie, onMMovieClick }) => {
-  const storedToken = localStorage.getItem("token");
-  const storedUser = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
+export const MovieCard = ({ fav, movie, onAddToFavorites, onRemoveFromFavorites  }) => {
+  const maxDescriptionLength = 100;
+  const truncatedDescription =
+    movie.description.length > maxDescriptionLength
+      ? `${movie.description.substring(0, maxDescriptionLength)}...`
+      : movie.description;
 
-  const [user, setUser] = useState(storedUser);
-  const [token, setToken] = useState(storedToken);
-  const [addTitle, setAddTitle] = useState("");
-  const [delTitle, setDelTitle] = useState("");
+  const [isFavorite, setIsFavorite] = useState(fav);
 
-  const handleAdd = (e) => {
-    e.preventDefault();
-    fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user}/Movies/${movie._id}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setAddTitle(data.Title);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
+      useEffect(() => {
+        setIsFavorite(fav);
+      }, [fav]);
 
-  const handleDelete = (e) => {
-    e.preventDefault();
-    fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user}/Movies/${movie._id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setDelTitle(data.Title);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
+
+  const handleAddToFavorites = (event) => {
+    event.preventDefault();
+    onAddToFavorites(movie.id);
+    setIsFavorite(true);
+  };
+
+  const handleRemoveFromFavorites = (event) => {
+    event.preventDefault();
+    onRemoveFromFavorites(movie.id);
+    setIsFavorite(false);
+  };
+
+  const handleFavoriteClick = (event) => {
+    event.preventDefault();
+    if (isFavorite) {
+      setIsFavorite(false);
+    } else {
+      handleAddToFavorites(event);
+    }
+  };
 
   return (
-    <Card className="movie-card">
-      <Card.Img variant="top" src={movie.ImagePath} />
+    <Card className="h-100">
+      <Card.Img
+        className="movie-card-img"
+        variant="top"
+        src={movie.image}
+        alt={movie.title}
+      />
       <Card.Body>
-        <Card.Title>{movie.Title}</Card.Title>
-        <Card.Text>{movie.Description}</Card.Text>
-        <Link to={`/movies/${movie._id}`}>
-          <Button variant="link">Open</Button>
-        </Link>
-        <Button variant="link" onClick={handleAdd}>Add</Button>
-        <Button variant="link" onClick={handleDelete}>Delete</Button>
+        <Card.Title>{movie.title}</Card.Title>
+        <Card.Text>{truncatedDescription}</Card.Text>
+        <div className="button-group">
+          <Link to={`/movies/${encodeURIComponent(movie.id)}`}>
+            <Button variant="link">Open</Button>
+          </Link>
+          <Button
+            className="favorite-button"
+            variant={isFavorite ? 'secondary' : 'outline-primary'}
+            onClick={!isFavorite ? handleFavoriteClick : handleRemoveFromFavorites} //use handleFavoriteClick for favorite button click
+          >
+            {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+          </Button>
+        </div>
       </Card.Body>
     </Card>
   );
-}
+};
 
 MovieCard.propTypes = {
-  movie: PropTypes.shape({
-    Title: PropTypes.string.isRequired,
+  Movie: PropTypes.shape({
+  Title: PropTypes.string.isRequired,
     Description: PropTypes.string.isRequired,
-    ImagePath: PropTypes.string.isRequired,
+    Image: PropTypes.string.isRequired,
+    Genre: PropTypes.shape({
+      Name: PropTypes.string,
+      Description: PropTypes.string,
+    }),
+    Director: PropTypes.shape({
+      Name: PropTypes.string.isRequired,
+      Bio: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
-  onMovieClick: PropTypes.func.isRequired,
+  onAddToFavorites: PropTypes.func.isRequired,
 };

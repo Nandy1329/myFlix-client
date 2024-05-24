@@ -1,73 +1,31 @@
 import React from "react";
-import PropTypes from "prop-types";
-import { Button, Form } from "react-bootstrap";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import "./favorite-movies.scss";
+import { MovieCard } from "../movie-card/movie-card";
 
-export class UpdateUser extends React.Component {
-  constructor() {
-    super();
+export const FavoriteMovies = ({ movies, onAddFavorite, onRemoveFavorite }) => {
+  const storedData = JSON.parse(localStorage.getItem("user"));
+  const favorites = storedData && storedData.FavoriteMovies ? storedData.FavoriteMovies : [];
 
-    this.state = {
-      Username: null,
-      Password: null,
-      Email: null,
-      Birthday: null,
-    };
-  }
-
-  handleUpdate(e) {
-    e.preventDefault();
-    console.log(this.state);
-  }
-
-  render() {
-    const { user, onBackClick } = this.props;
-
-    return (
-      <div className="update-user">
-        <Form>
-          <Form.Group controlId="formUsername">
-            <Form.Label>Username:</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="username"
-              onChange={(e) => this.setState({ Username: e.target.value })}
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="formPassword">
-            <Form.Label>Password:</Form.Label>
-            <Form.Control
-              type="password"
-              placeholder="password"
-              onChange={(e) => this.setState({ Password: e.target.value })}
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="formEmail">
-            <Form.Label>Email:</Form.Label>
-            <Form.Control
-              type="email"
-              placeholder="email"
-              onChange={(e) => this.setState({ Email: e.target.value })}
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="formBirthday">
-            <Form.Label>Birthday:</Form.Label>
-            <Form.Control
-              type="date"
-              onChange={(e) => this.setState({ Birthday: e.target.value })}
-              required
-            />
-          </Form.Group>
-          <Button variant="primary" type="submit" onClick={(e) => this.handleUpdate(e)}>
-            Update
-          </Button>
-          <Button variant="secondary" onClick={() => onBackClick(null)}>
-            Back
-          </Button>
-        </Form>
-      </div>
-    );
-  }
-}
+  return (
+    <div className="fav-movie-container">
+      <h2 className="my-custom-class">Favorite Movies</h2>
+      <Row xs={1} md={1} lg={2} className="g-4">
+        {movies &&
+          movies
+            .filter((movie) => favorites.includes(movie.id))
+            .map((movie) => (
+              <Col key={movie.id}>
+                <MovieCard
+                  movie={movie}
+                  fav={favorites.includes(movie.id)}
+                  onAddToFavorites={onAddFavorite}
+                  onRemoveFromFavorites={onRemoveFavorite}
+                />
+              </Col>
+            ))}
+      </Row>
+    </div>
+  );
+};

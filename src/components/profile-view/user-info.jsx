@@ -1,16 +1,25 @@
-import React from 'react'
-import PropTypes from "prop-types";
+import React from "react";
+import { Card } from 'react-bootstrap';
 
-export const UserInfo = ({email, name}) => {
+export const UserInfo = ({ user }) => {
+  
   return (
-   <div>
-    <p>Username: {name} </p>
-    <p>Email: {email} </p>
-    </div>
-  )
+    <Card style={{backgroundColor: 'DarkGray'}}>
+      <Card.Body>
+        <Card.Title className="profile-title" style={{color: 'DarkSlateGray'}}>User Info</Card.Title>
+        <Card.Text className="profile-text">
+          <span className="label">Username: </span>
+          <span className="value">{user.UserName}</span>
+        </Card.Text>
+        <Card.Text className="profile-text">
+          <span className="label">Email: </span>
+          <span className="value">{user.email}</span>
+        </Card.Text>
+        <Card.Text className="profile-text">
+          <span className="label">Birthday: </span>
+          <span className="value">{new Date(user.Birthday).toLocaleDateString('en-GB')}</span>
+        </Card.Text>
+        </Card.Body>
+    </Card>
+  );
 }
-
-UserInfo.propTypes = {
-  email: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired
-};

@@ -1,42 +1,63 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { Button, Form } from "react-bootstrap";
+import React, { useState } from 'react';
+import { useParams, Link } from "react-router-dom";
+import { Card, Button } from 'react-bootstrap';
+import './movie-view.scss';
 
+export const MovieView = ({
+  movies,
+  addToFavorites,
+  removeFromFavorites,
+  favoritesMovies,
+}) => {
+  const { movieId } = useParams();
 
-export const MovieView = ({ movie, onBackClick }) => {
+  const movie = movies.find((m) => m.id === movieId);
+  console.log("favoriteMovies", favoritesMovies);
+  const checkIfFavorite = favoritesMovies?.includes(movieId) || false;
+  const [isFavorite, setIsFavorite] = useState(checkIfFavorite);
+
+  const handleFavoriteClick = () => {
+    setIsFavorite(!isFavorite);
+    if (isFavorite) {
+      removeFromFavorites(movieId);
+    } else {
+      addToFavorites(movieId);
+    }
+  };
+
   return (
-    <div className="movie-view">
-      <div className="movie-title">
-        <span className="label">Title: </span>
-        <span className="value">{movie.Title}</span>
-      </div>
-      <div className="movie-description">
-        <span className="label">Description: </span>
-        <span className="value">{movie.Description}</span>
-      </div>
-      <div className="movie-genre">
-        <span className="label">Genre: </span>
-        <span className="value">{movie.Genre.Name}</span>
-      </div>
-      <div className="movie-director">
-        <span className="label">Director: </span>
-        <span className="value">{movie.Director.Name}</span>
-      </div>
-      <Button variant="primary" onClick={() => { onBackClick(null); }}>Back</Button>
+    <div className="movie-view-container">
+      {movie ? (
+        <Card className="movie-card">
+          {movie.image ? (
+            <Card.Img variant="top" src={movie.image} alt={movie.title} />
+          ) : null}
+          <Card.Body>
+            <Card.Title>{movie.title}</Card.Title>
+            <Card.Text>{movie.description}</Card.Text>
+            <Card.Text>Director: {movie.director.Name}</Card.Text>
+            <Card.Text>
+              Biography of the Director: {movie.director.Bio}
+            </Card.Text>
+            <Card.Text>Birth Year: {movie.director.Birth}</Card.Text>
+            <Card.Text>Death Year: {movie.director.Death}</Card.Text>
+            <Card.Text>Genre: {movie.genre.Name}</Card.Text>
+            <Card.Text>Genre Description: {movie.genre.Description}</Card.Text>
+            <Button
+              className="favorite-button"
+              variant={isFavorite ? "primary" : "outline-primary"}
+              onClick={handleFavoriteClick}
+            >
+              {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+            </Button>
+            <Link to={`/`}>
+              <Button className="back-button" variant="primary">
+                Back
+              </Button>
+            </Link>
+          </Card.Body>
+        </Card>
+      ) : null}
     </div>
   );
-};
-
-MovieView.propTypes = {
-  movie: PropTypes.shape({
-    Title: PropTypes.string,
-    Description: PropTypes.string,
-    Genre: PropTypes.shape({
-      Name: PropTypes.string
-    }),
-    Director: PropTypes.shape({
-      Name: PropTypes.string
-    })
-  }).isRequired,
-  onBackClick: PropTypes.func.isRequired
 };
