@@ -1,71 +1,37 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import axios from "axios";
 import { UserInfo } from "./user-info";
-import { FavoriteMovies } from "./favorite-movies";
-import UpdateUser from "./update-user";
+import {Link} from "react-router-dom";
+import {UserUpdate} from "./user-update";
+import {UserDelete} from "./user-deregister";
+import {FavoriteMovies} from "./favorite-movies";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./profile-view.scss";
 
-export const ProfileView = ({user, movies, favoritesMovies, addToFavorites, removeFromFavorites}) => {
+export const ProfileView = ({ movies, user }) => {
+ if (!user) {
+    return <div>User data not available</div>;
+ }
+    const { Username, Email, Birthday, Password } = user;
 
-  const updateUser = (updatedUser) => {
-    fetch(`/users/${user.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: updatedUser.email,
-        name: updatedUser.name,
-        birthday: updatedUser.birthday,
-        UserName: updatedUser.UserName,
-        password: updatedUser.password,
-      }),
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error("Network response was not ok.");
-      })
-      .then((data) => {
-        setUser(data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const handleUserInfoChange = (updatedUser) => {
-    setUser((prevUser) => ({ ...prevUser, ...updatedUser }));
-  };
-
-  return (
-    <>
-      <h1 style={{ color: 'DarkSlateGray' }}>Profile</h1>
-      <Container>
-        <Row>
-          <Col md={4}>
-            {user && (
-              <>
-                <div className="profile-card">
-                  <UserInfo
-                    user={user}
-                  />
-                </div>
-                <UpdateUser user={user} handleSubmit={updateUser} />
-              </>
-            )}
-          </Col>
-          <Col md={8}>
-            <FavoriteMovies
-              movies={movies}
-              favoritesMovies={favoritesMovies}
-              onAddFavorite={addToFavorites}
-              onRemoveFavorite={removeFromFavorites}
-            />
-          </Col>
-        </Row>
-      </Container>
-    </>
-  );
+    return(
+        <div className="profile-view-container">
+            <div className="user-info">
+            <UserInfo 
+            name ={user.Username} 
+            email = {user.Email} 
+            birthday = {user.Birthday} 
+            password = {user.Password} />
+            </div>
+            <div className="user-update">
+            <UserUpdate />
+            </div>
+            <div className="user-delete">
+            <UserDelete/>
+            </div>
+            <div className="favorite-movies">
+            <FavoriteMovies movies={movies} user={user}/>
+            </div>
+        </div>         
+    );    
 };

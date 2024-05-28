@@ -1,25 +1,25 @@
 import React from "react";
-import { Card } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import "./user-info.scss";
 
-export const UserInfo = ({ user }) => {
-  
-  return (
-    <Card style={{backgroundColor: 'DarkGray'}}>
-      <Card.Body>
-        <Card.Title className="profile-title" style={{color: 'DarkSlateGray'}}>User Info</Card.Title>
-        <Card.Text className="profile-text">
-          <span className="label">Username: </span>
-          <span className="value">{user.UserName}</span>
-        </Card.Text>
-        <Card.Text className="profile-text">
-          <span className="label">Email: </span>
-          <span className="value">{user.email}</span>
-        </Card.Text>
-        <Card.Text className="profile-text">
-          <span className="label">Birthday: </span>
-          <span className="value">{new Date(user.Birthday).toLocaleDateString('en-GB')}</span>
-        </Card.Text>
-        </Card.Body>
-    </Card>
-  );
+export const UserInfo = ({email, name, birthday}) => {
+return (
+    <div className="user-info card">
+        <div className="card-body">
+        <h3 className="card-title">User Information</h3>
+        <ul className="list-group list-group-flush">
+          <li className="list-group-item">Username:{name}</li>
+          <li className="list-group-item">Email:{email}</li>
+          <li className="list-group-item">Birthday:{birthday}</li>
+        </ul>
+        </div>
+    </div>
+)
+}
+
+
+UserInfo.propTypes = {
+    email: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    birthday: PropTypes.string.isRequired, 
 }

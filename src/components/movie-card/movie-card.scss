@@ -1,60 +1,69 @@
-$color_1: #666;
-$color_2: #fff;
-$background-color_1: #007bff;
-
-.movie-card {
-	display: flex;
-	flex-direction: column;
-	border: 1px solid #ccc;
-	border-radius: 8px;
-	overflow: hidden;
-	transition: box-shadow 0.3s ease;
-&:hover { 
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+.card {
+  border: solid;
+  background-color: transparent;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.3s;
 }
 
-.image-container {
-	position: relative;
-	overflow: hidden;
-	height: 300px;
-	border-bottom: 1px solid #ccc;
-	img { width: 100%;
-	height: 100%;
-	object-fit: cover;
+.card:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-	.details {
-		padding: 16px;
-		.title { font-size: 18px;
-		font-weight: bold;
-		margin-bottom: 8px;
-	}
-.actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px;
-  .button { 
-    padding: 8px 16px;
-    border-radius: 4px;
-    background-color: $background-color_1;
-    color: $color_2;
-    text-decoration: none;
-    text-transform: uppercase;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    &:hover { 
-      background-color: #0056b3;
-    } // closing brace for &:hover
-  } // closing brace for .button
-} // closing brace for .actions
-  }
+.movie-card-image {
+  border-radius: 8px;
+  transition: transform 0.3s;
+  border: solid;
+  cursor: pointer;
+}
 
-.director {
-	font-size: 14px;
-	color: $color_1;
+.movie-card-image:hover {
+  transform: scale(1.05);
 }
+
+.movieTitle {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 5px;
 }
+
+.movieGenre {
+  font-size: 0.9rem;
+  color: #737373;
+}
+
+.open-button {
+  color: #e50914;
+  font-weight: bold;
+}
+
+.primary {
+  background-color: #e50914;
+  border-color: #e50914;
+  font-weight: bold;
+}
+
+.primary:hover {
+  background-color: #ff0f1f;
+  border-color: #ff0f1f;
+  color: #fff;
+}
+
+.description-box {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 10px);
+  transform: translateY(-50%);
+  width: 200px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 10px;
+  box-sizing: border-box;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+.movie-card:hover .description-box {
+  opacity: 1;
 }

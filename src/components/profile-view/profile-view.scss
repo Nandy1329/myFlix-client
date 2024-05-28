@@ -1,9 +1,28 @@
-.profile-card {
-	border: 3px solid darkseagreen;
-	padding: 1rem;
-	margin-bottom: 2rem;
-}
-
-.back-button {
-	margin-top: 1rem;
-}
+.profile-view-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 20px;
+  }
+  
+  .user-info,
+  .user-update,
+  .user-delete,
+  .favorite-movies {
+	width: 100%;
+	max-width: 600px; /* Adjust the maximum width as needed */
+	margin-bottom: 20px;
+	background-color: #f9f9f9; /* Light background for better readability */
+	padding: 15px; /* Padding inside each section for spacing */
+	border-radius: 8px; /* Rounded corners for a smooth look */
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  }
+  
+  .user-info h2,
+  .user-update h2,
+  .user-delete h2,
+  .favorite-movies h2 {
+	margin-bottom: 15px;
+	color: #333; /* Darker color for headings */
+  }
+  

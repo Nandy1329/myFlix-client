@@ -1,0 +1,43 @@
+.signUpButton {
+    margin-top: 10px;
+    width: 100%;
+    background-color: #f0f0f0;
+    color: black;
+    font-size: medium;
+    font: bold;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.signUpButton:hover {
+    background-color: #f0f0f0;
+    color: black;
+}
+
+.signUpForm {
+    width: 100%;
+    margin: 10px;
+}
+
+.inputName {
+    margin-bottom: 10px;
+}
+
+.userNameGroup {
+    margin-bottom: 10px;
+}
+
+.newUserRegister {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: medium;
+    font: bold;
+}
+
+.newUserDiv {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

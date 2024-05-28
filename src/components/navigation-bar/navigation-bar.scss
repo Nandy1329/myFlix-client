@@ -1,27 +1,18 @@
-.custom-navbar {
-	background-color: darkseagreen;
-	font-size: 20px;
-	margin-bottom: 5%;
-}
-
-.navbar-brand {
-	color: sienna;
-}
-
-.nav-link {
-	color: sienna
-}
-
-&:hover {
-	background-color: lightseagreen;
-}
-
-.btn-outline-secondary {
-	color: sienna;
-	border-color: lightseagreen;
-}
-
-&:hover {
-	background-color: lightseagreen;	
-	color: slategray;
-}
+.navigation-bar {
+    position: fixed; /* Fix the navigation bar at the top of the viewport */
+    top: 0; /* Position it at the top */
+    width: 100%; /* Make it span the entire width of the viewport */
+    z-index: 1000; /* Ensure it's above other content */
+  }
+  
+  .navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .content-below-navigation {
+    margin-top: 60px; /* Adjust this value according to the height of the navigation bar */
+    padding-top: 20px; /* Add padding to ensure content is not hidden behind the navigation bar */
+  }
+  

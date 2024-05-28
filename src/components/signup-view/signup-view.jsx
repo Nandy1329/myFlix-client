@@ -1,113 +1,98 @@
-import { useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import { Row, Col, Card, CardGroup} from 'react-bootstrap';
+import React, { useState } from "react";
+import { FormGroup, Form, Button } from "react-bootstrap";
+import "./signup-view.scss";
 
 export const SignupView = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
-  const [birthday, setBirthday] = useState("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
+    const [birthday, setBirthday] = useState("");
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+    const handleSubmit = (event) => {
+        event.preventDefault();
 
-    if (username.length < 5) {
-      alert("Username must be at least 5 characters long");
-      return;
-    }
-
-    if (password.length < 6) {
-      alert("Password must be at least 6 characters long");
-      return;
-    }
-
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      alert("Invalid email address");
-      return;
-    }
-
-    const data = {
-      Username: username,
-      Password: password,
-      Email: email,
-      Birthday: birthday
-    };
-
-    {
-      fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users', {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json"
+        if (username.length < 5) {
+            alert("Username must be at least 5 characters long");
+            return;
         }
-      }).then((response) => {
-        if (response.ok) {
-          alert("Signup successful");
-          window.location.reload();
-        } else {
-          alert("Signup failed");
-        }
-      });
-    };
 
+        if (password.length < 6) {
+            alert("Password must be at least 6 characters long");
+            return;
+        }
+
+        if (!/\S+@\S+\.\S+/.test(email)) {
+            alert("Invalid email address");
+            return;
+        }
+
+        const data = {
+            Username: username,
+            Password: password,
+            Email: email,
+            Birthday: birthday,
+        };
+
+        fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users', {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then((response) => {
+            if (response.ok) {
+                alert("Signup successful");
+                window.location.reload();
+            } else {
+                alert("Signup failed");
+            }
+        });
+    };
 
     return (
-      <Row>
-        <Col xs={12} lg={10}>
-          <CardGroup>
-            <Card style={{ margin: '20px 0' }}>
-              <Card.Body>
-            <Card.Title>Sign Up</Card.Title>
-            <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="formUserName">
-                  <Form.Label>Username:</Form.Label>
-                  <Form.Control
+        <Form onSubmit={handleSubmit} className="signUpForm">
+            <div className="newUserDiv">
+                <h1 className="newUserSignup">User Signup</h1>
+            </div>
+            <FormGroup controlId="formUsername" className="userNameGroup">
+                <Form.Label>Username</Form.Label>
+                <Form.Control className="inputUser"
                     type="text"
-                    value={UserName}
-                    onChange={(e) => setUserName(e.target.value)}
-                    required
-                    minLength="5"
-                  />
-                </Form.Group>
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)} required
+                    minLength="3"
+                />
+            </FormGroup>
 
-                <Form.Group controlId="formSignupPassword">
-                  <Form.Label>Password:</Form.Label>
-                  <Form.Control
+            <FormGroup controlId="formPassword" className="userNameGroup">
+                <Form.Label>Password</Form.Label>
+                <Form.Control className="inputUser"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    minLength="8"
-                  />
-                </Form.Group>
+                />
+            </FormGroup>
 
-                <Form.Group controlId="formEmail">
-                  <Form.Label>Email:</Form.Label>
-                  <Form.Control
+            <FormGroup controlId="formEmail" className="userNameGroup">
+                <Form.Label>Email</Form.Label>
+                <Form.Control className="inputUser"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                  />
-                </Form.Group>
+                />
+            </FormGroup>
 
-                <Form.Group controlId="formBirthday">
-                  <Form.Label>Birthday:</Form.Label>
-                  <Form.Control
+            <FormGroup controlId="formBirthday" className="userNameGroup">
+                <Form.Label>Birthday</Form.Label>
+                <Form.Control className="inputUser"
                     type="date"
                     value={birthday}
                     onChange={(e) => setBirthday(e.target.value)}
-                    required
-                  />
-                </Form.Group>
-                <Button type="submit" style={{ margin: '20px 0' }}>Submit</Button>
-              </Form>
-            </Card.Body>
-          </Card>
-        </CardGroup>
-      </Col>
-    </Row>
-  );
+                    required />
+            </FormGroup>
+            <Button type="submit" className="signUpButton">Submit</Button>
+        </Form>
+    );
 };
-}

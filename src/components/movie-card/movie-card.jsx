@@ -1,85 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { Button, Card } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import './movie-card.scss';
+import { useState } from "react";
+import PropTypes from "prop-types";
+import { Button, Card } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import "./movie-card.scss";
 
-export const MovieCard = ({ fav, movie, onAddToFavorites, onRemoveFromFavorites  }) => {
-  const maxDescriptionLength = 100;
-  const truncatedDescription =
-    movie.description.length > maxDescriptionLength
-      ? `${movie.description.substring(0, maxDescriptionLength)}...`
-      : movie.description;
+export const MovieCard = ({ movie, onToggleFavorite, onSelectMovie }) => {
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
 
-  const [isFavorite, setIsFavorite] = useState(fav);
+    const handleToggleFavorite = () => {
+        setIsFavorite(!isFavorite);
+        onToggleFavorite(movie.id, !isFavorite);
+    };
 
-      useEffect(() => {
-        setIsFavorite(fav);
-      }, [fav]);
-
-
-  const handleAddToFavorites = (event) => {
-    event.preventDefault();
-    onAddToFavorites(movie.id);
-    setIsFavorite(true);
-  };
-
-  const handleRemoveFromFavorites = (event) => {
-    event.preventDefault();
-    onRemoveFromFavorites(movie.id);
-    setIsFavorite(false);
-  };
-
-  const handleFavoriteClick = (event) => {
-    event.preventDefault();
-    if (isFavorite) {
-      setIsFavorite(false);
-    } else {
-      handleAddToFavorites(event);
-    }
-  };
-
-  return (
-    <Card className="h-100">
-      <Card.Img
-        className="movie-card-img"
-        variant="top"
-        src={movie.image}
-        alt={movie.title}
-      />
-      <Card.Body>
-        <Card.Title>{movie.title}</Card.Title>
-        <Card.Text>{truncatedDescription}</Card.Text>
-        <div className="button-group">
-          <Link to={`/movies/${encodeURIComponent(movie.id)}`}>
-            <Button variant="link">Open</Button>
-          </Link>
-          <Button
-            className="favorite-button"
-            variant={isFavorite ? 'secondary' : 'outline-primary'}
-            onClick={!isFavorite ? handleFavoriteClick : handleRemoveFromFavorites} //use handleFavoriteClick for favorite button click
-          >
-            {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
-          </Button>
-        </div>
-      </Card.Body>
-    </Card>
-  );
+    return (
+        <Card
+            className="movie-card"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            <Link to={`/movies/${encodeURIComponent(movie.id)}`}>
+                <Card.Img variant="top" src={movie.image} className="movie-card-image" />
+            </Link>
+            <Card.Body>
+                <Card.Title className="movieTitle">{movie.title}</Card.Title>
+                <Card.Text className="movieGenre">{movie.genre}</Card.Text>
+                <Link to={`/movies/${encodeURIComponent(movie.id)}`}>
+                    <Button variant="link" className="open-button" onClick={onSelectMovie}>Open</Button>
+                </Link>
+                <Button variant="primary" onClick={handleToggleFavorite}>
+                    {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+                </Button>
+                {isHovered && (
+                    <div className="description-box">{movie.description}</div>
+                )}
+            </Card.Body>
+        </Card>
+    );
 };
 
 MovieCard.propTypes = {
-  Movie: PropTypes.shape({
-  Title: PropTypes.string.isRequired,
-    Description: PropTypes.string.isRequired,
-    Image: PropTypes.string.isRequired,
-    Genre: PropTypes.shape({
-      Name: PropTypes.string,
-      Description: PropTypes.string,
-    }),
-    Director: PropTypes.shape({
-      Name: PropTypes.string.isRequired,
-      Bio: PropTypes.string.isRequired,
+    movie: PropTypes.shape({
+        title: PropTypes.string.isRequired,
+        image: PropTypes.string.isRequired,
+        director: PropTypes.string,
+        description: PropTypes.string,
+        genre: PropTypes.string,
+        id: PropTypes.string.isRequired,
     }).isRequired,
-  }).isRequired,
-  onAddToFavorites: PropTypes.func.isRequired,
+    onToggleFavorite: PropTypes.func.isRequired,
+    onSelectMovie: PropTypes.func.isRequired,
 };

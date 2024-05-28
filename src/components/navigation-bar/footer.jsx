@@ -4,14 +4,14 @@ import './footer.scss';
 
 export const Footer = () => {
     return (
-        <footer>
-        <Container>
-            <Row>
-            <Col>
-                <p>&copy; 2024 MyFlix</p>
-            </Col>
-            </Row>
-        </Container>
+        <footer className="footer">
+            <Container>
+                <Row>
+                    <Col>
+                        <p className="footer-text">&copy; 2024 MyFlix</p>
+                    </Col>
+                </Row>
+            </Container>
         </footer>
     );
-    }
+};

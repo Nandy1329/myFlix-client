@@ -1,55 +1,59 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from "react-router-dom";
 import { Navbar, Container, Nav } from "react-bootstrap";
-import Button from "react-bootstrap/Button";
+import logo from '../../../img/logo.png';
 import "./navigation-bar.scss";
 
 export const NavigationBar = ({ user, onLoggedOut }) => {
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-      setLoggedIn(true);
-    } else {
-      setLoggedIn(false);
-    }
-  }, [user]);
-
   return (
-    <Navbar className="custom-navbar" expand="lg">
-      <Container>
-        <Navbar.Brand as={Link} to="/">
-          Movies App
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">
-            <Nav.Link as={Link} to="/">
-              Home
-            </Nav.Link>
-            {loggedIn && (
-              <Nav.Link as={Link} to={`/users/${user?.UserName}`}>
-                Profile
-              </Nav.Link>
-            )}
-            {!loggedIn && (
-              <>
-                <Nav.Link as={Link} to="/signup">
-                  Sign up
-                </Nav.Link>
-                <Nav.Link as={Link} to="/login">
-                  Log in
-                </Nav.Link>
-              </>
-            )}
-          </Nav>
-          {loggedIn && (
-            <Button variant="outline-secondary" onClick={onLoggedOut}>
-              Log out
-            </Button>
-          )}
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+    <>
+      <Navbar bg="light" expand="lg" className="navigation-bar">
+        <Container className="navigation">
+          <Navbar.Brand as={Link} to="/">
+            <img
+              src={logo}
+              width="30"
+              height="30"
+              className="d-inline-block align-top"
+              alt="myFlix logo"
+            />
+            myFlix
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="me-auto">
+              {!user && (
+                <>
+                  <Nav.Link as={Link} to="/login">
+                    Login
+                  </Nav.Link>
+                  <Nav.Link as={Link} to="/signup">
+                    Signup
+                  </Nav.Link>
+                </>
+              )}
+              {user && (
+                <>
+                  <Nav.Link as={Link} to="/">
+                    Movies
+                  </Nav.Link>
+                  <Nav.Link as={Link} to="/profile">
+                    Profile
+                  </Nav.Link>
+                  <Nav.Link onClick={onLoggedOut}>Logout</Nav.Link>
+                </>
+              )}
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+      <div className="content-below-navigation"></div>
+    </>
   );
+};
+
+NavigationBar.propTypes = {
+  user: PropTypes.object,
+  onLoggedOut: PropTypes.func.isRequired,
 };
