@@ -1,21 +1,33 @@
-import React from "react";
-import { Form, Row } from "react-bootstrap";
-import PropTypes from "prop-types";
+import { Button, Row, Col, Form } from "react-bootstrap";
+import { useState } from "react";
 
-export const SearchBar = ({ query, handleSearch }) => {
-    return (
-        <Row>
-            <Form.Control
-                type="text"
-                value={query}
-                onChange={(e) => handleSearch(e)}
-                placeholder="Search"
-                className="mr-sm-2"
-            />
-        </Row>
+export const SearchBar = ({ movies, handleMovieSearch }) => {
+  const [search, setSearch] = useState("");
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+    const filteredMovies = movies.filter((movie) =>
+      movie.Title.toUpperCase().includes(search.toUpperCase())
     );
-};
-SearchBar.propTypes = {
-    handleSearch: PropTypes.func.isRequired,
-    query: PropTypes.string.isRequired
+    handleMovieSearch(filteredMovies); // Call the callback function with the filtered movies
+  };
+
+  return (
+    <Row>
+      <Form onSubmit={handleSearch}>
+        <Form.Control
+          className="bg-input"
+          type="search"
+          placeholder="Search by title"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          
+          aria-label="Search"
+        />
+        <Button type="submit" variant="outline-success">
+          Search
+        </Button>
+      </Form>
+    </Row>
+  );
 };

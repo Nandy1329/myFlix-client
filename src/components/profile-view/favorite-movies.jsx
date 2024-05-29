@@ -1,6 +1,5 @@
 import React from "react";
 import { Row, Col } from "react-bootstrap";
-import "./favorite-movies.scss";
 import { MovieCard } from "../movie-card/movie-card";
 
 export const FavoriteMovies = ({ movies, user }) => {

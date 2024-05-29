@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FormGroup, Button, Form } from "react-bootstrap";
 import PropTypes from "prop-types";
-import "./login-view.scss";
+
 
 export const LoginView = ({ onLoggedIn }) => {
     const [username, setUsername] = useState("");

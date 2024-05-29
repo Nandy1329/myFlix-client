@@ -8,7 +8,6 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { NavigationBar } from "../navigation-bar/navigation-bar";
-import "./main-view.scss";
 
 export const MainView = () => {
     const storedUser = JSON.parse(localStorage.getItem("user"));

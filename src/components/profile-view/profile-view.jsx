@@ -5,8 +5,7 @@ import {Link} from "react-router-dom";
 import {UserUpdate} from "./user-update";
 import {UserDelete} from "./user-deregister";
 import {FavoriteMovies} from "./favorite-movies";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./profile-view.scss";
+
 
 export const ProfileView = ({ movies, user }) => {
  if (!user) {
