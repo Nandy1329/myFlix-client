@@ -4,8 +4,7 @@ import { MovieView } from "../movie-view/movie-view";
 import { LoginView } from "../login-view/login-view";
 import { SignupView } from "../signup-view/signup-view";
 import { ProfileView } from "../profile-view/profile-view";
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import { Row, Col, Container } from 'react-bootstrap';
 import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { NavigationBar } from "../navigation-bar/navigation-bar";
 
@@ -26,35 +25,31 @@ export const MainView = () => {
         setSelectedMovie(selectedMovie);
     };
 
-    useEffect(() => {
-        if (!token) return;
 
-        fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies', {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data && Array.isArray(data)) {
-                    const moviesFromApi = data.map((movie) => {
-                        return {
-                            id: movie._id,
-                            title: movie.Title,
-                            image: movie.ImagePath,
-                            description: movie.Description,
-                            director: movie.Director,
-                            genre: movie.Genre,
-                        };
-                    });
-                    console.log('Movies fetched:', moviesFromApi);
-                    setMovies(moviesFromApi);
-                } else {
-                    console.error('Invalid data format:', data);
-                }
+        useEffect(() => {
+            if (!token) return;
+        
+            console.log('Fetching movies with token:', token);
+        
+            fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies', {
+                headers: { Authorization: `Bearer ${token}` }
             })
-            .catch((error) => {
-                console.error('Error fetching movies:', error);
-            });
-    }, [token]);
+                .then((response) => {
+                    console.log('Response:', response);
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log('Data:', data);
+                    if (data && Array.isArray(data)) {
+                        // rest of your code...
+                    } else {
+                        console.error('Invalid data format:', data);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching movies:', error);
+                });
+        }, [token]);
 
     const MovieDetailsWrapper = () => {
         const { movieID } = useParams();

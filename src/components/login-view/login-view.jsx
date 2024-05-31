@@ -6,6 +6,7 @@ import PropTypes from "prop-types";
 export const LoginView = ({ onLoggedIn }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    
 
     useEffect(() => {
         setUsername("");
@@ -14,16 +15,14 @@ export const LoginView = ({ onLoggedIn }) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        const data = {
-            Username: username,
-            Password: password
-        };
+        
+    
         fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/login', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify({ Username: username, Password: password}),
         })
             .then((response) => response.json())
             .then((data) => {
@@ -70,8 +69,21 @@ export const LoginView = ({ onLoggedIn }) => {
             <Button variant="primary" type="submit" className="loginButton">Submit</Button>
         </Form>
     );
-};
-
 LoginView.propTypes = {
     onLoggedIn: PropTypes.func.isRequired,
 };
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
