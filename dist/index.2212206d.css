@@ -1,3 +1,56 @@
+.primaryButton, .deleteButton {
+  letter-spacing: 3px;
+  font-variant: all-small-caps;
+  border-radius: 10px;
+  font-size: 15px;
+  transition: all .9s;
+}
+
+.primaryButton:hover {
+  letter-spacing: 5px;
+  background-color: #f8f8ff;
+  box-shadow: 0 0 10px 2px #d8bfd8;
+}
+
+.deleteButton:hover {
+  color: red;
+  letter-spacing: 4px;
+  background-color: #f8f8ff;
+  font-weight: 700;
+  box-shadow: 0 0 10px 2px red;
+}
+
+.complementaryButton {
+  color: #396340;
+  background-color: #4c8355;
+}
+
+.complementaryButton:hover {
+  background-color: #26432b;
+}
+
+.warning {
+  letter-spacing: 2px;
+  text-align: center;
+  color: #000;
+  border: 2px dashed red;
+  border-radius: 10px;
+  margin-top: 150px;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.formLabel {
+  font-variant: all-small-caps;
+  font-size: 15px;
+}
+
+.formInput {
+  font-size: 13px;
+  font-style: italic;
+}
+
 .navigation-bar {
   z-index: 1000;
   width: 100%;
@@ -13346,58 +13399,5 @@ textarea.form-control-lg {
   .d-print-none {
     display: none !important;
   }
-}
-
-.primaryButton, .deleteButton {
-  letter-spacing: 3px;
-  font-variant: all-small-caps;
-  border-radius: 10px;
-  font-size: 15px;
-  transition: all .9s;
-}
-
-.primaryButton:hover {
-  letter-spacing: 5px;
-  background-color: #f8f8ff;
-  box-shadow: 0 0 10px 2px #d8bfd8;
-}
-
-.deleteButton:hover {
-  color: red;
-  letter-spacing: 4px;
-  background-color: #f8f8ff;
-  font-weight: 700;
-  box-shadow: 0 0 10px 2px red;
-}
-
-.complementaryButton {
-  color: #396340;
-  background-color: #4c8355;
-}
-
-.complementaryButton:hover {
-  background-color: #26432b;
-}
-
-.warning {
-  letter-spacing: 2px;
-  text-align: center;
-  color: #000;
-  border: 2px dashed red;
-  border-radius: 10px;
-  margin-top: 150px;
-  padding: 10px;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.formLabel {
-  font-variant: all-small-caps;
-  font-size: 15px;
-}
-
-.formInput {
-  font-size: 13px;
-  font-style: italic;
 }
 /*# sourceMappingURL=index.2212206d.css.map */
