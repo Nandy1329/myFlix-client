@@ -40,18 +40,20 @@ export const MainView = () => {
 
     const fetchMovies = async () => {
         try {
-            const response = await fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies", {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (!response.ok) {
-                throw new Error("Failed to fetch movies");
-            }
-            const data = await response.json();
-            setMovies(data);
-            setFilteredMovies(data); // Initialize filteredMovies with all movies
+          const response = await fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies", {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (!response.ok) {
+            throw new Error("Failed to fetch movies");
+          }
+          const data = await response.json();
+          console.log('Fetched data:', data); // Log the fetched data
+          setMovies(data);
+          setFilteredMovies(data); // Initialize filteredMovies with all movies
         } catch (error) {
-            console.error("Error fetching movies:", error.message);
+          console.error("Error fetching movies:", error.message);
         }
+      };
     };
 
     const handleLogout = () => {
@@ -240,7 +242,7 @@ export const MainView = () => {
             </Container>
         </Router>
     );
-};
+
 
 MainView.propTypes = {
     onLoggedIn: PropTypes.func
