@@ -1,73 +1,71 @@
-import React from 'react';
 import PropTypes from 'prop-types';
-import Button from 'react-bootstrap/Button';
-import Card from 'react-bootstrap/Card';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { MovieCard } from '../movie-card/movie-card';
-import { useParams, Link } from "react-router-dom";
+import Button from "react-bootstrap/Button";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import { useParams } from "react-router";
+import { Link } from "react-router-dom";
 
-export const MovieView = ({ movies, findSimilarMovies, onFavorite, isFavorite }) => {
-    const { movieId } = useParams();
-    const movie = movies.find((m) => m._id === movieId);
+export const MovieView = ({ movies }) => {
+  const { movieId } = useParams();
+  const movieData = movies.find((mov) => mov._id === movieId);
 
-    if (!movie) return <div>Movie not found</div>;
+  function formatDate(string) {
+    var options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(string).toLocaleDateString("en-US", options);
+  }
 
-    const similarMovies = findSimilarMovies(movie);
-
-    return (
-        <>
-            <Card className="movie-view">
-                <Card.Img variant="top" src={movie.ImagePath} alt={movie.Title} />
-                <Card.Body>
-                    <Card.Title><h2>{movie.Title}</h2></Card.Title>
-                    <Card.Text>
-                        <strong>Year:</strong> {movie.ReleaseYear}<br />
-                        <strong>Genre:</strong> {movie.Genre.Name}<br />
-                        <strong>Director:</strong> {movie.Director.Name}<br /><br></br>
-                        <strong>Description:</strong> {movie.Description}
-                    </Card.Text>
-                    <Link to={`/`}>
-                        <Button variant="light" className="me-2">Back</Button>
-                    </Link>
-                    <Button 
-                        variant="outline-primary" 
-                        onClick={() => onFavorite(movie)}
-                    >
-                        {isFavorite(movie._id) ? "Remove from Favorites" : "Favorite"}
-                    </Button>
-                </Card.Body>
-            </Card>
-            <h3 className="mt-5">Similar Movies</h3>
-            <hr></hr>
-            <Row>
-                {similarMovies.map((similarMovie) => (
-                    <Col xs={12} sm={6} md={4} lg={3} key={similarMovie._id} className="movie-card-container mb-5">
-                        <MovieCard movie={similarMovie} />
-                    </Col>
-                ))}
-            </Row>
-        </>
-    );
+  return (
+    <div className="bg-light m-5 rounded-3 noMargin-rf">
+      <Row className="p-5 padding-sm">
+        <Col md={6}>
+          <h2 className="mb-2">{movieData.Title}</h2>
+          <Row className="mb-4 text-secondary">
+            <Col md="auto"><h4>{movieData.Director.Name}</h4></Col>
+            <Col></Col>
+            <Col md="auto"><h5 className="text-dark">{movieData.Genre.Name}</h5></Col>
+          </Row>
+          <Col md={12} className="mb-4">
+            <p>{movieData.Description}</p>
+          </Col>
+          <Col md={12} className="mb-4">
+            <h4>Director</h4>
+            <p><strong>Bio: </strong>{movieData.Director.Bio}</p>
+            <p><strong>Birth: </strong>{formatDate(movieData.Director.Birth)}</p>
+            <p><strong>Death: </strong>{movieData.Director.Death ? formatDate(movieData.Director.Death) : "N/A"}</p>
+          </Col>
+          <Col md={12} className="mb-4">
+            <h4>Genre</h4>
+            <p><strong>Description: </strong>{movieData.Genre.Description}</p>
+          </Col>
+        </Col>
+        <Col md={6} className="text-center mb-5">
+          <img className="img-fluid" src={movieData.ImagePath} />
+        </Col>
+        <Col md={12}>
+          <Link to={`/`}>
+            <Button variant="primary">Go Back</Button>
+          </Link>
+        </Col>
+      </Row>
+    </div>
+  );
 };
 
 MovieView.propTypes = {
-    movies: PropTypes.arrayOf(
-        PropTypes.shape({
-            _id: PropTypes.string.isRequired,
-            Title: PropTypes.string.isRequired,
-            ImagePath: PropTypes.string.isRequired,
-            Director: PropTypes.shape({
-                Name: PropTypes.string.isRequired,
-            }).isRequired,
-            Genre: PropTypes.shape({
-                Name: PropTypes.string.isRequired,
-            }).isRequired,
-            ReleaseYear: PropTypes.number.isRequired,
-            Description: PropTypes.string.isRequired
-        })
-    ).isRequired,
-    findSimilarMovies: PropTypes.func.isRequired,
-    onFavorite: PropTypes.func.isRequired,
-    isFavorite: PropTypes.func.isRequired,
-};
+  movies: PropTypes.arrayOf(PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    Title: PropTypes.string.isRequired,
+    Description: PropTypes.string.isRequired,
+    ImagePath: PropTypes.string.isRequired,
+    Featured: PropTypes.bool.isRequired,
+    Genre: PropTypes.shape({
+      Name: PropTypes.string.isRequired,
+      Description: PropTypes.string.isRequired
+    }),
+    Director: PropTypes.shape({
+      Name: PropTypes.string.isRequired,
+      Bio: PropTypes.string.isRequired,
+      Birth: PropTypes.string.isRequired,
+    })
+  })).isRequired
+}
