@@ -2,5 +2,9 @@
     "cSpell.ignoreWords": [
         "Leota"
     ],
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "cSpell.words": [
+        "moviesfrom",
+        "signup"
+    ]
 }

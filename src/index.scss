@@ -1,7 +1,109 @@
-$color: #333;
-$primary: #007bff;
-$body-bg: #f8f9fa;  
+$dark-color: rgb(31, 41, 51);
+$lighter-color: rgb(43, 57, 72);
 
+body {
+    background-color: $lighter-color;
+    color: white;
+}
 
+.movie-card {
+    background-color: $dark-color;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
 
-@import '~bootstrap/scss/bootstrap.scss';
+    &:hover {
+        transform: scale(1.05);
+    }
+}
+
+.movie-view {
+    background-color: $dark-color;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    aspect-ratio: 16 / 9;
+}
+
+.movie-card-container img {
+    height: 100%;
+    object-fit: cover; 
+}
+
+.carousel-item img {
+    width: 100%;
+    height: auto;
+    max-height: 500px;
+    padding: 20px 0;
+}
+
+.login-view,
+.signup-view {
+    .form-label {
+        color: white;
+    }
+}
+
+// Add custom styles for the Navbar
+.navbar {
+    width: 100%;
+    z-index: 1000;
+}
+
+.navbar-nav .nav-link {
+    color: black;
+}
+
+// Custom styles for FavoritesView
+.favorites-view {
+    .favorites-title {
+        margin-bottom: 1rem; 
+        // text-align: center;
+    }
+
+    .favorites-divider {
+        border: 0;
+        height: 1px;
+        background: white;
+        margin: 0 auto 2rem auto; 
+        width: 100%; 
+    }
+}
+
+// Custom styles for ProfileView
+.profile-view {
+    .profile-title {
+        margin-bottom: 1rem; 
+        text-align: center;
+    }
+
+    .profile-divider {
+        border: 0;
+        height: 1px;
+        background: white;
+        margin: 0 auto 2rem auto; 
+        width: 50%; 
+    }
+}
+
+// Custom styles for the Modal
+.custom-modal .modal-content {
+    background-color: $dark-color;
+    color: white;
+}
+
+.custom-modal .modal-header,
+.custom-modal .modal-footer {
+    border: none;
+}
+
+.custom-modal .close {
+    color: white;
+}
