@@ -41,16 +41,16 @@ export const MovieCard = ({ movieData, user, onFavoritesUpdate }) => {
   useEffect(() => {
     // Check local storage for favorite status on component mount
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    const storedFavorites = storedUser.Movies;
-    if (storedFavorites.includes(movieData._id)) {
-      setIsFavorite(true);
+    if (storedUser && storedUser.Movies) {
+      const storedFavorites = storedUser.Movies;
+      if (storedFavorites.includes(movieData._id)) {
+        setIsFavorite(true);
+      }
     }
   }, [movieData._id]);
-
   return (
     <Card className="h-100 bg-secondary bg-gradient text-light shadow" border="dark">
       <Button variant="link" onClick={toggleFavorite} className="ms-2" style={{ position: "absolute", top: "10px", right: "10px", zIndex: 1 }}>
-        <FontAwesomeIcon icon={isFavorite ? solidHeart : regularHeart} size="lg" color={isFavorite ? "primary" : "primary"} />
       </Button>
       <Card.Img variant="top" src={movieData.ImagePath} />
       <Card.Body>
