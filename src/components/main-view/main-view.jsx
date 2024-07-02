@@ -4,7 +4,7 @@ import { MovieView } from "../movie-view/movie-view";
 import { LoginView } from "../login-view/login-view.jsx";
 import { SignupView } from "../signup-view/signup-view.jsx";
 import { NavigationBar } from "../navigation-bar/navigation-bar.jsx";
-import { ProfileView } from "../profile-view/profile-view.jsx";
+import { ProfileView } from "../profile-view/profile-view.jsx/profile-view.js";
 import "./main-view.scss";
 import { Row } from "react-bootstrap";
 import { Col, Form, Button } from "react-bootstrap";
