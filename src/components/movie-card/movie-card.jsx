@@ -1,8 +1,9 @@
 import PropTypes from "prop-types";
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
+import { Card, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
-export const MovieCard = ({ movie, onMovieClick }) => {
+export const MovieCard = ({ movie, addFav, removeFav, isFavorite }) => {
+
     return (
         <Card className="h-100 shadow-1g">
             <Card.Img variant="top" src={movie.ImagePath} />
@@ -19,12 +20,7 @@ export const MovieCard = ({ movie, onMovieClick }) => {
 
 // define all the props constraints for the MovieCard
 MovieCard.propTypes = {
-    movie: PropTypes.shape({
+       Movie: PropTypes.shape({
         Title: PropTypes.string,
-        ImagePath: PropTypes.string,
-        Director: PropTypes.shape({
-            Name: PropTypes.string
-        })
-    }).isRequired,
-    onMovieClick: PropTypes.func.isRequired
-}
+    }).isRequired
+};
