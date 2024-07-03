@@ -1,11 +1,11 @@
+import React from "react";
 import PropTypes from "prop-types";
-import { Card, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
 
-export const MovieCard = ({ movie, addFav, removeFav, isFavorite }) => {
-
+export const MovieCard = ({ movie, onMovieClick, isFavorite, addFav, removeFav }) => {
     return (
-        <Card className="h-100 shadow-1g">
+        <Card>
             <Card.Img variant="top" src={movie.ImagePath} />
             <Card.Body>
                 <Card.Title>{movie.Title}</Card.Title>
@@ -13,14 +13,35 @@ export const MovieCard = ({ movie, addFav, removeFav, isFavorite }) => {
                 <Button onClick={() => onMovieClick(movie)} variant="link">
                     Open
                 </Button>
+                <Button
+                    onClick={() => (isFavorite ? removeFav(movie._id) : addFav(movie._id))}
+                    variant="link"
+                >
+                    {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+                </Button>
             </Card.Body>
         </Card>
     );
 };
 
-// define all the props constraints for the MovieCard
 MovieCard.propTypes = {
-       Movie: PropTypes.shape({
-        Title: PropTypes.string,
-    }).isRequired
+    movie: PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+        Title: PropTypes.string.isRequired,
+        Description: PropTypes.string.isRequired,
+        ImagePath: PropTypes.string.isRequired,
+        Genre: PropTypes.shape({
+            Name: PropTypes.string.isRequired,
+            Description: PropTypes.string.isRequired,
+        }),
+        Director: PropTypes.shape({
+            Name: PropTypes.string.isRequired,
+            Bio: PropTypes.string.isRequired,
+            Birth: PropTypes.string.isRequired,
+        }),
+    }).isRequired,
+    onMovieClick: PropTypes.func.isRequired,
+    isFavorite: PropTypes.bool.isRequired,
+    addFav: PropTypes.func.isRequired,
+    removeFav: PropTypes.func.isRequired,
 };
