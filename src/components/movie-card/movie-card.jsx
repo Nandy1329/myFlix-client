@@ -1,24 +1,31 @@
-import React from "react";
-import PropTypes from "prop-types";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Card, Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
-export const MovieCard = ({ movie, onMovieClick, isFavorite, addFav, removeFav }) => {
+export const MovieCard = ({ movie, onAddToFavorites, onMovieClick }) => {
+    const { _id, Title, Description, ImagePath } = movie;
+
+    const handleAddToFavoritesClick = () => {
+        if (typeof onAddToFavorites === 'function') {
+            onAddToFavorites(_id);
+        }
+    };
+
     return (
-        <Card>
-            <Card.Img variant="top" src={movie.ImagePath} />
+        <Card style={{ width: '18rem' }}>
+            <Card.Img variant="top" src={ImagePath} />
             <Card.Body>
-                <Card.Title>{movie.Title}</Card.Title>
-                <Card.Text>{movie.Director && movie.Director.Name}</Card.Text>
-                <Button onClick={() => onMovieClick(movie)} variant="link">
-                    Open
+                <Card.Title>{Title}</Card.Title>
+                <Card.Text>{Description}</Card.Text>
+                <Button variant="primary" onClick={handleAddToFavoritesClick}>
+                    Add to Favorites
                 </Button>
-                <Button
-                    onClick={() => (isFavorite ? removeFav(movie._id) : addFav(movie._id))}
-                    variant="link"
-                >
-                    {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
-                </Button>
+                <Link to={`/movies/${_id}`}>
+                    <Button variant="secondary" className="mt-2" onClick={onMovieClick}>
+                        Open Movie
+                    </Button>
+                </Link>
             </Card.Body>
         </Card>
     );
@@ -30,18 +37,9 @@ MovieCard.propTypes = {
         Title: PropTypes.string.isRequired,
         Description: PropTypes.string.isRequired,
         ImagePath: PropTypes.string.isRequired,
-        Genre: PropTypes.shape({
-            Name: PropTypes.string.isRequired,
-            Description: PropTypes.string.isRequired,
-        }),
-        Director: PropTypes.shape({
-            Name: PropTypes.string.isRequired,
-            Bio: PropTypes.string.isRequired,
-            Birth: PropTypes.string.isRequired,
-        }),
     }).isRequired,
+    onAddToFavorites: PropTypes.func.isRequired,
     onMovieClick: PropTypes.func.isRequired,
-    isFavorite: PropTypes.bool.isRequired,
-    addFav: PropTypes.func.isRequired,
-    removeFav: PropTypes.func.isRequired,
 };
+
+export default MovieCard;

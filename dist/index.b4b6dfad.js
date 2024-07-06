@@ -2955,13 +2955,14 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _client = require("react-dom/client");
 var _mainViewJsx = require("./components/main-view/main-view.jsx");
+var _mainViewJsxDefault = parcelHelpers.interopDefault(_mainViewJsx);
 var _container = require("react-bootstrap/Container");
 var _containerDefault = parcelHelpers.interopDefault(_container);
 var _bootstrapMinCss = require("bootstrap/dist/css/bootstrap.min.css");
 var _indexScss = require("./index.scss");
 const MyFlixApp = ()=>{
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _containerDefault.default), {
-        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _mainViewJsx.MainView), {}, void 0, false, {
+        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _mainViewJsxDefault.default), {}, void 0, false, {
             fileName: "src/index.jsx",
             lineNumber: 12,
             columnNumber: 7
@@ -27184,83 +27185,77 @@ $parcel$ReactRefreshHelpers$f7a6.prelude(module);
 try {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "MainView", ()=>MainView);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _react = require("react");
-var _movieCard = require("../movie-card/movie-card");
-var _movieView = require("../movie-view/movie-view");
+var _reactDefault = parcelHelpers.interopDefault(_react);
+var _reactRouterDom = require("react-router-dom");
+var _reactBootstrap = require("react-bootstrap");
+var _navigationBar = require("../navigation-bar/navigation-bar");
 var _loginView = require("../login-view/login-view");
 var _signupView = require("../signup-view/signup-view");
+var _movieView = require("../movie-view/movie-view");
 var _profileView = require("../profile-view/profile-view");
-var _row = require("react-bootstrap/Row");
-var _rowDefault = parcelHelpers.interopDefault(_row);
-var _col = require("react-bootstrap/Col");
-var _colDefault = parcelHelpers.interopDefault(_col);
-var _reactBootstrap = require("react-bootstrap");
-var _reactRouterDom = require("react-router-dom");
-var _navigationBar = require("../navigation-bar/navigation-bar");
-var _mainViewScss = require("./main-view.scss");
+var _profileViewDefault = parcelHelpers.interopDefault(_profileView);
+var _movieCard = require("../movie-card/movie-card");
 var _s = $RefreshSig$();
 const MainView = ()=>{
     _s();
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    const storedToken = localStorage.getItem("token");
-    const [user, setUser] = (0, _react.useState)(storedUser ? storedUser : null);
-    const [token, setToken] = (0, _react.useState)(storedToken ? storedToken : null);
-    const [movies, setMovies] = (0, _react.useState)([]);
-    const [selectedMovie, setSelectedMovie] = (0, _react.useState)(null);
+    const [user, setUser] = (0, _react.useState)(()=>{
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        return storedUser ? {
+            ...storedUser,
+            FavoriteMovies: storedUser.FavoriteMovies || []
+        } : null;
+    });
+    const [movies, setMovies] = (0, _react.useState)([]); // Ensure this is always an array
+    const [token, setToken] = (0, _react.useState)(null);
     const [filter, setFilter] = (0, _react.useState)("");
-    const handleToggleFavorite = (movieId, isFavorite)=>{
-        console.log(`Toggle favorite for movie with ID ${movieId} (${isFavorite ? "Add to favorites" : "Remove from favorites"})`);
-    };
-    (0, _react.useEffect)(()=>{
-        if (!token) return;
-        fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies", {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }).then((response)=>response.json()).then((data)=>{
-            console.log(data);
-            const moviesFromApi = data.map((movie)=>{
-                return {
-                    _id: movie._id,
-                    Title: movie.Title,
-                    Description: movie.Description,
-                    Genre: movie.Genre,
-                    Director: movie.Director,
-                    Featured: movie.Featured,
-                    Year: movie.Year,
-                    ImagePath: movie.ImagePath
-                };
-            });
-            setMovies(moviesFromApi);
-        }).catch((error)=>{
-            console.error("Error fetching movies:", error);
-        });
-    }, [
-        token
-    ]);
+    const [favorites, setFavorites] = (0, _react.useState)([]);
     const handleFilterChange = (event)=>{
         setFilter(event.target.value);
     };
-    const filteredMovies = movies.filter((movie)=>{
-        if (!movie.Title) {
-            console.error("Movie title is undefined:", movie);
-            return false;
-        }
-        return movie.Title.toLowerCase().includes(filter.toLowerCase());
-    });
-    const onMovieClick = (movie)=>{
-        setSelectedMovie(movie);
-    };
+    // Ensure movies is an array before filtering
+    const filteredMovies = Array.isArray(movies) ? movies.filter((movie)=>movie.Title.toLowerCase().includes(filter.toLowerCase())) : [];
     const addFav = (movieId)=>{
-        // Your logic to add the movie to favorites
-        console.log(`Add movie with ID ${movieId} to favorites`);
+        const updatedUser = {
+            ...user,
+            FavoriteMovies: Array.isArray(user.FavoriteMovies) ? [
+                ...user.FavoriteMovies,
+                movieId
+            ] : [
+                movieId
+            ]
+        };
+        setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
     };
     const removeFav = (movieId)=>{
-        // Your logic to remove the movie from favorites
-        console.log(`Remove movie with ID ${movieId} from favorites`);
+        const updatedUser = {
+            ...user,
+            FavoriteMovies: Array.isArray(user.FavoriteMovies) ? user.FavoriteMovies.filter((id)=>id !== movieId) : []
+        };
+        setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
     };
+    (0, _react.useEffect)(()=>{
+        const fetchMovies = async ()=>{
+            try {
+                const response = await fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies", {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                setMovies(data.movies);
+            } catch (error) {
+                console.error("Error fetching movies:", error.message);
+            }
+        };
+        if (token) fetchMovies();
+    }, [
+        token
+    ]);
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.BrowserRouter), {
         children: [
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _navigationBar.NavigationBar), {
@@ -27272,209 +27267,201 @@ const MainView = ()=>{
                 }
             }, void 0, false, {
                 fileName: "src/components/main-view/main-view.jsx",
-                lineNumber: 83,
+                lineNumber: 75,
                 columnNumber: 13
             }, undefined),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _rowDefault.default), {
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Row), {
                 className: "justify-content-md-center movie-card-container",
                 children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Routes), {
                     children: [
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
                             path: "/login",
-                            element: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
-                                children: user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
-                                    to: "/"
-                                }, void 0, false, {
-                                    fileName: "src/components/main-view/main-view.jsx",
-                                    lineNumber: 98,
-                                    columnNumber: 37
-                                }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Container), {
-                                    children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _colDefault.default), {
-                                        md: 12,
-                                        className: "justify-content-md-center",
-                                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _loginView.LoginView), {
-                                            onLoggedIn: (user)=>setUser(user)
-                                        }, void 0, false, {
-                                            fileName: "src/components/main-view/main-view.jsx",
-                                            lineNumber: 102,
-                                            columnNumber: 45
-                                        }, void 0)
+                            element: user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
+                                to: "/"
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 89,
+                                columnNumber: 33
+                            }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Container), {
+                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                                    md: 12,
+                                    className: "justify-content-md-center",
+                                    children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _loginView.LoginView), {
+                                        onLoggedIn: (user)=>setUser(user)
                                     }, void 0, false, {
                                         fileName: "src/components/main-view/main-view.jsx",
-                                        lineNumber: 101,
+                                        lineNumber: 93,
                                         columnNumber: 41
                                     }, void 0)
                                 }, void 0, false, {
                                     fileName: "src/components/main-view/main-view.jsx",
-                                    lineNumber: 100,
+                                    lineNumber: 92,
                                     columnNumber: 37
                                 }, void 0)
-                            }, void 0, false)
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 91,
+                                columnNumber: 33
+                            }, void 0)
                         }, void 0, false, {
                             fileName: "src/components/main-view/main-view.jsx",
-                            lineNumber: 93,
+                            lineNumber: 85,
                             columnNumber: 21
                         }, undefined),
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
                             path: "/signup",
-                            element: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
-                                children: user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
-                                    to: "/"
+                            element: user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
+                                to: "/"
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 103,
+                                columnNumber: 33
+                            }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                                md: 12,
+                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _signupView.SignupView), {
+                                    className: "signUp"
                                 }, void 0, false, {
                                     fileName: "src/components/main-view/main-view.jsx",
-                                    lineNumber: 114,
-                                    columnNumber: 37
-                                }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _colDefault.default), {
-                                    md: 12,
-                                    children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _signupView.SignupView), {
-                                        className: "signUp"
-                                    }, void 0, false, {
-                                        fileName: "src/components/main-view/main-view.jsx",
-                                        lineNumber: 117,
-                                        columnNumber: 41
-                                    }, void 0)
-                                }, void 0, false, {
-                                    fileName: "src/components/main-view/main-view.jsx",
-                                    lineNumber: 116,
+                                    lineNumber: 106,
                                     columnNumber: 37
                                 }, void 0)
-                            }, void 0, false)
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 105,
+                                columnNumber: 33
+                            }, void 0)
                         }, void 0, false, {
                             fileName: "src/components/main-view/main-view.jsx",
-                            lineNumber: 109,
+                            lineNumber: 99,
                             columnNumber: 21
                         }, undefined),
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
                             path: "/movies/:movieId",
-                            element: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
-                                children: !user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
-                                    to: "/login",
-                                    replace: true
+                            element: !user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
+                                to: "/login",
+                                replace: true
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 115,
+                                columnNumber: 33
+                            }, void 0) : movies.length === 0 ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                                children: "The list is empty"
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 117,
+                                columnNumber: 33
+                            }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                                md: 8,
+                                className: "movieView",
+                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieView.MovieView), {
+                                    movies: movies
                                 }, void 0, false, {
                                     fileName: "src/components/main-view/main-view.jsx",
-                                    lineNumber: 128,
-                                    columnNumber: 37
-                                }, void 0) : movies.length === 0 ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _colDefault.default), {
-                                    children: "The list is empty"
-                                }, void 0, false, {
-                                    fileName: "src/components/main-view/main-view.jsx",
-                                    lineNumber: 130,
-                                    columnNumber: 37
-                                }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _colDefault.default), {
-                                    md: 8,
-                                    className: "movieView",
-                                    children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieView.MovieView), {
-                                        movies: movies
-                                    }, void 0, false, {
-                                        fileName: "src/components/main-view/main-view.jsx",
-                                        lineNumber: 133,
-                                        columnNumber: 41
-                                    }, void 0)
-                                }, void 0, false, {
-                                    fileName: "src/components/main-view/main-view.jsx",
-                                    lineNumber: 132,
+                                    lineNumber: 120,
                                     columnNumber: 37
                                 }, void 0)
-                            }, void 0, false)
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 119,
+                                columnNumber: 33
+                            }, void 0)
                         }, void 0, false, {
                             fileName: "src/components/main-view/main-view.jsx",
-                            lineNumber: 123,
+                            lineNumber: 111,
                             columnNumber: 21
                         }, undefined),
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
                             path: "/",
-                            element: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
-                                children: !user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
-                                    to: "/login",
-                                    replace: true
-                                }, void 0, false, {
-                                    fileName: "src/components/main-view/main-view.jsx",
-                                    lineNumber: 144,
-                                    columnNumber: 37
-                                }, void 0) : movies.length === 0 ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _colDefault.default), {
-                                    children: "The List is Empty!"
-                                }, void 0, false, {
-                                    fileName: "src/components/main-view/main-view.jsx",
-                                    lineNumber: 146,
-                                    columnNumber: 37
-                                }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
-                                    children: [
-                                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
-                                            type: "text",
-                                            placeholder: "Search movies...",
-                                            value: filter,
-                                            onChange: handleFilterChange
-                                        }, void 0, false, {
-                                            fileName: "src/components/main-view/main-view.jsx",
-                                            lineNumber: 149,
-                                            columnNumber: 41
-                                        }, void 0),
-                                        filteredMovies.map((movie)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _colDefault.default), {
-                                                md: 3,
-                                                sm: 6,
-                                                xs: 12,
-                                                className: "movie-card-col",
-                                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieCard.MovieCard), {
-                                                    movie: movie,
-                                                    onMovieClick: onMovieClick,
-                                                    isFavorite: user && user.FavoriteMovies ? user.FavoriteMovies.includes(movie._id) : false,
-                                                    addFav: addFav,
-                                                    removeFav: removeFav
-                                                }, void 0, false, {
-                                                    fileName: "src/components/main-view/main-view.jsx",
-                                                    lineNumber: 157,
-                                                    columnNumber: 49
-                                                }, void 0)
-                                            }, movie._id, false, {
+                            element: !user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
+                                to: "/login",
+                                replace: true
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 129,
+                                columnNumber: 33
+                            }, void 0) : movies.length === 0 ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                                children: "The List is Empty!"
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 131,
+                                columnNumber: 33
+                            }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
+                                children: [
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
+                                        type: "text",
+                                        placeholder: "Search movies...",
+                                        value: filter,
+                                        onChange: handleFilterChange
+                                    }, void 0, false, {
+                                        fileName: "src/components/main-view/main-view.jsx",
+                                        lineNumber: 134,
+                                        columnNumber: 37
+                                    }, void 0),
+                                    filteredMovies.map((movie)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                                            md: 3,
+                                            sm: 6,
+                                            xs: 12,
+                                            className: "movie-card-col",
+                                            children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieCard.MovieCard), {
+                                                movie: movie,
+                                                onAddToFavorites: addFav,
+                                                onMovieClick: ()=>console.log(`Open movie ${movie._id}`)
+                                            }, void 0, false, {
                                                 fileName: "src/components/main-view/main-view.jsx",
-                                                lineNumber: 156,
+                                                lineNumber: 142,
                                                 columnNumber: 45
-                                            }, void 0))
-                                    ]
-                                }, void 0, true)
-                            }, void 0, false)
+                                            }, void 0)
+                                        }, movie._id, false, {
+                                            fileName: "src/components/main-view/main-view.jsx",
+                                            lineNumber: 141,
+                                            columnNumber: 41
+                                        }, void 0))
+                                ]
+                            }, void 0, true)
                         }, void 0, false, {
                             fileName: "src/components/main-view/main-view.jsx",
-                            lineNumber: 139,
+                            lineNumber: 125,
                             columnNumber: 21
                         }, undefined),
                         user && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
                             path: "/profile",
-                            element: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _profileView.ProfileView), {
+                            element: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _profileViewDefault.default), {
+                                movies: movies,
                                 user: user,
                                 setUser: setUser,
-                                removeFav: removeFav,
-                                addFav: addFav
+                                addFav: addFav,
+                                removeFav: removeFav
                             }, void 0, false, {
                                 fileName: "src/components/main-view/main-view.jsx",
-                                lineNumber: 173,
-                                columnNumber: 29
+                                lineNumber: 157,
+                                columnNumber: 33
                             }, void 0)
                         }, void 0, false, {
                             fileName: "src/components/main-view/main-view.jsx",
-                            lineNumber: 172,
+                            lineNumber: 154,
                             columnNumber: 25
                         }, undefined)
                     ]
                 }, void 0, true, {
                     fileName: "src/components/main-view/main-view.jsx",
-                    lineNumber: 92,
+                    lineNumber: 84,
                     columnNumber: 17
                 }, undefined)
             }, void 0, false, {
                 fileName: "src/components/main-view/main-view.jsx",
-                lineNumber: 91,
+                lineNumber: 83,
                 columnNumber: 13
             }, undefined)
         ]
     }, void 0, true, {
         fileName: "src/components/main-view/main-view.jsx",
-        lineNumber: 82,
+        lineNumber: 74,
         columnNumber: 9
     }, undefined);
 };
-_s(MainView, "lC4wMIdDKjiqo0T/LLCv31eT5vM=");
+_s(MainView, "D3sKeVkz9+GE5hE8rEpJk0mOM+8=");
 _c = MainView;
+exports.default = MainView;
 var _c;
 $RefreshReg$(_c, "MainView");
 
@@ -27483,940 +27470,108 @@ $RefreshReg$(_c, "MainView");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","../movie-card/movie-card":"bwuIu","../movie-view/movie-view":"ggaUx","../login-view/login-view":"9YtA0","../signup-view/signup-view":"4OGiN","../profile-view/profile-view":"2vVqf","react-bootstrap/Row":"cMC39","react-bootstrap/Col":"2L2I6","react-bootstrap":"3AD9A","../navigation-bar/navigation-bar":"bsPVM","./main-view.scss":"eBaMl","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","react-router-dom":"9xmpe"}],"bwuIu":[function(require,module,exports) {
-var $parcel$ReactRefreshHelpers$67b2 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
-var prevRefreshReg = window.$RefreshReg$;
-var prevRefreshSig = window.$RefreshSig$;
-$parcel$ReactRefreshHelpers$67b2.prelude(module);
-
-try {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-router-dom":"9xmpe","react-bootstrap":"3AD9A","../navigation-bar/navigation-bar":"bsPVM","../login-view/login-view":"9YtA0","../signup-view/signup-view":"4OGiN","../movie-view/movie-view":"ggaUx","../profile-view/profile-view":"2vVqf","../movie-card/movie-card":"bwuIu","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"9xmpe":[function(require,module,exports) {
+/**
+ * React Router DOM v6.24.1
+ *
+ * Copyright (c) Remix Software Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE.md file in the root directory of this source tree.
+ *
+ * @license MIT
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "MovieCard", ()=>MovieCard);
-var _jsxDevRuntime = require("react/jsx-dev-runtime");
+parcelHelpers.export(exports, "AbortedDeferredError", ()=>(0, _reactRouter.AbortedDeferredError));
+parcelHelpers.export(exports, "Await", ()=>(0, _reactRouter.Await));
+parcelHelpers.export(exports, "MemoryRouter", ()=>(0, _reactRouter.MemoryRouter));
+parcelHelpers.export(exports, "Navigate", ()=>(0, _reactRouter.Navigate));
+parcelHelpers.export(exports, "NavigationType", ()=>(0, _reactRouter.NavigationType));
+parcelHelpers.export(exports, "Outlet", ()=>(0, _reactRouter.Outlet));
+parcelHelpers.export(exports, "Route", ()=>(0, _reactRouter.Route));
+parcelHelpers.export(exports, "Router", ()=>(0, _reactRouter.Router));
+parcelHelpers.export(exports, "Routes", ()=>(0, _reactRouter.Routes));
+parcelHelpers.export(exports, "UNSAFE_DataRouterContext", ()=>(0, _reactRouter.UNSAFE_DataRouterContext));
+parcelHelpers.export(exports, "UNSAFE_DataRouterStateContext", ()=>(0, _reactRouter.UNSAFE_DataRouterStateContext));
+parcelHelpers.export(exports, "UNSAFE_LocationContext", ()=>(0, _reactRouter.UNSAFE_LocationContext));
+parcelHelpers.export(exports, "UNSAFE_NavigationContext", ()=>(0, _reactRouter.UNSAFE_NavigationContext));
+parcelHelpers.export(exports, "UNSAFE_RouteContext", ()=>(0, _reactRouter.UNSAFE_RouteContext));
+parcelHelpers.export(exports, "UNSAFE_useRouteId", ()=>(0, _reactRouter.UNSAFE_useRouteId));
+parcelHelpers.export(exports, "createMemoryRouter", ()=>(0, _reactRouter.createMemoryRouter));
+parcelHelpers.export(exports, "createPath", ()=>(0, _reactRouter.createPath));
+parcelHelpers.export(exports, "createRoutesFromChildren", ()=>(0, _reactRouter.createRoutesFromChildren));
+parcelHelpers.export(exports, "createRoutesFromElements", ()=>(0, _reactRouter.createRoutesFromElements));
+parcelHelpers.export(exports, "defer", ()=>(0, _reactRouter.defer));
+parcelHelpers.export(exports, "generatePath", ()=>(0, _reactRouter.generatePath));
+parcelHelpers.export(exports, "isRouteErrorResponse", ()=>(0, _reactRouter.isRouteErrorResponse));
+parcelHelpers.export(exports, "json", ()=>(0, _reactRouter.json));
+parcelHelpers.export(exports, "matchPath", ()=>(0, _reactRouter.matchPath));
+parcelHelpers.export(exports, "matchRoutes", ()=>(0, _reactRouter.matchRoutes));
+parcelHelpers.export(exports, "parsePath", ()=>(0, _reactRouter.parsePath));
+parcelHelpers.export(exports, "redirect", ()=>(0, _reactRouter.redirect));
+parcelHelpers.export(exports, "redirectDocument", ()=>(0, _reactRouter.redirectDocument));
+parcelHelpers.export(exports, "renderMatches", ()=>(0, _reactRouter.renderMatches));
+parcelHelpers.export(exports, "resolvePath", ()=>(0, _reactRouter.resolvePath));
+parcelHelpers.export(exports, "useActionData", ()=>(0, _reactRouter.useActionData));
+parcelHelpers.export(exports, "useAsyncError", ()=>(0, _reactRouter.useAsyncError));
+parcelHelpers.export(exports, "useAsyncValue", ()=>(0, _reactRouter.useAsyncValue));
+parcelHelpers.export(exports, "useBlocker", ()=>(0, _reactRouter.useBlocker));
+parcelHelpers.export(exports, "useHref", ()=>(0, _reactRouter.useHref));
+parcelHelpers.export(exports, "useInRouterContext", ()=>(0, _reactRouter.useInRouterContext));
+parcelHelpers.export(exports, "useLoaderData", ()=>(0, _reactRouter.useLoaderData));
+parcelHelpers.export(exports, "useLocation", ()=>(0, _reactRouter.useLocation));
+parcelHelpers.export(exports, "useMatch", ()=>(0, _reactRouter.useMatch));
+parcelHelpers.export(exports, "useMatches", ()=>(0, _reactRouter.useMatches));
+parcelHelpers.export(exports, "useNavigate", ()=>(0, _reactRouter.useNavigate));
+parcelHelpers.export(exports, "useNavigation", ()=>(0, _reactRouter.useNavigation));
+parcelHelpers.export(exports, "useNavigationType", ()=>(0, _reactRouter.useNavigationType));
+parcelHelpers.export(exports, "useOutlet", ()=>(0, _reactRouter.useOutlet));
+parcelHelpers.export(exports, "useOutletContext", ()=>(0, _reactRouter.useOutletContext));
+parcelHelpers.export(exports, "useParams", ()=>(0, _reactRouter.useParams));
+parcelHelpers.export(exports, "useResolvedPath", ()=>(0, _reactRouter.useResolvedPath));
+parcelHelpers.export(exports, "useRevalidator", ()=>(0, _reactRouter.useRevalidator));
+parcelHelpers.export(exports, "useRouteError", ()=>(0, _reactRouter.useRouteError));
+parcelHelpers.export(exports, "useRouteLoaderData", ()=>(0, _reactRouter.useRouteLoaderData));
+parcelHelpers.export(exports, "useRoutes", ()=>(0, _reactRouter.useRoutes));
+parcelHelpers.export(exports, "UNSAFE_ErrorResponseImpl", ()=>(0, _router.UNSAFE_ErrorResponseImpl));
+//#endregion
+parcelHelpers.export(exports, "BrowserRouter", ()=>BrowserRouter);
+parcelHelpers.export(exports, "Form", ()=>Form);
+parcelHelpers.export(exports, "HashRouter", ()=>HashRouter);
+parcelHelpers.export(exports, "Link", ()=>Link);
+parcelHelpers.export(exports, "NavLink", ()=>NavLink);
+parcelHelpers.export(exports, "RouterProvider", ()=>RouterProvider);
+parcelHelpers.export(exports, "ScrollRestoration", ()=>ScrollRestoration);
+parcelHelpers.export(exports, "UNSAFE_FetchersContext", ()=>FetchersContext);
+parcelHelpers.export(exports, "UNSAFE_ViewTransitionContext", ()=>ViewTransitionContext);
+parcelHelpers.export(exports, "UNSAFE_useScrollRestoration", ()=>useScrollRestoration);
+parcelHelpers.export(exports, "createBrowserRouter", ()=>createBrowserRouter);
+parcelHelpers.export(exports, "createHashRouter", ()=>createHashRouter);
+parcelHelpers.export(exports, "createSearchParams", ()=>createSearchParams);
+parcelHelpers.export(exports, "unstable_HistoryRouter", ()=>HistoryRouter);
+parcelHelpers.export(exports, "unstable_usePrompt", ()=>usePrompt);
+parcelHelpers.export(exports, "unstable_useViewTransitionState", ()=>useViewTransitionState);
+parcelHelpers.export(exports, "useBeforeUnload", ()=>useBeforeUnload);
+parcelHelpers.export(exports, "useFetcher", ()=>useFetcher);
+parcelHelpers.export(exports, "useFetchers", ()=>useFetchers);
+parcelHelpers.export(exports, "useFormAction", ()=>useFormAction);
+parcelHelpers.export(exports, "useLinkClickHandler", ()=>useLinkClickHandler);
+parcelHelpers.export(exports, "useSearchParams", ()=>useSearchParams);
+parcelHelpers.export(exports, "useSubmit", ()=>useSubmit);
 var _react = require("react");
-var _reactDefault = parcelHelpers.interopDefault(_react);
-var _propTypes = require("prop-types");
-var _propTypesDefault = parcelHelpers.interopDefault(_propTypes);
-var _button = require("react-bootstrap/Button");
-var _buttonDefault = parcelHelpers.interopDefault(_button);
-var _card = require("react-bootstrap/Card");
-var _cardDefault = parcelHelpers.interopDefault(_card);
-const MovieCard = ({ movie, onMovieClick, isFavorite, addFav, removeFav })=>{
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _cardDefault.default), {
-        children: [
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _cardDefault.default).Img, {
-                variant: "top",
-                src: movie.ImagePath
-            }, void 0, false, {
-                fileName: "src/components/movie-card/movie-card.jsx",
-                lineNumber: 9,
-                columnNumber: 13
-            }, undefined),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _cardDefault.default).Body, {
-                children: [
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _cardDefault.default).Title, {
-                        children: movie.Title
-                    }, void 0, false, {
-                        fileName: "src/components/movie-card/movie-card.jsx",
-                        lineNumber: 11,
-                        columnNumber: 17
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _cardDefault.default).Text, {
-                        children: movie.Director && movie.Director.Name
-                    }, void 0, false, {
-                        fileName: "src/components/movie-card/movie-card.jsx",
-                        lineNumber: 12,
-                        columnNumber: 17
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _buttonDefault.default), {
-                        onClick: ()=>onMovieClick(movie),
-                        variant: "link",
-                        children: "Open"
-                    }, void 0, false, {
-                        fileName: "src/components/movie-card/movie-card.jsx",
-                        lineNumber: 13,
-                        columnNumber: 17
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _buttonDefault.default), {
-                        onClick: ()=>isFavorite ? removeFav(movie._id) : addFav(movie._id),
-                        variant: "link",
-                        children: isFavorite ? "Remove from Favorites" : "Add to Favorites"
-                    }, void 0, false, {
-                        fileName: "src/components/movie-card/movie-card.jsx",
-                        lineNumber: 16,
-                        columnNumber: 17
-                    }, undefined)
-                ]
-            }, void 0, true, {
-                fileName: "src/components/movie-card/movie-card.jsx",
-                lineNumber: 10,
-                columnNumber: 13
-            }, undefined)
-        ]
-    }, void 0, true, {
-        fileName: "src/components/movie-card/movie-card.jsx",
-        lineNumber: 8,
-        columnNumber: 9
-    }, undefined);
-};
-_c = MovieCard;
-MovieCard.propTypes = {
-    movie: (0, _propTypesDefault.default).shape({
-        _id: (0, _propTypesDefault.default).string.isRequired,
-        Title: (0, _propTypesDefault.default).string.isRequired,
-        Description: (0, _propTypesDefault.default).string.isRequired,
-        ImagePath: (0, _propTypesDefault.default).string.isRequired,
-        Genre: (0, _propTypesDefault.default).shape({
-            Name: (0, _propTypesDefault.default).string.isRequired,
-            Description: (0, _propTypesDefault.default).string.isRequired
-        }),
-        Director: (0, _propTypesDefault.default).shape({
-            Name: (0, _propTypesDefault.default).string.isRequired,
-            Bio: (0, _propTypesDefault.default).string.isRequired,
-            Birth: (0, _propTypesDefault.default).string.isRequired
-        })
-    }).isRequired,
-    onMovieClick: (0, _propTypesDefault.default).func.isRequired,
-    isFavorite: (0, _propTypesDefault.default).bool.isRequired,
-    addFav: (0, _propTypesDefault.default).func.isRequired,
-    removeFav: (0, _propTypesDefault.default).func.isRequired
-};
-var _c;
-$RefreshReg$(_c, "MovieCard");
-
-  $parcel$ReactRefreshHelpers$67b2.postlude(module);
-} finally {
-  window.$RefreshReg$ = prevRefreshReg;
-  window.$RefreshSig$ = prevRefreshSig;
-}
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","prop-types":"7wKI2","react-bootstrap/Button":"aPzUt","react-bootstrap/Card":"lAynp","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"7wKI2":[function(require,module,exports) {
-/**
- * Copyright (c) 2013-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */ var ReactIs = require("96e34ae03f5a2631");
-// By explicitly using `prop-types` you are opting into new development behavior.
-// http://fb.me/prop-types-in-prod
-var throwOnDirectAccess = true;
-module.exports = require("cb216452e2171041")(ReactIs.isElement, throwOnDirectAccess);
-
-},{"96e34ae03f5a2631":"7EuwB","cb216452e2171041":"bBUgD"}],"7EuwB":[function(require,module,exports) {
-"use strict";
-module.exports = require("2255125a8e8b1051");
-
-},{"2255125a8e8b1051":"5DsXl"}],"5DsXl":[function(require,module,exports) {
-/** @license React v16.13.1
- * react-is.development.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */ "use strict";
-(function() {
-    "use strict";
-    // The Symbol used to tag the ReactElement-like types. If there is no native Symbol
-    // nor polyfill, then a plain number is used for performance.
-    var hasSymbol = typeof Symbol === "function" && Symbol.for;
-    var REACT_ELEMENT_TYPE = hasSymbol ? Symbol.for("react.element") : 0xeac7;
-    var REACT_PORTAL_TYPE = hasSymbol ? Symbol.for("react.portal") : 0xeaca;
-    var REACT_FRAGMENT_TYPE = hasSymbol ? Symbol.for("react.fragment") : 0xeacb;
-    var REACT_STRICT_MODE_TYPE = hasSymbol ? Symbol.for("react.strict_mode") : 0xeacc;
-    var REACT_PROFILER_TYPE = hasSymbol ? Symbol.for("react.profiler") : 0xead2;
-    var REACT_PROVIDER_TYPE = hasSymbol ? Symbol.for("react.provider") : 0xeacd;
-    var REACT_CONTEXT_TYPE = hasSymbol ? Symbol.for("react.context") : 0xeace; // TODO: We don't use AsyncMode or ConcurrentMode anymore. They were temporary
-    // (unstable) APIs that have been removed. Can we remove the symbols?
-    var REACT_ASYNC_MODE_TYPE = hasSymbol ? Symbol.for("react.async_mode") : 0xeacf;
-    var REACT_CONCURRENT_MODE_TYPE = hasSymbol ? Symbol.for("react.concurrent_mode") : 0xeacf;
-    var REACT_FORWARD_REF_TYPE = hasSymbol ? Symbol.for("react.forward_ref") : 0xead0;
-    var REACT_SUSPENSE_TYPE = hasSymbol ? Symbol.for("react.suspense") : 0xead1;
-    var REACT_SUSPENSE_LIST_TYPE = hasSymbol ? Symbol.for("react.suspense_list") : 0xead8;
-    var REACT_MEMO_TYPE = hasSymbol ? Symbol.for("react.memo") : 0xead3;
-    var REACT_LAZY_TYPE = hasSymbol ? Symbol.for("react.lazy") : 0xead4;
-    var REACT_BLOCK_TYPE = hasSymbol ? Symbol.for("react.block") : 0xead9;
-    var REACT_FUNDAMENTAL_TYPE = hasSymbol ? Symbol.for("react.fundamental") : 0xead5;
-    var REACT_RESPONDER_TYPE = hasSymbol ? Symbol.for("react.responder") : 0xead6;
-    var REACT_SCOPE_TYPE = hasSymbol ? Symbol.for("react.scope") : 0xead7;
-    function isValidElementType(type) {
-        return typeof type === "string" || typeof type === "function" || // Note: its typeof might be other than 'symbol' or 'number' if it's a polyfill.
-        type === REACT_FRAGMENT_TYPE || type === REACT_CONCURRENT_MODE_TYPE || type === REACT_PROFILER_TYPE || type === REACT_STRICT_MODE_TYPE || type === REACT_SUSPENSE_TYPE || type === REACT_SUSPENSE_LIST_TYPE || typeof type === "object" && type !== null && (type.$$typeof === REACT_LAZY_TYPE || type.$$typeof === REACT_MEMO_TYPE || type.$$typeof === REACT_PROVIDER_TYPE || type.$$typeof === REACT_CONTEXT_TYPE || type.$$typeof === REACT_FORWARD_REF_TYPE || type.$$typeof === REACT_FUNDAMENTAL_TYPE || type.$$typeof === REACT_RESPONDER_TYPE || type.$$typeof === REACT_SCOPE_TYPE || type.$$typeof === REACT_BLOCK_TYPE);
-    }
-    function typeOf(object) {
-        if (typeof object === "object" && object !== null) {
-            var $$typeof = object.$$typeof;
-            switch($$typeof){
-                case REACT_ELEMENT_TYPE:
-                    var type = object.type;
-                    switch(type){
-                        case REACT_ASYNC_MODE_TYPE:
-                        case REACT_CONCURRENT_MODE_TYPE:
-                        case REACT_FRAGMENT_TYPE:
-                        case REACT_PROFILER_TYPE:
-                        case REACT_STRICT_MODE_TYPE:
-                        case REACT_SUSPENSE_TYPE:
-                            return type;
-                        default:
-                            var $$typeofType = type && type.$$typeof;
-                            switch($$typeofType){
-                                case REACT_CONTEXT_TYPE:
-                                case REACT_FORWARD_REF_TYPE:
-                                case REACT_LAZY_TYPE:
-                                case REACT_MEMO_TYPE:
-                                case REACT_PROVIDER_TYPE:
-                                    return $$typeofType;
-                                default:
-                                    return $$typeof;
-                            }
-                    }
-                case REACT_PORTAL_TYPE:
-                    return $$typeof;
-            }
+var _reactDom = require("react-dom");
+var _reactRouter = require("react-router");
+var _router = require("@remix-run/router");
+function _extends() {
+    _extends = Object.assign ? Object.assign.bind() : function(target) {
+        for(var i = 1; i < arguments.length; i++){
+            var source = arguments[i];
+            for(var key in source)if (Object.prototype.hasOwnProperty.call(source, key)) target[key] = source[key];
         }
-        return undefined;
-    } // AsyncMode is deprecated along with isAsyncMode
-    var AsyncMode = REACT_ASYNC_MODE_TYPE;
-    var ConcurrentMode = REACT_CONCURRENT_MODE_TYPE;
-    var ContextConsumer = REACT_CONTEXT_TYPE;
-    var ContextProvider = REACT_PROVIDER_TYPE;
-    var Element = REACT_ELEMENT_TYPE;
-    var ForwardRef = REACT_FORWARD_REF_TYPE;
-    var Fragment = REACT_FRAGMENT_TYPE;
-    var Lazy = REACT_LAZY_TYPE;
-    var Memo = REACT_MEMO_TYPE;
-    var Portal = REACT_PORTAL_TYPE;
-    var Profiler = REACT_PROFILER_TYPE;
-    var StrictMode = REACT_STRICT_MODE_TYPE;
-    var Suspense = REACT_SUSPENSE_TYPE;
-    var hasWarnedAboutDeprecatedIsAsyncMode = false; // AsyncMode should be deprecated
-    function isAsyncMode(object) {
-        if (!hasWarnedAboutDeprecatedIsAsyncMode) {
-            hasWarnedAboutDeprecatedIsAsyncMode = true; // Using console['warn'] to evade Babel and ESLint
-            console["warn"]("The ReactIs.isAsyncMode() alias has been deprecated, and will be removed in React 17+. Update your code to use ReactIs.isConcurrentMode() instead. It has the exact same API.");
-        }
-        return isConcurrentMode(object) || typeOf(object) === REACT_ASYNC_MODE_TYPE;
-    }
-    function isConcurrentMode(object) {
-        return typeOf(object) === REACT_CONCURRENT_MODE_TYPE;
-    }
-    function isContextConsumer(object) {
-        return typeOf(object) === REACT_CONTEXT_TYPE;
-    }
-    function isContextProvider(object) {
-        return typeOf(object) === REACT_PROVIDER_TYPE;
-    }
-    function isElement(object) {
-        return typeof object === "object" && object !== null && object.$$typeof === REACT_ELEMENT_TYPE;
-    }
-    function isForwardRef(object) {
-        return typeOf(object) === REACT_FORWARD_REF_TYPE;
-    }
-    function isFragment(object) {
-        return typeOf(object) === REACT_FRAGMENT_TYPE;
-    }
-    function isLazy(object) {
-        return typeOf(object) === REACT_LAZY_TYPE;
-    }
-    function isMemo(object) {
-        return typeOf(object) === REACT_MEMO_TYPE;
-    }
-    function isPortal(object) {
-        return typeOf(object) === REACT_PORTAL_TYPE;
-    }
-    function isProfiler(object) {
-        return typeOf(object) === REACT_PROFILER_TYPE;
-    }
-    function isStrictMode(object) {
-        return typeOf(object) === REACT_STRICT_MODE_TYPE;
-    }
-    function isSuspense(object) {
-        return typeOf(object) === REACT_SUSPENSE_TYPE;
-    }
-    exports.AsyncMode = AsyncMode;
-    exports.ConcurrentMode = ConcurrentMode;
-    exports.ContextConsumer = ContextConsumer;
-    exports.ContextProvider = ContextProvider;
-    exports.Element = Element;
-    exports.ForwardRef = ForwardRef;
-    exports.Fragment = Fragment;
-    exports.Lazy = Lazy;
-    exports.Memo = Memo;
-    exports.Portal = Portal;
-    exports.Profiler = Profiler;
-    exports.StrictMode = StrictMode;
-    exports.Suspense = Suspense;
-    exports.isAsyncMode = isAsyncMode;
-    exports.isConcurrentMode = isConcurrentMode;
-    exports.isContextConsumer = isContextConsumer;
-    exports.isContextProvider = isContextProvider;
-    exports.isElement = isElement;
-    exports.isForwardRef = isForwardRef;
-    exports.isFragment = isFragment;
-    exports.isLazy = isLazy;
-    exports.isMemo = isMemo;
-    exports.isPortal = isPortal;
-    exports.isProfiler = isProfiler;
-    exports.isStrictMode = isStrictMode;
-    exports.isSuspense = isSuspense;
-    exports.isValidElementType = isValidElementType;
-    exports.typeOf = typeOf;
-})();
-
-},{}],"bBUgD":[function(require,module,exports) {
-/**
- * Copyright (c) 2013-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */ "use strict";
-var ReactIs = require("c437388b089702c3");
-var assign = require("c067a60101d8520c");
-var ReactPropTypesSecret = require("74a0f89a70b9f3c2");
-var has = require("18441b11647bc78");
-var checkPropTypes = require("bec3f6ff89f0b072");
-var printWarning = function() {};
-printWarning = function(text) {
-    var message = "Warning: " + text;
-    if (typeof console !== "undefined") console.error(message);
-    try {
-        // --- Welcome to debugging React ---
-        // This error was thrown as a convenience so that you can use this stack
-        // to find the callsite that caused this warning to fire.
-        throw new Error(message);
-    } catch (x) {}
-};
-function emptyFunctionThatReturnsNull() {
-    return null;
-}
-module.exports = function(isValidElement, throwOnDirectAccess) {
-    /* global Symbol */ var ITERATOR_SYMBOL = typeof Symbol === "function" && Symbol.iterator;
-    var FAUX_ITERATOR_SYMBOL = "@@iterator"; // Before Symbol spec.
-    /**
-   * Returns the iterator method function contained on the iterable object.
-   *
-   * Be sure to invoke the function with the iterable as context:
-   *
-   *     var iteratorFn = getIteratorFn(myIterable);
-   *     if (iteratorFn) {
-   *       var iterator = iteratorFn.call(myIterable);
-   *       ...
-   *     }
-   *
-   * @param {?object} maybeIterable
-   * @return {?function}
-   */ function getIteratorFn(maybeIterable) {
-        var iteratorFn = maybeIterable && (ITERATOR_SYMBOL && maybeIterable[ITERATOR_SYMBOL] || maybeIterable[FAUX_ITERATOR_SYMBOL]);
-        if (typeof iteratorFn === "function") return iteratorFn;
-    }
-    /**
-   * Collection of methods that allow declaration and validation of props that are
-   * supplied to React components. Example usage:
-   *
-   *   var Props = require('ReactPropTypes');
-   *   var MyArticle = React.createClass({
-   *     propTypes: {
-   *       // An optional string prop named "description".
-   *       description: Props.string,
-   *
-   *       // A required enum prop named "category".
-   *       category: Props.oneOf(['News','Photos']).isRequired,
-   *
-   *       // A prop named "dialog" that requires an instance of Dialog.
-   *       dialog: Props.instanceOf(Dialog).isRequired
-   *     },
-   *     render: function() { ... }
-   *   });
-   *
-   * A more formal specification of how these methods are used:
-   *
-   *   type := array|bool|func|object|number|string|oneOf([...])|instanceOf(...)
-   *   decl := ReactPropTypes.{type}(.isRequired)?
-   *
-   * Each and every declaration produces a function with the same signature. This
-   * allows the creation of custom validation functions. For example:
-   *
-   *  var MyLink = React.createClass({
-   *    propTypes: {
-   *      // An optional string or URI prop named "href".
-   *      href: function(props, propName, componentName) {
-   *        var propValue = props[propName];
-   *        if (propValue != null && typeof propValue !== 'string' &&
-   *            !(propValue instanceof URI)) {
-   *          return new Error(
-   *            'Expected a string or an URI for ' + propName + ' in ' +
-   *            componentName
-   *          );
-   *        }
-   *      }
-   *    },
-   *    render: function() {...}
-   *  });
-   *
-   * @internal
-   */ var ANONYMOUS = "<<anonymous>>";
-    // Important!
-    // Keep this list in sync with production version in `./factoryWithThrowingShims.js`.
-    var ReactPropTypes = {
-        array: createPrimitiveTypeChecker("array"),
-        bigint: createPrimitiveTypeChecker("bigint"),
-        bool: createPrimitiveTypeChecker("boolean"),
-        func: createPrimitiveTypeChecker("function"),
-        number: createPrimitiveTypeChecker("number"),
-        object: createPrimitiveTypeChecker("object"),
-        string: createPrimitiveTypeChecker("string"),
-        symbol: createPrimitiveTypeChecker("symbol"),
-        any: createAnyTypeChecker(),
-        arrayOf: createArrayOfTypeChecker,
-        element: createElementTypeChecker(),
-        elementType: createElementTypeTypeChecker(),
-        instanceOf: createInstanceTypeChecker,
-        node: createNodeChecker(),
-        objectOf: createObjectOfTypeChecker,
-        oneOf: createEnumTypeChecker,
-        oneOfType: createUnionTypeChecker,
-        shape: createShapeTypeChecker,
-        exact: createStrictShapeTypeChecker
+        return target;
     };
-    /**
-   * inlined Object.is polyfill to avoid requiring consumers ship their own
-   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is
-   */ /*eslint-disable no-self-compare*/ function is(x, y) {
-        // SameValue algorithm
-        if (x === y) // Steps 1-5, 7-10
-        // Steps 6.b-6.e: +0 != -0
-        return x !== 0 || 1 / x === 1 / y;
-        else // Step 6.a: NaN == NaN
-        return x !== x && y !== y;
-    }
-    /*eslint-enable no-self-compare*/ /**
-   * We use an Error-like object for backward compatibility as people may call
-   * PropTypes directly and inspect their output. However, we don't use real
-   * Errors anymore. We don't inspect their stack anyway, and creating them
-   * is prohibitively expensive if they are created too often, such as what
-   * happens in oneOfType() for any type before the one that matched.
-   */ function PropTypeError(message, data) {
-        this.message = message;
-        this.data = data && typeof data === "object" ? data : {};
-        this.stack = "";
-    }
-    // Make `instanceof Error` still work for returned errors.
-    PropTypeError.prototype = Error.prototype;
-    function createChainableTypeChecker(validate) {
-        var manualPropTypeCallCache = {};
-        var manualPropTypeWarningCount = 0;
-        function checkType(isRequired, props, propName, componentName, location, propFullName, secret) {
-            componentName = componentName || ANONYMOUS;
-            propFullName = propFullName || propName;
-            if (secret !== ReactPropTypesSecret) {
-                if (throwOnDirectAccess) {
-                    // New behavior only for users of `prop-types` package
-                    var err = new Error("Calling PropTypes validators directly is not supported by the `prop-types` package. Use `PropTypes.checkPropTypes()` to call them. Read more at http://fb.me/use-check-prop-types");
-                    err.name = "Invariant Violation";
-                    throw err;
-                } else if (typeof console !== "undefined") {
-                    // Old behavior for people using React.PropTypes
-                    var cacheKey = componentName + ":" + propName;
-                    if (!manualPropTypeCallCache[cacheKey] && // Avoid spamming the console because they are often not actionable except for lib authors
-                    manualPropTypeWarningCount < 3) {
-                        printWarning("You are manually calling a React.PropTypes validation function for the `" + propFullName + "` prop on `" + componentName + "`. This is deprecated " + "and will throw in the standalone `prop-types` package. " + "You may be seeing this warning due to a third-party PropTypes " + "library. See https://fb.me/react-warning-dont-call-proptypes " + "for details.");
-                        manualPropTypeCallCache[cacheKey] = true;
-                        manualPropTypeWarningCount++;
-                    }
-                }
-            }
-            if (props[propName] == null) {
-                if (isRequired) {
-                    if (props[propName] === null) return new PropTypeError("The " + location + " `" + propFullName + "` is marked as required " + ("in `" + componentName + "`, but its value is `null`."));
-                    return new PropTypeError("The " + location + " `" + propFullName + "` is marked as required in " + ("`" + componentName + "`, but its value is `undefined`."));
-                }
-                return null;
-            } else return validate(props, propName, componentName, location, propFullName);
-        }
-        var chainedCheckType = checkType.bind(null, false);
-        chainedCheckType.isRequired = checkType.bind(null, true);
-        return chainedCheckType;
-    }
-    function createPrimitiveTypeChecker(expectedType) {
-        function validate(props, propName, componentName, location, propFullName, secret) {
-            var propValue = props[propName];
-            var propType = getPropType(propValue);
-            if (propType !== expectedType) {
-                // `propValue` being instance of, say, date/regexp, pass the 'object'
-                // check, but we can offer a more precise error message here rather than
-                // 'of type `object`'.
-                var preciseType = getPreciseType(propValue);
-                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + preciseType + "` supplied to `" + componentName + "`, expected ") + ("`" + expectedType + "`."), {
-                    expectedType: expectedType
-                });
-            }
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createAnyTypeChecker() {
-        return createChainableTypeChecker(emptyFunctionThatReturnsNull);
-    }
-    function createArrayOfTypeChecker(typeChecker) {
-        function validate(props, propName, componentName, location, propFullName) {
-            if (typeof typeChecker !== "function") return new PropTypeError("Property `" + propFullName + "` of component `" + componentName + "` has invalid PropType notation inside arrayOf.");
-            var propValue = props[propName];
-            if (!Array.isArray(propValue)) {
-                var propType = getPropType(propValue);
-                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected an array."));
-            }
-            for(var i = 0; i < propValue.length; i++){
-                var error = typeChecker(propValue, i, componentName, location, propFullName + "[" + i + "]", ReactPropTypesSecret);
-                if (error instanceof Error) return error;
-            }
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createElementTypeChecker() {
-        function validate(props, propName, componentName, location, propFullName) {
-            var propValue = props[propName];
-            if (!isValidElement(propValue)) {
-                var propType = getPropType(propValue);
-                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected a single ReactElement."));
-            }
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createElementTypeTypeChecker() {
-        function validate(props, propName, componentName, location, propFullName) {
-            var propValue = props[propName];
-            if (!ReactIs.isValidElementType(propValue)) {
-                var propType = getPropType(propValue);
-                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected a single ReactElement type."));
-            }
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createInstanceTypeChecker(expectedClass) {
-        function validate(props, propName, componentName, location, propFullName) {
-            if (!(props[propName] instanceof expectedClass)) {
-                var expectedClassName = expectedClass.name || ANONYMOUS;
-                var actualClassName = getClassName(props[propName]);
-                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + actualClassName + "` supplied to `" + componentName + "`, expected ") + ("instance of `" + expectedClassName + "`."));
-            }
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createEnumTypeChecker(expectedValues) {
-        if (!Array.isArray(expectedValues)) {
-            {
-                if (arguments.length > 1) printWarning("Invalid arguments supplied to oneOf, expected an array, got " + arguments.length + " arguments. " + "A common mistake is to write oneOf(x, y, z) instead of oneOf([x, y, z]).");
-                else printWarning("Invalid argument supplied to oneOf, expected an array.");
-            }
-            return emptyFunctionThatReturnsNull;
-        }
-        function validate(props, propName, componentName, location, propFullName) {
-            var propValue = props[propName];
-            for(var i = 0; i < expectedValues.length; i++){
-                if (is(propValue, expectedValues[i])) return null;
-            }
-            var valuesString = JSON.stringify(expectedValues, function replacer(key, value) {
-                var type = getPreciseType(value);
-                if (type === "symbol") return String(value);
-                return value;
-            });
-            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of value `" + String(propValue) + "` " + ("supplied to `" + componentName + "`, expected one of " + valuesString + "."));
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createObjectOfTypeChecker(typeChecker) {
-        function validate(props, propName, componentName, location, propFullName) {
-            if (typeof typeChecker !== "function") return new PropTypeError("Property `" + propFullName + "` of component `" + componentName + "` has invalid PropType notation inside objectOf.");
-            var propValue = props[propName];
-            var propType = getPropType(propValue);
-            if (propType !== "object") return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected an object."));
-            for(var key in propValue)if (has(propValue, key)) {
-                var error = typeChecker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
-                if (error instanceof Error) return error;
-            }
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createUnionTypeChecker(arrayOfTypeCheckers) {
-        if (!Array.isArray(arrayOfTypeCheckers)) {
-            printWarning("Invalid argument supplied to oneOfType, expected an instance of array.");
-            return emptyFunctionThatReturnsNull;
-        }
-        for(var i = 0; i < arrayOfTypeCheckers.length; i++){
-            var checker = arrayOfTypeCheckers[i];
-            if (typeof checker !== "function") {
-                printWarning("Invalid argument supplied to oneOfType. Expected an array of check functions, but received " + getPostfixForTypeWarning(checker) + " at index " + i + ".");
-                return emptyFunctionThatReturnsNull;
-            }
-        }
-        function validate(props, propName, componentName, location, propFullName) {
-            var expectedTypes = [];
-            for(var i = 0; i < arrayOfTypeCheckers.length; i++){
-                var checker = arrayOfTypeCheckers[i];
-                var checkerResult = checker(props, propName, componentName, location, propFullName, ReactPropTypesSecret);
-                if (checkerResult == null) return null;
-                if (checkerResult.data && has(checkerResult.data, "expectedType")) expectedTypes.push(checkerResult.data.expectedType);
-            }
-            var expectedTypesMessage = expectedTypes.length > 0 ? ", expected one of type [" + expectedTypes.join(", ") + "]" : "";
-            return new PropTypeError("Invalid " + location + " `" + propFullName + "` supplied to " + ("`" + componentName + "`" + expectedTypesMessage + "."));
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createNodeChecker() {
-        function validate(props, propName, componentName, location, propFullName) {
-            if (!isNode(props[propName])) return new PropTypeError("Invalid " + location + " `" + propFullName + "` supplied to " + ("`" + componentName + "`, expected a ReactNode."));
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function invalidValidatorError(componentName, location, propFullName, key, type) {
-        return new PropTypeError((componentName || "React class") + ": " + location + " type `" + propFullName + "." + key + "` is invalid; " + "it must be a function, usually from the `prop-types` package, but received `" + type + "`.");
-    }
-    function createShapeTypeChecker(shapeTypes) {
-        function validate(props, propName, componentName, location, propFullName) {
-            var propValue = props[propName];
-            var propType = getPropType(propValue);
-            if (propType !== "object") return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type `" + propType + "` " + ("supplied to `" + componentName + "`, expected `object`."));
-            for(var key in shapeTypes){
-                var checker = shapeTypes[key];
-                if (typeof checker !== "function") return invalidValidatorError(componentName, location, propFullName, key, getPreciseType(checker));
-                var error = checker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
-                if (error) return error;
-            }
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createStrictShapeTypeChecker(shapeTypes) {
-        function validate(props, propName, componentName, location, propFullName) {
-            var propValue = props[propName];
-            var propType = getPropType(propValue);
-            if (propType !== "object") return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type `" + propType + "` " + ("supplied to `" + componentName + "`, expected `object`."));
-            // We need to check all keys in case some are required but missing from props.
-            var allKeys = assign({}, props[propName], shapeTypes);
-            for(var key in allKeys){
-                var checker = shapeTypes[key];
-                if (has(shapeTypes, key) && typeof checker !== "function") return invalidValidatorError(componentName, location, propFullName, key, getPreciseType(checker));
-                if (!checker) return new PropTypeError("Invalid " + location + " `" + propFullName + "` key `" + key + "` supplied to `" + componentName + "`." + "\nBad object: " + JSON.stringify(props[propName], null, "  ") + "\nValid keys: " + JSON.stringify(Object.keys(shapeTypes), null, "  "));
-                var error = checker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
-                if (error) return error;
-            }
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function isNode(propValue) {
-        switch(typeof propValue){
-            case "number":
-            case "string":
-            case "undefined":
-                return true;
-            case "boolean":
-                return !propValue;
-            case "object":
-                if (Array.isArray(propValue)) return propValue.every(isNode);
-                if (propValue === null || isValidElement(propValue)) return true;
-                var iteratorFn = getIteratorFn(propValue);
-                if (iteratorFn) {
-                    var iterator = iteratorFn.call(propValue);
-                    var step;
-                    if (iteratorFn !== propValue.entries) while(!(step = iterator.next()).done){
-                        if (!isNode(step.value)) return false;
-                    }
-                    else // Iterator will provide entry [k,v] tuples rather than values.
-                    while(!(step = iterator.next()).done){
-                        var entry = step.value;
-                        if (entry) {
-                            if (!isNode(entry[1])) return false;
-                        }
-                    }
-                } else return false;
-                return true;
-            default:
-                return false;
-        }
-    }
-    function isSymbol(propType, propValue) {
-        // Native Symbol.
-        if (propType === "symbol") return true;
-        // falsy value can't be a Symbol
-        if (!propValue) return false;
-        // 19.4.3.5 Symbol.prototype[@@toStringTag] === 'Symbol'
-        if (propValue["@@toStringTag"] === "Symbol") return true;
-        // Fallback for non-spec compliant Symbols which are polyfilled.
-        if (typeof Symbol === "function" && propValue instanceof Symbol) return true;
-        return false;
-    }
-    // Equivalent of `typeof` but with special handling for array and regexp.
-    function getPropType(propValue) {
-        var propType = typeof propValue;
-        if (Array.isArray(propValue)) return "array";
-        if (propValue instanceof RegExp) // Old webkits (at least until Android 4.0) return 'function' rather than
-        // 'object' for typeof a RegExp. We'll normalize this here so that /bla/
-        // passes PropTypes.object.
-        return "object";
-        if (isSymbol(propType, propValue)) return "symbol";
-        return propType;
-    }
-    // This handles more types than `getPropType`. Only used for error messages.
-    // See `createPrimitiveTypeChecker`.
-    function getPreciseType(propValue) {
-        if (typeof propValue === "undefined" || propValue === null) return "" + propValue;
-        var propType = getPropType(propValue);
-        if (propType === "object") {
-            if (propValue instanceof Date) return "date";
-            else if (propValue instanceof RegExp) return "regexp";
-        }
-        return propType;
-    }
-    // Returns a string that is postfixed to a warning about an invalid type.
-    // For example, "undefined" or "of type array"
-    function getPostfixForTypeWarning(value) {
-        var type = getPreciseType(value);
-        switch(type){
-            case "array":
-            case "object":
-                return "an " + type;
-            case "boolean":
-            case "date":
-            case "regexp":
-                return "a " + type;
-            default:
-                return type;
-        }
-    }
-    // Returns class name of the object, if any.
-    function getClassName(propValue) {
-        if (!propValue.constructor || !propValue.constructor.name) return ANONYMOUS;
-        return propValue.constructor.name;
-    }
-    ReactPropTypes.checkPropTypes = checkPropTypes;
-    ReactPropTypes.resetWarningCache = checkPropTypes.resetWarningCache;
-    ReactPropTypes.PropTypes = ReactPropTypes;
-    return ReactPropTypes;
-};
-
-},{"c437388b089702c3":"7EuwB","c067a60101d8520c":"7OXxh","74a0f89a70b9f3c2":"jZTZJ","18441b11647bc78":"fqKuf","bec3f6ff89f0b072":"5VwyJ"}],"7OXxh":[function(require,module,exports) {
-/*
-object-assign
-(c) Sindre Sorhus
-@license MIT
-*/ "use strict";
-/* eslint-disable no-unused-vars */ var getOwnPropertySymbols = Object.getOwnPropertySymbols;
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-function toObject(val) {
-    if (val === null || val === undefined) throw new TypeError("Object.assign cannot be called with null or undefined");
-    return Object(val);
+    return _extends.apply(this, arguments);
 }
-function shouldUseNative() {
-    try {
-        if (!Object.assign) return false;
-        // Detect buggy property enumeration order in older V8 versions.
-        // https://bugs.chromium.org/p/v8/issues/detail?id=4118
-        var test1 = new String("abc"); // eslint-disable-line no-new-wrappers
-        test1[5] = "de";
-        if (Object.getOwnPropertyNames(test1)[0] === "5") return false;
-        // https://bugs.chromium.org/p/v8/issues/detail?id=3056
-        var test2 = {};
-        for(var i = 0; i < 10; i++)test2["_" + String.fromCharCode(i)] = i;
-        var order2 = Object.getOwnPropertyNames(test2).map(function(n) {
-            return test2[n];
-        });
-        if (order2.join("") !== "0123456789") return false;
-        // https://bugs.chromium.org/p/v8/issues/detail?id=3056
-        var test3 = {};
-        "abcdefghijklmnopqrst".split("").forEach(function(letter) {
-            test3[letter] = letter;
-        });
-        if (Object.keys(Object.assign({}, test3)).join("") !== "abcdefghijklmnopqrst") return false;
-        return true;
-    } catch (err) {
-        // We don't expect any of the above to throw, but better to be safe.
-        return false;
-    }
-}
-module.exports = shouldUseNative() ? Object.assign : function(target, source) {
-    var from;
-    var to = toObject(target);
-    var symbols;
-    for(var s = 1; s < arguments.length; s++){
-        from = Object(arguments[s]);
-        for(var key in from)if (hasOwnProperty.call(from, key)) to[key] = from[key];
-        if (getOwnPropertySymbols) {
-            symbols = getOwnPropertySymbols(from);
-            for(var i = 0; i < symbols.length; i++)if (propIsEnumerable.call(from, symbols[i])) to[symbols[i]] = from[symbols[i]];
-        }
-    }
-    return to;
-};
-
-},{}],"jZTZJ":[function(require,module,exports) {
-/**
- * Copyright (c) 2013-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */ "use strict";
-var ReactPropTypesSecret = "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED";
-module.exports = ReactPropTypesSecret;
-
-},{}],"fqKuf":[function(require,module,exports) {
-module.exports = Function.call.bind(Object.prototype.hasOwnProperty);
-
-},{}],"5VwyJ":[function(require,module,exports) {
-/**
- * Copyright (c) 2013-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */ "use strict";
-var printWarning = function() {};
-var ReactPropTypesSecret = require("24ba1e58d167a82c");
-var loggedTypeFailures = {};
-var has = require("898bc82f39d83f7c");
-printWarning = function(text) {
-    var message = "Warning: " + text;
-    if (typeof console !== "undefined") console.error(message);
-    try {
-        // --- Welcome to debugging React ---
-        // This error was thrown as a convenience so that you can use this stack
-        // to find the callsite that caused this warning to fire.
-        throw new Error(message);
-    } catch (x) {}
-};
-/**
- * Assert that the values match with the type specs.
- * Error messages are memorized and will only be shown once.
- *
- * @param {object} typeSpecs Map of name to a ReactPropType
- * @param {object} values Runtime values that need to be type-checked
- * @param {string} location e.g. "prop", "context", "child context"
- * @param {string} componentName Name of the component for error messages.
- * @param {?Function} getStack Returns the component stack.
- * @private
- */ function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
-    for(var typeSpecName in typeSpecs)if (has(typeSpecs, typeSpecName)) {
-        var error;
-        // Prop type validation may throw. In case they do, we don't want to
-        // fail the render phase where it didn't fail before. So we log it.
-        // After these have been cleaned up, we'll let them throw.
-        try {
-            // This is intentionally an invariant that gets caught. It's the same
-            // behavior as without this statement except with a better message.
-            if (typeof typeSpecs[typeSpecName] !== "function") {
-                var err = Error((componentName || "React class") + ": " + location + " type `" + typeSpecName + "` is invalid; " + "it must be a function, usually from the `prop-types` package, but received `" + typeof typeSpecs[typeSpecName] + "`." + "This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`.");
-                err.name = "Invariant Violation";
-                throw err;
-            }
-            error = typeSpecs[typeSpecName](values, typeSpecName, componentName, location, null, ReactPropTypesSecret);
-        } catch (ex) {
-            error = ex;
-        }
-        if (error && !(error instanceof Error)) printWarning((componentName || "React class") + ": type specification of " + location + " `" + typeSpecName + "` is invalid; the type checker " + "function must return `null` or an `Error` but returned a " + typeof error + ". " + "You may have forgotten to pass an argument to the type checker " + "creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and " + "shape all require an argument).");
-        if (error instanceof Error && !(error.message in loggedTypeFailures)) {
-            // Only monitor this failure once because there tends to be a lot of the
-            // same error.
-            loggedTypeFailures[error.message] = true;
-            var stack = getStack ? getStack() : "";
-            printWarning("Failed " + location + " type: " + error.message + (stack != null ? stack : ""));
-        }
-    }
-}
-/**
- * Resets warning cache when testing.
- *
- * @private
- */ checkPropTypes.resetWarningCache = function() {
-    loggedTypeFailures = {};
-};
-module.exports = checkPropTypes;
-
-},{"24ba1e58d167a82c":"jZTZJ","898bc82f39d83f7c":"fqKuf"}],"aPzUt":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _classnames = require("classnames");
-var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
-var _react = require("react");
-var _button = require("@restart/ui/Button");
-var _themeProvider = require("./ThemeProvider");
-var _jsxRuntime = require("react/jsx-runtime");
-"use client";
-const Button = /*#__PURE__*/ _react.forwardRef(({ as, bsPrefix, variant = "primary", size, active = false, disabled = false, className, ...props }, ref)=>{
-    const prefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "btn");
-    const [buttonProps, { tagName }] = (0, _button.useButtonProps)({
-        tagName: as,
-        disabled,
-        ...props
-    });
-    const Component = tagName;
-    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
-        ...buttonProps,
-        ...props,
-        ref: ref,
-        disabled: disabled,
-        className: (0, _classnamesDefault.default)(className, prefix, active && "active", variant && `${prefix}-${variant}`, size && `${prefix}-${size}`, props.href && disabled && "disabled")
-    });
-});
-Button.displayName = "Button";
-exports.default = Button;
-
-},{"classnames":"jocGM","react":"21dqq","@restart/ui/Button":"8YUbR","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jocGM":[function(require,module,exports) {
-/*!
-	Copyright (c) 2018 Jed Watson.
-	Licensed under the MIT License (MIT), see
-	http://jedwatson.github.io/classnames
-*/ /* global define */ (function() {
-    "use strict";
-    var hasOwn = {}.hasOwnProperty;
-    function classNames() {
-        var classes = "";
-        for(var i = 0; i < arguments.length; i++){
-            var arg = arguments[i];
-            if (arg) classes = appendClass(classes, parseValue(arg));
-        }
-        return classes;
-    }
-    function parseValue(arg) {
-        if (typeof arg === "string" || typeof arg === "number") return arg;
-        if (typeof arg !== "object") return "";
-        if (Array.isArray(arg)) return classNames.apply(null, arg);
-        if (arg.toString !== Object.prototype.toString && !arg.toString.toString().includes("[native code]")) return arg.toString();
-        var classes = "";
-        for(var key in arg)if (hasOwn.call(arg, key) && arg[key]) classes = appendClass(classes, key);
-        return classes;
-    }
-    function appendClass(value, newClass) {
-        if (!newClass) return value;
-        if (value) return value + " " + newClass;
-        return value + newClass;
-    }
-    if (0, module.exports) {
-        classNames.default = classNames;
-        module.exports = classNames;
-    } else if (typeof define === "function" && typeof define.amd === "object" && define.amd) // register as 'classnames', consistent with npm package name
-    define("classnames", [], function() {
-        return classNames;
-    });
-    else window.classNames = classNames;
-})();
-
-},{}],"8YUbR":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "isTrivialHref", ()=>isTrivialHref);
-parcelHelpers.export(exports, "useButtonProps", ()=>useButtonProps);
-var _react = require("react");
-var _jsxRuntime = require("react/jsx-runtime");
-const _excluded = [
-    "as",
-    "disabled"
-];
 function _objectWithoutPropertiesLoose(source, excluded) {
     if (source == null) return {};
     var target = {};
@@ -28429,1662 +27584,1322 @@ function _objectWithoutPropertiesLoose(source, excluded) {
     }
     return target;
 }
-function isTrivialHref(href) {
-    return !href || href.trim() === "#";
+const defaultMethod = "get";
+const defaultEncType = "application/x-www-form-urlencoded";
+function isHtmlElement(object) {
+    return object != null && typeof object.tagName === "string";
 }
-function useButtonProps({ tagName, disabled, href, target, rel, role, onClick, tabIndex = 0, type }) {
-    if (!tagName) {
-        if (href != null || target != null || rel != null) tagName = "a";
-        else tagName = "button";
+function isButtonElement(object) {
+    return isHtmlElement(object) && object.tagName.toLowerCase() === "button";
+}
+function isFormElement(object) {
+    return isHtmlElement(object) && object.tagName.toLowerCase() === "form";
+}
+function isInputElement(object) {
+    return isHtmlElement(object) && object.tagName.toLowerCase() === "input";
+}
+function isModifiedEvent(event) {
+    return !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey);
+}
+function shouldProcessLinkClick(event, target) {
+    return event.button === 0 && // Ignore everything but left clicks
+    (!target || target === "_self") && // Let browser handle "target=_blank" etc.
+    !isModifiedEvent(event) // Ignore clicks with modifier keys
+    ;
+}
+/**
+ * Creates a URLSearchParams object using the given initializer.
+ *
+ * This is identical to `new URLSearchParams(init)` except it also
+ * supports arrays as values in the object form of the initializer
+ * instead of just strings. This is convenient when you need multiple
+ * values for a given key, but don't want to use an array initializer.
+ *
+ * For example, instead of:
+ *
+ *   let searchParams = new URLSearchParams([
+ *     ['sort', 'name'],
+ *     ['sort', 'price']
+ *   ]);
+ *
+ * you can do:
+ *
+ *   let searchParams = createSearchParams({
+ *     sort: ['name', 'price']
+ *   });
+ */ function createSearchParams(init) {
+    if (init === void 0) init = "";
+    return new URLSearchParams(typeof init === "string" || Array.isArray(init) || init instanceof URLSearchParams ? init : Object.keys(init).reduce((memo, key)=>{
+        let value = init[key];
+        return memo.concat(Array.isArray(value) ? value.map((v)=>[
+                key,
+                v
+            ]) : [
+            [
+                key,
+                value
+            ]
+        ]);
+    }, []));
+}
+function getSearchParamsForLocation(locationSearch, defaultSearchParams) {
+    let searchParams = createSearchParams(locationSearch);
+    if (defaultSearchParams) // Use `defaultSearchParams.forEach(...)` here instead of iterating of
+    // `defaultSearchParams.keys()` to work-around a bug in Firefox related to
+    // web extensions. Relevant Bugzilla tickets:
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=1414602
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=1023984
+    defaultSearchParams.forEach((_, key)=>{
+        if (!searchParams.has(key)) defaultSearchParams.getAll(key).forEach((value)=>{
+            searchParams.append(key, value);
+        });
+    });
+    return searchParams;
+}
+// One-time check for submitter support
+let _formDataSupportsSubmitter = null;
+function isFormDataSubmitterSupported() {
+    if (_formDataSupportsSubmitter === null) try {
+        new FormData(document.createElement("form"), // @ts-expect-error if FormData supports the submitter parameter, this will throw
+        0);
+        _formDataSupportsSubmitter = false;
+    } catch (e) {
+        _formDataSupportsSubmitter = true;
     }
-    const meta = {
-        tagName
+    return _formDataSupportsSubmitter;
+}
+const supportedFormEncTypes = new Set([
+    "application/x-www-form-urlencoded",
+    "multipart/form-data",
+    "text/plain"
+]);
+function getFormEncType(encType) {
+    if (encType != null && !supportedFormEncTypes.has(encType)) {
+        (0, _router.UNSAFE_warning)(false, '"' + encType + '" is not a valid `encType` for `<Form>`/`<fetcher.Form>` ' + ('and will default to "' + defaultEncType + '"'));
+        return null;
+    }
+    return encType;
+}
+function getFormSubmissionInfo(target, basename) {
+    let method;
+    let action;
+    let encType;
+    let formData;
+    let body;
+    if (isFormElement(target)) {
+        // When grabbing the action from the element, it will have had the basename
+        // prefixed to ensure non-JS scenarios work, so strip it since we'll
+        // re-prefix in the router
+        let attr = target.getAttribute("action");
+        action = attr ? (0, _router.stripBasename)(attr, basename) : null;
+        method = target.getAttribute("method") || defaultMethod;
+        encType = getFormEncType(target.getAttribute("enctype")) || defaultEncType;
+        formData = new FormData(target);
+    } else if (isButtonElement(target) || isInputElement(target) && (target.type === "submit" || target.type === "image")) {
+        let form = target.form;
+        if (form == null) throw new Error('Cannot submit a <button> or <input type="submit"> without a <form>');
+        // <button>/<input type="submit"> may override attributes of <form>
+        // When grabbing the action from the element, it will have had the basename
+        // prefixed to ensure non-JS scenarios work, so strip it since we'll
+        // re-prefix in the router
+        let attr = target.getAttribute("formaction") || form.getAttribute("action");
+        action = attr ? (0, _router.stripBasename)(attr, basename) : null;
+        method = target.getAttribute("formmethod") || form.getAttribute("method") || defaultMethod;
+        encType = getFormEncType(target.getAttribute("formenctype")) || getFormEncType(form.getAttribute("enctype")) || defaultEncType;
+        // Build a FormData object populated from a form and submitter
+        formData = new FormData(form, target);
+        // If this browser doesn't support the `FormData(el, submitter)` format,
+        // then tack on the submitter value at the end.  This is a lightweight
+        // solution that is not 100% spec compliant.  For complete support in older
+        // browsers, consider using the `formdata-submitter-polyfill` package
+        if (!isFormDataSubmitterSupported()) {
+            let { name, type, value } = target;
+            if (type === "image") {
+                let prefix = name ? name + "." : "";
+                formData.append(prefix + "x", "0");
+                formData.append(prefix + "y", "0");
+            } else if (name) formData.append(name, value);
+        }
+    } else if (isHtmlElement(target)) throw new Error('Cannot submit element that is not <form>, <button>, or <input type="submit|image">');
+    else {
+        method = defaultMethod;
+        action = null;
+        encType = defaultEncType;
+        body = target;
+    }
+    // Send body for <Form encType="text/plain" so we encode it into text
+    if (formData && encType === "text/plain") {
+        body = formData;
+        formData = undefined;
+    }
+    return {
+        action,
+        method: method.toLowerCase(),
+        encType,
+        formData,
+        body
     };
-    if (tagName === "button") return [
-        {
-            type: type || "button",
-            disabled
-        },
-        meta
-    ];
-    const handleClick = (event)=>{
-        if (disabled || tagName === "a" && isTrivialHref(href)) event.preventDefault();
-        if (disabled) {
-            event.stopPropagation();
+}
+const _excluded = [
+    "onClick",
+    "relative",
+    "reloadDocument",
+    "replace",
+    "state",
+    "target",
+    "to",
+    "preventScrollReset",
+    "unstable_viewTransition"
+], _excluded2 = [
+    "aria-current",
+    "caseSensitive",
+    "className",
+    "end",
+    "style",
+    "to",
+    "unstable_viewTransition",
+    "children"
+], _excluded3 = [
+    "fetcherKey",
+    "navigate",
+    "reloadDocument",
+    "replace",
+    "state",
+    "method",
+    "action",
+    "onSubmit",
+    "relative",
+    "preventScrollReset",
+    "unstable_viewTransition"
+];
+// HEY YOU! DON'T TOUCH THIS VARIABLE!
+//
+// It is replaced with the proper version at build time via a babel plugin in
+// the rollup config.
+//
+// Export a global property onto the window for React Router detection by the
+// Core Web Vitals Technology Report.  This way they can configure the `wappalyzer`
+// to detect and properly classify live websites as being built with React Router:
+// https://github.com/HTTPArchive/wappalyzer/blob/main/src/technologies/r.json
+const REACT_ROUTER_VERSION = "6";
+try {
+    window.__reactRouterVersion = REACT_ROUTER_VERSION;
+} catch (e) {
+// no-op
+}
+function createBrowserRouter(routes, opts) {
+    return (0, _router.createRouter)({
+        basename: opts == null ? void 0 : opts.basename,
+        future: _extends({}, opts == null ? void 0 : opts.future, {
+            v7_prependBasename: true
+        }),
+        history: (0, _router.createBrowserHistory)({
+            window: opts == null ? void 0 : opts.window
+        }),
+        hydrationData: (opts == null ? void 0 : opts.hydrationData) || parseHydrationData(),
+        routes,
+        mapRouteProperties: (0, _reactRouter.UNSAFE_mapRouteProperties),
+        unstable_dataStrategy: opts == null ? void 0 : opts.unstable_dataStrategy,
+        unstable_patchRoutesOnMiss: opts == null ? void 0 : opts.unstable_patchRoutesOnMiss,
+        window: opts == null ? void 0 : opts.window
+    }).initialize();
+}
+function createHashRouter(routes, opts) {
+    return (0, _router.createRouter)({
+        basename: opts == null ? void 0 : opts.basename,
+        future: _extends({}, opts == null ? void 0 : opts.future, {
+            v7_prependBasename: true
+        }),
+        history: (0, _router.createHashHistory)({
+            window: opts == null ? void 0 : opts.window
+        }),
+        hydrationData: (opts == null ? void 0 : opts.hydrationData) || parseHydrationData(),
+        routes,
+        mapRouteProperties: (0, _reactRouter.UNSAFE_mapRouteProperties),
+        unstable_dataStrategy: opts == null ? void 0 : opts.unstable_dataStrategy,
+        unstable_patchRoutesOnMiss: opts == null ? void 0 : opts.unstable_patchRoutesOnMiss,
+        window: opts == null ? void 0 : opts.window
+    }).initialize();
+}
+function parseHydrationData() {
+    var _window;
+    let state = (_window = window) == null ? void 0 : _window.__staticRouterHydrationData;
+    if (state && state.errors) state = _extends({}, state, {
+        errors: deserializeErrors(state.errors)
+    });
+    return state;
+}
+function deserializeErrors(errors) {
+    if (!errors) return null;
+    let entries = Object.entries(errors);
+    let serialized = {};
+    for (let [key, val] of entries){
+        // Hey you!  If you change this, please change the corresponding logic in
+        // serializeErrors in react-router-dom/server.tsx :)
+        if (val && val.__type === "RouteErrorResponse") serialized[key] = new (0, _router.UNSAFE_ErrorResponseImpl)(val.status, val.statusText, val.data, val.internal === true);
+        else if (val && val.__type === "Error") {
+            // Attempt to reconstruct the right type of Error (i.e., ReferenceError)
+            if (val.__subType) {
+                let ErrorConstructor = window[val.__subType];
+                if (typeof ErrorConstructor === "function") try {
+                    // @ts-expect-error
+                    let error = new ErrorConstructor(val.message);
+                    // Wipe away the client-side stack trace.  Nothing to fill it in with
+                    // because we don't serialize SSR stack traces for security reasons
+                    error.stack = "";
+                    serialized[key] = error;
+                } catch (e) {
+                // no-op - fall through and create a normal Error
+                }
+            }
+            if (serialized[key] == null) {
+                let error = new Error(val.message);
+                // Wipe away the client-side stack trace.  Nothing to fill it in with
+                // because we don't serialize SSR stack traces for security reasons
+                error.stack = "";
+                serialized[key] = error;
+            }
+        } else serialized[key] = val;
+    }
+    return serialized;
+}
+const ViewTransitionContext = /*#__PURE__*/ _react.createContext({
+    isTransitioning: false
+});
+ViewTransitionContext.displayName = "ViewTransition";
+const FetchersContext = /*#__PURE__*/ _react.createContext(new Map());
+FetchersContext.displayName = "Fetchers";
+//#endregion
+////////////////////////////////////////////////////////////////////////////////
+//#region Components
+////////////////////////////////////////////////////////////////////////////////
+/**
+  Webpack + React 17 fails to compile on any of the following because webpack
+  complains that `startTransition` doesn't exist in `React`:
+  * import { startTransition } from "react"
+  * import * as React from from "react";
+    "startTransition" in React ? React.startTransition(() => setState()) : setState()
+  * import * as React from from "react";
+    "startTransition" in React ? React["startTransition"](() => setState()) : setState()
+
+  Moving it to a constant such as the following solves the Webpack/React 17 issue:
+  * import * as React from from "react";
+    const START_TRANSITION = "startTransition";
+    START_TRANSITION in React ? React[START_TRANSITION](() => setState()) : setState()
+
+  However, that introduces webpack/terser minification issues in production builds
+  in React 18 where minification/obfuscation ends up removing the call of
+  React.startTransition entirely from the first half of the ternary.  Grabbing
+  this exported reference once up front resolves that issue.
+
+  See https://github.com/remix-run/react-router/issues/10579
+*/ const START_TRANSITION = "startTransition";
+const startTransitionImpl = _react[START_TRANSITION];
+const FLUSH_SYNC = "flushSync";
+const flushSyncImpl = _reactDom[FLUSH_SYNC];
+const USE_ID = "useId";
+const useIdImpl = _react[USE_ID];
+function startTransitionSafe(cb) {
+    if (startTransitionImpl) startTransitionImpl(cb);
+    else cb();
+}
+function flushSyncSafe(cb) {
+    if (flushSyncImpl) flushSyncImpl(cb);
+    else cb();
+}
+class Deferred {
+    constructor(){
+        this.status = "pending";
+        this.promise = new Promise((resolve, reject)=>{
+            this.resolve = (value)=>{
+                if (this.status === "pending") {
+                    this.status = "resolved";
+                    resolve(value);
+                }
+            };
+            this.reject = (reason)=>{
+                if (this.status === "pending") {
+                    this.status = "rejected";
+                    reject(reason);
+                }
+            };
+        });
+    }
+}
+/**
+ * Given a Remix Router instance, render the appropriate UI
+ */ function RouterProvider(_ref) {
+    let { fallbackElement, router, future } = _ref;
+    let [state, setStateImpl] = _react.useState(router.state);
+    let [pendingState, setPendingState] = _react.useState();
+    let [vtContext, setVtContext] = _react.useState({
+        isTransitioning: false
+    });
+    let [renderDfd, setRenderDfd] = _react.useState();
+    let [transition, setTransition] = _react.useState();
+    let [interruption, setInterruption] = _react.useState();
+    let fetcherData = _react.useRef(new Map());
+    let { v7_startTransition } = future || {};
+    let optInStartTransition = _react.useCallback((cb)=>{
+        if (v7_startTransition) startTransitionSafe(cb);
+        else cb();
+    }, [
+        v7_startTransition
+    ]);
+    let setState = _react.useCallback((newState, _ref2)=>{
+        let { deletedFetchers, unstable_flushSync: flushSync, unstable_viewTransitionOpts: viewTransitionOpts } = _ref2;
+        deletedFetchers.forEach((key)=>fetcherData.current.delete(key));
+        newState.fetchers.forEach((fetcher, key)=>{
+            if (fetcher.data !== undefined) fetcherData.current.set(key, fetcher.data);
+        });
+        let isViewTransitionUnavailable = router.window == null || router.window.document == null || typeof router.window.document.startViewTransition !== "function";
+        // If this isn't a view transition or it's not available in this browser,
+        // just update and be done with it
+        if (!viewTransitionOpts || isViewTransitionUnavailable) {
+            if (flushSync) flushSyncSafe(()=>setStateImpl(newState));
+            else optInStartTransition(()=>setStateImpl(newState));
             return;
         }
-        onClick == null || onClick(event);
-    };
-    const handleKeyDown = (event)=>{
-        if (event.key === " ") {
-            event.preventDefault();
-            handleClick(event);
-        }
-    };
-    if (tagName === "a") {
-        // Ensure there's a href so Enter can trigger anchor button.
-        href || (href = "#");
-        if (disabled) href = undefined;
-    }
-    return [
-        {
-            role: role != null ? role : "button",
-            // explicitly undefined so that it overrides the props disabled in a spread
-            // e.g. <Tag {...props} {...hookProps} />
-            disabled: undefined,
-            tabIndex: disabled ? undefined : tabIndex,
-            href,
-            target: tagName === "a" ? target : undefined,
-            "aria-disabled": !disabled ? undefined : disabled,
-            rel: tagName === "a" ? rel : undefined,
-            onClick: handleClick,
-            onKeyDown: handleKeyDown
-        },
-        meta
-    ];
-}
-const Button = /*#__PURE__*/ _react.forwardRef((_ref, ref)=>{
-    let { as: asProp, disabled } = _ref, props = _objectWithoutPropertiesLoose(_ref, _excluded);
-    const [buttonProps, { tagName: Component }] = useButtonProps(Object.assign({
-        tagName: asProp,
-        disabled
-    }, props));
-    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, Object.assign({}, props, buttonProps, {
-        ref: ref
-    }));
-});
-Button.displayName = "Button";
-exports.default = Button;
-
-},{"react":"21dqq","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6AEwr":[function(require,module,exports) {
-"use strict";
-module.exports = require("c4c10cbba9862d5f");
-
-},{"c4c10cbba9862d5f":"kujY4"}],"kujY4":[function(require,module,exports) {
-/**
- * @license React
- * react-jsx-runtime.development.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */ "use strict";
-(function() {
-    "use strict";
-    var React = require("593632ccebda0d3a");
-    // ATTENTION
-    // When adding new symbols to this file,
-    // Please consider also adding to 'react-devtools-shared/src/backend/ReactSymbols'
-    // The Symbol used to tag the ReactElement-like types.
-    var REACT_ELEMENT_TYPE = Symbol.for("react.element");
-    var REACT_PORTAL_TYPE = Symbol.for("react.portal");
-    var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
-    var REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode");
-    var REACT_PROFILER_TYPE = Symbol.for("react.profiler");
-    var REACT_PROVIDER_TYPE = Symbol.for("react.provider");
-    var REACT_CONTEXT_TYPE = Symbol.for("react.context");
-    var REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref");
-    var REACT_SUSPENSE_TYPE = Symbol.for("react.suspense");
-    var REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list");
-    var REACT_MEMO_TYPE = Symbol.for("react.memo");
-    var REACT_LAZY_TYPE = Symbol.for("react.lazy");
-    var REACT_OFFSCREEN_TYPE = Symbol.for("react.offscreen");
-    var MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
-    var FAUX_ITERATOR_SYMBOL = "@@iterator";
-    function getIteratorFn(maybeIterable) {
-        if (maybeIterable === null || typeof maybeIterable !== "object") return null;
-        var maybeIterator = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable[FAUX_ITERATOR_SYMBOL];
-        if (typeof maybeIterator === "function") return maybeIterator;
-        return null;
-    }
-    var ReactSharedInternals = React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
-    function error(format) {
-        for(var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++)args[_key2 - 1] = arguments[_key2];
-        printWarning("error", format, args);
-    }
-    function printWarning(level, format, args) {
-        var ReactDebugCurrentFrame = ReactSharedInternals.ReactDebugCurrentFrame;
-        var stack = ReactDebugCurrentFrame.getStackAddendum();
-        if (stack !== "") {
-            format += "%s";
-            args = args.concat([
-                stack
-            ]);
-        } // eslint-disable-next-line react-internal/safe-string-coercion
-        var argsWithFormat = args.map(function(item) {
-            return String(item);
-        }); // Careful: RN currently depends on this prefix
-        argsWithFormat.unshift("Warning: " + format); // We intentionally don't use spread (or .apply) directly because it
-        // breaks IE9: https://github.com/facebook/react/issues/13610
-        // eslint-disable-next-line react-internal/no-production-logging
-        Function.prototype.apply.call(console[level], console, argsWithFormat);
-    }
-    // -----------------------------------------------------------------------------
-    var enableScopeAPI = false; // Experimental Create Event Handle API.
-    var enableCacheElement = false;
-    var enableTransitionTracing = false; // No known bugs, but needs performance testing
-    var enableLegacyHidden = false; // Enables unstable_avoidThisFallback feature in Fiber
-    // stuff. Intended to enable React core members to more easily debug scheduling
-    // issues in DEV builds.
-    var enableDebugTracing = false; // Track which Fiber(s) schedule render work.
-    var REACT_MODULE_REFERENCE;
-    REACT_MODULE_REFERENCE = Symbol.for("react.module.reference");
-    function isValidElementType(type) {
-        if (typeof type === "string" || typeof type === "function") return true;
-         // Note: typeof might be other than 'symbol' or 'number' (e.g. if it's a polyfill).
-        if (type === REACT_FRAGMENT_TYPE || type === REACT_PROFILER_TYPE || enableDebugTracing || type === REACT_STRICT_MODE_TYPE || type === REACT_SUSPENSE_TYPE || type === REACT_SUSPENSE_LIST_TYPE || enableLegacyHidden || type === REACT_OFFSCREEN_TYPE || enableScopeAPI || enableCacheElement || enableTransitionTracing) return true;
-        if (typeof type === "object" && type !== null) {
-            if (type.$$typeof === REACT_LAZY_TYPE || type.$$typeof === REACT_MEMO_TYPE || type.$$typeof === REACT_PROVIDER_TYPE || type.$$typeof === REACT_CONTEXT_TYPE || type.$$typeof === REACT_FORWARD_REF_TYPE || // This needs to include all possible module reference object
-            // types supported by any Flight configuration anywhere since
-            // we don't know which Flight build this will end up being used
-            // with.
-            type.$$typeof === REACT_MODULE_REFERENCE || type.getModuleId !== undefined) return true;
-        }
-        return false;
-    }
-    function getWrappedName(outerType, innerType, wrapperName) {
-        var displayName = outerType.displayName;
-        if (displayName) return displayName;
-        var functionName = innerType.displayName || innerType.name || "";
-        return functionName !== "" ? wrapperName + "(" + functionName + ")" : wrapperName;
-    } // Keep in sync with react-reconciler/getComponentNameFromFiber
-    function getContextName(type) {
-        return type.displayName || "Context";
-    } // Note that the reconciler package should generally prefer to use getComponentNameFromFiber() instead.
-    function getComponentNameFromType(type) {
-        if (type == null) // Host root, text node or just invalid type.
-        return null;
-        if (typeof type.tag === "number") error("Received an unexpected object in getComponentNameFromType(). This is likely a bug in React. Please file an issue.");
-        if (typeof type === "function") return type.displayName || type.name || null;
-        if (typeof type === "string") return type;
-        switch(type){
-            case REACT_FRAGMENT_TYPE:
-                return "Fragment";
-            case REACT_PORTAL_TYPE:
-                return "Portal";
-            case REACT_PROFILER_TYPE:
-                return "Profiler";
-            case REACT_STRICT_MODE_TYPE:
-                return "StrictMode";
-            case REACT_SUSPENSE_TYPE:
-                return "Suspense";
-            case REACT_SUSPENSE_LIST_TYPE:
-                return "SuspenseList";
-        }
-        if (typeof type === "object") switch(type.$$typeof){
-            case REACT_CONTEXT_TYPE:
-                var context = type;
-                return getContextName(context) + ".Consumer";
-            case REACT_PROVIDER_TYPE:
-                var provider = type;
-                return getContextName(provider._context) + ".Provider";
-            case REACT_FORWARD_REF_TYPE:
-                return getWrappedName(type, type.render, "ForwardRef");
-            case REACT_MEMO_TYPE:
-                var outerName = type.displayName || null;
-                if (outerName !== null) return outerName;
-                return getComponentNameFromType(type.type) || "Memo";
-            case REACT_LAZY_TYPE:
-                var lazyComponent = type;
-                var payload = lazyComponent._payload;
-                var init = lazyComponent._init;
-                try {
-                    return getComponentNameFromType(init(payload));
-                } catch (x) {
-                    return null;
+        // flushSync + startViewTransition
+        if (flushSync) {
+            // Flush through the context to mark DOM elements as transition=ing
+            flushSyncSafe(()=>{
+                // Cancel any pending transitions
+                if (transition) {
+                    renderDfd && renderDfd.resolve();
+                    transition.skipTransition();
                 }
-        }
-        return null;
-    }
-    var assign = Object.assign;
-    // Helpers to patch console.logs to avoid logging during side-effect free
-    // replaying on render function. This currently only patches the object
-    // lazily which won't cover if the log function was extracted eagerly.
-    // We could also eagerly patch the method.
-    var disabledDepth = 0;
-    var prevLog;
-    var prevInfo;
-    var prevWarn;
-    var prevError;
-    var prevGroup;
-    var prevGroupCollapsed;
-    var prevGroupEnd;
-    function disabledLog() {}
-    disabledLog.__reactDisabledLog = true;
-    function disableLogs() {
-        if (disabledDepth === 0) {
-            /* eslint-disable react-internal/no-production-logging */ prevLog = console.log;
-            prevInfo = console.info;
-            prevWarn = console.warn;
-            prevError = console.error;
-            prevGroup = console.group;
-            prevGroupCollapsed = console.groupCollapsed;
-            prevGroupEnd = console.groupEnd; // https://github.com/facebook/react/issues/19099
-            var props = {
-                configurable: true,
-                enumerable: true,
-                value: disabledLog,
-                writable: true
-            }; // $FlowFixMe Flow thinks console is immutable.
-            Object.defineProperties(console, {
-                info: props,
-                log: props,
-                warn: props,
-                error: props,
-                group: props,
-                groupCollapsed: props,
-                groupEnd: props
-            });
-        /* eslint-enable react-internal/no-production-logging */ }
-        disabledDepth++;
-    }
-    function reenableLogs() {
-        disabledDepth--;
-        if (disabledDepth === 0) {
-            /* eslint-disable react-internal/no-production-logging */ var props = {
-                configurable: true,
-                enumerable: true,
-                writable: true
-            }; // $FlowFixMe Flow thinks console is immutable.
-            Object.defineProperties(console, {
-                log: assign({}, props, {
-                    value: prevLog
-                }),
-                info: assign({}, props, {
-                    value: prevInfo
-                }),
-                warn: assign({}, props, {
-                    value: prevWarn
-                }),
-                error: assign({}, props, {
-                    value: prevError
-                }),
-                group: assign({}, props, {
-                    value: prevGroup
-                }),
-                groupCollapsed: assign({}, props, {
-                    value: prevGroupCollapsed
-                }),
-                groupEnd: assign({}, props, {
-                    value: prevGroupEnd
-                })
-            });
-        /* eslint-enable react-internal/no-production-logging */ }
-        if (disabledDepth < 0) error("disabledDepth fell below zero. This is a bug in React. Please file an issue.");
-    }
-    var ReactCurrentDispatcher = ReactSharedInternals.ReactCurrentDispatcher;
-    var prefix;
-    function describeBuiltInComponentFrame(name, source, ownerFn) {
-        if (prefix === undefined) // Extract the VM specific prefix used by each line.
-        try {
-            throw Error();
-        } catch (x) {
-            var match = x.stack.trim().match(/\n( *(at )?)/);
-            prefix = match && match[1] || "";
-        }
-         // We use the prefix to ensure our stacks line up with native stack frames.
-        return "\n" + prefix + name;
-    }
-    var reentry = false;
-    var componentFrameCache;
-    var PossiblyWeakMap = typeof WeakMap === "function" ? WeakMap : Map;
-    componentFrameCache = new PossiblyWeakMap();
-    function describeNativeComponentFrame(fn, construct) {
-        // If something asked for a stack inside a fake render, it should get ignored.
-        if (!fn || reentry) return "";
-        var frame = componentFrameCache.get(fn);
-        if (frame !== undefined) return frame;
-        var control;
-        reentry = true;
-        var previousPrepareStackTrace = Error.prepareStackTrace; // $FlowFixMe It does accept undefined.
-        Error.prepareStackTrace = undefined;
-        var previousDispatcher;
-        previousDispatcher = ReactCurrentDispatcher.current; // Set the dispatcher in DEV because this might be call in the render function
-        // for warnings.
-        ReactCurrentDispatcher.current = null;
-        disableLogs();
-        try {
-            // This should throw.
-            if (construct) {
-                // Something should be setting the props in the constructor.
-                var Fake = function() {
-                    throw Error();
-                }; // $FlowFixMe
-                Object.defineProperty(Fake.prototype, "props", {
-                    set: function() {
-                        // We use a throwing setter instead of frozen or non-writable props
-                        // because that won't throw in a non-strict mode function.
-                        throw Error();
-                    }
+                setVtContext({
+                    isTransitioning: true,
+                    flushSync: true,
+                    currentLocation: viewTransitionOpts.currentLocation,
+                    nextLocation: viewTransitionOpts.nextLocation
                 });
-                if (typeof Reflect === "object" && Reflect.construct) {
-                    // We construct a different control for this case to include any extra
-                    // frames added by the construct call.
-                    try {
-                        Reflect.construct(Fake, []);
-                    } catch (x) {
-                        control = x;
-                    }
-                    Reflect.construct(fn, [], Fake);
-                } else {
-                    try {
-                        Fake.call();
-                    } catch (x) {
-                        control = x;
-                    }
-                    fn.call(Fake.prototype);
-                }
-            } else {
-                try {
-                    throw Error();
-                } catch (x) {
-                    control = x;
-                }
-                fn();
-            }
-        } catch (sample) {
-            // This is inlined manually because closure doesn't do it for us.
-            if (sample && control && typeof sample.stack === "string") {
-                // This extracts the first frame from the sample that isn't also in the control.
-                // Skipping one frame that we assume is the frame that calls the two.
-                var sampleLines = sample.stack.split("\n");
-                var controlLines = control.stack.split("\n");
-                var s = sampleLines.length - 1;
-                var c = controlLines.length - 1;
-                while(s >= 1 && c >= 0 && sampleLines[s] !== controlLines[c])// We expect at least one stack frame to be shared.
-                // Typically this will be the root most one. However, stack frames may be
-                // cut off due to maximum stack limits. In this case, one maybe cut off
-                // earlier than the other. We assume that the sample is longer or the same
-                // and there for cut off earlier. So we should find the root most frame in
-                // the sample somewhere in the control.
-                c--;
-                for(; s >= 1 && c >= 0; s--, c--)// Next we find the first one that isn't the same which should be the
-                // frame that called our sample function and the control.
-                if (sampleLines[s] !== controlLines[c]) {
-                    // In V8, the first line is describing the message but other VMs don't.
-                    // If we're about to return the first line, and the control is also on the same
-                    // line, that's a pretty good indicator that our sample threw at same line as
-                    // the control. I.e. before we entered the sample frame. So we ignore this result.
-                    // This can happen if you passed a class to function component, or non-function.
-                    if (s !== 1 || c !== 1) do {
-                        s--;
-                        c--; // We may still have similar intermediate frames from the construct call.
-                        // The next one that isn't the same should be our match though.
-                        if (c < 0 || sampleLines[s] !== controlLines[c]) {
-                            // V8 adds a "new" prefix for native classes. Let's remove it to make it prettier.
-                            var _frame = "\n" + sampleLines[s].replace(" at new ", " at "); // If our component frame is labeled "<anonymous>"
-                            // but we have a user-provided "displayName"
-                            // splice it in to make the stack more readable.
-                            if (fn.displayName && _frame.includes("<anonymous>")) _frame = _frame.replace("<anonymous>", fn.displayName);
-                            if (typeof fn === "function") componentFrameCache.set(fn, _frame);
-                            return _frame;
-                        }
-                    }while (s >= 1 && c >= 0);
-                    break;
-                }
-            }
-        } finally{
-            reentry = false;
-            ReactCurrentDispatcher.current = previousDispatcher;
-            reenableLogs();
-            Error.prepareStackTrace = previousPrepareStackTrace;
-        } // Fallback to just using the name if we couldn't make it throw.
-        var name = fn ? fn.displayName || fn.name : "";
-        var syntheticFrame = name ? describeBuiltInComponentFrame(name) : "";
-        if (typeof fn === "function") componentFrameCache.set(fn, syntheticFrame);
-        return syntheticFrame;
-    }
-    function describeFunctionComponentFrame(fn, source, ownerFn) {
-        return describeNativeComponentFrame(fn, false);
-    }
-    function shouldConstruct(Component) {
-        var prototype = Component.prototype;
-        return !!(prototype && prototype.isReactComponent);
-    }
-    function describeUnknownElementTypeFrameInDEV(type, source, ownerFn) {
-        if (type == null) return "";
-        if (typeof type === "function") return describeNativeComponentFrame(type, shouldConstruct(type));
-        if (typeof type === "string") return describeBuiltInComponentFrame(type);
-        switch(type){
-            case REACT_SUSPENSE_TYPE:
-                return describeBuiltInComponentFrame("Suspense");
-            case REACT_SUSPENSE_LIST_TYPE:
-                return describeBuiltInComponentFrame("SuspenseList");
+            });
+            // Update the DOM
+            let t = router.window.document.startViewTransition(()=>{
+                flushSyncSafe(()=>setStateImpl(newState));
+            });
+            // Clean up after the animation completes
+            t.finished.finally(()=>{
+                flushSyncSafe(()=>{
+                    setRenderDfd(undefined);
+                    setTransition(undefined);
+                    setPendingState(undefined);
+                    setVtContext({
+                        isTransitioning: false
+                    });
+                });
+            });
+            flushSyncSafe(()=>setTransition(t));
+            return;
         }
-        if (typeof type === "object") switch(type.$$typeof){
-            case REACT_FORWARD_REF_TYPE:
-                return describeFunctionComponentFrame(type.render);
-            case REACT_MEMO_TYPE:
-                // Memo may contain any component type so we recursively resolve it.
-                return describeUnknownElementTypeFrameInDEV(type.type, source, ownerFn);
-            case REACT_LAZY_TYPE:
-                var lazyComponent = type;
-                var payload = lazyComponent._payload;
-                var init = lazyComponent._init;
-                try {
-                    // Lazy may contain any component type so we recursively resolve it.
-                    return describeUnknownElementTypeFrameInDEV(init(payload), source, ownerFn);
-                } catch (x) {}
+        // startTransition + startViewTransition
+        if (transition) {
+            // Interrupting an in-progress transition, cancel and let everything flush
+            // out, and then kick off a new transition from the interruption state
+            renderDfd && renderDfd.resolve();
+            transition.skipTransition();
+            setInterruption({
+                state: newState,
+                currentLocation: viewTransitionOpts.currentLocation,
+                nextLocation: viewTransitionOpts.nextLocation
+            });
+        } else {
+            // Completed navigation update with opted-in view transitions, let 'er rip
+            setPendingState(newState);
+            setVtContext({
+                isTransitioning: true,
+                flushSync: false,
+                currentLocation: viewTransitionOpts.currentLocation,
+                nextLocation: viewTransitionOpts.nextLocation
+            });
         }
-        return "";
-    }
-    var hasOwnProperty = Object.prototype.hasOwnProperty;
-    var loggedTypeFailures = {};
-    var ReactDebugCurrentFrame = ReactSharedInternals.ReactDebugCurrentFrame;
-    function setCurrentlyValidatingElement(element) {
-        if (element) {
-            var owner = element._owner;
-            var stack = describeUnknownElementTypeFrameInDEV(element.type, element._source, owner ? owner.type : null);
-            ReactDebugCurrentFrame.setExtraStackFrame(stack);
-        } else ReactDebugCurrentFrame.setExtraStackFrame(null);
-    }
-    function checkPropTypes(typeSpecs, values, location, componentName, element) {
-        // $FlowFixMe This is okay but Flow doesn't know it.
-        var has = Function.call.bind(hasOwnProperty);
-        for(var typeSpecName in typeSpecs)if (has(typeSpecs, typeSpecName)) {
-            var error$1 = void 0; // Prop type validation may throw. In case they do, we don't want to
-            // fail the render phase where it didn't fail before. So we log it.
-            // After these have been cleaned up, we'll let them throw.
-            try {
-                // This is intentionally an invariant that gets caught. It's the same
-                // behavior as without this statement except with a better message.
-                if (typeof typeSpecs[typeSpecName] !== "function") {
-                    // eslint-disable-next-line react-internal/prod-error-codes
-                    var err = Error((componentName || "React class") + ": " + location + " type `" + typeSpecName + "` is invalid; " + "it must be a function, usually from the `prop-types` package, but received `" + typeof typeSpecs[typeSpecName] + "`." + "This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`.");
-                    err.name = "Invariant Violation";
-                    throw err;
-                }
-                error$1 = typeSpecs[typeSpecName](values, typeSpecName, componentName, location, null, "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED");
-            } catch (ex) {
-                error$1 = ex;
-            }
-            if (error$1 && !(error$1 instanceof Error)) {
-                setCurrentlyValidatingElement(element);
-                error("%s: type specification of %s `%s` is invalid; the type checker function must return `null` or an `Error` but returned a %s. You may have forgotten to pass an argument to the type checker creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and shape all require an argument).", componentName || "React class", location, typeSpecName, typeof error$1);
-                setCurrentlyValidatingElement(null);
-            }
-            if (error$1 instanceof Error && !(error$1.message in loggedTypeFailures)) {
-                // Only monitor this failure once because there tends to be a lot of the
-                // same error.
-                loggedTypeFailures[error$1.message] = true;
-                setCurrentlyValidatingElement(element);
-                error("Failed %s type: %s", location, error$1.message);
-                setCurrentlyValidatingElement(null);
-            }
+    }, [
+        router.window,
+        transition,
+        renderDfd,
+        fetcherData,
+        optInStartTransition
+    ]);
+    // Need to use a layout effect here so we are subscribed early enough to
+    // pick up on any render-driven redirects/navigations (useEffect/<Navigate>)
+    _react.useLayoutEffect(()=>router.subscribe(setState), [
+        router,
+        setState
+    ]);
+    // When we start a view transition, create a Deferred we can use for the
+    // eventual "completed" render
+    _react.useEffect(()=>{
+        if (vtContext.isTransitioning && !vtContext.flushSync) setRenderDfd(new Deferred());
+    }, [
+        vtContext
+    ]);
+    // Once the deferred is created, kick off startViewTransition() to update the
+    // DOM and then wait on the Deferred to resolve (indicating the DOM update has
+    // happened)
+    _react.useEffect(()=>{
+        if (renderDfd && pendingState && router.window) {
+            let newState = pendingState;
+            let renderPromise = renderDfd.promise;
+            let transition = router.window.document.startViewTransition(async ()=>{
+                optInStartTransition(()=>setStateImpl(newState));
+                await renderPromise;
+            });
+            transition.finished.finally(()=>{
+                setRenderDfd(undefined);
+                setTransition(undefined);
+                setPendingState(undefined);
+                setVtContext({
+                    isTransitioning: false
+                });
+            });
+            setTransition(transition);
         }
-    }
-    var isArrayImpl = Array.isArray; // eslint-disable-next-line no-redeclare
-    function isArray(a) {
-        return isArrayImpl(a);
-    }
-    /*
- * The `'' + value` pattern (used in in perf-sensitive code) throws for Symbol
- * and Temporal.* types. See https://github.com/facebook/react/pull/22064.
- *
- * The functions in this module will throw an easier-to-understand,
- * easier-to-debug exception with a clear errors message message explaining the
- * problem. (Instead of a confusing exception thrown inside the implementation
- * of the `value` object).
- */ // $FlowFixMe only called in DEV, so void return is not possible.
-    function typeName(value) {
-        // toStringTag is needed for namespaced types like Temporal.Instant
-        var hasToStringTag = typeof Symbol === "function" && Symbol.toStringTag;
-        var type = hasToStringTag && value[Symbol.toStringTag] || value.constructor.name || "Object";
-        return type;
-    } // $FlowFixMe only called in DEV, so void return is not possible.
-    function willCoercionThrow(value) {
-        try {
-            testStringCoercion(value);
-            return false;
+    }, [
+        optInStartTransition,
+        pendingState,
+        renderDfd,
+        router.window
+    ]);
+    // When the new location finally renders and is committed to the DOM, this
+    // effect will run to resolve the transition
+    _react.useEffect(()=>{
+        if (renderDfd && pendingState && state.location.key === pendingState.location.key) renderDfd.resolve();
+    }, [
+        renderDfd,
+        transition,
+        state.location,
+        pendingState
+    ]);
+    // If we get interrupted with a new navigation during a transition, we skip
+    // the active transition, let it cleanup, then kick it off again here
+    _react.useEffect(()=>{
+        if (!vtContext.isTransitioning && interruption) {
+            setPendingState(interruption.state);
+            setVtContext({
+                isTransitioning: true,
+                flushSync: false,
+                currentLocation: interruption.currentLocation,
+                nextLocation: interruption.nextLocation
+            });
+            setInterruption(undefined);
+        }
+    }, [
+        vtContext.isTransitioning,
+        interruption
+    ]);
+    _react.useEffect(()=>{
+        (0, _router.UNSAFE_warning)(fallbackElement == null || !router.future.v7_partialHydration, "`<RouterProvider fallbackElement>` is deprecated when using `v7_partialHydration`, use a `HydrateFallback` component instead");
+    // Only log this once on initial mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    let navigator = _react.useMemo(()=>{
+        return {
+            createHref: router.createHref,
+            encodeLocation: router.encodeLocation,
+            go: (n)=>router.navigate(n),
+            push: (to, state, opts)=>router.navigate(to, {
+                    state,
+                    preventScrollReset: opts == null ? void 0 : opts.preventScrollReset
+                }),
+            replace: (to, state, opts)=>router.navigate(to, {
+                    replace: true,
+                    state,
+                    preventScrollReset: opts == null ? void 0 : opts.preventScrollReset
+                })
+        };
+    }, [
+        router
+    ]);
+    let basename = router.basename || "/";
+    let dataRouterContext = _react.useMemo(()=>({
+            router,
+            navigator,
+            static: false,
+            basename
+        }), [
+        router,
+        navigator,
+        basename
+    ]);
+    // The fragment and {null} here are important!  We need them to keep React 18's
+    // useId happy when we are server-rendering since we may have a <script> here
+    // containing the hydrated server-side staticContext (from StaticRouterProvider).
+    // useId relies on the component tree structure to generate deterministic id's
+    // so we need to ensure it remains the same on the client even though
+    // we don't need the <script> tag
+    return /*#__PURE__*/ _react.createElement(_react.Fragment, null, /*#__PURE__*/ _react.createElement((0, _reactRouter.UNSAFE_DataRouterContext).Provider, {
+        value: dataRouterContext
+    }, /*#__PURE__*/ _react.createElement((0, _reactRouter.UNSAFE_DataRouterStateContext).Provider, {
+        value: state
+    }, /*#__PURE__*/ _react.createElement(FetchersContext.Provider, {
+        value: fetcherData.current
+    }, /*#__PURE__*/ _react.createElement(ViewTransitionContext.Provider, {
+        value: vtContext
+    }, /*#__PURE__*/ _react.createElement((0, _reactRouter.Router), {
+        basename: basename,
+        location: state.location,
+        navigationType: state.historyAction,
+        navigator: navigator,
+        future: {
+            v7_relativeSplatPath: router.future.v7_relativeSplatPath
+        }
+    }, state.initialized || router.future.v7_partialHydration ? /*#__PURE__*/ _react.createElement(DataRoutes, {
+        routes: router.routes,
+        future: router.future,
+        state: state
+    }) : fallbackElement))))), null);
+}
+function DataRoutes(_ref3) {
+    let { routes, future, state } = _ref3;
+    return (0, _reactRouter.UNSAFE_useRoutesImpl)(routes, undefined, state, future);
+}
+/**
+ * A `<Router>` for use in web browsers. Provides the cleanest URLs.
+ */ function BrowserRouter(_ref4) {
+    let { basename, children, future, window: window1 } = _ref4;
+    let historyRef = _react.useRef();
+    if (historyRef.current == null) historyRef.current = (0, _router.createBrowserHistory)({
+        window: window1,
+        v5Compat: true
+    });
+    let history = historyRef.current;
+    let [state, setStateImpl] = _react.useState({
+        action: history.action,
+        location: history.location
+    });
+    let { v7_startTransition } = future || {};
+    let setState = _react.useCallback((newState)=>{
+        v7_startTransition && startTransitionImpl ? startTransitionImpl(()=>setStateImpl(newState)) : setStateImpl(newState);
+    }, [
+        setStateImpl,
+        v7_startTransition
+    ]);
+    _react.useLayoutEffect(()=>history.listen(setState), [
+        history,
+        setState
+    ]);
+    return /*#__PURE__*/ _react.createElement((0, _reactRouter.Router), {
+        basename: basename,
+        children: children,
+        location: state.location,
+        navigationType: state.action,
+        navigator: history,
+        future: future
+    });
+}
+/**
+ * A `<Router>` for use in web browsers. Stores the location in the hash
+ * portion of the URL so it is not sent to the server.
+ */ function HashRouter(_ref5) {
+    let { basename, children, future, window: window1 } = _ref5;
+    let historyRef = _react.useRef();
+    if (historyRef.current == null) historyRef.current = (0, _router.createHashHistory)({
+        window: window1,
+        v5Compat: true
+    });
+    let history = historyRef.current;
+    let [state, setStateImpl] = _react.useState({
+        action: history.action,
+        location: history.location
+    });
+    let { v7_startTransition } = future || {};
+    let setState = _react.useCallback((newState)=>{
+        v7_startTransition && startTransitionImpl ? startTransitionImpl(()=>setStateImpl(newState)) : setStateImpl(newState);
+    }, [
+        setStateImpl,
+        v7_startTransition
+    ]);
+    _react.useLayoutEffect(()=>history.listen(setState), [
+        history,
+        setState
+    ]);
+    return /*#__PURE__*/ _react.createElement((0, _reactRouter.Router), {
+        basename: basename,
+        children: children,
+        location: state.location,
+        navigationType: state.action,
+        navigator: history,
+        future: future
+    });
+}
+/**
+ * A `<Router>` that accepts a pre-instantiated history object. It's important
+ * to note that using your own history object is highly discouraged and may add
+ * two versions of the history library to your bundles unless you use the same
+ * version of the history library that React Router uses internally.
+ */ function HistoryRouter(_ref6) {
+    let { basename, children, future, history } = _ref6;
+    let [state, setStateImpl] = _react.useState({
+        action: history.action,
+        location: history.location
+    });
+    let { v7_startTransition } = future || {};
+    let setState = _react.useCallback((newState)=>{
+        v7_startTransition && startTransitionImpl ? startTransitionImpl(()=>setStateImpl(newState)) : setStateImpl(newState);
+    }, [
+        setStateImpl,
+        v7_startTransition
+    ]);
+    _react.useLayoutEffect(()=>history.listen(setState), [
+        history,
+        setState
+    ]);
+    return /*#__PURE__*/ _react.createElement((0, _reactRouter.Router), {
+        basename: basename,
+        children: children,
+        location: state.location,
+        navigationType: state.action,
+        navigator: history,
+        future: future
+    });
+}
+HistoryRouter.displayName = "unstable_HistoryRouter";
+const isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined" && typeof window.document.createElement !== "undefined";
+const ABSOLUTE_URL_REGEX = /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i;
+/**
+ * The public API for rendering a history-aware `<a>`.
+ */ const Link = /*#__PURE__*/ _react.forwardRef(function LinkWithRef(_ref7, ref) {
+    let { onClick, relative, reloadDocument, replace, state, target, to, preventScrollReset, unstable_viewTransition } = _ref7, rest = _objectWithoutPropertiesLoose(_ref7, _excluded);
+    let { basename } = _react.useContext((0, _reactRouter.UNSAFE_NavigationContext));
+    // Rendered into <a href> for absolute URLs
+    let absoluteHref;
+    let isExternal = false;
+    if (typeof to === "string" && ABSOLUTE_URL_REGEX.test(to)) {
+        // Render the absolute href server- and client-side
+        absoluteHref = to;
+        // Only check for external origins client-side
+        if (isBrowser) try {
+            let currentUrl = new URL(window.location.href);
+            let targetUrl = to.startsWith("//") ? new URL(currentUrl.protocol + to) : new URL(to);
+            let path = (0, _router.stripBasename)(targetUrl.pathname, basename);
+            if (targetUrl.origin === currentUrl.origin && path != null) // Strip the protocol/origin/basename for same-origin absolute URLs
+            to = path + targetUrl.search + targetUrl.hash;
+            else isExternal = true;
         } catch (e) {
-            return true;
+            // We can't do external URL detection without a valid URL
+            (0, _router.UNSAFE_warning)(false, '<Link to="' + to + '"> contains an invalid URL which will probably break ' + "when clicked - please update to a valid URL path.");
         }
     }
-    function testStringCoercion(value) {
-        // If you ended up here by following an exception call stack, here's what's
-        // happened: you supplied an object or symbol value to React (as a prop, key,
-        // DOM attribute, CSS property, string ref, etc.) and when React tried to
-        // coerce it to a string using `'' + value`, an exception was thrown.
-        //
-        // The most common types that will cause this exception are `Symbol` instances
-        // and Temporal objects like `Temporal.Instant`. But any object that has a
-        // `valueOf` or `[Symbol.toPrimitive]` method that throws will also cause this
-        // exception. (Library authors do this to prevent users from using built-in
-        // numeric operators like `+` or comparison operators like `>=` because custom
-        // methods are needed to perform accurate arithmetic or comparison.)
-        //
-        // To fix the problem, coerce this object or symbol value to a string before
-        // passing it to React. The most reliable way is usually `String(value)`.
-        //
-        // To find which value is throwing, check the browser or debugger console.
-        // Before this exception was thrown, there should be `console.error` output
-        // that shows the type (Symbol, Temporal.PlainDate, etc.) that caused the
-        // problem and how that type was used: key, atrribute, input value prop, etc.
-        // In most cases, this console output also shows the component and its
-        // ancestor components where the exception happened.
-        //
-        // eslint-disable-next-line react-internal/safe-string-coercion
-        return "" + value;
+    // Rendered into <a href> for relative URLs
+    let href = (0, _reactRouter.useHref)(to, {
+        relative
+    });
+    let internalOnClick = useLinkClickHandler(to, {
+        replace,
+        state,
+        target,
+        preventScrollReset,
+        relative,
+        unstable_viewTransition
+    });
+    function handleClick(event) {
+        if (onClick) onClick(event);
+        if (!event.defaultPrevented) internalOnClick(event);
     }
-    function checkKeyStringCoercion(value) {
-        if (willCoercionThrow(value)) {
-            error("The provided key is an unsupported type %s. This value must be coerced to a string before before using it here.", typeName(value));
-            return testStringCoercion(value); // throw (to help callers find troubleshooting comments)
-        }
+    return(/*#__PURE__*/ // eslint-disable-next-line jsx-a11y/anchor-has-content
+    _react.createElement("a", _extends({}, rest, {
+        href: absoluteHref || href,
+        onClick: isExternal || reloadDocument ? onClick : handleClick,
+        ref: ref,
+        target: target
+    })));
+});
+Link.displayName = "Link";
+/**
+ * A `<Link>` wrapper that knows if it's "active" or not.
+ */ const NavLink = /*#__PURE__*/ _react.forwardRef(function NavLinkWithRef(_ref8, ref) {
+    let { "aria-current": ariaCurrentProp = "page", caseSensitive = false, className: classNameProp = "", end = false, style: styleProp, to, unstable_viewTransition, children } = _ref8, rest = _objectWithoutPropertiesLoose(_ref8, _excluded2);
+    let path = (0, _reactRouter.useResolvedPath)(to, {
+        relative: rest.relative
+    });
+    let location = (0, _reactRouter.useLocation)();
+    let routerState = _react.useContext((0, _reactRouter.UNSAFE_DataRouterStateContext));
+    let { navigator, basename } = _react.useContext((0, _reactRouter.UNSAFE_NavigationContext));
+    let isTransitioning = routerState != null && // Conditional usage is OK here because the usage of a data router is static
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useViewTransitionState(path) && unstable_viewTransition === true;
+    let toPathname = navigator.encodeLocation ? navigator.encodeLocation(path).pathname : path.pathname;
+    let locationPathname = location.pathname;
+    let nextLocationPathname = routerState && routerState.navigation && routerState.navigation.location ? routerState.navigation.location.pathname : null;
+    if (!caseSensitive) {
+        locationPathname = locationPathname.toLowerCase();
+        nextLocationPathname = nextLocationPathname ? nextLocationPathname.toLowerCase() : null;
+        toPathname = toPathname.toLowerCase();
     }
-    var ReactCurrentOwner = ReactSharedInternals.ReactCurrentOwner;
-    var RESERVED_PROPS = {
-        key: true,
-        ref: true,
-        __self: true,
-        __source: true
+    if (nextLocationPathname && basename) nextLocationPathname = (0, _router.stripBasename)(nextLocationPathname, basename) || nextLocationPathname;
+    // If the `to` has a trailing slash, look at that exact spot.  Otherwise,
+    // we're looking for a slash _after_ what's in `to`.  For example:
+    //
+    // <NavLink to="/users"> and <NavLink to="/users/">
+    // both want to look for a / at index 6 to match URL `/users/matt`
+    const endSlashPosition = toPathname !== "/" && toPathname.endsWith("/") ? toPathname.length - 1 : toPathname.length;
+    let isActive = locationPathname === toPathname || !end && locationPathname.startsWith(toPathname) && locationPathname.charAt(endSlashPosition) === "/";
+    let isPending = nextLocationPathname != null && (nextLocationPathname === toPathname || !end && nextLocationPathname.startsWith(toPathname) && nextLocationPathname.charAt(toPathname.length) === "/");
+    let renderProps = {
+        isActive,
+        isPending,
+        isTransitioning
     };
-    var specialPropKeyWarningShown;
-    var specialPropRefWarningShown;
-    var didWarnAboutStringRefs;
-    didWarnAboutStringRefs = {};
-    function hasValidRef(config) {
-        if (hasOwnProperty.call(config, "ref")) {
-            var getter = Object.getOwnPropertyDescriptor(config, "ref").get;
-            if (getter && getter.isReactWarning) return false;
-        }
-        return config.ref !== undefined;
-    }
-    function hasValidKey(config) {
-        if (hasOwnProperty.call(config, "key")) {
-            var getter = Object.getOwnPropertyDescriptor(config, "key").get;
-            if (getter && getter.isReactWarning) return false;
-        }
-        return config.key !== undefined;
-    }
-    function warnIfStringRefCannotBeAutoConverted(config, self) {
-        if (typeof config.ref === "string" && ReactCurrentOwner.current && self && ReactCurrentOwner.current.stateNode !== self) {
-            var componentName = getComponentNameFromType(ReactCurrentOwner.current.type);
-            if (!didWarnAboutStringRefs[componentName]) {
-                error('Component "%s" contains the string ref "%s". Support for string refs will be removed in a future major release. This case cannot be automatically converted to an arrow function. We ask you to manually fix this case by using useRef() or createRef() instead. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-string-ref', getComponentNameFromType(ReactCurrentOwner.current.type), config.ref);
-                didWarnAboutStringRefs[componentName] = true;
-            }
-        }
-    }
-    function defineKeyPropWarningGetter(props, displayName) {
-        var warnAboutAccessingKey = function() {
-            if (!specialPropKeyWarningShown) {
-                specialPropKeyWarningShown = true;
-                error("%s: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://reactjs.org/link/special-props)", displayName);
-            }
-        };
-        warnAboutAccessingKey.isReactWarning = true;
-        Object.defineProperty(props, "key", {
-            get: warnAboutAccessingKey,
-            configurable: true
+    let ariaCurrent = isActive ? ariaCurrentProp : undefined;
+    let className;
+    if (typeof classNameProp === "function") className = classNameProp(renderProps);
+    else // If the className prop is not a function, we use a default `active`
+    // class for <NavLink />s that are active. In v5 `active` was the default
+    // value for `activeClassName`, but we are removing that API and can still
+    // use the old default behavior for a cleaner upgrade path and keep the
+    // simple styling rules working as they currently do.
+    className = [
+        classNameProp,
+        isActive ? "active" : null,
+        isPending ? "pending" : null,
+        isTransitioning ? "transitioning" : null
+    ].filter(Boolean).join(" ");
+    let style = typeof styleProp === "function" ? styleProp(renderProps) : styleProp;
+    return /*#__PURE__*/ _react.createElement(Link, _extends({}, rest, {
+        "aria-current": ariaCurrent,
+        className: className,
+        ref: ref,
+        style: style,
+        to: to,
+        unstable_viewTransition: unstable_viewTransition
+    }), typeof children === "function" ? children(renderProps) : children);
+});
+NavLink.displayName = "NavLink";
+/**
+ * A `@remix-run/router`-aware `<form>`. It behaves like a normal form except
+ * that the interaction with the server is with `fetch` instead of new document
+ * requests, allowing components to add nicer UX to the page as the form is
+ * submitted and returns with data.
+ */ const Form = /*#__PURE__*/ _react.forwardRef((_ref9, forwardedRef)=>{
+    let { fetcherKey, navigate, reloadDocument, replace, state, method = defaultMethod, action, onSubmit, relative, preventScrollReset, unstable_viewTransition } = _ref9, props = _objectWithoutPropertiesLoose(_ref9, _excluded3);
+    let submit = useSubmit();
+    let formAction = useFormAction(action, {
+        relative
+    });
+    let formMethod = method.toLowerCase() === "get" ? "get" : "post";
+    let submitHandler = (event)=>{
+        onSubmit && onSubmit(event);
+        if (event.defaultPrevented) return;
+        event.preventDefault();
+        let submitter = event.nativeEvent.submitter;
+        let submitMethod = (submitter == null ? void 0 : submitter.getAttribute("formmethod")) || method;
+        submit(submitter || event.currentTarget, {
+            fetcherKey,
+            method: submitMethod,
+            navigate,
+            replace,
+            state,
+            relative,
+            preventScrollReset,
+            unstable_viewTransition
         });
-    }
-    function defineRefPropWarningGetter(props, displayName) {
-        var warnAboutAccessingRef = function() {
-            if (!specialPropRefWarningShown) {
-                specialPropRefWarningShown = true;
-                error("%s: `ref` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://reactjs.org/link/special-props)", displayName);
-            }
-        };
-        warnAboutAccessingRef.isReactWarning = true;
-        Object.defineProperty(props, "ref", {
-            get: warnAboutAccessingRef,
-            configurable: true
-        });
-    }
-    /**
- * Factory method to create a new React element. This no longer adheres to
- * the class pattern, so do not use new to call it. Also, instanceof check
- * will not work. Instead test $$typeof field against Symbol.for('react.element') to check
- * if something is a React Element.
- *
- * @param {*} type
- * @param {*} props
- * @param {*} key
- * @param {string|object} ref
- * @param {*} owner
- * @param {*} self A *temporary* helper to detect places where `this` is
- * different from the `owner` when React.createElement is called, so that we
- * can warn. We want to get rid of owner and replace string `ref`s with arrow
- * functions, and as long as `this` and owner are the same, there will be no
- * change in behavior.
- * @param {*} source An annotation object (added by a transpiler or otherwise)
- * indicating filename, line number, and/or other information.
- * @internal
- */ var ReactElement = function(type, key, ref, self, source, owner, props) {
-        var element = {
-            // This tag allows us to uniquely identify this as a React Element
-            $$typeof: REACT_ELEMENT_TYPE,
-            // Built-in properties that belong on the element
-            type: type,
-            key: key,
-            ref: ref,
-            props: props,
-            // Record the component responsible for creating this element.
-            _owner: owner
-        };
-        // The validation flag is currently mutative. We put it on
-        // an external backing store so that we can freeze the whole object.
-        // This can be replaced with a WeakMap once they are implemented in
-        // commonly used development environments.
-        element._store = {}; // To make comparing ReactElements easier for testing purposes, we make
-        // the validation flag non-enumerable (where possible, which should
-        // include every environment we run tests in), so the test framework
-        // ignores it.
-        Object.defineProperty(element._store, "validated", {
-            configurable: false,
-            enumerable: false,
-            writable: true,
-            value: false
-        }); // self and source are DEV only properties.
-        Object.defineProperty(element, "_self", {
-            configurable: false,
-            enumerable: false,
-            writable: false,
-            value: self
-        }); // Two elements created in two different places should be considered
-        // equal for testing purposes and therefore we hide it from enumeration.
-        Object.defineProperty(element, "_source", {
-            configurable: false,
-            enumerable: false,
-            writable: false,
-            value: source
-        });
-        if (Object.freeze) {
-            Object.freeze(element.props);
-            Object.freeze(element);
-        }
-        return element;
     };
-    /**
- * https://github.com/reactjs/rfcs/pull/107
- * @param {*} type
- * @param {object} props
- * @param {string} key
- */ function jsxDEV(type, config, maybeKey, source, self) {
-        var propName; // Reserved names are extracted
-        var props = {};
-        var key = null;
-        var ref = null; // Currently, key can be spread in as a prop. This causes a potential
-        // issue if key is also explicitly declared (ie. <div {...props} key="Hi" />
-        // or <div key="Hi" {...props} /> ). We want to deprecate key spread,
-        // but as an intermediary step, we will use jsxDEV for everything except
-        // <div {...props} key="Hi" />, because we aren't currently able to tell if
-        // key is explicitly declared to be undefined or not.
-        if (maybeKey !== undefined) {
-            checkKeyStringCoercion(maybeKey);
-            key = "" + maybeKey;
-        }
-        if (hasValidKey(config)) {
-            checkKeyStringCoercion(config.key);
-            key = "" + config.key;
-        }
-        if (hasValidRef(config)) {
-            ref = config.ref;
-            warnIfStringRefCannotBeAutoConverted(config, self);
-        } // Remaining properties are added to a new props object
-        for(propName in config)if (hasOwnProperty.call(config, propName) && !RESERVED_PROPS.hasOwnProperty(propName)) props[propName] = config[propName];
-         // Resolve default props
-        if (type && type.defaultProps) {
-            var defaultProps = type.defaultProps;
-            for(propName in defaultProps)if (props[propName] === undefined) props[propName] = defaultProps[propName];
-        }
-        if (key || ref) {
-            var displayName = typeof type === "function" ? type.displayName || type.name || "Unknown" : type;
-            if (key) defineKeyPropWarningGetter(props, displayName);
-            if (ref) defineRefPropWarningGetter(props, displayName);
-        }
-        return ReactElement(type, key, ref, self, source, ReactCurrentOwner.current, props);
-    }
-    var ReactCurrentOwner$1 = ReactSharedInternals.ReactCurrentOwner;
-    var ReactDebugCurrentFrame$1 = ReactSharedInternals.ReactDebugCurrentFrame;
-    function setCurrentlyValidatingElement$1(element) {
-        if (element) {
-            var owner = element._owner;
-            var stack = describeUnknownElementTypeFrameInDEV(element.type, element._source, owner ? owner.type : null);
-            ReactDebugCurrentFrame$1.setExtraStackFrame(stack);
-        } else ReactDebugCurrentFrame$1.setExtraStackFrame(null);
-    }
-    var propTypesMisspellWarningShown;
-    propTypesMisspellWarningShown = false;
-    /**
- * Verifies the object is a ReactElement.
- * See https://reactjs.org/docs/react-api.html#isvalidelement
- * @param {?object} object
- * @return {boolean} True if `object` is a ReactElement.
- * @final
- */ function isValidElement(object) {
-        return typeof object === "object" && object !== null && object.$$typeof === REACT_ELEMENT_TYPE;
-    }
-    function getDeclarationErrorAddendum() {
-        if (ReactCurrentOwner$1.current) {
-            var name = getComponentNameFromType(ReactCurrentOwner$1.current.type);
-            if (name) return "\n\nCheck the render method of `" + name + "`.";
-        }
-        return "";
-    }
-    function getSourceInfoErrorAddendum(source) {
-        if (source !== undefined) {
-            var fileName = source.fileName.replace(/^.*[\\\/]/, "");
-            var lineNumber = source.lineNumber;
-            return "\n\nCheck your code at " + fileName + ":" + lineNumber + ".";
-        }
-        return "";
-    }
-    /**
- * Warn if there's no key explicitly set on dynamic arrays of children or
- * object keys are not valid. This allows us to keep track of children between
- * updates.
- */ var ownerHasKeyUseWarning = {};
-    function getCurrentComponentErrorInfo(parentType) {
-        var info = getDeclarationErrorAddendum();
-        if (!info) {
-            var parentName = typeof parentType === "string" ? parentType : parentType.displayName || parentType.name;
-            if (parentName) info = "\n\nCheck the top-level render call using <" + parentName + ">.";
-        }
-        return info;
-    }
-    /**
- * Warn if the element doesn't have an explicit key assigned to it.
- * This element is in an array. The array could grow and shrink or be
- * reordered. All children that haven't already been validated are required to
- * have a "key" property assigned to it. Error statuses are cached so a warning
- * will only be shown once.
- *
- * @internal
- * @param {ReactElement} element Element that requires a key.
- * @param {*} parentType element's parent's type.
- */ function validateExplicitKey(element, parentType) {
-        if (!element._store || element._store.validated || element.key != null) return;
-        element._store.validated = true;
-        var currentComponentErrorInfo = getCurrentComponentErrorInfo(parentType);
-        if (ownerHasKeyUseWarning[currentComponentErrorInfo]) return;
-        ownerHasKeyUseWarning[currentComponentErrorInfo] = true; // Usually the current owner is the offender, but if it accepts children as a
-        // property, it may be the creator of the child that's responsible for
-        // assigning it a key.
-        var childOwner = "";
-        if (element && element._owner && element._owner !== ReactCurrentOwner$1.current) // Give the component that originally created this child.
-        childOwner = " It was passed a child from " + getComponentNameFromType(element._owner.type) + ".";
-        setCurrentlyValidatingElement$1(element);
-        error('Each child in a list should have a unique "key" prop.%s%s See https://reactjs.org/link/warning-keys for more information.', currentComponentErrorInfo, childOwner);
-        setCurrentlyValidatingElement$1(null);
-    }
-    /**
- * Ensure that every element either is passed in a static location, in an
- * array with an explicit keys property defined, or in an object literal
- * with valid key property.
- *
- * @internal
- * @param {ReactNode} node Statically passed child of any type.
- * @param {*} parentType node's parent's type.
- */ function validateChildKeys(node, parentType) {
-        if (typeof node !== "object") return;
-        if (isArray(node)) for(var i = 0; i < node.length; i++){
-            var child = node[i];
-            if (isValidElement(child)) validateExplicitKey(child, parentType);
-        }
-        else if (isValidElement(node)) // This element was passed in a valid location.
-        {
-            if (node._store) node._store.validated = true;
-        } else if (node) {
-            var iteratorFn = getIteratorFn(node);
-            if (typeof iteratorFn === "function") // Entry iterators used to provide implicit keys,
-            // but now we print a separate warning for them later.
-            {
-                if (iteratorFn !== node.entries) {
-                    var iterator = iteratorFn.call(node);
-                    var step;
-                    while(!(step = iterator.next()).done)if (isValidElement(step.value)) validateExplicitKey(step.value, parentType);
-                }
-            }
-        }
-    }
-    /**
- * Given an element, validate that its props follow the propTypes definition,
- * provided by the type.
- *
- * @param {ReactElement} element
- */ function validatePropTypes(element) {
-        var type = element.type;
-        if (type === null || type === undefined || typeof type === "string") return;
-        var propTypes;
-        if (typeof type === "function") propTypes = type.propTypes;
-        else if (typeof type === "object" && (type.$$typeof === REACT_FORWARD_REF_TYPE || // Note: Memo only checks outer props here.
-        // Inner props are checked in the reconciler.
-        type.$$typeof === REACT_MEMO_TYPE)) propTypes = type.propTypes;
-        else return;
-        if (propTypes) {
-            // Intentionally inside to avoid triggering lazy initializers:
-            var name = getComponentNameFromType(type);
-            checkPropTypes(propTypes, element.props, "prop", name, element);
-        } else if (type.PropTypes !== undefined && !propTypesMisspellWarningShown) {
-            propTypesMisspellWarningShown = true; // Intentionally inside to avoid triggering lazy initializers:
-            var _name = getComponentNameFromType(type);
-            error("Component %s declared `PropTypes` instead of `propTypes`. Did you misspell the property assignment?", _name || "Unknown");
-        }
-        if (typeof type.getDefaultProps === "function" && !type.getDefaultProps.isReactClassApproved) error("getDefaultProps is only used on classic React.createClass definitions. Use a static property named `defaultProps` instead.");
-    }
-    /**
- * Given a fragment, validate that it can only be provided with fragment props
- * @param {ReactElement} fragment
- */ function validateFragmentProps(fragment) {
-        var keys = Object.keys(fragment.props);
-        for(var i = 0; i < keys.length; i++){
-            var key = keys[i];
-            if (key !== "children" && key !== "key") {
-                setCurrentlyValidatingElement$1(fragment);
-                error("Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.", key);
-                setCurrentlyValidatingElement$1(null);
-                break;
-            }
-        }
-        if (fragment.ref !== null) {
-            setCurrentlyValidatingElement$1(fragment);
-            error("Invalid attribute `ref` supplied to `React.Fragment`.");
-            setCurrentlyValidatingElement$1(null);
-        }
-    }
-    function jsxWithValidation(type, props, key, isStaticChildren, source, self) {
-        var validType = isValidElementType(type); // We warn in this case but don't throw. We expect the element creation to
-        // succeed and there will likely be errors in render.
-        if (!validType) {
-            var info = "";
-            if (type === undefined || typeof type === "object" && type !== null && Object.keys(type).length === 0) info += " You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.";
-            var sourceInfo = getSourceInfoErrorAddendum(source);
-            if (sourceInfo) info += sourceInfo;
-            else info += getDeclarationErrorAddendum();
-            var typeString;
-            if (type === null) typeString = "null";
-            else if (isArray(type)) typeString = "array";
-            else if (type !== undefined && type.$$typeof === REACT_ELEMENT_TYPE) {
-                typeString = "<" + (getComponentNameFromType(type.type) || "Unknown") + " />";
-                info = " Did you accidentally export a JSX literal instead of a component?";
-            } else typeString = typeof type;
-            error("React.jsx: type is invalid -- expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s", typeString, info);
-        }
-        var element = jsxDEV(type, props, key, source, self); // The result can be nullish if a mock or a custom function is used.
-        // TODO: Drop this when these are no longer allowed as the type argument.
-        if (element == null) return element;
-         // Skip key warning if the type isn't valid since our key validation logic
-        // doesn't expect a non-string/function type and can throw confusing errors.
-        // We don't want exception behavior to differ between dev and prod.
-        // (Rendering will throw with a helpful message and as soon as the type is
-        // fixed, the key warnings will appear.)
-        if (validType) {
-            var children = props.children;
-            if (children !== undefined) {
-                if (isStaticChildren) {
-                    if (isArray(children)) {
-                        for(var i = 0; i < children.length; i++)validateChildKeys(children[i], type);
-                        if (Object.freeze) Object.freeze(children);
-                    } else error("React.jsx: Static children should always be an array. You are likely explicitly calling React.jsxs or React.jsxDEV. Use the Babel transform instead.");
-                } else validateChildKeys(children, type);
-            }
-        }
-        if (type === REACT_FRAGMENT_TYPE) validateFragmentProps(element);
-        else validatePropTypes(element);
-        return element;
-    } // These two functions exist to still get child warnings in dev
-    // even with the prod transform. This means that jsxDEV is purely
-    // opt-in behavior for better messages but that we won't stop
-    // giving you warnings if you use production apis.
-    function jsxWithValidationStatic(type, props, key) {
-        return jsxWithValidation(type, props, key, true);
-    }
-    function jsxWithValidationDynamic(type, props, key) {
-        return jsxWithValidation(type, props, key, false);
-    }
-    var jsx = jsxWithValidationDynamic; // we may want to special case jsxs internally to take advantage of static children.
-    // for now we can ship identical prod functions
-    var jsxs = jsxWithValidationStatic;
-    exports.Fragment = REACT_FRAGMENT_TYPE;
-    exports.jsx = jsx;
-    exports.jsxs = jsxs;
-})();
-
-},{"593632ccebda0d3a":"21dqq"}],"gkKU3":[function(require,module,exports) {
-exports.interopDefault = function(a) {
-    return a && a.__esModule ? a : {
-        default: a
-    };
-};
-exports.defineInteropFlag = function(a) {
-    Object.defineProperty(a, "__esModule", {
-        value: true
-    });
-};
-exports.exportAll = function(source, dest) {
-    Object.keys(source).forEach(function(key) {
-        if (key === "default" || key === "__esModule" || Object.prototype.hasOwnProperty.call(dest, key)) return;
-        Object.defineProperty(dest, key, {
-            enumerable: true,
-            get: function() {
-                return source[key];
-            }
-        });
-    });
-    return dest;
-};
-exports.export = function(dest, destName, get) {
-    Object.defineProperty(dest, destName, {
-        enumerable: true,
-        get: get
-    });
-};
-
-},{}],"dVixI":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "DEFAULT_BREAKPOINTS", ()=>DEFAULT_BREAKPOINTS);
-parcelHelpers.export(exports, "DEFAULT_MIN_BREAKPOINT", ()=>DEFAULT_MIN_BREAKPOINT);
-parcelHelpers.export(exports, "useBootstrapPrefix", ()=>useBootstrapPrefix);
-parcelHelpers.export(exports, "useBootstrapBreakpoints", ()=>useBootstrapBreakpoints);
-parcelHelpers.export(exports, "useBootstrapMinBreakpoint", ()=>useBootstrapMinBreakpoint);
-parcelHelpers.export(exports, "useIsRTL", ()=>useIsRTL);
-parcelHelpers.export(exports, "createBootstrapComponent", ()=>createBootstrapComponent);
-parcelHelpers.export(exports, "ThemeConsumer", ()=>Consumer);
-var _react = require("react");
-var _jsxRuntime = require("react/jsx-runtime");
-"use client";
-const DEFAULT_BREAKPOINTS = [
-    "xxl",
-    "xl",
-    "lg",
-    "md",
-    "sm",
-    "xs"
-];
-const DEFAULT_MIN_BREAKPOINT = "xs";
-const ThemeContext = /*#__PURE__*/ _react.createContext({
-    prefixes: {},
-    breakpoints: DEFAULT_BREAKPOINTS,
-    minBreakpoint: DEFAULT_MIN_BREAKPOINT
+    return /*#__PURE__*/ _react.createElement("form", _extends({
+        ref: forwardedRef,
+        method: formMethod,
+        action: formAction,
+        onSubmit: reloadDocument ? onSubmit : submitHandler
+    }, props));
 });
-const { Consumer, Provider } = ThemeContext;
-function ThemeProvider({ prefixes = {}, breakpoints = DEFAULT_BREAKPOINTS, minBreakpoint = DEFAULT_MIN_BREAKPOINT, dir, children }) {
-    const contextValue = (0, _react.useMemo)(()=>({
-            prefixes: {
-                ...prefixes
-            },
-            breakpoints,
-            minBreakpoint,
-            dir
-        }), [
-        prefixes,
-        breakpoints,
-        minBreakpoint,
-        dir
-    ]);
-    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Provider, {
-        value: contextValue,
-        children: children
+Form.displayName = "Form";
+/**
+ * This component will emulate the browser's scroll restoration on location
+ * changes.
+ */ function ScrollRestoration(_ref10) {
+    let { getKey, storageKey } = _ref10;
+    useScrollRestoration({
+        getKey,
+        storageKey
     });
+    return null;
 }
-function useBootstrapPrefix(prefix, defaultPrefix) {
-    const { prefixes } = (0, _react.useContext)(ThemeContext);
-    return prefix || prefixes[defaultPrefix] || defaultPrefix;
+ScrollRestoration.displayName = "ScrollRestoration";
+//#endregion
+////////////////////////////////////////////////////////////////////////////////
+//#region Hooks
+////////////////////////////////////////////////////////////////////////////////
+var DataRouterHook;
+(function(DataRouterHook) {
+    DataRouterHook["UseScrollRestoration"] = "useScrollRestoration";
+    DataRouterHook["UseSubmit"] = "useSubmit";
+    DataRouterHook["UseSubmitFetcher"] = "useSubmitFetcher";
+    DataRouterHook["UseFetcher"] = "useFetcher";
+    DataRouterHook["useViewTransitionState"] = "useViewTransitionState";
+})(DataRouterHook || (DataRouterHook = {}));
+var DataRouterStateHook;
+(function(DataRouterStateHook) {
+    DataRouterStateHook["UseFetcher"] = "useFetcher";
+    DataRouterStateHook["UseFetchers"] = "useFetchers";
+    DataRouterStateHook["UseScrollRestoration"] = "useScrollRestoration";
+})(DataRouterStateHook || (DataRouterStateHook = {}));
+// Internal hooks
+function getDataRouterConsoleError(hookName) {
+    return hookName + " must be used within a data router.  See https://reactrouter.com/routers/picking-a-router.";
 }
-function useBootstrapBreakpoints() {
-    const { breakpoints } = (0, _react.useContext)(ThemeContext);
-    return breakpoints;
+function useDataRouterContext(hookName) {
+    let ctx = _react.useContext((0, _reactRouter.UNSAFE_DataRouterContext));
+    !ctx && (0, _router.UNSAFE_invariant)(false, getDataRouterConsoleError(hookName));
+    return ctx;
 }
-function useBootstrapMinBreakpoint() {
-    const { minBreakpoint } = (0, _react.useContext)(ThemeContext);
-    return minBreakpoint;
+function useDataRouterState(hookName) {
+    let state = _react.useContext((0, _reactRouter.UNSAFE_DataRouterStateContext));
+    !state && (0, _router.UNSAFE_invariant)(false, getDataRouterConsoleError(hookName));
+    return state;
 }
-function useIsRTL() {
-    const { dir } = (0, _react.useContext)(ThemeContext);
-    return dir === "rtl";
-}
-function createBootstrapComponent(Component, opts) {
-    if (typeof opts === "string") opts = {
-        prefix: opts
-    };
-    const isClassy = Component.prototype && Component.prototype.isReactComponent;
-    // If it's a functional component make sure we don't break it with a ref
-    const { prefix, forwardRefAs = isClassy ? "ref" : "innerRef" } = opts;
-    const Wrapped = /*#__PURE__*/ _react.forwardRef(({ ...props }, ref)=>{
-        props[forwardRefAs] = ref;
-        const bsPrefix = useBootstrapPrefix(props.bsPrefix, prefix);
-        return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
-            ...props,
-            bsPrefix: bsPrefix
-        });
+// External hooks
+/**
+ * Handles the click behavior for router `<Link>` components. This is useful if
+ * you need to create custom `<Link>` components with the same click behavior we
+ * use in our exported `<Link>`.
+ */ function useLinkClickHandler(to, _temp) {
+    let { target, replace: replaceProp, state, preventScrollReset, relative, unstable_viewTransition } = _temp === void 0 ? {} : _temp;
+    let navigate = (0, _reactRouter.useNavigate)();
+    let location = (0, _reactRouter.useLocation)();
+    let path = (0, _reactRouter.useResolvedPath)(to, {
+        relative
     });
-    Wrapped.displayName = `Bootstrap(${Component.displayName || Component.name})`;
-    return Wrapped;
-}
-exports.default = ThemeProvider;
-
-},{"react":"21dqq","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lAynp":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _classnames = require("classnames");
-var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
-var _react = require("react");
-var _themeProvider = require("./ThemeProvider");
-var _cardBody = require("./CardBody");
-var _cardBodyDefault = parcelHelpers.interopDefault(_cardBody);
-var _cardFooter = require("./CardFooter");
-var _cardFooterDefault = parcelHelpers.interopDefault(_cardFooter);
-var _cardHeader = require("./CardHeader");
-var _cardHeaderDefault = parcelHelpers.interopDefault(_cardHeader);
-var _cardImg = require("./CardImg");
-var _cardImgDefault = parcelHelpers.interopDefault(_cardImg);
-var _cardImgOverlay = require("./CardImgOverlay");
-var _cardImgOverlayDefault = parcelHelpers.interopDefault(_cardImgOverlay);
-var _cardLink = require("./CardLink");
-var _cardLinkDefault = parcelHelpers.interopDefault(_cardLink);
-var _cardSubtitle = require("./CardSubtitle");
-var _cardSubtitleDefault = parcelHelpers.interopDefault(_cardSubtitle);
-var _cardText = require("./CardText");
-var _cardTextDefault = parcelHelpers.interopDefault(_cardText);
-var _cardTitle = require("./CardTitle");
-var _cardTitleDefault = parcelHelpers.interopDefault(_cardTitle);
-var _jsxRuntime = require("react/jsx-runtime");
-"use client";
-const Card = /*#__PURE__*/ _react.forwardRef(({ bsPrefix, className, bg, text, border, body = false, children, // Need to define the default "as" during prop destructuring to be compatible with styled-components github.com/react-bootstrap/react-bootstrap/issues/3595
-as: Component = "div", ...props }, ref)=>{
-    const prefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card");
-    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
-        ref: ref,
-        ...props,
-        className: (0, _classnamesDefault.default)(className, prefix, bg && `bg-${bg}`, text && `text-${text}`, border && `border-${border}`),
-        children: body ? /*#__PURE__*/ (0, _jsxRuntime.jsx)((0, _cardBodyDefault.default), {
-            children: children
-        }) : children
-    });
-});
-Card.displayName = "Card";
-exports.default = Object.assign(Card, {
-    Img: (0, _cardImgDefault.default),
-    Title: (0, _cardTitleDefault.default),
-    Subtitle: (0, _cardSubtitleDefault.default),
-    Body: (0, _cardBodyDefault.default),
-    Link: (0, _cardLinkDefault.default),
-    Text: (0, _cardTextDefault.default),
-    Header: (0, _cardHeaderDefault.default),
-    Footer: (0, _cardFooterDefault.default),
-    ImgOverlay: (0, _cardImgOverlayDefault.default)
-});
-
-},{"classnames":"jocGM","react":"21dqq","./ThemeProvider":"dVixI","./CardBody":"iN1Jc","./CardFooter":"jUi26","./CardHeader":"dXnnx","./CardImg":"1reTi","./CardImgOverlay":"Bi8dC","./CardLink":"9uFCo","./CardSubtitle":"i2BiN","./CardText":"aUUmg","./CardTitle":"79rSZ","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"iN1Jc":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _react = require("react");
-var _classnames = require("classnames");
-var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
-var _themeProvider = require("./ThemeProvider");
-var _jsxRuntime = require("react/jsx-runtime");
-"use client";
-const CardBody = /*#__PURE__*/ _react.forwardRef(({ className, bsPrefix, as: Component = "div", ...props }, ref)=>{
-    bsPrefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-body");
-    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
-        ref: ref,
-        className: (0, _classnamesDefault.default)(className, bsPrefix),
-        ...props
-    });
-});
-CardBody.displayName = "CardBody";
-exports.default = CardBody;
-
-},{"react":"21dqq","classnames":"jocGM","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jUi26":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _react = require("react");
-var _classnames = require("classnames");
-var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
-var _themeProvider = require("./ThemeProvider");
-var _jsxRuntime = require("react/jsx-runtime");
-"use client";
-const CardFooter = /*#__PURE__*/ _react.forwardRef(({ className, bsPrefix, as: Component = "div", ...props }, ref)=>{
-    bsPrefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-footer");
-    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
-        ref: ref,
-        className: (0, _classnamesDefault.default)(className, bsPrefix),
-        ...props
-    });
-});
-CardFooter.displayName = "CardFooter";
-exports.default = CardFooter;
-
-},{"react":"21dqq","classnames":"jocGM","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dXnnx":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _classnames = require("classnames");
-var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
-var _react = require("react");
-var _themeProvider = require("./ThemeProvider");
-var _cardHeaderContext = require("./CardHeaderContext");
-var _cardHeaderContextDefault = parcelHelpers.interopDefault(_cardHeaderContext);
-var _jsxRuntime = require("react/jsx-runtime");
-"use client";
-const CardHeader = /*#__PURE__*/ _react.forwardRef(({ bsPrefix, className, // Need to define the default "as" during prop destructuring to be compatible with styled-components github.com/react-bootstrap/react-bootstrap/issues/3595
-as: Component = "div", ...props }, ref)=>{
-    const prefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-header");
-    const contextValue = (0, _react.useMemo)(()=>({
-            cardHeaderBsPrefix: prefix
-        }), [
-        prefix
-    ]);
-    return /*#__PURE__*/ (0, _jsxRuntime.jsx)((0, _cardHeaderContextDefault.default).Provider, {
-        value: contextValue,
-        children: /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
-            ref: ref,
-            ...props,
-            className: (0, _classnamesDefault.default)(className, prefix)
-        })
-    });
-});
-CardHeader.displayName = "CardHeader";
-exports.default = CardHeader;
-
-},{"classnames":"jocGM","react":"21dqq","./ThemeProvider":"dVixI","./CardHeaderContext":"36cNB","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"36cNB":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _react = require("react");
-"use client";
-const context = /*#__PURE__*/ _react.createContext(null);
-context.displayName = "CardHeaderContext";
-exports.default = context;
-
-},{"react":"21dqq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1reTi":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _classnames = require("classnames");
-var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
-var _react = require("react");
-var _themeProvider = require("./ThemeProvider");
-var _jsxRuntime = require("react/jsx-runtime");
-"use client";
-const CardImg = /*#__PURE__*/ _react.forwardRef(// Need to define the default "as" during prop destructuring to be compatible with styled-components github.com/react-bootstrap/react-bootstrap/issues/3595
-({ bsPrefix, className, variant, as: Component = "img", ...props }, ref)=>{
-    const prefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-img");
-    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
-        ref: ref,
-        className: (0, _classnamesDefault.default)(variant ? `${prefix}-${variant}` : prefix, className),
-        ...props
-    });
-});
-CardImg.displayName = "CardImg";
-exports.default = CardImg;
-
-},{"classnames":"jocGM","react":"21dqq","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"Bi8dC":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _react = require("react");
-var _classnames = require("classnames");
-var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
-var _themeProvider = require("./ThemeProvider");
-var _jsxRuntime = require("react/jsx-runtime");
-"use client";
-const CardImgOverlay = /*#__PURE__*/ _react.forwardRef(({ className, bsPrefix, as: Component = "div", ...props }, ref)=>{
-    bsPrefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-img-overlay");
-    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
-        ref: ref,
-        className: (0, _classnamesDefault.default)(className, bsPrefix),
-        ...props
-    });
-});
-CardImgOverlay.displayName = "CardImgOverlay";
-exports.default = CardImgOverlay;
-
-},{"react":"21dqq","classnames":"jocGM","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9uFCo":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _react = require("react");
-var _classnames = require("classnames");
-var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
-var _themeProvider = require("./ThemeProvider");
-var _jsxRuntime = require("react/jsx-runtime");
-"use client";
-const CardLink = /*#__PURE__*/ _react.forwardRef(({ className, bsPrefix, as: Component = "a", ...props }, ref)=>{
-    bsPrefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-link");
-    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
-        ref: ref,
-        className: (0, _classnamesDefault.default)(className, bsPrefix),
-        ...props
-    });
-});
-CardLink.displayName = "CardLink";
-exports.default = CardLink;
-
-},{"react":"21dqq","classnames":"jocGM","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"i2BiN":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _react = require("react");
-var _classnames = require("classnames");
-var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
-var _themeProvider = require("./ThemeProvider");
-var _divWithClassName = require("./divWithClassName");
-var _divWithClassNameDefault = parcelHelpers.interopDefault(_divWithClassName);
-var _jsxRuntime = require("react/jsx-runtime");
-"use client";
-const DivStyledAsH6 = (0, _divWithClassNameDefault.default)("h6");
-const CardSubtitle = /*#__PURE__*/ _react.forwardRef(({ className, bsPrefix, as: Component = DivStyledAsH6, ...props }, ref)=>{
-    bsPrefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-subtitle");
-    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
-        ref: ref,
-        className: (0, _classnamesDefault.default)(className, bsPrefix),
-        ...props
-    });
-});
-CardSubtitle.displayName = "CardSubtitle";
-exports.default = CardSubtitle;
-
-},{"react":"21dqq","classnames":"jocGM","./ThemeProvider":"dVixI","./divWithClassName":"eDg7t","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"eDg7t":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _react = require("react");
-var _classnames = require("classnames");
-var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
-var _jsxRuntime = require("react/jsx-runtime");
-exports.default = (className)=>/*#__PURE__*/ _react.forwardRef((p, ref)=>/*#__PURE__*/ (0, _jsxRuntime.jsx)("div", {
-            ...p,
-            ref: ref,
-            className: (0, _classnamesDefault.default)(p.className, className)
-        }));
-
-},{"react":"21dqq","classnames":"jocGM","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"aUUmg":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _react = require("react");
-var _classnames = require("classnames");
-var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
-var _themeProvider = require("./ThemeProvider");
-var _jsxRuntime = require("react/jsx-runtime");
-"use client";
-const CardText = /*#__PURE__*/ _react.forwardRef(({ className, bsPrefix, as: Component = "p", ...props }, ref)=>{
-    bsPrefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-text");
-    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
-        ref: ref,
-        className: (0, _classnamesDefault.default)(className, bsPrefix),
-        ...props
-    });
-});
-CardText.displayName = "CardText";
-exports.default = CardText;
-
-},{"react":"21dqq","classnames":"jocGM","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"79rSZ":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _react = require("react");
-var _classnames = require("classnames");
-var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
-var _themeProvider = require("./ThemeProvider");
-var _divWithClassName = require("./divWithClassName");
-var _divWithClassNameDefault = parcelHelpers.interopDefault(_divWithClassName);
-var _jsxRuntime = require("react/jsx-runtime");
-"use client";
-const DivStyledAsH5 = (0, _divWithClassNameDefault.default)("h5");
-const CardTitle = /*#__PURE__*/ _react.forwardRef(({ className, bsPrefix, as: Component = DivStyledAsH5, ...props }, ref)=>{
-    bsPrefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-title");
-    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
-        ref: ref,
-        className: (0, _classnamesDefault.default)(className, bsPrefix),
-        ...props
-    });
-});
-CardTitle.displayName = "CardTitle";
-exports.default = CardTitle;
-
-},{"react":"21dqq","classnames":"jocGM","./ThemeProvider":"dVixI","./divWithClassName":"eDg7t","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"km3Ru":[function(require,module,exports) {
-"use strict";
-var Refresh = require("7422ead32dcc1e6b");
-function debounce(func, delay) {
-    {
-        let timeout = undefined;
-        let lastTime = 0;
-        return function(args) {
-            // Call immediately if last call was more than the delay ago.
-            // Otherwise, set a timeout. This means the first call is fast
-            // (for the common case of a single update), and subsequent updates
-            // are batched.
-            let now = Date.now();
-            if (now - lastTime > delay) {
-                lastTime = now;
-                func.call(null, args);
-            } else {
-                clearTimeout(timeout);
-                timeout = setTimeout(function() {
-                    timeout = undefined;
-                    lastTime = Date.now();
-                    func.call(null, args);
-                }, delay);
-            }
-        };
-    }
-}
-var enqueueUpdate = debounce(function() {
-    Refresh.performReactRefresh();
-}, 30);
-// Everthing below is either adapted or copied from
-// https://github.com/facebook/metro/blob/61de16bd1edd7e738dd0311c89555a644023ab2d/packages/metro/src/lib/polyfills/require.js
-// MIT License - Copyright (c) Facebook, Inc. and its affiliates.
-module.exports.prelude = function(module1) {
-    window.$RefreshReg$ = function(type, id) {
-        Refresh.register(type, module1.id + " " + id);
-    };
-    window.$RefreshSig$ = Refresh.createSignatureFunctionForTransform;
-};
-module.exports.postlude = function(module1) {
-    if (isReactRefreshBoundary(module1.exports)) {
-        registerExportsForReactRefresh(module1);
-        if (module1.hot) {
-            module1.hot.dispose(function(data) {
-                if (Refresh.hasUnrecoverableErrors()) window.location.reload();
-                data.prevExports = module1.exports;
-            });
-            module1.hot.accept(function(getParents) {
-                var prevExports = module1.hot.data.prevExports;
-                var nextExports = module1.exports;
-                // Since we just executed the code for it, it's possible
-                // that the new exports make it ineligible for being a boundary.
-                var isNoLongerABoundary = !isReactRefreshBoundary(nextExports);
-                // It can also become ineligible if its exports are incompatible
-                // with the previous exports.
-                // For example, if you add/remove/change exports, we'll want
-                // to re-execute the importing modules, and force those components
-                // to re-render. Similarly, if you convert a class component
-                // to a function, we want to invalidate the boundary.
-                var didInvalidate = shouldInvalidateReactRefreshBoundary(prevExports, nextExports);
-                if (isNoLongerABoundary || didInvalidate) {
-                    // We'll be conservative. The only case in which we won't do a full
-                    // reload is if all parent modules are also refresh boundaries.
-                    // In that case we'll add them to the current queue.
-                    var parents = getParents();
-                    if (parents.length === 0) {
-                        // Looks like we bubbled to the root. Can't recover from that.
-                        window.location.reload();
-                        return;
-                    }
-                    return parents;
-                }
-                enqueueUpdate();
+    return _react.useCallback((event)=>{
+        if (shouldProcessLinkClick(event, target)) {
+            event.preventDefault();
+            // If the URL hasn't changed, a regular <a> will do a replace instead of
+            // a push, so do the same here unless the replace prop is explicitly set
+            let replace = replaceProp !== undefined ? replaceProp : (0, _reactRouter.createPath)(location) === (0, _reactRouter.createPath)(path);
+            navigate(to, {
+                replace,
+                state,
+                preventScrollReset,
+                relative,
+                unstable_viewTransition
             });
         }
-    }
-};
-function isReactRefreshBoundary(exports) {
-    if (Refresh.isLikelyComponentType(exports)) return true;
-    if (exports == null || typeof exports !== "object") // Exit if we can't iterate over exports.
-    return false;
-    var hasExports = false;
-    var areAllExportsComponents = true;
-    let isESM = "__esModule" in exports;
-    for(var key in exports){
-        hasExports = true;
-        if (key === "__esModule") continue;
-        var desc = Object.getOwnPropertyDescriptor(exports, key);
-        if (desc && desc.get && !isESM) // Don't invoke getters for CJS as they may have side effects.
-        return false;
-        var exportValue = exports[key];
-        if (!Refresh.isLikelyComponentType(exportValue)) areAllExportsComponents = false;
-    }
-    return hasExports && areAllExportsComponents;
+    }, [
+        location,
+        navigate,
+        path,
+        replaceProp,
+        state,
+        target,
+        to,
+        preventScrollReset,
+        relative,
+        unstable_viewTransition
+    ]);
 }
-function shouldInvalidateReactRefreshBoundary(prevExports, nextExports) {
-    var prevSignature = getRefreshBoundarySignature(prevExports);
-    var nextSignature = getRefreshBoundarySignature(nextExports);
-    if (prevSignature.length !== nextSignature.length) return true;
-    for(var i = 0; i < nextSignature.length; i++){
-        if (prevSignature[i] !== nextSignature[i]) return true;
-    }
-    return false;
-}
-// When this signature changes, it's unsafe to stop at this refresh boundary.
-function getRefreshBoundarySignature(exports) {
-    var signature = [];
-    signature.push(Refresh.getFamilyByType(exports));
-    if (exports == null || typeof exports !== "object") // Exit if we can't iterate over exports.
-    // (This is important for legacy environments.)
-    return signature;
-    let isESM = "__esModule" in exports;
-    for(var key in exports){
-        if (key === "__esModule") continue;
-        var desc = Object.getOwnPropertyDescriptor(exports, key);
-        if (desc && desc.get && !isESM) continue;
-        var exportValue = exports[key];
-        signature.push(key);
-        signature.push(Refresh.getFamilyByType(exportValue));
-    }
-    return signature;
-}
-function registerExportsForReactRefresh(module1) {
-    var exports = module1.exports, id = module1.id;
-    Refresh.register(exports, id + " %exports%");
-    if (exports == null || typeof exports !== "object") // Exit if we can't iterate over exports.
-    // (This is important for legacy environments.)
-    return;
-    let isESM = "__esModule" in exports;
-    for(var key in exports){
-        var desc = Object.getOwnPropertyDescriptor(exports, key);
-        if (desc && desc.get && !isESM) continue;
-        var exportValue = exports[key];
-        var typeID = id + " %exports% " + key;
-        Refresh.register(exportValue, typeID);
-    }
-}
-
-},{"7422ead32dcc1e6b":"786KC"}],"ggaUx":[function(require,module,exports) {
-var $parcel$ReactRefreshHelpers$e9f6 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
-var prevRefreshReg = window.$RefreshReg$;
-var prevRefreshSig = window.$RefreshSig$;
-$parcel$ReactRefreshHelpers$e9f6.prelude(module);
-
-try {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "MovieView", ()=>MovieView);
-var _jsxDevRuntime = require("react/jsx-dev-runtime");
-var _react = require("react");
-var _reactDefault = parcelHelpers.interopDefault(_react);
-var _reactRouter = require("react-router");
-var _reactRouterDom = require("react-router-dom");
-var _reactBootstrap = require("react-bootstrap");
-var _movieCard = require("../movie-card/movie-card");
-var _s = $RefreshSig$();
-const MovieView = ({ movies })=>{
-    _s();
-    const { movieId } = (0, _reactRouter.useParams)();
-    const movie = movies.find((movie)=>movie._id === movieId);
-    if (!movie) return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-        children: "Loading..."
-    }, void 0, false, {
-        fileName: "src/components/movie-view/movie-view.jsx",
-        lineNumber: 12,
-        columnNumber: 16
-    }, undefined); // Handle case where movie with movieId is not found
-    const { Title, Description, Genre, Director, Year, ImagePath } = movie;
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
-        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Row), {
-            className: "my-5 justify-content-md-center",
-            children: [
-                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                    md: 7,
-                    className: "col-12",
-                    children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("img", {
-                        src: ImagePath,
-                        alt: "movie cover",
-                        className: "mx-auto w-100"
-                    }, void 0, false, {
-                        fileName: "src/components/movie-view/movie-view.jsx",
-                        lineNumber: 21,
-                        columnNumber: 21
-                    }, undefined)
-                }, void 0, false, {
-                    fileName: "src/components/movie-view/movie-view.jsx",
-                    lineNumber: 20,
-                    columnNumber: 17
-                }, undefined),
-                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                    md: 5,
-                    className: "col-12",
-                    children: [
-                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                            className: "my-1",
-                            children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                className: "h1",
-                                children: Title
-                            }, void 0, false, {
-                                fileName: "src/components/movie-view/movie-view.jsx",
-                                lineNumber: 25,
-                                columnNumber: 25
-                            }, undefined)
-                        }, void 0, false, {
-                            fileName: "src/components/movie-view/movie-view.jsx",
-                            lineNumber: 24,
-                            columnNumber: 21
-                        }, undefined),
-                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                            className: "my-1",
-                            children: [
-                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                    className: "h6",
-                                    children: "Description: "
-                                }, void 0, false, {
-                                    fileName: "src/components/movie-view/movie-view.jsx",
-                                    lineNumber: 28,
-                                    columnNumber: 25
-                                }, undefined),
-                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                    children: Description
-                                }, void 0, false, {
-                                    fileName: "src/components/movie-view/movie-view.jsx",
-                                    lineNumber: 29,
-                                    columnNumber: 25
-                                }, undefined)
-                            ]
-                        }, void 0, true, {
-                            fileName: "src/components/movie-view/movie-view.jsx",
-                            lineNumber: 27,
-                            columnNumber: 21
-                        }, undefined),
-                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                            className: "my-1",
-                            children: [
-                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                    className: "h6",
-                                    children: "Director: "
-                                }, void 0, false, {
-                                    fileName: "src/components/movie-view/movie-view.jsx",
-                                    lineNumber: 32,
-                                    columnNumber: 25
-                                }, undefined),
-                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                    children: Director.Name
-                                }, void 0, false, {
-                                    fileName: "src/components/movie-view/movie-view.jsx",
-                                    lineNumber: 33,
-                                    columnNumber: 25
-                                }, undefined)
-                            ]
-                        }, void 0, true, {
-                            fileName: "src/components/movie-view/movie-view.jsx",
-                            lineNumber: 31,
-                            columnNumber: 21
-                        }, undefined),
-                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                            className: "my-1",
-                            children: [
-                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                    className: "h6",
-                                    children: "Genre: "
-                                }, void 0, false, {
-                                    fileName: "src/components/movie-view/movie-view.jsx",
-                                    lineNumber: 36,
-                                    columnNumber: 25
-                                }, undefined),
-                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                    children: Genre.Name
-                                }, void 0, false, {
-                                    fileName: "src/components/movie-view/movie-view.jsx",
-                                    lineNumber: 37,
-                                    columnNumber: 25
-                                }, undefined)
-                            ]
-                        }, void 0, true, {
-                            fileName: "src/components/movie-view/movie-view.jsx",
-                            lineNumber: 35,
-                            columnNumber: 21
-                        }, undefined),
-                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                            className: "my-1",
-                            children: [
-                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                    className: "h6",
-                                    children: "Year: "
-                                }, void 0, false, {
-                                    fileName: "src/components/movie-view/movie-view.jsx",
-                                    lineNumber: 40,
-                                    columnNumber: 25
-                                }, undefined),
-                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                    children: Year
-                                }, void 0, false, {
-                                    fileName: "src/components/movie-view/movie-view.jsx",
-                                    lineNumber: 41,
-                                    columnNumber: 25
-                                }, undefined)
-                            ]
-                        }, void 0, true, {
-                            fileName: "src/components/movie-view/movie-view.jsx",
-                            lineNumber: 39,
-                            columnNumber: 21
-                        }, undefined),
-                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
-                            className: "my-2 me-2",
-                            children: "Add to Favorite"
-                        }, void 0, false, {
-                            fileName: "src/components/movie-view/movie-view.jsx",
-                            lineNumber: 44,
-                            columnNumber: 21
-                        }, undefined),
-                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Link), {
-                            to: `/`,
-                            children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
-                                className: "my-2",
-                                children: "Back"
-                            }, void 0, false, {
-                                fileName: "src/components/movie-view/movie-view.jsx",
-                                lineNumber: 46,
-                                columnNumber: 25
-                            }, undefined)
-                        }, void 0, false, {
-                            fileName: "src/components/movie-view/movie-view.jsx",
-                            lineNumber: 45,
-                            columnNumber: 21
-                        }, undefined)
-                    ]
-                }, void 0, true, {
-                    fileName: "src/components/movie-view/movie-view.jsx",
-                    lineNumber: 23,
-                    columnNumber: 17
-                }, undefined)
-            ]
-        }, void 0, true, {
-            fileName: "src/components/movie-view/movie-view.jsx",
-            lineNumber: 19,
-            columnNumber: 13
-        }, undefined)
-    }, void 0, false);
-};
-_s(MovieView, "e2L2DPdRH1AShA7yIOCsYRlzvlI=", false, function() {
+/**
+ * A convenient wrapper for reading and writing search parameters via the
+ * URLSearchParams interface.
+ */ function useSearchParams(defaultInit) {
+    (0, _router.UNSAFE_warning)(typeof URLSearchParams !== "undefined", "You cannot use the `useSearchParams` hook in a browser that does not support the URLSearchParams API. If you need to support Internet Explorer 11, we recommend you load a polyfill such as https://github.com/ungap/url-search-params.");
+    let defaultSearchParamsRef = _react.useRef(createSearchParams(defaultInit));
+    let hasSetSearchParamsRef = _react.useRef(false);
+    let location = (0, _reactRouter.useLocation)();
+    let searchParams = _react.useMemo(()=>// Only merge in the defaults if we haven't yet called setSearchParams.
+        // Once we call that we want those to take precedence, otherwise you can't
+        // remove a param with setSearchParams({}) if it has an initial value
+        getSearchParamsForLocation(location.search, hasSetSearchParamsRef.current ? null : defaultSearchParamsRef.current), [
+        location.search
+    ]);
+    let navigate = (0, _reactRouter.useNavigate)();
+    let setSearchParams = _react.useCallback((nextInit, navigateOptions)=>{
+        const newSearchParams = createSearchParams(typeof nextInit === "function" ? nextInit(searchParams) : nextInit);
+        hasSetSearchParamsRef.current = true;
+        navigate("?" + newSearchParams, navigateOptions);
+    }, [
+        navigate,
+        searchParams
+    ]);
     return [
-        (0, _reactRouter.useParams)
+        searchParams,
+        setSearchParams
     ];
-});
-_c = MovieView;
-var _c;
-$RefreshReg$(_c, "MovieView");
-
-  $parcel$ReactRefreshHelpers$e9f6.postlude(module);
-} finally {
-  window.$RefreshReg$ = prevRefreshReg;
-  window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-router":"dbWyW","react-router-dom":"9xmpe","react-bootstrap":"3AD9A","../movie-card/movie-card":"bwuIu","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"dbWyW":[function(require,module,exports) {
+function validateClientSideSubmission() {
+    if (typeof document === "undefined") throw new Error("You are calling submit during the server render. Try calling submit within a `useEffect` or callback instead.");
+}
+let fetcherId = 0;
+let getUniqueFetcherId = ()=>"__" + String(++fetcherId) + "__";
+/**
+ * Returns a function that may be used to programmatically submit a form (or
+ * some arbitrary data) to the server.
+ */ function useSubmit() {
+    let { router } = useDataRouterContext(DataRouterHook.UseSubmit);
+    let { basename } = _react.useContext((0, _reactRouter.UNSAFE_NavigationContext));
+    let currentRouteId = (0, _reactRouter.UNSAFE_useRouteId)();
+    return _react.useCallback(function(target, options) {
+        if (options === void 0) options = {};
+        validateClientSideSubmission();
+        let { action, method, encType, formData, body } = getFormSubmissionInfo(target, basename);
+        if (options.navigate === false) {
+            let key = options.fetcherKey || getUniqueFetcherId();
+            router.fetch(key, currentRouteId, options.action || action, {
+                preventScrollReset: options.preventScrollReset,
+                formData,
+                body,
+                formMethod: options.method || method,
+                formEncType: options.encType || encType,
+                unstable_flushSync: options.unstable_flushSync
+            });
+        } else router.navigate(options.action || action, {
+            preventScrollReset: options.preventScrollReset,
+            formData,
+            body,
+            formMethod: options.method || method,
+            formEncType: options.encType || encType,
+            replace: options.replace,
+            state: options.state,
+            fromRouteId: currentRouteId,
+            unstable_flushSync: options.unstable_flushSync,
+            unstable_viewTransition: options.unstable_viewTransition
+        });
+    }, [
+        router,
+        basename,
+        currentRouteId
+    ]);
+}
+// v7: Eventually we should deprecate this entirely in favor of using the
+// router method directly?
+function useFormAction(action, _temp2) {
+    let { relative } = _temp2 === void 0 ? {} : _temp2;
+    let { basename } = _react.useContext((0, _reactRouter.UNSAFE_NavigationContext));
+    let routeContext = _react.useContext((0, _reactRouter.UNSAFE_RouteContext));
+    !routeContext && (0, _router.UNSAFE_invariant)(false, "useFormAction must be used inside a RouteContext");
+    let [match] = routeContext.matches.slice(-1);
+    // Shallow clone path so we can modify it below, otherwise we modify the
+    // object referenced by useMemo inside useResolvedPath
+    let path = _extends({}, (0, _reactRouter.useResolvedPath)(action ? action : ".", {
+        relative
+    }));
+    // If no action was specified, browsers will persist current search params
+    // when determining the path, so match that behavior
+    // https://github.com/remix-run/remix/issues/927
+    let location = (0, _reactRouter.useLocation)();
+    if (action == null) {
+        // Safe to write to this directly here since if action was undefined, we
+        // would have called useResolvedPath(".") which will never include a search
+        path.search = location.search;
+        // When grabbing search params from the URL, remove any included ?index param
+        // since it might not apply to our contextual route.  We add it back based
+        // on match.route.index below
+        let params = new URLSearchParams(path.search);
+        if (params.has("index") && params.get("index") === "") {
+            params.delete("index");
+            path.search = params.toString() ? "?" + params.toString() : "";
+        }
+    }
+    if ((!action || action === ".") && match.route.index) path.search = path.search ? path.search.replace(/^\?/, "?index&") : "?index";
+    // If we're operating within a basename, prepend it to the pathname prior
+    // to creating the form action.  If this is a root navigation, then just use
+    // the raw basename which allows the basename to have full control over the
+    // presence of a trailing slash on root actions
+    if (basename !== "/") path.pathname = path.pathname === "/" ? basename : (0, _router.joinPaths)([
+        basename,
+        path.pathname
+    ]);
+    return (0, _reactRouter.createPath)(path);
+}
+// TODO: (v7) Change the useFetcher generic default from `any` to `unknown`
+/**
+ * Interacts with route loaders and actions without causing a navigation. Great
+ * for any interaction that stays on the same page.
+ */ function useFetcher(_temp3) {
+    var _route$matches;
+    let { key } = _temp3 === void 0 ? {} : _temp3;
+    let { router } = useDataRouterContext(DataRouterHook.UseFetcher);
+    let state = useDataRouterState(DataRouterStateHook.UseFetcher);
+    let fetcherData = _react.useContext(FetchersContext);
+    let route = _react.useContext((0, _reactRouter.UNSAFE_RouteContext));
+    let routeId = (_route$matches = route.matches[route.matches.length - 1]) == null ? void 0 : _route$matches.route.id;
+    !fetcherData && (0, _router.UNSAFE_invariant)(false, "useFetcher must be used inside a FetchersContext");
+    !route && (0, _router.UNSAFE_invariant)(false, "useFetcher must be used inside a RouteContext");
+    !(routeId != null) && (0, _router.UNSAFE_invariant)(false, 'useFetcher can only be used on routes that contain a unique "id"');
+    // Fetcher key handling
+    // OK to call conditionally to feature detect `useId`
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    let defaultKey = useIdImpl ? useIdImpl() : "";
+    let [fetcherKey, setFetcherKey] = _react.useState(key || defaultKey);
+    if (key && key !== fetcherKey) setFetcherKey(key);
+    else if (!fetcherKey) // We will only fall through here when `useId` is not available
+    setFetcherKey(getUniqueFetcherId());
+    // Registration/cleanup
+    _react.useEffect(()=>{
+        router.getFetcher(fetcherKey);
+        return ()=>{
+            // Tell the router we've unmounted - if v7_fetcherPersist is enabled this
+            // will not delete immediately but instead queue up a delete after the
+            // fetcher returns to an `idle` state
+            router.deleteFetcher(fetcherKey);
+        };
+    }, [
+        router,
+        fetcherKey
+    ]);
+    // Fetcher additions
+    let load = _react.useCallback((href, opts)=>{
+        !routeId && (0, _router.UNSAFE_invariant)(false, "No routeId available for fetcher.load()");
+        router.fetch(fetcherKey, routeId, href, opts);
+    }, [
+        fetcherKey,
+        routeId,
+        router
+    ]);
+    let submitImpl = useSubmit();
+    let submit = _react.useCallback((target, opts)=>{
+        submitImpl(target, _extends({}, opts, {
+            navigate: false,
+            fetcherKey
+        }));
+    }, [
+        fetcherKey,
+        submitImpl
+    ]);
+    let FetcherForm = _react.useMemo(()=>{
+        let FetcherForm = /*#__PURE__*/ _react.forwardRef((props, ref)=>{
+            return /*#__PURE__*/ _react.createElement(Form, _extends({}, props, {
+                navigate: false,
+                fetcherKey: fetcherKey,
+                ref: ref
+            }));
+        });
+        FetcherForm.displayName = "fetcher.Form";
+        return FetcherForm;
+    }, [
+        fetcherKey
+    ]);
+    // Exposed FetcherWithComponents
+    let fetcher = state.fetchers.get(fetcherKey) || (0, _router.IDLE_FETCHER);
+    let data = fetcherData.get(fetcherKey);
+    let fetcherWithComponents = _react.useMemo(()=>_extends({
+            Form: FetcherForm,
+            submit,
+            load
+        }, fetcher, {
+            data
+        }), [
+        FetcherForm,
+        submit,
+        load,
+        fetcher,
+        data
+    ]);
+    return fetcherWithComponents;
+}
+/**
+ * Provides all fetchers currently on the page. Useful for layouts and parent
+ * routes that need to provide pending/optimistic UI regarding the fetch.
+ */ function useFetchers() {
+    let state = useDataRouterState(DataRouterStateHook.UseFetchers);
+    return Array.from(state.fetchers.entries()).map((_ref11)=>{
+        let [key, fetcher] = _ref11;
+        return _extends({}, fetcher, {
+            key
+        });
+    });
+}
+const SCROLL_RESTORATION_STORAGE_KEY = "react-router-scroll-positions";
+let savedScrollPositions = {};
+/**
+ * When rendered inside a RouterProvider, will restore scroll positions on navigations
+ */ function useScrollRestoration(_temp4) {
+    let { getKey, storageKey } = _temp4 === void 0 ? {} : _temp4;
+    let { router } = useDataRouterContext(DataRouterHook.UseScrollRestoration);
+    let { restoreScrollPosition, preventScrollReset } = useDataRouterState(DataRouterStateHook.UseScrollRestoration);
+    let { basename } = _react.useContext((0, _reactRouter.UNSAFE_NavigationContext));
+    let location = (0, _reactRouter.useLocation)();
+    let matches = (0, _reactRouter.useMatches)();
+    let navigation = (0, _reactRouter.useNavigation)();
+    // Trigger manual scroll restoration while we're active
+    _react.useEffect(()=>{
+        window.history.scrollRestoration = "manual";
+        return ()=>{
+            window.history.scrollRestoration = "auto";
+        };
+    }, []);
+    // Save positions on pagehide
+    usePageHide(_react.useCallback(()=>{
+        if (navigation.state === "idle") {
+            let key = (getKey ? getKey(location, matches) : null) || location.key;
+            savedScrollPositions[key] = window.scrollY;
+        }
+        try {
+            sessionStorage.setItem(storageKey || SCROLL_RESTORATION_STORAGE_KEY, JSON.stringify(savedScrollPositions));
+        } catch (error) {
+            (0, _router.UNSAFE_warning)(false, "Failed to save scroll positions in sessionStorage, <ScrollRestoration /> will not work properly (" + error + ").");
+        }
+        window.history.scrollRestoration = "auto";
+    }, [
+        storageKey,
+        getKey,
+        navigation.state,
+        location,
+        matches
+    ]));
+    // Read in any saved scroll locations
+    if (typeof document !== "undefined") {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        _react.useLayoutEffect(()=>{
+            try {
+                let sessionPositions = sessionStorage.getItem(storageKey || SCROLL_RESTORATION_STORAGE_KEY);
+                if (sessionPositions) savedScrollPositions = JSON.parse(sessionPositions);
+            } catch (e) {
+            // no-op, use default empty object
+            }
+        }, [
+            storageKey
+        ]);
+        // Enable scroll restoration in the router
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        _react.useLayoutEffect(()=>{
+            let getKeyWithoutBasename = getKey && basename !== "/" ? (location, matches)=>getKey(_extends({}, location, {
+                    pathname: (0, _router.stripBasename)(location.pathname, basename) || location.pathname
+                }), matches) : getKey;
+            let disableScrollRestoration = router == null ? void 0 : router.enableScrollRestoration(savedScrollPositions, ()=>window.scrollY, getKeyWithoutBasename);
+            return ()=>disableScrollRestoration && disableScrollRestoration();
+        }, [
+            router,
+            basename,
+            getKey
+        ]);
+        // Restore scrolling when state.restoreScrollPosition changes
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        _react.useLayoutEffect(()=>{
+            // Explicit false means don't do anything (used for submissions)
+            if (restoreScrollPosition === false) return;
+            // been here before, scroll to it
+            if (typeof restoreScrollPosition === "number") {
+                window.scrollTo(0, restoreScrollPosition);
+                return;
+            }
+            // try to scroll to the hash
+            if (location.hash) {
+                let el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+                if (el) {
+                    el.scrollIntoView();
+                    return;
+                }
+            }
+            // Don't reset if this navigation opted out
+            if (preventScrollReset === true) return;
+            // otherwise go to the top on new locations
+            window.scrollTo(0, 0);
+        }, [
+            location,
+            restoreScrollPosition,
+            preventScrollReset
+        ]);
+    }
+}
+/**
+ * Setup a callback to be fired on the window's `beforeunload` event. This is
+ * useful for saving some data to `window.localStorage` just before the page
+ * refreshes.
+ *
+ * Note: The `callback` argument should be a function created with
+ * `React.useCallback()`.
+ */ function useBeforeUnload(callback, options) {
+    let { capture } = options || {};
+    _react.useEffect(()=>{
+        let opts = capture != null ? {
+            capture
+        } : undefined;
+        window.addEventListener("beforeunload", callback, opts);
+        return ()=>{
+            window.removeEventListener("beforeunload", callback, opts);
+        };
+    }, [
+        callback,
+        capture
+    ]);
+}
+/**
+ * Setup a callback to be fired on the window's `pagehide` event. This is
+ * useful for saving some data to `window.localStorage` just before the page
+ * refreshes.  This event is better supported than beforeunload across browsers.
+ *
+ * Note: The `callback` argument should be a function created with
+ * `React.useCallback()`.
+ */ function usePageHide(callback, options) {
+    let { capture } = options || {};
+    _react.useEffect(()=>{
+        let opts = capture != null ? {
+            capture
+        } : undefined;
+        window.addEventListener("pagehide", callback, opts);
+        return ()=>{
+            window.removeEventListener("pagehide", callback, opts);
+        };
+    }, [
+        callback,
+        capture
+    ]);
+}
+/**
+ * Wrapper around useBlocker to show a window.confirm prompt to users instead
+ * of building a custom UI with useBlocker.
+ *
+ * Warning: This has *a lot of rough edges* and behaves very differently (and
+ * very incorrectly in some cases) across browsers if user click addition
+ * back/forward navigations while the confirm is open.  Use at your own risk.
+ */ function usePrompt(_ref12) {
+    let { when, message } = _ref12;
+    let blocker = (0, _reactRouter.useBlocker)(when);
+    _react.useEffect(()=>{
+        if (blocker.state === "blocked") {
+            let proceed = window.confirm(message);
+            if (proceed) // This timeout is needed to avoid a weird "race" on POP navigations
+            // between the `window.history` revert navigation and the result of
+            // `window.confirm`
+            setTimeout(blocker.proceed, 0);
+            else blocker.reset();
+        }
+    }, [
+        blocker,
+        message
+    ]);
+    _react.useEffect(()=>{
+        if (blocker.state === "blocked" && !when) blocker.reset();
+    }, [
+        blocker,
+        when
+    ]);
+}
+/**
+ * Return a boolean indicating if there is an active view transition to the
+ * given href.  You can use this value to render CSS classes or viewTransitionName
+ * styles onto your elements
+ *
+ * @param href The destination href
+ * @param [opts.relative] Relative routing type ("route" | "path")
+ */ function useViewTransitionState(to, opts) {
+    if (opts === void 0) opts = {};
+    let vtContext = _react.useContext(ViewTransitionContext);
+    !(vtContext != null) && (0, _router.UNSAFE_invariant)(false, "`unstable_useViewTransitionState` must be used within `react-router-dom`'s `RouterProvider`.  Did you accidentally import `RouterProvider` from `react-router`?");
+    let { basename } = useDataRouterContext(DataRouterHook.useViewTransitionState);
+    let path = (0, _reactRouter.useResolvedPath)(to, {
+        relative: opts.relative
+    });
+    if (!vtContext.isTransitioning) return false;
+    let currentPath = (0, _router.stripBasename)(vtContext.currentLocation.pathname, basename) || vtContext.currentLocation.pathname;
+    let nextPath = (0, _router.stripBasename)(vtContext.nextLocation.pathname, basename) || vtContext.nextLocation.pathname;
+    // Transition is active if we're going to or coming from the indicated
+    // destination.  This ensures that other PUSH navigations that reverse
+    // an indicated transition apply.  I.e., on the list view you have:
+    //
+    //   <NavLink to="/details/1" unstable_viewTransition>
+    //
+    // If you click the breadcrumb back to the list view:
+    //
+    //   <NavLink to="/list" unstable_viewTransition>
+    //
+    // We should apply the transition because it's indicated as active going
+    // from /list -> /details/1 and therefore should be active on the reverse
+    // (even though this isn't strictly a POP reverse)
+    return (0, _router.matchPath)(path.pathname, nextPath) != null || (0, _router.matchPath)(path.pathname, currentPath) != null;
+}
+
+},{"react":"21dqq","react-dom":"j6uA9","react-router":"dbWyW","@remix-run/router":"5ncDG","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dbWyW":[function(require,module,exports) {
 /**
  * React Router v6.24.1
  *
@@ -35709,1436 +34524,37 @@ function persistAppliedTransitions(_window, transitions) {
     }
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9xmpe":[function(require,module,exports) {
-/**
- * React Router DOM v6.24.1
- *
- * Copyright (c) Remix Software Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.md file in the root directory of this source tree.
- *
- * @license MIT
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "AbortedDeferredError", ()=>(0, _reactRouter.AbortedDeferredError));
-parcelHelpers.export(exports, "Await", ()=>(0, _reactRouter.Await));
-parcelHelpers.export(exports, "MemoryRouter", ()=>(0, _reactRouter.MemoryRouter));
-parcelHelpers.export(exports, "Navigate", ()=>(0, _reactRouter.Navigate));
-parcelHelpers.export(exports, "NavigationType", ()=>(0, _reactRouter.NavigationType));
-parcelHelpers.export(exports, "Outlet", ()=>(0, _reactRouter.Outlet));
-parcelHelpers.export(exports, "Route", ()=>(0, _reactRouter.Route));
-parcelHelpers.export(exports, "Router", ()=>(0, _reactRouter.Router));
-parcelHelpers.export(exports, "Routes", ()=>(0, _reactRouter.Routes));
-parcelHelpers.export(exports, "UNSAFE_DataRouterContext", ()=>(0, _reactRouter.UNSAFE_DataRouterContext));
-parcelHelpers.export(exports, "UNSAFE_DataRouterStateContext", ()=>(0, _reactRouter.UNSAFE_DataRouterStateContext));
-parcelHelpers.export(exports, "UNSAFE_LocationContext", ()=>(0, _reactRouter.UNSAFE_LocationContext));
-parcelHelpers.export(exports, "UNSAFE_NavigationContext", ()=>(0, _reactRouter.UNSAFE_NavigationContext));
-parcelHelpers.export(exports, "UNSAFE_RouteContext", ()=>(0, _reactRouter.UNSAFE_RouteContext));
-parcelHelpers.export(exports, "UNSAFE_useRouteId", ()=>(0, _reactRouter.UNSAFE_useRouteId));
-parcelHelpers.export(exports, "createMemoryRouter", ()=>(0, _reactRouter.createMemoryRouter));
-parcelHelpers.export(exports, "createPath", ()=>(0, _reactRouter.createPath));
-parcelHelpers.export(exports, "createRoutesFromChildren", ()=>(0, _reactRouter.createRoutesFromChildren));
-parcelHelpers.export(exports, "createRoutesFromElements", ()=>(0, _reactRouter.createRoutesFromElements));
-parcelHelpers.export(exports, "defer", ()=>(0, _reactRouter.defer));
-parcelHelpers.export(exports, "generatePath", ()=>(0, _reactRouter.generatePath));
-parcelHelpers.export(exports, "isRouteErrorResponse", ()=>(0, _reactRouter.isRouteErrorResponse));
-parcelHelpers.export(exports, "json", ()=>(0, _reactRouter.json));
-parcelHelpers.export(exports, "matchPath", ()=>(0, _reactRouter.matchPath));
-parcelHelpers.export(exports, "matchRoutes", ()=>(0, _reactRouter.matchRoutes));
-parcelHelpers.export(exports, "parsePath", ()=>(0, _reactRouter.parsePath));
-parcelHelpers.export(exports, "redirect", ()=>(0, _reactRouter.redirect));
-parcelHelpers.export(exports, "redirectDocument", ()=>(0, _reactRouter.redirectDocument));
-parcelHelpers.export(exports, "renderMatches", ()=>(0, _reactRouter.renderMatches));
-parcelHelpers.export(exports, "resolvePath", ()=>(0, _reactRouter.resolvePath));
-parcelHelpers.export(exports, "useActionData", ()=>(0, _reactRouter.useActionData));
-parcelHelpers.export(exports, "useAsyncError", ()=>(0, _reactRouter.useAsyncError));
-parcelHelpers.export(exports, "useAsyncValue", ()=>(0, _reactRouter.useAsyncValue));
-parcelHelpers.export(exports, "useBlocker", ()=>(0, _reactRouter.useBlocker));
-parcelHelpers.export(exports, "useHref", ()=>(0, _reactRouter.useHref));
-parcelHelpers.export(exports, "useInRouterContext", ()=>(0, _reactRouter.useInRouterContext));
-parcelHelpers.export(exports, "useLoaderData", ()=>(0, _reactRouter.useLoaderData));
-parcelHelpers.export(exports, "useLocation", ()=>(0, _reactRouter.useLocation));
-parcelHelpers.export(exports, "useMatch", ()=>(0, _reactRouter.useMatch));
-parcelHelpers.export(exports, "useMatches", ()=>(0, _reactRouter.useMatches));
-parcelHelpers.export(exports, "useNavigate", ()=>(0, _reactRouter.useNavigate));
-parcelHelpers.export(exports, "useNavigation", ()=>(0, _reactRouter.useNavigation));
-parcelHelpers.export(exports, "useNavigationType", ()=>(0, _reactRouter.useNavigationType));
-parcelHelpers.export(exports, "useOutlet", ()=>(0, _reactRouter.useOutlet));
-parcelHelpers.export(exports, "useOutletContext", ()=>(0, _reactRouter.useOutletContext));
-parcelHelpers.export(exports, "useParams", ()=>(0, _reactRouter.useParams));
-parcelHelpers.export(exports, "useResolvedPath", ()=>(0, _reactRouter.useResolvedPath));
-parcelHelpers.export(exports, "useRevalidator", ()=>(0, _reactRouter.useRevalidator));
-parcelHelpers.export(exports, "useRouteError", ()=>(0, _reactRouter.useRouteError));
-parcelHelpers.export(exports, "useRouteLoaderData", ()=>(0, _reactRouter.useRouteLoaderData));
-parcelHelpers.export(exports, "useRoutes", ()=>(0, _reactRouter.useRoutes));
-parcelHelpers.export(exports, "UNSAFE_ErrorResponseImpl", ()=>(0, _router.UNSAFE_ErrorResponseImpl));
-//#endregion
-parcelHelpers.export(exports, "BrowserRouter", ()=>BrowserRouter);
-parcelHelpers.export(exports, "Form", ()=>Form);
-parcelHelpers.export(exports, "HashRouter", ()=>HashRouter);
-parcelHelpers.export(exports, "Link", ()=>Link);
-parcelHelpers.export(exports, "NavLink", ()=>NavLink);
-parcelHelpers.export(exports, "RouterProvider", ()=>RouterProvider);
-parcelHelpers.export(exports, "ScrollRestoration", ()=>ScrollRestoration);
-parcelHelpers.export(exports, "UNSAFE_FetchersContext", ()=>FetchersContext);
-parcelHelpers.export(exports, "UNSAFE_ViewTransitionContext", ()=>ViewTransitionContext);
-parcelHelpers.export(exports, "UNSAFE_useScrollRestoration", ()=>useScrollRestoration);
-parcelHelpers.export(exports, "createBrowserRouter", ()=>createBrowserRouter);
-parcelHelpers.export(exports, "createHashRouter", ()=>createHashRouter);
-parcelHelpers.export(exports, "createSearchParams", ()=>createSearchParams);
-parcelHelpers.export(exports, "unstable_HistoryRouter", ()=>HistoryRouter);
-parcelHelpers.export(exports, "unstable_usePrompt", ()=>usePrompt);
-parcelHelpers.export(exports, "unstable_useViewTransitionState", ()=>useViewTransitionState);
-parcelHelpers.export(exports, "useBeforeUnload", ()=>useBeforeUnload);
-parcelHelpers.export(exports, "useFetcher", ()=>useFetcher);
-parcelHelpers.export(exports, "useFetchers", ()=>useFetchers);
-parcelHelpers.export(exports, "useFormAction", ()=>useFormAction);
-parcelHelpers.export(exports, "useLinkClickHandler", ()=>useLinkClickHandler);
-parcelHelpers.export(exports, "useSearchParams", ()=>useSearchParams);
-parcelHelpers.export(exports, "useSubmit", ()=>useSubmit);
-var _react = require("react");
-var _reactDom = require("react-dom");
-var _reactRouter = require("react-router");
-var _router = require("@remix-run/router");
-function _extends() {
-    _extends = Object.assign ? Object.assign.bind() : function(target) {
-        for(var i = 1; i < arguments.length; i++){
-            var source = arguments[i];
-            for(var key in source)if (Object.prototype.hasOwnProperty.call(source, key)) target[key] = source[key];
-        }
-        return target;
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
+exports.interopDefault = function(a) {
+    return a && a.__esModule ? a : {
+        default: a
     };
-    return _extends.apply(this, arguments);
-}
-function _objectWithoutPropertiesLoose(source, excluded) {
-    if (source == null) return {};
-    var target = {};
-    var sourceKeys = Object.keys(source);
-    var key, i;
-    for(i = 0; i < sourceKeys.length; i++){
-        key = sourceKeys[i];
-        if (excluded.indexOf(key) >= 0) continue;
-        target[key] = source[key];
-    }
-    return target;
-}
-const defaultMethod = "get";
-const defaultEncType = "application/x-www-form-urlencoded";
-function isHtmlElement(object) {
-    return object != null && typeof object.tagName === "string";
-}
-function isButtonElement(object) {
-    return isHtmlElement(object) && object.tagName.toLowerCase() === "button";
-}
-function isFormElement(object) {
-    return isHtmlElement(object) && object.tagName.toLowerCase() === "form";
-}
-function isInputElement(object) {
-    return isHtmlElement(object) && object.tagName.toLowerCase() === "input";
-}
-function isModifiedEvent(event) {
-    return !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey);
-}
-function shouldProcessLinkClick(event, target) {
-    return event.button === 0 && // Ignore everything but left clicks
-    (!target || target === "_self") && // Let browser handle "target=_blank" etc.
-    !isModifiedEvent(event) // Ignore clicks with modifier keys
-    ;
-}
-/**
- * Creates a URLSearchParams object using the given initializer.
- *
- * This is identical to `new URLSearchParams(init)` except it also
- * supports arrays as values in the object form of the initializer
- * instead of just strings. This is convenient when you need multiple
- * values for a given key, but don't want to use an array initializer.
- *
- * For example, instead of:
- *
- *   let searchParams = new URLSearchParams([
- *     ['sort', 'name'],
- *     ['sort', 'price']
- *   ]);
- *
- * you can do:
- *
- *   let searchParams = createSearchParams({
- *     sort: ['name', 'price']
- *   });
- */ function createSearchParams(init) {
-    if (init === void 0) init = "";
-    return new URLSearchParams(typeof init === "string" || Array.isArray(init) || init instanceof URLSearchParams ? init : Object.keys(init).reduce((memo, key)=>{
-        let value = init[key];
-        return memo.concat(Array.isArray(value) ? value.map((v)=>[
-                key,
-                v
-            ]) : [
-            [
-                key,
-                value
-            ]
-        ]);
-    }, []));
-}
-function getSearchParamsForLocation(locationSearch, defaultSearchParams) {
-    let searchParams = createSearchParams(locationSearch);
-    if (defaultSearchParams) // Use `defaultSearchParams.forEach(...)` here instead of iterating of
-    // `defaultSearchParams.keys()` to work-around a bug in Firefox related to
-    // web extensions. Relevant Bugzilla tickets:
-    // https://bugzilla.mozilla.org/show_bug.cgi?id=1414602
-    // https://bugzilla.mozilla.org/show_bug.cgi?id=1023984
-    defaultSearchParams.forEach((_, key)=>{
-        if (!searchParams.has(key)) defaultSearchParams.getAll(key).forEach((value)=>{
-            searchParams.append(key, value);
+};
+exports.defineInteropFlag = function(a) {
+    Object.defineProperty(a, "__esModule", {
+        value: true
+    });
+};
+exports.exportAll = function(source, dest) {
+    Object.keys(source).forEach(function(key) {
+        if (key === "default" || key === "__esModule" || Object.prototype.hasOwnProperty.call(dest, key)) return;
+        Object.defineProperty(dest, key, {
+            enumerable: true,
+            get: function() {
+                return source[key];
+            }
         });
     });
-    return searchParams;
-}
-// One-time check for submitter support
-let _formDataSupportsSubmitter = null;
-function isFormDataSubmitterSupported() {
-    if (_formDataSupportsSubmitter === null) try {
-        new FormData(document.createElement("form"), // @ts-expect-error if FormData supports the submitter parameter, this will throw
-        0);
-        _formDataSupportsSubmitter = false;
-    } catch (e) {
-        _formDataSupportsSubmitter = true;
-    }
-    return _formDataSupportsSubmitter;
-}
-const supportedFormEncTypes = new Set([
-    "application/x-www-form-urlencoded",
-    "multipart/form-data",
-    "text/plain"
-]);
-function getFormEncType(encType) {
-    if (encType != null && !supportedFormEncTypes.has(encType)) {
-        (0, _router.UNSAFE_warning)(false, '"' + encType + '" is not a valid `encType` for `<Form>`/`<fetcher.Form>` ' + ('and will default to "' + defaultEncType + '"'));
-        return null;
-    }
-    return encType;
-}
-function getFormSubmissionInfo(target, basename) {
-    let method;
-    let action;
-    let encType;
-    let formData;
-    let body;
-    if (isFormElement(target)) {
-        // When grabbing the action from the element, it will have had the basename
-        // prefixed to ensure non-JS scenarios work, so strip it since we'll
-        // re-prefix in the router
-        let attr = target.getAttribute("action");
-        action = attr ? (0, _router.stripBasename)(attr, basename) : null;
-        method = target.getAttribute("method") || defaultMethod;
-        encType = getFormEncType(target.getAttribute("enctype")) || defaultEncType;
-        formData = new FormData(target);
-    } else if (isButtonElement(target) || isInputElement(target) && (target.type === "submit" || target.type === "image")) {
-        let form = target.form;
-        if (form == null) throw new Error('Cannot submit a <button> or <input type="submit"> without a <form>');
-        // <button>/<input type="submit"> may override attributes of <form>
-        // When grabbing the action from the element, it will have had the basename
-        // prefixed to ensure non-JS scenarios work, so strip it since we'll
-        // re-prefix in the router
-        let attr = target.getAttribute("formaction") || form.getAttribute("action");
-        action = attr ? (0, _router.stripBasename)(attr, basename) : null;
-        method = target.getAttribute("formmethod") || form.getAttribute("method") || defaultMethod;
-        encType = getFormEncType(target.getAttribute("formenctype")) || getFormEncType(form.getAttribute("enctype")) || defaultEncType;
-        // Build a FormData object populated from a form and submitter
-        formData = new FormData(form, target);
-        // If this browser doesn't support the `FormData(el, submitter)` format,
-        // then tack on the submitter value at the end.  This is a lightweight
-        // solution that is not 100% spec compliant.  For complete support in older
-        // browsers, consider using the `formdata-submitter-polyfill` package
-        if (!isFormDataSubmitterSupported()) {
-            let { name, type, value } = target;
-            if (type === "image") {
-                let prefix = name ? name + "." : "";
-                formData.append(prefix + "x", "0");
-                formData.append(prefix + "y", "0");
-            } else if (name) formData.append(name, value);
-        }
-    } else if (isHtmlElement(target)) throw new Error('Cannot submit element that is not <form>, <button>, or <input type="submit|image">');
-    else {
-        method = defaultMethod;
-        action = null;
-        encType = defaultEncType;
-        body = target;
-    }
-    // Send body for <Form encType="text/plain" so we encode it into text
-    if (formData && encType === "text/plain") {
-        body = formData;
-        formData = undefined;
-    }
-    return {
-        action,
-        method: method.toLowerCase(),
-        encType,
-        formData,
-        body
-    };
-}
-const _excluded = [
-    "onClick",
-    "relative",
-    "reloadDocument",
-    "replace",
-    "state",
-    "target",
-    "to",
-    "preventScrollReset",
-    "unstable_viewTransition"
-], _excluded2 = [
-    "aria-current",
-    "caseSensitive",
-    "className",
-    "end",
-    "style",
-    "to",
-    "unstable_viewTransition",
-    "children"
-], _excluded3 = [
-    "fetcherKey",
-    "navigate",
-    "reloadDocument",
-    "replace",
-    "state",
-    "method",
-    "action",
-    "onSubmit",
-    "relative",
-    "preventScrollReset",
-    "unstable_viewTransition"
-];
-// HEY YOU! DON'T TOUCH THIS VARIABLE!
-//
-// It is replaced with the proper version at build time via a babel plugin in
-// the rollup config.
-//
-// Export a global property onto the window for React Router detection by the
-// Core Web Vitals Technology Report.  This way they can configure the `wappalyzer`
-// to detect and properly classify live websites as being built with React Router:
-// https://github.com/HTTPArchive/wappalyzer/blob/main/src/technologies/r.json
-const REACT_ROUTER_VERSION = "6";
-try {
-    window.__reactRouterVersion = REACT_ROUTER_VERSION;
-} catch (e) {
-// no-op
-}
-function createBrowserRouter(routes, opts) {
-    return (0, _router.createRouter)({
-        basename: opts == null ? void 0 : opts.basename,
-        future: _extends({}, opts == null ? void 0 : opts.future, {
-            v7_prependBasename: true
-        }),
-        history: (0, _router.createBrowserHistory)({
-            window: opts == null ? void 0 : opts.window
-        }),
-        hydrationData: (opts == null ? void 0 : opts.hydrationData) || parseHydrationData(),
-        routes,
-        mapRouteProperties: (0, _reactRouter.UNSAFE_mapRouteProperties),
-        unstable_dataStrategy: opts == null ? void 0 : opts.unstable_dataStrategy,
-        unstable_patchRoutesOnMiss: opts == null ? void 0 : opts.unstable_patchRoutesOnMiss,
-        window: opts == null ? void 0 : opts.window
-    }).initialize();
-}
-function createHashRouter(routes, opts) {
-    return (0, _router.createRouter)({
-        basename: opts == null ? void 0 : opts.basename,
-        future: _extends({}, opts == null ? void 0 : opts.future, {
-            v7_prependBasename: true
-        }),
-        history: (0, _router.createHashHistory)({
-            window: opts == null ? void 0 : opts.window
-        }),
-        hydrationData: (opts == null ? void 0 : opts.hydrationData) || parseHydrationData(),
-        routes,
-        mapRouteProperties: (0, _reactRouter.UNSAFE_mapRouteProperties),
-        unstable_dataStrategy: opts == null ? void 0 : opts.unstable_dataStrategy,
-        unstable_patchRoutesOnMiss: opts == null ? void 0 : opts.unstable_patchRoutesOnMiss,
-        window: opts == null ? void 0 : opts.window
-    }).initialize();
-}
-function parseHydrationData() {
-    var _window;
-    let state = (_window = window) == null ? void 0 : _window.__staticRouterHydrationData;
-    if (state && state.errors) state = _extends({}, state, {
-        errors: deserializeErrors(state.errors)
+    return dest;
+};
+exports.export = function(dest, destName, get) {
+    Object.defineProperty(dest, destName, {
+        enumerable: true,
+        get: get
     });
-    return state;
-}
-function deserializeErrors(errors) {
-    if (!errors) return null;
-    let entries = Object.entries(errors);
-    let serialized = {};
-    for (let [key, val] of entries){
-        // Hey you!  If you change this, please change the corresponding logic in
-        // serializeErrors in react-router-dom/server.tsx :)
-        if (val && val.__type === "RouteErrorResponse") serialized[key] = new (0, _router.UNSAFE_ErrorResponseImpl)(val.status, val.statusText, val.data, val.internal === true);
-        else if (val && val.__type === "Error") {
-            // Attempt to reconstruct the right type of Error (i.e., ReferenceError)
-            if (val.__subType) {
-                let ErrorConstructor = window[val.__subType];
-                if (typeof ErrorConstructor === "function") try {
-                    // @ts-expect-error
-                    let error = new ErrorConstructor(val.message);
-                    // Wipe away the client-side stack trace.  Nothing to fill it in with
-                    // because we don't serialize SSR stack traces for security reasons
-                    error.stack = "";
-                    serialized[key] = error;
-                } catch (e) {
-                // no-op - fall through and create a normal Error
-                }
-            }
-            if (serialized[key] == null) {
-                let error = new Error(val.message);
-                // Wipe away the client-side stack trace.  Nothing to fill it in with
-                // because we don't serialize SSR stack traces for security reasons
-                error.stack = "";
-                serialized[key] = error;
-            }
-        } else serialized[key] = val;
-    }
-    return serialized;
-}
-const ViewTransitionContext = /*#__PURE__*/ _react.createContext({
-    isTransitioning: false
-});
-ViewTransitionContext.displayName = "ViewTransition";
-const FetchersContext = /*#__PURE__*/ _react.createContext(new Map());
-FetchersContext.displayName = "Fetchers";
-//#endregion
-////////////////////////////////////////////////////////////////////////////////
-//#region Components
-////////////////////////////////////////////////////////////////////////////////
-/**
-  Webpack + React 17 fails to compile on any of the following because webpack
-  complains that `startTransition` doesn't exist in `React`:
-  * import { startTransition } from "react"
-  * import * as React from from "react";
-    "startTransition" in React ? React.startTransition(() => setState()) : setState()
-  * import * as React from from "react";
-    "startTransition" in React ? React["startTransition"](() => setState()) : setState()
+};
 
-  Moving it to a constant such as the following solves the Webpack/React 17 issue:
-  * import * as React from from "react";
-    const START_TRANSITION = "startTransition";
-    START_TRANSITION in React ? React[START_TRANSITION](() => setState()) : setState()
-
-  However, that introduces webpack/terser minification issues in production builds
-  in React 18 where minification/obfuscation ends up removing the call of
-  React.startTransition entirely from the first half of the ternary.  Grabbing
-  this exported reference once up front resolves that issue.
-
-  See https://github.com/remix-run/react-router/issues/10579
-*/ const START_TRANSITION = "startTransition";
-const startTransitionImpl = _react[START_TRANSITION];
-const FLUSH_SYNC = "flushSync";
-const flushSyncImpl = _reactDom[FLUSH_SYNC];
-const USE_ID = "useId";
-const useIdImpl = _react[USE_ID];
-function startTransitionSafe(cb) {
-    if (startTransitionImpl) startTransitionImpl(cb);
-    else cb();
-}
-function flushSyncSafe(cb) {
-    if (flushSyncImpl) flushSyncImpl(cb);
-    else cb();
-}
-class Deferred {
-    constructor(){
-        this.status = "pending";
-        this.promise = new Promise((resolve, reject)=>{
-            this.resolve = (value)=>{
-                if (this.status === "pending") {
-                    this.status = "resolved";
-                    resolve(value);
-                }
-            };
-            this.reject = (reason)=>{
-                if (this.status === "pending") {
-                    this.status = "rejected";
-                    reject(reason);
-                }
-            };
-        });
-    }
-}
-/**
- * Given a Remix Router instance, render the appropriate UI
- */ function RouterProvider(_ref) {
-    let { fallbackElement, router, future } = _ref;
-    let [state, setStateImpl] = _react.useState(router.state);
-    let [pendingState, setPendingState] = _react.useState();
-    let [vtContext, setVtContext] = _react.useState({
-        isTransitioning: false
-    });
-    let [renderDfd, setRenderDfd] = _react.useState();
-    let [transition, setTransition] = _react.useState();
-    let [interruption, setInterruption] = _react.useState();
-    let fetcherData = _react.useRef(new Map());
-    let { v7_startTransition } = future || {};
-    let optInStartTransition = _react.useCallback((cb)=>{
-        if (v7_startTransition) startTransitionSafe(cb);
-        else cb();
-    }, [
-        v7_startTransition
-    ]);
-    let setState = _react.useCallback((newState, _ref2)=>{
-        let { deletedFetchers, unstable_flushSync: flushSync, unstable_viewTransitionOpts: viewTransitionOpts } = _ref2;
-        deletedFetchers.forEach((key)=>fetcherData.current.delete(key));
-        newState.fetchers.forEach((fetcher, key)=>{
-            if (fetcher.data !== undefined) fetcherData.current.set(key, fetcher.data);
-        });
-        let isViewTransitionUnavailable = router.window == null || router.window.document == null || typeof router.window.document.startViewTransition !== "function";
-        // If this isn't a view transition or it's not available in this browser,
-        // just update and be done with it
-        if (!viewTransitionOpts || isViewTransitionUnavailable) {
-            if (flushSync) flushSyncSafe(()=>setStateImpl(newState));
-            else optInStartTransition(()=>setStateImpl(newState));
-            return;
-        }
-        // flushSync + startViewTransition
-        if (flushSync) {
-            // Flush through the context to mark DOM elements as transition=ing
-            flushSyncSafe(()=>{
-                // Cancel any pending transitions
-                if (transition) {
-                    renderDfd && renderDfd.resolve();
-                    transition.skipTransition();
-                }
-                setVtContext({
-                    isTransitioning: true,
-                    flushSync: true,
-                    currentLocation: viewTransitionOpts.currentLocation,
-                    nextLocation: viewTransitionOpts.nextLocation
-                });
-            });
-            // Update the DOM
-            let t = router.window.document.startViewTransition(()=>{
-                flushSyncSafe(()=>setStateImpl(newState));
-            });
-            // Clean up after the animation completes
-            t.finished.finally(()=>{
-                flushSyncSafe(()=>{
-                    setRenderDfd(undefined);
-                    setTransition(undefined);
-                    setPendingState(undefined);
-                    setVtContext({
-                        isTransitioning: false
-                    });
-                });
-            });
-            flushSyncSafe(()=>setTransition(t));
-            return;
-        }
-        // startTransition + startViewTransition
-        if (transition) {
-            // Interrupting an in-progress transition, cancel and let everything flush
-            // out, and then kick off a new transition from the interruption state
-            renderDfd && renderDfd.resolve();
-            transition.skipTransition();
-            setInterruption({
-                state: newState,
-                currentLocation: viewTransitionOpts.currentLocation,
-                nextLocation: viewTransitionOpts.nextLocation
-            });
-        } else {
-            // Completed navigation update with opted-in view transitions, let 'er rip
-            setPendingState(newState);
-            setVtContext({
-                isTransitioning: true,
-                flushSync: false,
-                currentLocation: viewTransitionOpts.currentLocation,
-                nextLocation: viewTransitionOpts.nextLocation
-            });
-        }
-    }, [
-        router.window,
-        transition,
-        renderDfd,
-        fetcherData,
-        optInStartTransition
-    ]);
-    // Need to use a layout effect here so we are subscribed early enough to
-    // pick up on any render-driven redirects/navigations (useEffect/<Navigate>)
-    _react.useLayoutEffect(()=>router.subscribe(setState), [
-        router,
-        setState
-    ]);
-    // When we start a view transition, create a Deferred we can use for the
-    // eventual "completed" render
-    _react.useEffect(()=>{
-        if (vtContext.isTransitioning && !vtContext.flushSync) setRenderDfd(new Deferred());
-    }, [
-        vtContext
-    ]);
-    // Once the deferred is created, kick off startViewTransition() to update the
-    // DOM and then wait on the Deferred to resolve (indicating the DOM update has
-    // happened)
-    _react.useEffect(()=>{
-        if (renderDfd && pendingState && router.window) {
-            let newState = pendingState;
-            let renderPromise = renderDfd.promise;
-            let transition = router.window.document.startViewTransition(async ()=>{
-                optInStartTransition(()=>setStateImpl(newState));
-                await renderPromise;
-            });
-            transition.finished.finally(()=>{
-                setRenderDfd(undefined);
-                setTransition(undefined);
-                setPendingState(undefined);
-                setVtContext({
-                    isTransitioning: false
-                });
-            });
-            setTransition(transition);
-        }
-    }, [
-        optInStartTransition,
-        pendingState,
-        renderDfd,
-        router.window
-    ]);
-    // When the new location finally renders and is committed to the DOM, this
-    // effect will run to resolve the transition
-    _react.useEffect(()=>{
-        if (renderDfd && pendingState && state.location.key === pendingState.location.key) renderDfd.resolve();
-    }, [
-        renderDfd,
-        transition,
-        state.location,
-        pendingState
-    ]);
-    // If we get interrupted with a new navigation during a transition, we skip
-    // the active transition, let it cleanup, then kick it off again here
-    _react.useEffect(()=>{
-        if (!vtContext.isTransitioning && interruption) {
-            setPendingState(interruption.state);
-            setVtContext({
-                isTransitioning: true,
-                flushSync: false,
-                currentLocation: interruption.currentLocation,
-                nextLocation: interruption.nextLocation
-            });
-            setInterruption(undefined);
-        }
-    }, [
-        vtContext.isTransitioning,
-        interruption
-    ]);
-    _react.useEffect(()=>{
-        (0, _router.UNSAFE_warning)(fallbackElement == null || !router.future.v7_partialHydration, "`<RouterProvider fallbackElement>` is deprecated when using `v7_partialHydration`, use a `HydrateFallback` component instead");
-    // Only log this once on initial mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-    let navigator = _react.useMemo(()=>{
-        return {
-            createHref: router.createHref,
-            encodeLocation: router.encodeLocation,
-            go: (n)=>router.navigate(n),
-            push: (to, state, opts)=>router.navigate(to, {
-                    state,
-                    preventScrollReset: opts == null ? void 0 : opts.preventScrollReset
-                }),
-            replace: (to, state, opts)=>router.navigate(to, {
-                    replace: true,
-                    state,
-                    preventScrollReset: opts == null ? void 0 : opts.preventScrollReset
-                })
-        };
-    }, [
-        router
-    ]);
-    let basename = router.basename || "/";
-    let dataRouterContext = _react.useMemo(()=>({
-            router,
-            navigator,
-            static: false,
-            basename
-        }), [
-        router,
-        navigator,
-        basename
-    ]);
-    // The fragment and {null} here are important!  We need them to keep React 18's
-    // useId happy when we are server-rendering since we may have a <script> here
-    // containing the hydrated server-side staticContext (from StaticRouterProvider).
-    // useId relies on the component tree structure to generate deterministic id's
-    // so we need to ensure it remains the same on the client even though
-    // we don't need the <script> tag
-    return /*#__PURE__*/ _react.createElement(_react.Fragment, null, /*#__PURE__*/ _react.createElement((0, _reactRouter.UNSAFE_DataRouterContext).Provider, {
-        value: dataRouterContext
-    }, /*#__PURE__*/ _react.createElement((0, _reactRouter.UNSAFE_DataRouterStateContext).Provider, {
-        value: state
-    }, /*#__PURE__*/ _react.createElement(FetchersContext.Provider, {
-        value: fetcherData.current
-    }, /*#__PURE__*/ _react.createElement(ViewTransitionContext.Provider, {
-        value: vtContext
-    }, /*#__PURE__*/ _react.createElement((0, _reactRouter.Router), {
-        basename: basename,
-        location: state.location,
-        navigationType: state.historyAction,
-        navigator: navigator,
-        future: {
-            v7_relativeSplatPath: router.future.v7_relativeSplatPath
-        }
-    }, state.initialized || router.future.v7_partialHydration ? /*#__PURE__*/ _react.createElement(DataRoutes, {
-        routes: router.routes,
-        future: router.future,
-        state: state
-    }) : fallbackElement))))), null);
-}
-function DataRoutes(_ref3) {
-    let { routes, future, state } = _ref3;
-    return (0, _reactRouter.UNSAFE_useRoutesImpl)(routes, undefined, state, future);
-}
-/**
- * A `<Router>` for use in web browsers. Provides the cleanest URLs.
- */ function BrowserRouter(_ref4) {
-    let { basename, children, future, window: window1 } = _ref4;
-    let historyRef = _react.useRef();
-    if (historyRef.current == null) historyRef.current = (0, _router.createBrowserHistory)({
-        window: window1,
-        v5Compat: true
-    });
-    let history = historyRef.current;
-    let [state, setStateImpl] = _react.useState({
-        action: history.action,
-        location: history.location
-    });
-    let { v7_startTransition } = future || {};
-    let setState = _react.useCallback((newState)=>{
-        v7_startTransition && startTransitionImpl ? startTransitionImpl(()=>setStateImpl(newState)) : setStateImpl(newState);
-    }, [
-        setStateImpl,
-        v7_startTransition
-    ]);
-    _react.useLayoutEffect(()=>history.listen(setState), [
-        history,
-        setState
-    ]);
-    return /*#__PURE__*/ _react.createElement((0, _reactRouter.Router), {
-        basename: basename,
-        children: children,
-        location: state.location,
-        navigationType: state.action,
-        navigator: history,
-        future: future
-    });
-}
-/**
- * A `<Router>` for use in web browsers. Stores the location in the hash
- * portion of the URL so it is not sent to the server.
- */ function HashRouter(_ref5) {
-    let { basename, children, future, window: window1 } = _ref5;
-    let historyRef = _react.useRef();
-    if (historyRef.current == null) historyRef.current = (0, _router.createHashHistory)({
-        window: window1,
-        v5Compat: true
-    });
-    let history = historyRef.current;
-    let [state, setStateImpl] = _react.useState({
-        action: history.action,
-        location: history.location
-    });
-    let { v7_startTransition } = future || {};
-    let setState = _react.useCallback((newState)=>{
-        v7_startTransition && startTransitionImpl ? startTransitionImpl(()=>setStateImpl(newState)) : setStateImpl(newState);
-    }, [
-        setStateImpl,
-        v7_startTransition
-    ]);
-    _react.useLayoutEffect(()=>history.listen(setState), [
-        history,
-        setState
-    ]);
-    return /*#__PURE__*/ _react.createElement((0, _reactRouter.Router), {
-        basename: basename,
-        children: children,
-        location: state.location,
-        navigationType: state.action,
-        navigator: history,
-        future: future
-    });
-}
-/**
- * A `<Router>` that accepts a pre-instantiated history object. It's important
- * to note that using your own history object is highly discouraged and may add
- * two versions of the history library to your bundles unless you use the same
- * version of the history library that React Router uses internally.
- */ function HistoryRouter(_ref6) {
-    let { basename, children, future, history } = _ref6;
-    let [state, setStateImpl] = _react.useState({
-        action: history.action,
-        location: history.location
-    });
-    let { v7_startTransition } = future || {};
-    let setState = _react.useCallback((newState)=>{
-        v7_startTransition && startTransitionImpl ? startTransitionImpl(()=>setStateImpl(newState)) : setStateImpl(newState);
-    }, [
-        setStateImpl,
-        v7_startTransition
-    ]);
-    _react.useLayoutEffect(()=>history.listen(setState), [
-        history,
-        setState
-    ]);
-    return /*#__PURE__*/ _react.createElement((0, _reactRouter.Router), {
-        basename: basename,
-        children: children,
-        location: state.location,
-        navigationType: state.action,
-        navigator: history,
-        future: future
-    });
-}
-HistoryRouter.displayName = "unstable_HistoryRouter";
-const isBrowser = typeof window !== "undefined" && typeof window.document !== "undefined" && typeof window.document.createElement !== "undefined";
-const ABSOLUTE_URL_REGEX = /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i;
-/**
- * The public API for rendering a history-aware `<a>`.
- */ const Link = /*#__PURE__*/ _react.forwardRef(function LinkWithRef(_ref7, ref) {
-    let { onClick, relative, reloadDocument, replace, state, target, to, preventScrollReset, unstable_viewTransition } = _ref7, rest = _objectWithoutPropertiesLoose(_ref7, _excluded);
-    let { basename } = _react.useContext((0, _reactRouter.UNSAFE_NavigationContext));
-    // Rendered into <a href> for absolute URLs
-    let absoluteHref;
-    let isExternal = false;
-    if (typeof to === "string" && ABSOLUTE_URL_REGEX.test(to)) {
-        // Render the absolute href server- and client-side
-        absoluteHref = to;
-        // Only check for external origins client-side
-        if (isBrowser) try {
-            let currentUrl = new URL(window.location.href);
-            let targetUrl = to.startsWith("//") ? new URL(currentUrl.protocol + to) : new URL(to);
-            let path = (0, _router.stripBasename)(targetUrl.pathname, basename);
-            if (targetUrl.origin === currentUrl.origin && path != null) // Strip the protocol/origin/basename for same-origin absolute URLs
-            to = path + targetUrl.search + targetUrl.hash;
-            else isExternal = true;
-        } catch (e) {
-            // We can't do external URL detection without a valid URL
-            (0, _router.UNSAFE_warning)(false, '<Link to="' + to + '"> contains an invalid URL which will probably break ' + "when clicked - please update to a valid URL path.");
-        }
-    }
-    // Rendered into <a href> for relative URLs
-    let href = (0, _reactRouter.useHref)(to, {
-        relative
-    });
-    let internalOnClick = useLinkClickHandler(to, {
-        replace,
-        state,
-        target,
-        preventScrollReset,
-        relative,
-        unstable_viewTransition
-    });
-    function handleClick(event) {
-        if (onClick) onClick(event);
-        if (!event.defaultPrevented) internalOnClick(event);
-    }
-    return(/*#__PURE__*/ // eslint-disable-next-line jsx-a11y/anchor-has-content
-    _react.createElement("a", _extends({}, rest, {
-        href: absoluteHref || href,
-        onClick: isExternal || reloadDocument ? onClick : handleClick,
-        ref: ref,
-        target: target
-    })));
-});
-Link.displayName = "Link";
-/**
- * A `<Link>` wrapper that knows if it's "active" or not.
- */ const NavLink = /*#__PURE__*/ _react.forwardRef(function NavLinkWithRef(_ref8, ref) {
-    let { "aria-current": ariaCurrentProp = "page", caseSensitive = false, className: classNameProp = "", end = false, style: styleProp, to, unstable_viewTransition, children } = _ref8, rest = _objectWithoutPropertiesLoose(_ref8, _excluded2);
-    let path = (0, _reactRouter.useResolvedPath)(to, {
-        relative: rest.relative
-    });
-    let location = (0, _reactRouter.useLocation)();
-    let routerState = _react.useContext((0, _reactRouter.UNSAFE_DataRouterStateContext));
-    let { navigator, basename } = _react.useContext((0, _reactRouter.UNSAFE_NavigationContext));
-    let isTransitioning = routerState != null && // Conditional usage is OK here because the usage of a data router is static
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useViewTransitionState(path) && unstable_viewTransition === true;
-    let toPathname = navigator.encodeLocation ? navigator.encodeLocation(path).pathname : path.pathname;
-    let locationPathname = location.pathname;
-    let nextLocationPathname = routerState && routerState.navigation && routerState.navigation.location ? routerState.navigation.location.pathname : null;
-    if (!caseSensitive) {
-        locationPathname = locationPathname.toLowerCase();
-        nextLocationPathname = nextLocationPathname ? nextLocationPathname.toLowerCase() : null;
-        toPathname = toPathname.toLowerCase();
-    }
-    if (nextLocationPathname && basename) nextLocationPathname = (0, _router.stripBasename)(nextLocationPathname, basename) || nextLocationPathname;
-    // If the `to` has a trailing slash, look at that exact spot.  Otherwise,
-    // we're looking for a slash _after_ what's in `to`.  For example:
-    //
-    // <NavLink to="/users"> and <NavLink to="/users/">
-    // both want to look for a / at index 6 to match URL `/users/matt`
-    const endSlashPosition = toPathname !== "/" && toPathname.endsWith("/") ? toPathname.length - 1 : toPathname.length;
-    let isActive = locationPathname === toPathname || !end && locationPathname.startsWith(toPathname) && locationPathname.charAt(endSlashPosition) === "/";
-    let isPending = nextLocationPathname != null && (nextLocationPathname === toPathname || !end && nextLocationPathname.startsWith(toPathname) && nextLocationPathname.charAt(toPathname.length) === "/");
-    let renderProps = {
-        isActive,
-        isPending,
-        isTransitioning
-    };
-    let ariaCurrent = isActive ? ariaCurrentProp : undefined;
-    let className;
-    if (typeof classNameProp === "function") className = classNameProp(renderProps);
-    else // If the className prop is not a function, we use a default `active`
-    // class for <NavLink />s that are active. In v5 `active` was the default
-    // value for `activeClassName`, but we are removing that API and can still
-    // use the old default behavior for a cleaner upgrade path and keep the
-    // simple styling rules working as they currently do.
-    className = [
-        classNameProp,
-        isActive ? "active" : null,
-        isPending ? "pending" : null,
-        isTransitioning ? "transitioning" : null
-    ].filter(Boolean).join(" ");
-    let style = typeof styleProp === "function" ? styleProp(renderProps) : styleProp;
-    return /*#__PURE__*/ _react.createElement(Link, _extends({}, rest, {
-        "aria-current": ariaCurrent,
-        className: className,
-        ref: ref,
-        style: style,
-        to: to,
-        unstable_viewTransition: unstable_viewTransition
-    }), typeof children === "function" ? children(renderProps) : children);
-});
-NavLink.displayName = "NavLink";
-/**
- * A `@remix-run/router`-aware `<form>`. It behaves like a normal form except
- * that the interaction with the server is with `fetch` instead of new document
- * requests, allowing components to add nicer UX to the page as the form is
- * submitted and returns with data.
- */ const Form = /*#__PURE__*/ _react.forwardRef((_ref9, forwardedRef)=>{
-    let { fetcherKey, navigate, reloadDocument, replace, state, method = defaultMethod, action, onSubmit, relative, preventScrollReset, unstable_viewTransition } = _ref9, props = _objectWithoutPropertiesLoose(_ref9, _excluded3);
-    let submit = useSubmit();
-    let formAction = useFormAction(action, {
-        relative
-    });
-    let formMethod = method.toLowerCase() === "get" ? "get" : "post";
-    let submitHandler = (event)=>{
-        onSubmit && onSubmit(event);
-        if (event.defaultPrevented) return;
-        event.preventDefault();
-        let submitter = event.nativeEvent.submitter;
-        let submitMethod = (submitter == null ? void 0 : submitter.getAttribute("formmethod")) || method;
-        submit(submitter || event.currentTarget, {
-            fetcherKey,
-            method: submitMethod,
-            navigate,
-            replace,
-            state,
-            relative,
-            preventScrollReset,
-            unstable_viewTransition
-        });
-    };
-    return /*#__PURE__*/ _react.createElement("form", _extends({
-        ref: forwardedRef,
-        method: formMethod,
-        action: formAction,
-        onSubmit: reloadDocument ? onSubmit : submitHandler
-    }, props));
-});
-Form.displayName = "Form";
-/**
- * This component will emulate the browser's scroll restoration on location
- * changes.
- */ function ScrollRestoration(_ref10) {
-    let { getKey, storageKey } = _ref10;
-    useScrollRestoration({
-        getKey,
-        storageKey
-    });
-    return null;
-}
-ScrollRestoration.displayName = "ScrollRestoration";
-//#endregion
-////////////////////////////////////////////////////////////////////////////////
-//#region Hooks
-////////////////////////////////////////////////////////////////////////////////
-var DataRouterHook;
-(function(DataRouterHook) {
-    DataRouterHook["UseScrollRestoration"] = "useScrollRestoration";
-    DataRouterHook["UseSubmit"] = "useSubmit";
-    DataRouterHook["UseSubmitFetcher"] = "useSubmitFetcher";
-    DataRouterHook["UseFetcher"] = "useFetcher";
-    DataRouterHook["useViewTransitionState"] = "useViewTransitionState";
-})(DataRouterHook || (DataRouterHook = {}));
-var DataRouterStateHook;
-(function(DataRouterStateHook) {
-    DataRouterStateHook["UseFetcher"] = "useFetcher";
-    DataRouterStateHook["UseFetchers"] = "useFetchers";
-    DataRouterStateHook["UseScrollRestoration"] = "useScrollRestoration";
-})(DataRouterStateHook || (DataRouterStateHook = {}));
-// Internal hooks
-function getDataRouterConsoleError(hookName) {
-    return hookName + " must be used within a data router.  See https://reactrouter.com/routers/picking-a-router.";
-}
-function useDataRouterContext(hookName) {
-    let ctx = _react.useContext((0, _reactRouter.UNSAFE_DataRouterContext));
-    !ctx && (0, _router.UNSAFE_invariant)(false, getDataRouterConsoleError(hookName));
-    return ctx;
-}
-function useDataRouterState(hookName) {
-    let state = _react.useContext((0, _reactRouter.UNSAFE_DataRouterStateContext));
-    !state && (0, _router.UNSAFE_invariant)(false, getDataRouterConsoleError(hookName));
-    return state;
-}
-// External hooks
-/**
- * Handles the click behavior for router `<Link>` components. This is useful if
- * you need to create custom `<Link>` components with the same click behavior we
- * use in our exported `<Link>`.
- */ function useLinkClickHandler(to, _temp) {
-    let { target, replace: replaceProp, state, preventScrollReset, relative, unstable_viewTransition } = _temp === void 0 ? {} : _temp;
-    let navigate = (0, _reactRouter.useNavigate)();
-    let location = (0, _reactRouter.useLocation)();
-    let path = (0, _reactRouter.useResolvedPath)(to, {
-        relative
-    });
-    return _react.useCallback((event)=>{
-        if (shouldProcessLinkClick(event, target)) {
-            event.preventDefault();
-            // If the URL hasn't changed, a regular <a> will do a replace instead of
-            // a push, so do the same here unless the replace prop is explicitly set
-            let replace = replaceProp !== undefined ? replaceProp : (0, _reactRouter.createPath)(location) === (0, _reactRouter.createPath)(path);
-            navigate(to, {
-                replace,
-                state,
-                preventScrollReset,
-                relative,
-                unstable_viewTransition
-            });
-        }
-    }, [
-        location,
-        navigate,
-        path,
-        replaceProp,
-        state,
-        target,
-        to,
-        preventScrollReset,
-        relative,
-        unstable_viewTransition
-    ]);
-}
-/**
- * A convenient wrapper for reading and writing search parameters via the
- * URLSearchParams interface.
- */ function useSearchParams(defaultInit) {
-    (0, _router.UNSAFE_warning)(typeof URLSearchParams !== "undefined", "You cannot use the `useSearchParams` hook in a browser that does not support the URLSearchParams API. If you need to support Internet Explorer 11, we recommend you load a polyfill such as https://github.com/ungap/url-search-params.");
-    let defaultSearchParamsRef = _react.useRef(createSearchParams(defaultInit));
-    let hasSetSearchParamsRef = _react.useRef(false);
-    let location = (0, _reactRouter.useLocation)();
-    let searchParams = _react.useMemo(()=>// Only merge in the defaults if we haven't yet called setSearchParams.
-        // Once we call that we want those to take precedence, otherwise you can't
-        // remove a param with setSearchParams({}) if it has an initial value
-        getSearchParamsForLocation(location.search, hasSetSearchParamsRef.current ? null : defaultSearchParamsRef.current), [
-        location.search
-    ]);
-    let navigate = (0, _reactRouter.useNavigate)();
-    let setSearchParams = _react.useCallback((nextInit, navigateOptions)=>{
-        const newSearchParams = createSearchParams(typeof nextInit === "function" ? nextInit(searchParams) : nextInit);
-        hasSetSearchParamsRef.current = true;
-        navigate("?" + newSearchParams, navigateOptions);
-    }, [
-        navigate,
-        searchParams
-    ]);
-    return [
-        searchParams,
-        setSearchParams
-    ];
-}
-function validateClientSideSubmission() {
-    if (typeof document === "undefined") throw new Error("You are calling submit during the server render. Try calling submit within a `useEffect` or callback instead.");
-}
-let fetcherId = 0;
-let getUniqueFetcherId = ()=>"__" + String(++fetcherId) + "__";
-/**
- * Returns a function that may be used to programmatically submit a form (or
- * some arbitrary data) to the server.
- */ function useSubmit() {
-    let { router } = useDataRouterContext(DataRouterHook.UseSubmit);
-    let { basename } = _react.useContext((0, _reactRouter.UNSAFE_NavigationContext));
-    let currentRouteId = (0, _reactRouter.UNSAFE_useRouteId)();
-    return _react.useCallback(function(target, options) {
-        if (options === void 0) options = {};
-        validateClientSideSubmission();
-        let { action, method, encType, formData, body } = getFormSubmissionInfo(target, basename);
-        if (options.navigate === false) {
-            let key = options.fetcherKey || getUniqueFetcherId();
-            router.fetch(key, currentRouteId, options.action || action, {
-                preventScrollReset: options.preventScrollReset,
-                formData,
-                body,
-                formMethod: options.method || method,
-                formEncType: options.encType || encType,
-                unstable_flushSync: options.unstable_flushSync
-            });
-        } else router.navigate(options.action || action, {
-            preventScrollReset: options.preventScrollReset,
-            formData,
-            body,
-            formMethod: options.method || method,
-            formEncType: options.encType || encType,
-            replace: options.replace,
-            state: options.state,
-            fromRouteId: currentRouteId,
-            unstable_flushSync: options.unstable_flushSync,
-            unstable_viewTransition: options.unstable_viewTransition
-        });
-    }, [
-        router,
-        basename,
-        currentRouteId
-    ]);
-}
-// v7: Eventually we should deprecate this entirely in favor of using the
-// router method directly?
-function useFormAction(action, _temp2) {
-    let { relative } = _temp2 === void 0 ? {} : _temp2;
-    let { basename } = _react.useContext((0, _reactRouter.UNSAFE_NavigationContext));
-    let routeContext = _react.useContext((0, _reactRouter.UNSAFE_RouteContext));
-    !routeContext && (0, _router.UNSAFE_invariant)(false, "useFormAction must be used inside a RouteContext");
-    let [match] = routeContext.matches.slice(-1);
-    // Shallow clone path so we can modify it below, otherwise we modify the
-    // object referenced by useMemo inside useResolvedPath
-    let path = _extends({}, (0, _reactRouter.useResolvedPath)(action ? action : ".", {
-        relative
-    }));
-    // If no action was specified, browsers will persist current search params
-    // when determining the path, so match that behavior
-    // https://github.com/remix-run/remix/issues/927
-    let location = (0, _reactRouter.useLocation)();
-    if (action == null) {
-        // Safe to write to this directly here since if action was undefined, we
-        // would have called useResolvedPath(".") which will never include a search
-        path.search = location.search;
-        // When grabbing search params from the URL, remove any included ?index param
-        // since it might not apply to our contextual route.  We add it back based
-        // on match.route.index below
-        let params = new URLSearchParams(path.search);
-        if (params.has("index") && params.get("index") === "") {
-            params.delete("index");
-            path.search = params.toString() ? "?" + params.toString() : "";
-        }
-    }
-    if ((!action || action === ".") && match.route.index) path.search = path.search ? path.search.replace(/^\?/, "?index&") : "?index";
-    // If we're operating within a basename, prepend it to the pathname prior
-    // to creating the form action.  If this is a root navigation, then just use
-    // the raw basename which allows the basename to have full control over the
-    // presence of a trailing slash on root actions
-    if (basename !== "/") path.pathname = path.pathname === "/" ? basename : (0, _router.joinPaths)([
-        basename,
-        path.pathname
-    ]);
-    return (0, _reactRouter.createPath)(path);
-}
-// TODO: (v7) Change the useFetcher generic default from `any` to `unknown`
-/**
- * Interacts with route loaders and actions without causing a navigation. Great
- * for any interaction that stays on the same page.
- */ function useFetcher(_temp3) {
-    var _route$matches;
-    let { key } = _temp3 === void 0 ? {} : _temp3;
-    let { router } = useDataRouterContext(DataRouterHook.UseFetcher);
-    let state = useDataRouterState(DataRouterStateHook.UseFetcher);
-    let fetcherData = _react.useContext(FetchersContext);
-    let route = _react.useContext((0, _reactRouter.UNSAFE_RouteContext));
-    let routeId = (_route$matches = route.matches[route.matches.length - 1]) == null ? void 0 : _route$matches.route.id;
-    !fetcherData && (0, _router.UNSAFE_invariant)(false, "useFetcher must be used inside a FetchersContext");
-    !route && (0, _router.UNSAFE_invariant)(false, "useFetcher must be used inside a RouteContext");
-    !(routeId != null) && (0, _router.UNSAFE_invariant)(false, 'useFetcher can only be used on routes that contain a unique "id"');
-    // Fetcher key handling
-    // OK to call conditionally to feature detect `useId`
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    let defaultKey = useIdImpl ? useIdImpl() : "";
-    let [fetcherKey, setFetcherKey] = _react.useState(key || defaultKey);
-    if (key && key !== fetcherKey) setFetcherKey(key);
-    else if (!fetcherKey) // We will only fall through here when `useId` is not available
-    setFetcherKey(getUniqueFetcherId());
-    // Registration/cleanup
-    _react.useEffect(()=>{
-        router.getFetcher(fetcherKey);
-        return ()=>{
-            // Tell the router we've unmounted - if v7_fetcherPersist is enabled this
-            // will not delete immediately but instead queue up a delete after the
-            // fetcher returns to an `idle` state
-            router.deleteFetcher(fetcherKey);
-        };
-    }, [
-        router,
-        fetcherKey
-    ]);
-    // Fetcher additions
-    let load = _react.useCallback((href, opts)=>{
-        !routeId && (0, _router.UNSAFE_invariant)(false, "No routeId available for fetcher.load()");
-        router.fetch(fetcherKey, routeId, href, opts);
-    }, [
-        fetcherKey,
-        routeId,
-        router
-    ]);
-    let submitImpl = useSubmit();
-    let submit = _react.useCallback((target, opts)=>{
-        submitImpl(target, _extends({}, opts, {
-            navigate: false,
-            fetcherKey
-        }));
-    }, [
-        fetcherKey,
-        submitImpl
-    ]);
-    let FetcherForm = _react.useMemo(()=>{
-        let FetcherForm = /*#__PURE__*/ _react.forwardRef((props, ref)=>{
-            return /*#__PURE__*/ _react.createElement(Form, _extends({}, props, {
-                navigate: false,
-                fetcherKey: fetcherKey,
-                ref: ref
-            }));
-        });
-        FetcherForm.displayName = "fetcher.Form";
-        return FetcherForm;
-    }, [
-        fetcherKey
-    ]);
-    // Exposed FetcherWithComponents
-    let fetcher = state.fetchers.get(fetcherKey) || (0, _router.IDLE_FETCHER);
-    let data = fetcherData.get(fetcherKey);
-    let fetcherWithComponents = _react.useMemo(()=>_extends({
-            Form: FetcherForm,
-            submit,
-            load
-        }, fetcher, {
-            data
-        }), [
-        FetcherForm,
-        submit,
-        load,
-        fetcher,
-        data
-    ]);
-    return fetcherWithComponents;
-}
-/**
- * Provides all fetchers currently on the page. Useful for layouts and parent
- * routes that need to provide pending/optimistic UI regarding the fetch.
- */ function useFetchers() {
-    let state = useDataRouterState(DataRouterStateHook.UseFetchers);
-    return Array.from(state.fetchers.entries()).map((_ref11)=>{
-        let [key, fetcher] = _ref11;
-        return _extends({}, fetcher, {
-            key
-        });
-    });
-}
-const SCROLL_RESTORATION_STORAGE_KEY = "react-router-scroll-positions";
-let savedScrollPositions = {};
-/**
- * When rendered inside a RouterProvider, will restore scroll positions on navigations
- */ function useScrollRestoration(_temp4) {
-    let { getKey, storageKey } = _temp4 === void 0 ? {} : _temp4;
-    let { router } = useDataRouterContext(DataRouterHook.UseScrollRestoration);
-    let { restoreScrollPosition, preventScrollReset } = useDataRouterState(DataRouterStateHook.UseScrollRestoration);
-    let { basename } = _react.useContext((0, _reactRouter.UNSAFE_NavigationContext));
-    let location = (0, _reactRouter.useLocation)();
-    let matches = (0, _reactRouter.useMatches)();
-    let navigation = (0, _reactRouter.useNavigation)();
-    // Trigger manual scroll restoration while we're active
-    _react.useEffect(()=>{
-        window.history.scrollRestoration = "manual";
-        return ()=>{
-            window.history.scrollRestoration = "auto";
-        };
-    }, []);
-    // Save positions on pagehide
-    usePageHide(_react.useCallback(()=>{
-        if (navigation.state === "idle") {
-            let key = (getKey ? getKey(location, matches) : null) || location.key;
-            savedScrollPositions[key] = window.scrollY;
-        }
-        try {
-            sessionStorage.setItem(storageKey || SCROLL_RESTORATION_STORAGE_KEY, JSON.stringify(savedScrollPositions));
-        } catch (error) {
-            (0, _router.UNSAFE_warning)(false, "Failed to save scroll positions in sessionStorage, <ScrollRestoration /> will not work properly (" + error + ").");
-        }
-        window.history.scrollRestoration = "auto";
-    }, [
-        storageKey,
-        getKey,
-        navigation.state,
-        location,
-        matches
-    ]));
-    // Read in any saved scroll locations
-    if (typeof document !== "undefined") {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        _react.useLayoutEffect(()=>{
-            try {
-                let sessionPositions = sessionStorage.getItem(storageKey || SCROLL_RESTORATION_STORAGE_KEY);
-                if (sessionPositions) savedScrollPositions = JSON.parse(sessionPositions);
-            } catch (e) {
-            // no-op, use default empty object
-            }
-        }, [
-            storageKey
-        ]);
-        // Enable scroll restoration in the router
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        _react.useLayoutEffect(()=>{
-            let getKeyWithoutBasename = getKey && basename !== "/" ? (location, matches)=>getKey(_extends({}, location, {
-                    pathname: (0, _router.stripBasename)(location.pathname, basename) || location.pathname
-                }), matches) : getKey;
-            let disableScrollRestoration = router == null ? void 0 : router.enableScrollRestoration(savedScrollPositions, ()=>window.scrollY, getKeyWithoutBasename);
-            return ()=>disableScrollRestoration && disableScrollRestoration();
-        }, [
-            router,
-            basename,
-            getKey
-        ]);
-        // Restore scrolling when state.restoreScrollPosition changes
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        _react.useLayoutEffect(()=>{
-            // Explicit false means don't do anything (used for submissions)
-            if (restoreScrollPosition === false) return;
-            // been here before, scroll to it
-            if (typeof restoreScrollPosition === "number") {
-                window.scrollTo(0, restoreScrollPosition);
-                return;
-            }
-            // try to scroll to the hash
-            if (location.hash) {
-                let el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
-                if (el) {
-                    el.scrollIntoView();
-                    return;
-                }
-            }
-            // Don't reset if this navigation opted out
-            if (preventScrollReset === true) return;
-            // otherwise go to the top on new locations
-            window.scrollTo(0, 0);
-        }, [
-            location,
-            restoreScrollPosition,
-            preventScrollReset
-        ]);
-    }
-}
-/**
- * Setup a callback to be fired on the window's `beforeunload` event. This is
- * useful for saving some data to `window.localStorage` just before the page
- * refreshes.
- *
- * Note: The `callback` argument should be a function created with
- * `React.useCallback()`.
- */ function useBeforeUnload(callback, options) {
-    let { capture } = options || {};
-    _react.useEffect(()=>{
-        let opts = capture != null ? {
-            capture
-        } : undefined;
-        window.addEventListener("beforeunload", callback, opts);
-        return ()=>{
-            window.removeEventListener("beforeunload", callback, opts);
-        };
-    }, [
-        callback,
-        capture
-    ]);
-}
-/**
- * Setup a callback to be fired on the window's `pagehide` event. This is
- * useful for saving some data to `window.localStorage` just before the page
- * refreshes.  This event is better supported than beforeunload across browsers.
- *
- * Note: The `callback` argument should be a function created with
- * `React.useCallback()`.
- */ function usePageHide(callback, options) {
-    let { capture } = options || {};
-    _react.useEffect(()=>{
-        let opts = capture != null ? {
-            capture
-        } : undefined;
-        window.addEventListener("pagehide", callback, opts);
-        return ()=>{
-            window.removeEventListener("pagehide", callback, opts);
-        };
-    }, [
-        callback,
-        capture
-    ]);
-}
-/**
- * Wrapper around useBlocker to show a window.confirm prompt to users instead
- * of building a custom UI with useBlocker.
- *
- * Warning: This has *a lot of rough edges* and behaves very differently (and
- * very incorrectly in some cases) across browsers if user click addition
- * back/forward navigations while the confirm is open.  Use at your own risk.
- */ function usePrompt(_ref12) {
-    let { when, message } = _ref12;
-    let blocker = (0, _reactRouter.useBlocker)(when);
-    _react.useEffect(()=>{
-        if (blocker.state === "blocked") {
-            let proceed = window.confirm(message);
-            if (proceed) // This timeout is needed to avoid a weird "race" on POP navigations
-            // between the `window.history` revert navigation and the result of
-            // `window.confirm`
-            setTimeout(blocker.proceed, 0);
-            else blocker.reset();
-        }
-    }, [
-        blocker,
-        message
-    ]);
-    _react.useEffect(()=>{
-        if (blocker.state === "blocked" && !when) blocker.reset();
-    }, [
-        blocker,
-        when
-    ]);
-}
-/**
- * Return a boolean indicating if there is an active view transition to the
- * given href.  You can use this value to render CSS classes or viewTransitionName
- * styles onto your elements
- *
- * @param href The destination href
- * @param [opts.relative] Relative routing type ("route" | "path")
- */ function useViewTransitionState(to, opts) {
-    if (opts === void 0) opts = {};
-    let vtContext = _react.useContext(ViewTransitionContext);
-    !(vtContext != null) && (0, _router.UNSAFE_invariant)(false, "`unstable_useViewTransitionState` must be used within `react-router-dom`'s `RouterProvider`.  Did you accidentally import `RouterProvider` from `react-router`?");
-    let { basename } = useDataRouterContext(DataRouterHook.useViewTransitionState);
-    let path = (0, _reactRouter.useResolvedPath)(to, {
-        relative: opts.relative
-    });
-    if (!vtContext.isTransitioning) return false;
-    let currentPath = (0, _router.stripBasename)(vtContext.currentLocation.pathname, basename) || vtContext.currentLocation.pathname;
-    let nextPath = (0, _router.stripBasename)(vtContext.nextLocation.pathname, basename) || vtContext.nextLocation.pathname;
-    // Transition is active if we're going to or coming from the indicated
-    // destination.  This ensures that other PUSH navigations that reverse
-    // an indicated transition apply.  I.e., on the list view you have:
-    //
-    //   <NavLink to="/details/1" unstable_viewTransition>
-    //
-    // If you click the breadcrumb back to the list view:
-    //
-    //   <NavLink to="/list" unstable_viewTransition>
-    //
-    // We should apply the transition because it's indicated as active going
-    // from /list -> /details/1 and therefore should be active on the reverse
-    // (even though this isn't strictly a POP reverse)
-    return (0, _router.matchPath)(path.pathname, nextPath) != null || (0, _router.matchPath)(path.pathname, currentPath) != null;
-}
-
-},{"react":"21dqq","react-dom":"j6uA9","react-router":"dbWyW","@remix-run/router":"5ncDG","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3AD9A":[function(require,module,exports) {
+},{}],"3AD9A":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Accordion", ()=>(0, _accordionDefault.default));
@@ -37476,7 +34892,1369 @@ var _toggleButtonGroupDefault = parcelHelpers.interopDefault(_toggleButtonGroup)
 var _tooltip = require("./Tooltip");
 var _tooltipDefault = parcelHelpers.interopDefault(_tooltip);
 
-},{"./Accordion":false,"./AccordionContext":false,"./AccordionCollapse":false,"./AccordionButton":false,"./AccordionBody":false,"./AccordionHeader":false,"./AccordionItem":false,"./Alert":false,"./AlertHeading":false,"./AlertLink":false,"./Anchor":false,"./Badge":false,"./Breadcrumb":false,"./BreadcrumbItem":false,"./Button":"aPzUt","./ButtonGroup":false,"./ButtonToolbar":false,"./Card":"lAynp","./CardBody":false,"./CardFooter":false,"./CardGroup":false,"./CardHeader":false,"./CardImg":false,"./CardImgOverlay":false,"./CardLink":false,"./CardSubtitle":false,"./CardText":false,"./CardTitle":false,"./Carousel":false,"./CarouselCaption":false,"./CarouselItem":false,"./CloseButton":false,"./Col":"2L2I6","./Collapse":false,"./Container":"hEdsw","./Dropdown":false,"./DropdownButton":false,"./DropdownDivider":false,"./DropdownHeader":false,"./DropdownItem":false,"./DropdownItemText":false,"./DropdownMenu":false,"./DropdownToggle":false,"./Fade":false,"./Figure":false,"./FigureCaption":false,"./FigureImage":false,"./Form":"iBZ80","./FormControl":false,"./FormCheck":false,"./FormFloating":false,"./FloatingLabel":false,"./FormGroup":false,"./FormLabel":false,"./FormText":false,"./FormSelect":false,"./Image":false,"./InputGroup":false,"./ListGroup":false,"./ListGroupItem":false,"./Modal":false,"./ModalBody":false,"./ModalDialog":false,"./ModalFooter":false,"./ModalHeader":false,"./ModalTitle":false,"./Nav":"cXyL2","./Navbar":"1mHjo","./NavbarBrand":false,"./NavbarCollapse":false,"./NavbarOffcanvas":false,"./NavbarText":false,"./NavbarToggle":false,"./NavDropdown":false,"./NavItem":false,"./NavLink":false,"./Offcanvas":false,"./OffcanvasBody":false,"./OffcanvasHeader":false,"./OffcanvasTitle":false,"./OffcanvasToggling":false,"./Overlay":false,"./OverlayTrigger":false,"./PageItem":false,"./Pagination":false,"./Placeholder":false,"./PlaceholderButton":false,"./Popover":false,"./PopoverBody":false,"./PopoverHeader":false,"./ProgressBar":false,"./Ratio":false,"./Row":"cMC39","./Spinner":false,"./SplitButton":false,"./SSRProvider":false,"./Stack":false,"./Tab":false,"./TabContainer":false,"./TabContent":false,"./Table":false,"./TabPane":false,"./Tabs":false,"./ThemeProvider":false,"./Toast":false,"./ToastBody":false,"./ToastContainer":false,"./ToastHeader":false,"./ToggleButton":false,"./ToggleButtonGroup":false,"./Tooltip":false,"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1wmVl":[function(require,module,exports) {
+},{"./Accordion":false,"./AccordionContext":false,"./AccordionCollapse":false,"./AccordionButton":false,"./AccordionBody":false,"./AccordionHeader":false,"./AccordionItem":false,"./Alert":false,"./AlertHeading":false,"./AlertLink":false,"./Anchor":false,"./Badge":false,"./Breadcrumb":false,"./BreadcrumbItem":false,"./Button":"aPzUt","./ButtonGroup":false,"./ButtonToolbar":false,"./Card":"lAynp","./CardBody":false,"./CardFooter":false,"./CardGroup":false,"./CardHeader":false,"./CardImg":false,"./CardImgOverlay":false,"./CardLink":false,"./CardSubtitle":false,"./CardText":false,"./CardTitle":false,"./Carousel":false,"./CarouselCaption":false,"./CarouselItem":false,"./CloseButton":false,"./Col":"2L2I6","./Collapse":false,"./Container":"hEdsw","./Dropdown":false,"./DropdownButton":false,"./DropdownDivider":false,"./DropdownHeader":false,"./DropdownItem":false,"./DropdownItemText":false,"./DropdownMenu":false,"./DropdownToggle":false,"./Fade":false,"./Figure":false,"./FigureCaption":false,"./FigureImage":false,"./Form":"iBZ80","./FormControl":false,"./FormCheck":false,"./FormFloating":false,"./FloatingLabel":false,"./FormGroup":false,"./FormLabel":false,"./FormText":false,"./FormSelect":false,"./Image":false,"./InputGroup":false,"./ListGroup":false,"./ListGroupItem":false,"./Modal":false,"./ModalBody":false,"./ModalDialog":false,"./ModalFooter":false,"./ModalHeader":false,"./ModalTitle":false,"./Nav":"cXyL2","./Navbar":"1mHjo","./NavbarBrand":false,"./NavbarCollapse":false,"./NavbarOffcanvas":false,"./NavbarText":false,"./NavbarToggle":false,"./NavDropdown":false,"./NavItem":false,"./NavLink":false,"./Offcanvas":false,"./OffcanvasBody":false,"./OffcanvasHeader":false,"./OffcanvasTitle":false,"./OffcanvasToggling":false,"./Overlay":false,"./OverlayTrigger":false,"./PageItem":false,"./Pagination":false,"./Placeholder":false,"./PlaceholderButton":false,"./Popover":false,"./PopoverBody":false,"./PopoverHeader":false,"./ProgressBar":false,"./Ratio":false,"./Row":"cMC39","./Spinner":false,"./SplitButton":false,"./SSRProvider":false,"./Stack":false,"./Tab":false,"./TabContainer":false,"./TabContent":false,"./Table":false,"./TabPane":false,"./Tabs":false,"./ThemeProvider":false,"./Toast":false,"./ToastBody":false,"./ToastContainer":false,"./ToastHeader":false,"./ToggleButton":false,"./ToggleButtonGroup":false,"./Tooltip":false,"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"aPzUt":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _classnames = require("classnames");
+var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
+var _react = require("react");
+var _button = require("@restart/ui/Button");
+var _themeProvider = require("./ThemeProvider");
+var _jsxRuntime = require("react/jsx-runtime");
+"use client";
+const Button = /*#__PURE__*/ _react.forwardRef(({ as, bsPrefix, variant = "primary", size, active = false, disabled = false, className, ...props }, ref)=>{
+    const prefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "btn");
+    const [buttonProps, { tagName }] = (0, _button.useButtonProps)({
+        tagName: as,
+        disabled,
+        ...props
+    });
+    const Component = tagName;
+    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
+        ...buttonProps,
+        ...props,
+        ref: ref,
+        disabled: disabled,
+        className: (0, _classnamesDefault.default)(className, prefix, active && "active", variant && `${prefix}-${variant}`, size && `${prefix}-${size}`, props.href && disabled && "disabled")
+    });
+});
+Button.displayName = "Button";
+exports.default = Button;
+
+},{"classnames":"jocGM","react":"21dqq","@restart/ui/Button":"8YUbR","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jocGM":[function(require,module,exports) {
+/*!
+	Copyright (c) 2018 Jed Watson.
+	Licensed under the MIT License (MIT), see
+	http://jedwatson.github.io/classnames
+*/ /* global define */ (function() {
+    "use strict";
+    var hasOwn = {}.hasOwnProperty;
+    function classNames() {
+        var classes = "";
+        for(var i = 0; i < arguments.length; i++){
+            var arg = arguments[i];
+            if (arg) classes = appendClass(classes, parseValue(arg));
+        }
+        return classes;
+    }
+    function parseValue(arg) {
+        if (typeof arg === "string" || typeof arg === "number") return arg;
+        if (typeof arg !== "object") return "";
+        if (Array.isArray(arg)) return classNames.apply(null, arg);
+        if (arg.toString !== Object.prototype.toString && !arg.toString.toString().includes("[native code]")) return arg.toString();
+        var classes = "";
+        for(var key in arg)if (hasOwn.call(arg, key) && arg[key]) classes = appendClass(classes, key);
+        return classes;
+    }
+    function appendClass(value, newClass) {
+        if (!newClass) return value;
+        if (value) return value + " " + newClass;
+        return value + newClass;
+    }
+    if (0, module.exports) {
+        classNames.default = classNames;
+        module.exports = classNames;
+    } else if (typeof define === "function" && typeof define.amd === "object" && define.amd) // register as 'classnames', consistent with npm package name
+    define("classnames", [], function() {
+        return classNames;
+    });
+    else window.classNames = classNames;
+})();
+
+},{}],"8YUbR":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "isTrivialHref", ()=>isTrivialHref);
+parcelHelpers.export(exports, "useButtonProps", ()=>useButtonProps);
+var _react = require("react");
+var _jsxRuntime = require("react/jsx-runtime");
+const _excluded = [
+    "as",
+    "disabled"
+];
+function _objectWithoutPropertiesLoose(source, excluded) {
+    if (source == null) return {};
+    var target = {};
+    var sourceKeys = Object.keys(source);
+    var key, i;
+    for(i = 0; i < sourceKeys.length; i++){
+        key = sourceKeys[i];
+        if (excluded.indexOf(key) >= 0) continue;
+        target[key] = source[key];
+    }
+    return target;
+}
+function isTrivialHref(href) {
+    return !href || href.trim() === "#";
+}
+function useButtonProps({ tagName, disabled, href, target, rel, role, onClick, tabIndex = 0, type }) {
+    if (!tagName) {
+        if (href != null || target != null || rel != null) tagName = "a";
+        else tagName = "button";
+    }
+    const meta = {
+        tagName
+    };
+    if (tagName === "button") return [
+        {
+            type: type || "button",
+            disabled
+        },
+        meta
+    ];
+    const handleClick = (event)=>{
+        if (disabled || tagName === "a" && isTrivialHref(href)) event.preventDefault();
+        if (disabled) {
+            event.stopPropagation();
+            return;
+        }
+        onClick == null || onClick(event);
+    };
+    const handleKeyDown = (event)=>{
+        if (event.key === " ") {
+            event.preventDefault();
+            handleClick(event);
+        }
+    };
+    if (tagName === "a") {
+        // Ensure there's a href so Enter can trigger anchor button.
+        href || (href = "#");
+        if (disabled) href = undefined;
+    }
+    return [
+        {
+            role: role != null ? role : "button",
+            // explicitly undefined so that it overrides the props disabled in a spread
+            // e.g. <Tag {...props} {...hookProps} />
+            disabled: undefined,
+            tabIndex: disabled ? undefined : tabIndex,
+            href,
+            target: tagName === "a" ? target : undefined,
+            "aria-disabled": !disabled ? undefined : disabled,
+            rel: tagName === "a" ? rel : undefined,
+            onClick: handleClick,
+            onKeyDown: handleKeyDown
+        },
+        meta
+    ];
+}
+const Button = /*#__PURE__*/ _react.forwardRef((_ref, ref)=>{
+    let { as: asProp, disabled } = _ref, props = _objectWithoutPropertiesLoose(_ref, _excluded);
+    const [buttonProps, { tagName: Component }] = useButtonProps(Object.assign({
+        tagName: asProp,
+        disabled
+    }, props));
+    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, Object.assign({}, props, buttonProps, {
+        ref: ref
+    }));
+});
+Button.displayName = "Button";
+exports.default = Button;
+
+},{"react":"21dqq","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6AEwr":[function(require,module,exports) {
+"use strict";
+module.exports = require("c4c10cbba9862d5f");
+
+},{"c4c10cbba9862d5f":"kujY4"}],"kujY4":[function(require,module,exports) {
+/**
+ * @license React
+ * react-jsx-runtime.development.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */ "use strict";
+(function() {
+    "use strict";
+    var React = require("593632ccebda0d3a");
+    // ATTENTION
+    // When adding new symbols to this file,
+    // Please consider also adding to 'react-devtools-shared/src/backend/ReactSymbols'
+    // The Symbol used to tag the ReactElement-like types.
+    var REACT_ELEMENT_TYPE = Symbol.for("react.element");
+    var REACT_PORTAL_TYPE = Symbol.for("react.portal");
+    var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
+    var REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode");
+    var REACT_PROFILER_TYPE = Symbol.for("react.profiler");
+    var REACT_PROVIDER_TYPE = Symbol.for("react.provider");
+    var REACT_CONTEXT_TYPE = Symbol.for("react.context");
+    var REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref");
+    var REACT_SUSPENSE_TYPE = Symbol.for("react.suspense");
+    var REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list");
+    var REACT_MEMO_TYPE = Symbol.for("react.memo");
+    var REACT_LAZY_TYPE = Symbol.for("react.lazy");
+    var REACT_OFFSCREEN_TYPE = Symbol.for("react.offscreen");
+    var MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
+    var FAUX_ITERATOR_SYMBOL = "@@iterator";
+    function getIteratorFn(maybeIterable) {
+        if (maybeIterable === null || typeof maybeIterable !== "object") return null;
+        var maybeIterator = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable[FAUX_ITERATOR_SYMBOL];
+        if (typeof maybeIterator === "function") return maybeIterator;
+        return null;
+    }
+    var ReactSharedInternals = React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+    function error(format) {
+        for(var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++)args[_key2 - 1] = arguments[_key2];
+        printWarning("error", format, args);
+    }
+    function printWarning(level, format, args) {
+        var ReactDebugCurrentFrame = ReactSharedInternals.ReactDebugCurrentFrame;
+        var stack = ReactDebugCurrentFrame.getStackAddendum();
+        if (stack !== "") {
+            format += "%s";
+            args = args.concat([
+                stack
+            ]);
+        } // eslint-disable-next-line react-internal/safe-string-coercion
+        var argsWithFormat = args.map(function(item) {
+            return String(item);
+        }); // Careful: RN currently depends on this prefix
+        argsWithFormat.unshift("Warning: " + format); // We intentionally don't use spread (or .apply) directly because it
+        // breaks IE9: https://github.com/facebook/react/issues/13610
+        // eslint-disable-next-line react-internal/no-production-logging
+        Function.prototype.apply.call(console[level], console, argsWithFormat);
+    }
+    // -----------------------------------------------------------------------------
+    var enableScopeAPI = false; // Experimental Create Event Handle API.
+    var enableCacheElement = false;
+    var enableTransitionTracing = false; // No known bugs, but needs performance testing
+    var enableLegacyHidden = false; // Enables unstable_avoidThisFallback feature in Fiber
+    // stuff. Intended to enable React core members to more easily debug scheduling
+    // issues in DEV builds.
+    var enableDebugTracing = false; // Track which Fiber(s) schedule render work.
+    var REACT_MODULE_REFERENCE;
+    REACT_MODULE_REFERENCE = Symbol.for("react.module.reference");
+    function isValidElementType(type) {
+        if (typeof type === "string" || typeof type === "function") return true;
+         // Note: typeof might be other than 'symbol' or 'number' (e.g. if it's a polyfill).
+        if (type === REACT_FRAGMENT_TYPE || type === REACT_PROFILER_TYPE || enableDebugTracing || type === REACT_STRICT_MODE_TYPE || type === REACT_SUSPENSE_TYPE || type === REACT_SUSPENSE_LIST_TYPE || enableLegacyHidden || type === REACT_OFFSCREEN_TYPE || enableScopeAPI || enableCacheElement || enableTransitionTracing) return true;
+        if (typeof type === "object" && type !== null) {
+            if (type.$$typeof === REACT_LAZY_TYPE || type.$$typeof === REACT_MEMO_TYPE || type.$$typeof === REACT_PROVIDER_TYPE || type.$$typeof === REACT_CONTEXT_TYPE || type.$$typeof === REACT_FORWARD_REF_TYPE || // This needs to include all possible module reference object
+            // types supported by any Flight configuration anywhere since
+            // we don't know which Flight build this will end up being used
+            // with.
+            type.$$typeof === REACT_MODULE_REFERENCE || type.getModuleId !== undefined) return true;
+        }
+        return false;
+    }
+    function getWrappedName(outerType, innerType, wrapperName) {
+        var displayName = outerType.displayName;
+        if (displayName) return displayName;
+        var functionName = innerType.displayName || innerType.name || "";
+        return functionName !== "" ? wrapperName + "(" + functionName + ")" : wrapperName;
+    } // Keep in sync with react-reconciler/getComponentNameFromFiber
+    function getContextName(type) {
+        return type.displayName || "Context";
+    } // Note that the reconciler package should generally prefer to use getComponentNameFromFiber() instead.
+    function getComponentNameFromType(type) {
+        if (type == null) // Host root, text node or just invalid type.
+        return null;
+        if (typeof type.tag === "number") error("Received an unexpected object in getComponentNameFromType(). This is likely a bug in React. Please file an issue.");
+        if (typeof type === "function") return type.displayName || type.name || null;
+        if (typeof type === "string") return type;
+        switch(type){
+            case REACT_FRAGMENT_TYPE:
+                return "Fragment";
+            case REACT_PORTAL_TYPE:
+                return "Portal";
+            case REACT_PROFILER_TYPE:
+                return "Profiler";
+            case REACT_STRICT_MODE_TYPE:
+                return "StrictMode";
+            case REACT_SUSPENSE_TYPE:
+                return "Suspense";
+            case REACT_SUSPENSE_LIST_TYPE:
+                return "SuspenseList";
+        }
+        if (typeof type === "object") switch(type.$$typeof){
+            case REACT_CONTEXT_TYPE:
+                var context = type;
+                return getContextName(context) + ".Consumer";
+            case REACT_PROVIDER_TYPE:
+                var provider = type;
+                return getContextName(provider._context) + ".Provider";
+            case REACT_FORWARD_REF_TYPE:
+                return getWrappedName(type, type.render, "ForwardRef");
+            case REACT_MEMO_TYPE:
+                var outerName = type.displayName || null;
+                if (outerName !== null) return outerName;
+                return getComponentNameFromType(type.type) || "Memo";
+            case REACT_LAZY_TYPE:
+                var lazyComponent = type;
+                var payload = lazyComponent._payload;
+                var init = lazyComponent._init;
+                try {
+                    return getComponentNameFromType(init(payload));
+                } catch (x) {
+                    return null;
+                }
+        }
+        return null;
+    }
+    var assign = Object.assign;
+    // Helpers to patch console.logs to avoid logging during side-effect free
+    // replaying on render function. This currently only patches the object
+    // lazily which won't cover if the log function was extracted eagerly.
+    // We could also eagerly patch the method.
+    var disabledDepth = 0;
+    var prevLog;
+    var prevInfo;
+    var prevWarn;
+    var prevError;
+    var prevGroup;
+    var prevGroupCollapsed;
+    var prevGroupEnd;
+    function disabledLog() {}
+    disabledLog.__reactDisabledLog = true;
+    function disableLogs() {
+        if (disabledDepth === 0) {
+            /* eslint-disable react-internal/no-production-logging */ prevLog = console.log;
+            prevInfo = console.info;
+            prevWarn = console.warn;
+            prevError = console.error;
+            prevGroup = console.group;
+            prevGroupCollapsed = console.groupCollapsed;
+            prevGroupEnd = console.groupEnd; // https://github.com/facebook/react/issues/19099
+            var props = {
+                configurable: true,
+                enumerable: true,
+                value: disabledLog,
+                writable: true
+            }; // $FlowFixMe Flow thinks console is immutable.
+            Object.defineProperties(console, {
+                info: props,
+                log: props,
+                warn: props,
+                error: props,
+                group: props,
+                groupCollapsed: props,
+                groupEnd: props
+            });
+        /* eslint-enable react-internal/no-production-logging */ }
+        disabledDepth++;
+    }
+    function reenableLogs() {
+        disabledDepth--;
+        if (disabledDepth === 0) {
+            /* eslint-disable react-internal/no-production-logging */ var props = {
+                configurable: true,
+                enumerable: true,
+                writable: true
+            }; // $FlowFixMe Flow thinks console is immutable.
+            Object.defineProperties(console, {
+                log: assign({}, props, {
+                    value: prevLog
+                }),
+                info: assign({}, props, {
+                    value: prevInfo
+                }),
+                warn: assign({}, props, {
+                    value: prevWarn
+                }),
+                error: assign({}, props, {
+                    value: prevError
+                }),
+                group: assign({}, props, {
+                    value: prevGroup
+                }),
+                groupCollapsed: assign({}, props, {
+                    value: prevGroupCollapsed
+                }),
+                groupEnd: assign({}, props, {
+                    value: prevGroupEnd
+                })
+            });
+        /* eslint-enable react-internal/no-production-logging */ }
+        if (disabledDepth < 0) error("disabledDepth fell below zero. This is a bug in React. Please file an issue.");
+    }
+    var ReactCurrentDispatcher = ReactSharedInternals.ReactCurrentDispatcher;
+    var prefix;
+    function describeBuiltInComponentFrame(name, source, ownerFn) {
+        if (prefix === undefined) // Extract the VM specific prefix used by each line.
+        try {
+            throw Error();
+        } catch (x) {
+            var match = x.stack.trim().match(/\n( *(at )?)/);
+            prefix = match && match[1] || "";
+        }
+         // We use the prefix to ensure our stacks line up with native stack frames.
+        return "\n" + prefix + name;
+    }
+    var reentry = false;
+    var componentFrameCache;
+    var PossiblyWeakMap = typeof WeakMap === "function" ? WeakMap : Map;
+    componentFrameCache = new PossiblyWeakMap();
+    function describeNativeComponentFrame(fn, construct) {
+        // If something asked for a stack inside a fake render, it should get ignored.
+        if (!fn || reentry) return "";
+        var frame = componentFrameCache.get(fn);
+        if (frame !== undefined) return frame;
+        var control;
+        reentry = true;
+        var previousPrepareStackTrace = Error.prepareStackTrace; // $FlowFixMe It does accept undefined.
+        Error.prepareStackTrace = undefined;
+        var previousDispatcher;
+        previousDispatcher = ReactCurrentDispatcher.current; // Set the dispatcher in DEV because this might be call in the render function
+        // for warnings.
+        ReactCurrentDispatcher.current = null;
+        disableLogs();
+        try {
+            // This should throw.
+            if (construct) {
+                // Something should be setting the props in the constructor.
+                var Fake = function() {
+                    throw Error();
+                }; // $FlowFixMe
+                Object.defineProperty(Fake.prototype, "props", {
+                    set: function() {
+                        // We use a throwing setter instead of frozen or non-writable props
+                        // because that won't throw in a non-strict mode function.
+                        throw Error();
+                    }
+                });
+                if (typeof Reflect === "object" && Reflect.construct) {
+                    // We construct a different control for this case to include any extra
+                    // frames added by the construct call.
+                    try {
+                        Reflect.construct(Fake, []);
+                    } catch (x) {
+                        control = x;
+                    }
+                    Reflect.construct(fn, [], Fake);
+                } else {
+                    try {
+                        Fake.call();
+                    } catch (x) {
+                        control = x;
+                    }
+                    fn.call(Fake.prototype);
+                }
+            } else {
+                try {
+                    throw Error();
+                } catch (x) {
+                    control = x;
+                }
+                fn();
+            }
+        } catch (sample) {
+            // This is inlined manually because closure doesn't do it for us.
+            if (sample && control && typeof sample.stack === "string") {
+                // This extracts the first frame from the sample that isn't also in the control.
+                // Skipping one frame that we assume is the frame that calls the two.
+                var sampleLines = sample.stack.split("\n");
+                var controlLines = control.stack.split("\n");
+                var s = sampleLines.length - 1;
+                var c = controlLines.length - 1;
+                while(s >= 1 && c >= 0 && sampleLines[s] !== controlLines[c])// We expect at least one stack frame to be shared.
+                // Typically this will be the root most one. However, stack frames may be
+                // cut off due to maximum stack limits. In this case, one maybe cut off
+                // earlier than the other. We assume that the sample is longer or the same
+                // and there for cut off earlier. So we should find the root most frame in
+                // the sample somewhere in the control.
+                c--;
+                for(; s >= 1 && c >= 0; s--, c--)// Next we find the first one that isn't the same which should be the
+                // frame that called our sample function and the control.
+                if (sampleLines[s] !== controlLines[c]) {
+                    // In V8, the first line is describing the message but other VMs don't.
+                    // If we're about to return the first line, and the control is also on the same
+                    // line, that's a pretty good indicator that our sample threw at same line as
+                    // the control. I.e. before we entered the sample frame. So we ignore this result.
+                    // This can happen if you passed a class to function component, or non-function.
+                    if (s !== 1 || c !== 1) do {
+                        s--;
+                        c--; // We may still have similar intermediate frames from the construct call.
+                        // The next one that isn't the same should be our match though.
+                        if (c < 0 || sampleLines[s] !== controlLines[c]) {
+                            // V8 adds a "new" prefix for native classes. Let's remove it to make it prettier.
+                            var _frame = "\n" + sampleLines[s].replace(" at new ", " at "); // If our component frame is labeled "<anonymous>"
+                            // but we have a user-provided "displayName"
+                            // splice it in to make the stack more readable.
+                            if (fn.displayName && _frame.includes("<anonymous>")) _frame = _frame.replace("<anonymous>", fn.displayName);
+                            if (typeof fn === "function") componentFrameCache.set(fn, _frame);
+                            return _frame;
+                        }
+                    }while (s >= 1 && c >= 0);
+                    break;
+                }
+            }
+        } finally{
+            reentry = false;
+            ReactCurrentDispatcher.current = previousDispatcher;
+            reenableLogs();
+            Error.prepareStackTrace = previousPrepareStackTrace;
+        } // Fallback to just using the name if we couldn't make it throw.
+        var name = fn ? fn.displayName || fn.name : "";
+        var syntheticFrame = name ? describeBuiltInComponentFrame(name) : "";
+        if (typeof fn === "function") componentFrameCache.set(fn, syntheticFrame);
+        return syntheticFrame;
+    }
+    function describeFunctionComponentFrame(fn, source, ownerFn) {
+        return describeNativeComponentFrame(fn, false);
+    }
+    function shouldConstruct(Component) {
+        var prototype = Component.prototype;
+        return !!(prototype && prototype.isReactComponent);
+    }
+    function describeUnknownElementTypeFrameInDEV(type, source, ownerFn) {
+        if (type == null) return "";
+        if (typeof type === "function") return describeNativeComponentFrame(type, shouldConstruct(type));
+        if (typeof type === "string") return describeBuiltInComponentFrame(type);
+        switch(type){
+            case REACT_SUSPENSE_TYPE:
+                return describeBuiltInComponentFrame("Suspense");
+            case REACT_SUSPENSE_LIST_TYPE:
+                return describeBuiltInComponentFrame("SuspenseList");
+        }
+        if (typeof type === "object") switch(type.$$typeof){
+            case REACT_FORWARD_REF_TYPE:
+                return describeFunctionComponentFrame(type.render);
+            case REACT_MEMO_TYPE:
+                // Memo may contain any component type so we recursively resolve it.
+                return describeUnknownElementTypeFrameInDEV(type.type, source, ownerFn);
+            case REACT_LAZY_TYPE:
+                var lazyComponent = type;
+                var payload = lazyComponent._payload;
+                var init = lazyComponent._init;
+                try {
+                    // Lazy may contain any component type so we recursively resolve it.
+                    return describeUnknownElementTypeFrameInDEV(init(payload), source, ownerFn);
+                } catch (x) {}
+        }
+        return "";
+    }
+    var hasOwnProperty = Object.prototype.hasOwnProperty;
+    var loggedTypeFailures = {};
+    var ReactDebugCurrentFrame = ReactSharedInternals.ReactDebugCurrentFrame;
+    function setCurrentlyValidatingElement(element) {
+        if (element) {
+            var owner = element._owner;
+            var stack = describeUnknownElementTypeFrameInDEV(element.type, element._source, owner ? owner.type : null);
+            ReactDebugCurrentFrame.setExtraStackFrame(stack);
+        } else ReactDebugCurrentFrame.setExtraStackFrame(null);
+    }
+    function checkPropTypes(typeSpecs, values, location, componentName, element) {
+        // $FlowFixMe This is okay but Flow doesn't know it.
+        var has = Function.call.bind(hasOwnProperty);
+        for(var typeSpecName in typeSpecs)if (has(typeSpecs, typeSpecName)) {
+            var error$1 = void 0; // Prop type validation may throw. In case they do, we don't want to
+            // fail the render phase where it didn't fail before. So we log it.
+            // After these have been cleaned up, we'll let them throw.
+            try {
+                // This is intentionally an invariant that gets caught. It's the same
+                // behavior as without this statement except with a better message.
+                if (typeof typeSpecs[typeSpecName] !== "function") {
+                    // eslint-disable-next-line react-internal/prod-error-codes
+                    var err = Error((componentName || "React class") + ": " + location + " type `" + typeSpecName + "` is invalid; " + "it must be a function, usually from the `prop-types` package, but received `" + typeof typeSpecs[typeSpecName] + "`." + "This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`.");
+                    err.name = "Invariant Violation";
+                    throw err;
+                }
+                error$1 = typeSpecs[typeSpecName](values, typeSpecName, componentName, location, null, "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED");
+            } catch (ex) {
+                error$1 = ex;
+            }
+            if (error$1 && !(error$1 instanceof Error)) {
+                setCurrentlyValidatingElement(element);
+                error("%s: type specification of %s `%s` is invalid; the type checker function must return `null` or an `Error` but returned a %s. You may have forgotten to pass an argument to the type checker creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and shape all require an argument).", componentName || "React class", location, typeSpecName, typeof error$1);
+                setCurrentlyValidatingElement(null);
+            }
+            if (error$1 instanceof Error && !(error$1.message in loggedTypeFailures)) {
+                // Only monitor this failure once because there tends to be a lot of the
+                // same error.
+                loggedTypeFailures[error$1.message] = true;
+                setCurrentlyValidatingElement(element);
+                error("Failed %s type: %s", location, error$1.message);
+                setCurrentlyValidatingElement(null);
+            }
+        }
+    }
+    var isArrayImpl = Array.isArray; // eslint-disable-next-line no-redeclare
+    function isArray(a) {
+        return isArrayImpl(a);
+    }
+    /*
+ * The `'' + value` pattern (used in in perf-sensitive code) throws for Symbol
+ * and Temporal.* types. See https://github.com/facebook/react/pull/22064.
+ *
+ * The functions in this module will throw an easier-to-understand,
+ * easier-to-debug exception with a clear errors message message explaining the
+ * problem. (Instead of a confusing exception thrown inside the implementation
+ * of the `value` object).
+ */ // $FlowFixMe only called in DEV, so void return is not possible.
+    function typeName(value) {
+        // toStringTag is needed for namespaced types like Temporal.Instant
+        var hasToStringTag = typeof Symbol === "function" && Symbol.toStringTag;
+        var type = hasToStringTag && value[Symbol.toStringTag] || value.constructor.name || "Object";
+        return type;
+    } // $FlowFixMe only called in DEV, so void return is not possible.
+    function willCoercionThrow(value) {
+        try {
+            testStringCoercion(value);
+            return false;
+        } catch (e) {
+            return true;
+        }
+    }
+    function testStringCoercion(value) {
+        // If you ended up here by following an exception call stack, here's what's
+        // happened: you supplied an object or symbol value to React (as a prop, key,
+        // DOM attribute, CSS property, string ref, etc.) and when React tried to
+        // coerce it to a string using `'' + value`, an exception was thrown.
+        //
+        // The most common types that will cause this exception are `Symbol` instances
+        // and Temporal objects like `Temporal.Instant`. But any object that has a
+        // `valueOf` or `[Symbol.toPrimitive]` method that throws will also cause this
+        // exception. (Library authors do this to prevent users from using built-in
+        // numeric operators like `+` or comparison operators like `>=` because custom
+        // methods are needed to perform accurate arithmetic or comparison.)
+        //
+        // To fix the problem, coerce this object or symbol value to a string before
+        // passing it to React. The most reliable way is usually `String(value)`.
+        //
+        // To find which value is throwing, check the browser or debugger console.
+        // Before this exception was thrown, there should be `console.error` output
+        // that shows the type (Symbol, Temporal.PlainDate, etc.) that caused the
+        // problem and how that type was used: key, atrribute, input value prop, etc.
+        // In most cases, this console output also shows the component and its
+        // ancestor components where the exception happened.
+        //
+        // eslint-disable-next-line react-internal/safe-string-coercion
+        return "" + value;
+    }
+    function checkKeyStringCoercion(value) {
+        if (willCoercionThrow(value)) {
+            error("The provided key is an unsupported type %s. This value must be coerced to a string before before using it here.", typeName(value));
+            return testStringCoercion(value); // throw (to help callers find troubleshooting comments)
+        }
+    }
+    var ReactCurrentOwner = ReactSharedInternals.ReactCurrentOwner;
+    var RESERVED_PROPS = {
+        key: true,
+        ref: true,
+        __self: true,
+        __source: true
+    };
+    var specialPropKeyWarningShown;
+    var specialPropRefWarningShown;
+    var didWarnAboutStringRefs;
+    didWarnAboutStringRefs = {};
+    function hasValidRef(config) {
+        if (hasOwnProperty.call(config, "ref")) {
+            var getter = Object.getOwnPropertyDescriptor(config, "ref").get;
+            if (getter && getter.isReactWarning) return false;
+        }
+        return config.ref !== undefined;
+    }
+    function hasValidKey(config) {
+        if (hasOwnProperty.call(config, "key")) {
+            var getter = Object.getOwnPropertyDescriptor(config, "key").get;
+            if (getter && getter.isReactWarning) return false;
+        }
+        return config.key !== undefined;
+    }
+    function warnIfStringRefCannotBeAutoConverted(config, self) {
+        if (typeof config.ref === "string" && ReactCurrentOwner.current && self && ReactCurrentOwner.current.stateNode !== self) {
+            var componentName = getComponentNameFromType(ReactCurrentOwner.current.type);
+            if (!didWarnAboutStringRefs[componentName]) {
+                error('Component "%s" contains the string ref "%s". Support for string refs will be removed in a future major release. This case cannot be automatically converted to an arrow function. We ask you to manually fix this case by using useRef() or createRef() instead. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-string-ref', getComponentNameFromType(ReactCurrentOwner.current.type), config.ref);
+                didWarnAboutStringRefs[componentName] = true;
+            }
+        }
+    }
+    function defineKeyPropWarningGetter(props, displayName) {
+        var warnAboutAccessingKey = function() {
+            if (!specialPropKeyWarningShown) {
+                specialPropKeyWarningShown = true;
+                error("%s: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://reactjs.org/link/special-props)", displayName);
+            }
+        };
+        warnAboutAccessingKey.isReactWarning = true;
+        Object.defineProperty(props, "key", {
+            get: warnAboutAccessingKey,
+            configurable: true
+        });
+    }
+    function defineRefPropWarningGetter(props, displayName) {
+        var warnAboutAccessingRef = function() {
+            if (!specialPropRefWarningShown) {
+                specialPropRefWarningShown = true;
+                error("%s: `ref` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://reactjs.org/link/special-props)", displayName);
+            }
+        };
+        warnAboutAccessingRef.isReactWarning = true;
+        Object.defineProperty(props, "ref", {
+            get: warnAboutAccessingRef,
+            configurable: true
+        });
+    }
+    /**
+ * Factory method to create a new React element. This no longer adheres to
+ * the class pattern, so do not use new to call it. Also, instanceof check
+ * will not work. Instead test $$typeof field against Symbol.for('react.element') to check
+ * if something is a React Element.
+ *
+ * @param {*} type
+ * @param {*} props
+ * @param {*} key
+ * @param {string|object} ref
+ * @param {*} owner
+ * @param {*} self A *temporary* helper to detect places where `this` is
+ * different from the `owner` when React.createElement is called, so that we
+ * can warn. We want to get rid of owner and replace string `ref`s with arrow
+ * functions, and as long as `this` and owner are the same, there will be no
+ * change in behavior.
+ * @param {*} source An annotation object (added by a transpiler or otherwise)
+ * indicating filename, line number, and/or other information.
+ * @internal
+ */ var ReactElement = function(type, key, ref, self, source, owner, props) {
+        var element = {
+            // This tag allows us to uniquely identify this as a React Element
+            $$typeof: REACT_ELEMENT_TYPE,
+            // Built-in properties that belong on the element
+            type: type,
+            key: key,
+            ref: ref,
+            props: props,
+            // Record the component responsible for creating this element.
+            _owner: owner
+        };
+        // The validation flag is currently mutative. We put it on
+        // an external backing store so that we can freeze the whole object.
+        // This can be replaced with a WeakMap once they are implemented in
+        // commonly used development environments.
+        element._store = {}; // To make comparing ReactElements easier for testing purposes, we make
+        // the validation flag non-enumerable (where possible, which should
+        // include every environment we run tests in), so the test framework
+        // ignores it.
+        Object.defineProperty(element._store, "validated", {
+            configurable: false,
+            enumerable: false,
+            writable: true,
+            value: false
+        }); // self and source are DEV only properties.
+        Object.defineProperty(element, "_self", {
+            configurable: false,
+            enumerable: false,
+            writable: false,
+            value: self
+        }); // Two elements created in two different places should be considered
+        // equal for testing purposes and therefore we hide it from enumeration.
+        Object.defineProperty(element, "_source", {
+            configurable: false,
+            enumerable: false,
+            writable: false,
+            value: source
+        });
+        if (Object.freeze) {
+            Object.freeze(element.props);
+            Object.freeze(element);
+        }
+        return element;
+    };
+    /**
+ * https://github.com/reactjs/rfcs/pull/107
+ * @param {*} type
+ * @param {object} props
+ * @param {string} key
+ */ function jsxDEV(type, config, maybeKey, source, self) {
+        var propName; // Reserved names are extracted
+        var props = {};
+        var key = null;
+        var ref = null; // Currently, key can be spread in as a prop. This causes a potential
+        // issue if key is also explicitly declared (ie. <div {...props} key="Hi" />
+        // or <div key="Hi" {...props} /> ). We want to deprecate key spread,
+        // but as an intermediary step, we will use jsxDEV for everything except
+        // <div {...props} key="Hi" />, because we aren't currently able to tell if
+        // key is explicitly declared to be undefined or not.
+        if (maybeKey !== undefined) {
+            checkKeyStringCoercion(maybeKey);
+            key = "" + maybeKey;
+        }
+        if (hasValidKey(config)) {
+            checkKeyStringCoercion(config.key);
+            key = "" + config.key;
+        }
+        if (hasValidRef(config)) {
+            ref = config.ref;
+            warnIfStringRefCannotBeAutoConverted(config, self);
+        } // Remaining properties are added to a new props object
+        for(propName in config)if (hasOwnProperty.call(config, propName) && !RESERVED_PROPS.hasOwnProperty(propName)) props[propName] = config[propName];
+         // Resolve default props
+        if (type && type.defaultProps) {
+            var defaultProps = type.defaultProps;
+            for(propName in defaultProps)if (props[propName] === undefined) props[propName] = defaultProps[propName];
+        }
+        if (key || ref) {
+            var displayName = typeof type === "function" ? type.displayName || type.name || "Unknown" : type;
+            if (key) defineKeyPropWarningGetter(props, displayName);
+            if (ref) defineRefPropWarningGetter(props, displayName);
+        }
+        return ReactElement(type, key, ref, self, source, ReactCurrentOwner.current, props);
+    }
+    var ReactCurrentOwner$1 = ReactSharedInternals.ReactCurrentOwner;
+    var ReactDebugCurrentFrame$1 = ReactSharedInternals.ReactDebugCurrentFrame;
+    function setCurrentlyValidatingElement$1(element) {
+        if (element) {
+            var owner = element._owner;
+            var stack = describeUnknownElementTypeFrameInDEV(element.type, element._source, owner ? owner.type : null);
+            ReactDebugCurrentFrame$1.setExtraStackFrame(stack);
+        } else ReactDebugCurrentFrame$1.setExtraStackFrame(null);
+    }
+    var propTypesMisspellWarningShown;
+    propTypesMisspellWarningShown = false;
+    /**
+ * Verifies the object is a ReactElement.
+ * See https://reactjs.org/docs/react-api.html#isvalidelement
+ * @param {?object} object
+ * @return {boolean} True if `object` is a ReactElement.
+ * @final
+ */ function isValidElement(object) {
+        return typeof object === "object" && object !== null && object.$$typeof === REACT_ELEMENT_TYPE;
+    }
+    function getDeclarationErrorAddendum() {
+        if (ReactCurrentOwner$1.current) {
+            var name = getComponentNameFromType(ReactCurrentOwner$1.current.type);
+            if (name) return "\n\nCheck the render method of `" + name + "`.";
+        }
+        return "";
+    }
+    function getSourceInfoErrorAddendum(source) {
+        if (source !== undefined) {
+            var fileName = source.fileName.replace(/^.*[\\\/]/, "");
+            var lineNumber = source.lineNumber;
+            return "\n\nCheck your code at " + fileName + ":" + lineNumber + ".";
+        }
+        return "";
+    }
+    /**
+ * Warn if there's no key explicitly set on dynamic arrays of children or
+ * object keys are not valid. This allows us to keep track of children between
+ * updates.
+ */ var ownerHasKeyUseWarning = {};
+    function getCurrentComponentErrorInfo(parentType) {
+        var info = getDeclarationErrorAddendum();
+        if (!info) {
+            var parentName = typeof parentType === "string" ? parentType : parentType.displayName || parentType.name;
+            if (parentName) info = "\n\nCheck the top-level render call using <" + parentName + ">.";
+        }
+        return info;
+    }
+    /**
+ * Warn if the element doesn't have an explicit key assigned to it.
+ * This element is in an array. The array could grow and shrink or be
+ * reordered. All children that haven't already been validated are required to
+ * have a "key" property assigned to it. Error statuses are cached so a warning
+ * will only be shown once.
+ *
+ * @internal
+ * @param {ReactElement} element Element that requires a key.
+ * @param {*} parentType element's parent's type.
+ */ function validateExplicitKey(element, parentType) {
+        if (!element._store || element._store.validated || element.key != null) return;
+        element._store.validated = true;
+        var currentComponentErrorInfo = getCurrentComponentErrorInfo(parentType);
+        if (ownerHasKeyUseWarning[currentComponentErrorInfo]) return;
+        ownerHasKeyUseWarning[currentComponentErrorInfo] = true; // Usually the current owner is the offender, but if it accepts children as a
+        // property, it may be the creator of the child that's responsible for
+        // assigning it a key.
+        var childOwner = "";
+        if (element && element._owner && element._owner !== ReactCurrentOwner$1.current) // Give the component that originally created this child.
+        childOwner = " It was passed a child from " + getComponentNameFromType(element._owner.type) + ".";
+        setCurrentlyValidatingElement$1(element);
+        error('Each child in a list should have a unique "key" prop.%s%s See https://reactjs.org/link/warning-keys for more information.', currentComponentErrorInfo, childOwner);
+        setCurrentlyValidatingElement$1(null);
+    }
+    /**
+ * Ensure that every element either is passed in a static location, in an
+ * array with an explicit keys property defined, or in an object literal
+ * with valid key property.
+ *
+ * @internal
+ * @param {ReactNode} node Statically passed child of any type.
+ * @param {*} parentType node's parent's type.
+ */ function validateChildKeys(node, parentType) {
+        if (typeof node !== "object") return;
+        if (isArray(node)) for(var i = 0; i < node.length; i++){
+            var child = node[i];
+            if (isValidElement(child)) validateExplicitKey(child, parentType);
+        }
+        else if (isValidElement(node)) // This element was passed in a valid location.
+        {
+            if (node._store) node._store.validated = true;
+        } else if (node) {
+            var iteratorFn = getIteratorFn(node);
+            if (typeof iteratorFn === "function") // Entry iterators used to provide implicit keys,
+            // but now we print a separate warning for them later.
+            {
+                if (iteratorFn !== node.entries) {
+                    var iterator = iteratorFn.call(node);
+                    var step;
+                    while(!(step = iterator.next()).done)if (isValidElement(step.value)) validateExplicitKey(step.value, parentType);
+                }
+            }
+        }
+    }
+    /**
+ * Given an element, validate that its props follow the propTypes definition,
+ * provided by the type.
+ *
+ * @param {ReactElement} element
+ */ function validatePropTypes(element) {
+        var type = element.type;
+        if (type === null || type === undefined || typeof type === "string") return;
+        var propTypes;
+        if (typeof type === "function") propTypes = type.propTypes;
+        else if (typeof type === "object" && (type.$$typeof === REACT_FORWARD_REF_TYPE || // Note: Memo only checks outer props here.
+        // Inner props are checked in the reconciler.
+        type.$$typeof === REACT_MEMO_TYPE)) propTypes = type.propTypes;
+        else return;
+        if (propTypes) {
+            // Intentionally inside to avoid triggering lazy initializers:
+            var name = getComponentNameFromType(type);
+            checkPropTypes(propTypes, element.props, "prop", name, element);
+        } else if (type.PropTypes !== undefined && !propTypesMisspellWarningShown) {
+            propTypesMisspellWarningShown = true; // Intentionally inside to avoid triggering lazy initializers:
+            var _name = getComponentNameFromType(type);
+            error("Component %s declared `PropTypes` instead of `propTypes`. Did you misspell the property assignment?", _name || "Unknown");
+        }
+        if (typeof type.getDefaultProps === "function" && !type.getDefaultProps.isReactClassApproved) error("getDefaultProps is only used on classic React.createClass definitions. Use a static property named `defaultProps` instead.");
+    }
+    /**
+ * Given a fragment, validate that it can only be provided with fragment props
+ * @param {ReactElement} fragment
+ */ function validateFragmentProps(fragment) {
+        var keys = Object.keys(fragment.props);
+        for(var i = 0; i < keys.length; i++){
+            var key = keys[i];
+            if (key !== "children" && key !== "key") {
+                setCurrentlyValidatingElement$1(fragment);
+                error("Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.", key);
+                setCurrentlyValidatingElement$1(null);
+                break;
+            }
+        }
+        if (fragment.ref !== null) {
+            setCurrentlyValidatingElement$1(fragment);
+            error("Invalid attribute `ref` supplied to `React.Fragment`.");
+            setCurrentlyValidatingElement$1(null);
+        }
+    }
+    function jsxWithValidation(type, props, key, isStaticChildren, source, self) {
+        var validType = isValidElementType(type); // We warn in this case but don't throw. We expect the element creation to
+        // succeed and there will likely be errors in render.
+        if (!validType) {
+            var info = "";
+            if (type === undefined || typeof type === "object" && type !== null && Object.keys(type).length === 0) info += " You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.";
+            var sourceInfo = getSourceInfoErrorAddendum(source);
+            if (sourceInfo) info += sourceInfo;
+            else info += getDeclarationErrorAddendum();
+            var typeString;
+            if (type === null) typeString = "null";
+            else if (isArray(type)) typeString = "array";
+            else if (type !== undefined && type.$$typeof === REACT_ELEMENT_TYPE) {
+                typeString = "<" + (getComponentNameFromType(type.type) || "Unknown") + " />";
+                info = " Did you accidentally export a JSX literal instead of a component?";
+            } else typeString = typeof type;
+            error("React.jsx: type is invalid -- expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s", typeString, info);
+        }
+        var element = jsxDEV(type, props, key, source, self); // The result can be nullish if a mock or a custom function is used.
+        // TODO: Drop this when these are no longer allowed as the type argument.
+        if (element == null) return element;
+         // Skip key warning if the type isn't valid since our key validation logic
+        // doesn't expect a non-string/function type and can throw confusing errors.
+        // We don't want exception behavior to differ between dev and prod.
+        // (Rendering will throw with a helpful message and as soon as the type is
+        // fixed, the key warnings will appear.)
+        if (validType) {
+            var children = props.children;
+            if (children !== undefined) {
+                if (isStaticChildren) {
+                    if (isArray(children)) {
+                        for(var i = 0; i < children.length; i++)validateChildKeys(children[i], type);
+                        if (Object.freeze) Object.freeze(children);
+                    } else error("React.jsx: Static children should always be an array. You are likely explicitly calling React.jsxs or React.jsxDEV. Use the Babel transform instead.");
+                } else validateChildKeys(children, type);
+            }
+        }
+        if (type === REACT_FRAGMENT_TYPE) validateFragmentProps(element);
+        else validatePropTypes(element);
+        return element;
+    } // These two functions exist to still get child warnings in dev
+    // even with the prod transform. This means that jsxDEV is purely
+    // opt-in behavior for better messages but that we won't stop
+    // giving you warnings if you use production apis.
+    function jsxWithValidationStatic(type, props, key) {
+        return jsxWithValidation(type, props, key, true);
+    }
+    function jsxWithValidationDynamic(type, props, key) {
+        return jsxWithValidation(type, props, key, false);
+    }
+    var jsx = jsxWithValidationDynamic; // we may want to special case jsxs internally to take advantage of static children.
+    // for now we can ship identical prod functions
+    var jsxs = jsxWithValidationStatic;
+    exports.Fragment = REACT_FRAGMENT_TYPE;
+    exports.jsx = jsx;
+    exports.jsxs = jsxs;
+})();
+
+},{"593632ccebda0d3a":"21dqq"}],"dVixI":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "DEFAULT_BREAKPOINTS", ()=>DEFAULT_BREAKPOINTS);
+parcelHelpers.export(exports, "DEFAULT_MIN_BREAKPOINT", ()=>DEFAULT_MIN_BREAKPOINT);
+parcelHelpers.export(exports, "useBootstrapPrefix", ()=>useBootstrapPrefix);
+parcelHelpers.export(exports, "useBootstrapBreakpoints", ()=>useBootstrapBreakpoints);
+parcelHelpers.export(exports, "useBootstrapMinBreakpoint", ()=>useBootstrapMinBreakpoint);
+parcelHelpers.export(exports, "useIsRTL", ()=>useIsRTL);
+parcelHelpers.export(exports, "createBootstrapComponent", ()=>createBootstrapComponent);
+parcelHelpers.export(exports, "ThemeConsumer", ()=>Consumer);
+var _react = require("react");
+var _jsxRuntime = require("react/jsx-runtime");
+"use client";
+const DEFAULT_BREAKPOINTS = [
+    "xxl",
+    "xl",
+    "lg",
+    "md",
+    "sm",
+    "xs"
+];
+const DEFAULT_MIN_BREAKPOINT = "xs";
+const ThemeContext = /*#__PURE__*/ _react.createContext({
+    prefixes: {},
+    breakpoints: DEFAULT_BREAKPOINTS,
+    minBreakpoint: DEFAULT_MIN_BREAKPOINT
+});
+const { Consumer, Provider } = ThemeContext;
+function ThemeProvider({ prefixes = {}, breakpoints = DEFAULT_BREAKPOINTS, minBreakpoint = DEFAULT_MIN_BREAKPOINT, dir, children }) {
+    const contextValue = (0, _react.useMemo)(()=>({
+            prefixes: {
+                ...prefixes
+            },
+            breakpoints,
+            minBreakpoint,
+            dir
+        }), [
+        prefixes,
+        breakpoints,
+        minBreakpoint,
+        dir
+    ]);
+    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Provider, {
+        value: contextValue,
+        children: children
+    });
+}
+function useBootstrapPrefix(prefix, defaultPrefix) {
+    const { prefixes } = (0, _react.useContext)(ThemeContext);
+    return prefix || prefixes[defaultPrefix] || defaultPrefix;
+}
+function useBootstrapBreakpoints() {
+    const { breakpoints } = (0, _react.useContext)(ThemeContext);
+    return breakpoints;
+}
+function useBootstrapMinBreakpoint() {
+    const { minBreakpoint } = (0, _react.useContext)(ThemeContext);
+    return minBreakpoint;
+}
+function useIsRTL() {
+    const { dir } = (0, _react.useContext)(ThemeContext);
+    return dir === "rtl";
+}
+function createBootstrapComponent(Component, opts) {
+    if (typeof opts === "string") opts = {
+        prefix: opts
+    };
+    const isClassy = Component.prototype && Component.prototype.isReactComponent;
+    // If it's a functional component make sure we don't break it with a ref
+    const { prefix, forwardRefAs = isClassy ? "ref" : "innerRef" } = opts;
+    const Wrapped = /*#__PURE__*/ _react.forwardRef(({ ...props }, ref)=>{
+        props[forwardRefAs] = ref;
+        const bsPrefix = useBootstrapPrefix(props.bsPrefix, prefix);
+        return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
+            ...props,
+            bsPrefix: bsPrefix
+        });
+    });
+    Wrapped.displayName = `Bootstrap(${Component.displayName || Component.name})`;
+    return Wrapped;
+}
+exports.default = ThemeProvider;
+
+},{"react":"21dqq","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lAynp":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _classnames = require("classnames");
+var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
+var _react = require("react");
+var _themeProvider = require("./ThemeProvider");
+var _cardBody = require("./CardBody");
+var _cardBodyDefault = parcelHelpers.interopDefault(_cardBody);
+var _cardFooter = require("./CardFooter");
+var _cardFooterDefault = parcelHelpers.interopDefault(_cardFooter);
+var _cardHeader = require("./CardHeader");
+var _cardHeaderDefault = parcelHelpers.interopDefault(_cardHeader);
+var _cardImg = require("./CardImg");
+var _cardImgDefault = parcelHelpers.interopDefault(_cardImg);
+var _cardImgOverlay = require("./CardImgOverlay");
+var _cardImgOverlayDefault = parcelHelpers.interopDefault(_cardImgOverlay);
+var _cardLink = require("./CardLink");
+var _cardLinkDefault = parcelHelpers.interopDefault(_cardLink);
+var _cardSubtitle = require("./CardSubtitle");
+var _cardSubtitleDefault = parcelHelpers.interopDefault(_cardSubtitle);
+var _cardText = require("./CardText");
+var _cardTextDefault = parcelHelpers.interopDefault(_cardText);
+var _cardTitle = require("./CardTitle");
+var _cardTitleDefault = parcelHelpers.interopDefault(_cardTitle);
+var _jsxRuntime = require("react/jsx-runtime");
+"use client";
+const Card = /*#__PURE__*/ _react.forwardRef(({ bsPrefix, className, bg, text, border, body = false, children, // Need to define the default "as" during prop destructuring to be compatible with styled-components github.com/react-bootstrap/react-bootstrap/issues/3595
+as: Component = "div", ...props }, ref)=>{
+    const prefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card");
+    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
+        ref: ref,
+        ...props,
+        className: (0, _classnamesDefault.default)(className, prefix, bg && `bg-${bg}`, text && `text-${text}`, border && `border-${border}`),
+        children: body ? /*#__PURE__*/ (0, _jsxRuntime.jsx)((0, _cardBodyDefault.default), {
+            children: children
+        }) : children
+    });
+});
+Card.displayName = "Card";
+exports.default = Object.assign(Card, {
+    Img: (0, _cardImgDefault.default),
+    Title: (0, _cardTitleDefault.default),
+    Subtitle: (0, _cardSubtitleDefault.default),
+    Body: (0, _cardBodyDefault.default),
+    Link: (0, _cardLinkDefault.default),
+    Text: (0, _cardTextDefault.default),
+    Header: (0, _cardHeaderDefault.default),
+    Footer: (0, _cardFooterDefault.default),
+    ImgOverlay: (0, _cardImgOverlayDefault.default)
+});
+
+},{"classnames":"jocGM","react":"21dqq","./ThemeProvider":"dVixI","./CardBody":"iN1Jc","./CardFooter":"jUi26","./CardHeader":"dXnnx","./CardImg":"1reTi","./CardImgOverlay":"Bi8dC","./CardLink":"9uFCo","./CardSubtitle":"i2BiN","./CardText":"aUUmg","./CardTitle":"79rSZ","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"iN1Jc":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _react = require("react");
+var _classnames = require("classnames");
+var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
+var _themeProvider = require("./ThemeProvider");
+var _jsxRuntime = require("react/jsx-runtime");
+"use client";
+const CardBody = /*#__PURE__*/ _react.forwardRef(({ className, bsPrefix, as: Component = "div", ...props }, ref)=>{
+    bsPrefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-body");
+    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
+        ref: ref,
+        className: (0, _classnamesDefault.default)(className, bsPrefix),
+        ...props
+    });
+});
+CardBody.displayName = "CardBody";
+exports.default = CardBody;
+
+},{"react":"21dqq","classnames":"jocGM","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jUi26":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _react = require("react");
+var _classnames = require("classnames");
+var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
+var _themeProvider = require("./ThemeProvider");
+var _jsxRuntime = require("react/jsx-runtime");
+"use client";
+const CardFooter = /*#__PURE__*/ _react.forwardRef(({ className, bsPrefix, as: Component = "div", ...props }, ref)=>{
+    bsPrefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-footer");
+    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
+        ref: ref,
+        className: (0, _classnamesDefault.default)(className, bsPrefix),
+        ...props
+    });
+});
+CardFooter.displayName = "CardFooter";
+exports.default = CardFooter;
+
+},{"react":"21dqq","classnames":"jocGM","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dXnnx":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _classnames = require("classnames");
+var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
+var _react = require("react");
+var _themeProvider = require("./ThemeProvider");
+var _cardHeaderContext = require("./CardHeaderContext");
+var _cardHeaderContextDefault = parcelHelpers.interopDefault(_cardHeaderContext);
+var _jsxRuntime = require("react/jsx-runtime");
+"use client";
+const CardHeader = /*#__PURE__*/ _react.forwardRef(({ bsPrefix, className, // Need to define the default "as" during prop destructuring to be compatible with styled-components github.com/react-bootstrap/react-bootstrap/issues/3595
+as: Component = "div", ...props }, ref)=>{
+    const prefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-header");
+    const contextValue = (0, _react.useMemo)(()=>({
+            cardHeaderBsPrefix: prefix
+        }), [
+        prefix
+    ]);
+    return /*#__PURE__*/ (0, _jsxRuntime.jsx)((0, _cardHeaderContextDefault.default).Provider, {
+        value: contextValue,
+        children: /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
+            ref: ref,
+            ...props,
+            className: (0, _classnamesDefault.default)(className, prefix)
+        })
+    });
+});
+CardHeader.displayName = "CardHeader";
+exports.default = CardHeader;
+
+},{"classnames":"jocGM","react":"21dqq","./ThemeProvider":"dVixI","./CardHeaderContext":"36cNB","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"36cNB":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _react = require("react");
+"use client";
+const context = /*#__PURE__*/ _react.createContext(null);
+context.displayName = "CardHeaderContext";
+exports.default = context;
+
+},{"react":"21dqq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1reTi":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _classnames = require("classnames");
+var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
+var _react = require("react");
+var _themeProvider = require("./ThemeProvider");
+var _jsxRuntime = require("react/jsx-runtime");
+"use client";
+const CardImg = /*#__PURE__*/ _react.forwardRef(// Need to define the default "as" during prop destructuring to be compatible with styled-components github.com/react-bootstrap/react-bootstrap/issues/3595
+({ bsPrefix, className, variant, as: Component = "img", ...props }, ref)=>{
+    const prefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-img");
+    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
+        ref: ref,
+        className: (0, _classnamesDefault.default)(variant ? `${prefix}-${variant}` : prefix, className),
+        ...props
+    });
+});
+CardImg.displayName = "CardImg";
+exports.default = CardImg;
+
+},{"classnames":"jocGM","react":"21dqq","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"Bi8dC":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _react = require("react");
+var _classnames = require("classnames");
+var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
+var _themeProvider = require("./ThemeProvider");
+var _jsxRuntime = require("react/jsx-runtime");
+"use client";
+const CardImgOverlay = /*#__PURE__*/ _react.forwardRef(({ className, bsPrefix, as: Component = "div", ...props }, ref)=>{
+    bsPrefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-img-overlay");
+    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
+        ref: ref,
+        className: (0, _classnamesDefault.default)(className, bsPrefix),
+        ...props
+    });
+});
+CardImgOverlay.displayName = "CardImgOverlay";
+exports.default = CardImgOverlay;
+
+},{"react":"21dqq","classnames":"jocGM","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9uFCo":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _react = require("react");
+var _classnames = require("classnames");
+var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
+var _themeProvider = require("./ThemeProvider");
+var _jsxRuntime = require("react/jsx-runtime");
+"use client";
+const CardLink = /*#__PURE__*/ _react.forwardRef(({ className, bsPrefix, as: Component = "a", ...props }, ref)=>{
+    bsPrefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-link");
+    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
+        ref: ref,
+        className: (0, _classnamesDefault.default)(className, bsPrefix),
+        ...props
+    });
+});
+CardLink.displayName = "CardLink";
+exports.default = CardLink;
+
+},{"react":"21dqq","classnames":"jocGM","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"i2BiN":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _react = require("react");
+var _classnames = require("classnames");
+var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
+var _themeProvider = require("./ThemeProvider");
+var _divWithClassName = require("./divWithClassName");
+var _divWithClassNameDefault = parcelHelpers.interopDefault(_divWithClassName);
+var _jsxRuntime = require("react/jsx-runtime");
+"use client";
+const DivStyledAsH6 = (0, _divWithClassNameDefault.default)("h6");
+const CardSubtitle = /*#__PURE__*/ _react.forwardRef(({ className, bsPrefix, as: Component = DivStyledAsH6, ...props }, ref)=>{
+    bsPrefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-subtitle");
+    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
+        ref: ref,
+        className: (0, _classnamesDefault.default)(className, bsPrefix),
+        ...props
+    });
+});
+CardSubtitle.displayName = "CardSubtitle";
+exports.default = CardSubtitle;
+
+},{"react":"21dqq","classnames":"jocGM","./ThemeProvider":"dVixI","./divWithClassName":"eDg7t","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"eDg7t":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _react = require("react");
+var _classnames = require("classnames");
+var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
+var _jsxRuntime = require("react/jsx-runtime");
+exports.default = (className)=>/*#__PURE__*/ _react.forwardRef((p, ref)=>/*#__PURE__*/ (0, _jsxRuntime.jsx)("div", {
+            ...p,
+            ref: ref,
+            className: (0, _classnamesDefault.default)(p.className, className)
+        }));
+
+},{"react":"21dqq","classnames":"jocGM","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"aUUmg":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _react = require("react");
+var _classnames = require("classnames");
+var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
+var _themeProvider = require("./ThemeProvider");
+var _jsxRuntime = require("react/jsx-runtime");
+"use client";
+const CardText = /*#__PURE__*/ _react.forwardRef(({ className, bsPrefix, as: Component = "p", ...props }, ref)=>{
+    bsPrefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-text");
+    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
+        ref: ref,
+        className: (0, _classnamesDefault.default)(className, bsPrefix),
+        ...props
+    });
+});
+CardText.displayName = "CardText";
+exports.default = CardText;
+
+},{"react":"21dqq","classnames":"jocGM","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"79rSZ":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _react = require("react");
+var _classnames = require("classnames");
+var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
+var _themeProvider = require("./ThemeProvider");
+var _divWithClassName = require("./divWithClassName");
+var _divWithClassNameDefault = parcelHelpers.interopDefault(_divWithClassName);
+var _jsxRuntime = require("react/jsx-runtime");
+"use client";
+const DivStyledAsH5 = (0, _divWithClassNameDefault.default)("h5");
+const CardTitle = /*#__PURE__*/ _react.forwardRef(({ className, bsPrefix, as: Component = DivStyledAsH5, ...props }, ref)=>{
+    bsPrefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "card-title");
+    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
+        ref: ref,
+        className: (0, _classnamesDefault.default)(className, bsPrefix),
+        ...props
+    });
+});
+CardTitle.displayName = "CardTitle";
+exports.default = CardTitle;
+
+},{"react":"21dqq","classnames":"jocGM","./ThemeProvider":"dVixI","./divWithClassName":"eDg7t","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1wmVl":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _propTypes = require("prop-types");
@@ -37507,7 +36285,754 @@ CloseButton.displayName = "CloseButton";
 CloseButton.propTypes = propTypes;
 exports.default = CloseButton;
 
-},{"prop-types":"7wKI2","react":"21dqq","classnames":"jocGM","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2L2I6":[function(require,module,exports) {
+},{"prop-types":"7wKI2","react":"21dqq","classnames":"jocGM","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"7wKI2":[function(require,module,exports) {
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */ var ReactIs = require("96e34ae03f5a2631");
+// By explicitly using `prop-types` you are opting into new development behavior.
+// http://fb.me/prop-types-in-prod
+var throwOnDirectAccess = true;
+module.exports = require("cb216452e2171041")(ReactIs.isElement, throwOnDirectAccess);
+
+},{"96e34ae03f5a2631":"7EuwB","cb216452e2171041":"bBUgD"}],"7EuwB":[function(require,module,exports) {
+"use strict";
+module.exports = require("2255125a8e8b1051");
+
+},{"2255125a8e8b1051":"5DsXl"}],"5DsXl":[function(require,module,exports) {
+/** @license React v16.13.1
+ * react-is.development.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */ "use strict";
+(function() {
+    "use strict";
+    // The Symbol used to tag the ReactElement-like types. If there is no native Symbol
+    // nor polyfill, then a plain number is used for performance.
+    var hasSymbol = typeof Symbol === "function" && Symbol.for;
+    var REACT_ELEMENT_TYPE = hasSymbol ? Symbol.for("react.element") : 0xeac7;
+    var REACT_PORTAL_TYPE = hasSymbol ? Symbol.for("react.portal") : 0xeaca;
+    var REACT_FRAGMENT_TYPE = hasSymbol ? Symbol.for("react.fragment") : 0xeacb;
+    var REACT_STRICT_MODE_TYPE = hasSymbol ? Symbol.for("react.strict_mode") : 0xeacc;
+    var REACT_PROFILER_TYPE = hasSymbol ? Symbol.for("react.profiler") : 0xead2;
+    var REACT_PROVIDER_TYPE = hasSymbol ? Symbol.for("react.provider") : 0xeacd;
+    var REACT_CONTEXT_TYPE = hasSymbol ? Symbol.for("react.context") : 0xeace; // TODO: We don't use AsyncMode or ConcurrentMode anymore. They were temporary
+    // (unstable) APIs that have been removed. Can we remove the symbols?
+    var REACT_ASYNC_MODE_TYPE = hasSymbol ? Symbol.for("react.async_mode") : 0xeacf;
+    var REACT_CONCURRENT_MODE_TYPE = hasSymbol ? Symbol.for("react.concurrent_mode") : 0xeacf;
+    var REACT_FORWARD_REF_TYPE = hasSymbol ? Symbol.for("react.forward_ref") : 0xead0;
+    var REACT_SUSPENSE_TYPE = hasSymbol ? Symbol.for("react.suspense") : 0xead1;
+    var REACT_SUSPENSE_LIST_TYPE = hasSymbol ? Symbol.for("react.suspense_list") : 0xead8;
+    var REACT_MEMO_TYPE = hasSymbol ? Symbol.for("react.memo") : 0xead3;
+    var REACT_LAZY_TYPE = hasSymbol ? Symbol.for("react.lazy") : 0xead4;
+    var REACT_BLOCK_TYPE = hasSymbol ? Symbol.for("react.block") : 0xead9;
+    var REACT_FUNDAMENTAL_TYPE = hasSymbol ? Symbol.for("react.fundamental") : 0xead5;
+    var REACT_RESPONDER_TYPE = hasSymbol ? Symbol.for("react.responder") : 0xead6;
+    var REACT_SCOPE_TYPE = hasSymbol ? Symbol.for("react.scope") : 0xead7;
+    function isValidElementType(type) {
+        return typeof type === "string" || typeof type === "function" || // Note: its typeof might be other than 'symbol' or 'number' if it's a polyfill.
+        type === REACT_FRAGMENT_TYPE || type === REACT_CONCURRENT_MODE_TYPE || type === REACT_PROFILER_TYPE || type === REACT_STRICT_MODE_TYPE || type === REACT_SUSPENSE_TYPE || type === REACT_SUSPENSE_LIST_TYPE || typeof type === "object" && type !== null && (type.$$typeof === REACT_LAZY_TYPE || type.$$typeof === REACT_MEMO_TYPE || type.$$typeof === REACT_PROVIDER_TYPE || type.$$typeof === REACT_CONTEXT_TYPE || type.$$typeof === REACT_FORWARD_REF_TYPE || type.$$typeof === REACT_FUNDAMENTAL_TYPE || type.$$typeof === REACT_RESPONDER_TYPE || type.$$typeof === REACT_SCOPE_TYPE || type.$$typeof === REACT_BLOCK_TYPE);
+    }
+    function typeOf(object) {
+        if (typeof object === "object" && object !== null) {
+            var $$typeof = object.$$typeof;
+            switch($$typeof){
+                case REACT_ELEMENT_TYPE:
+                    var type = object.type;
+                    switch(type){
+                        case REACT_ASYNC_MODE_TYPE:
+                        case REACT_CONCURRENT_MODE_TYPE:
+                        case REACT_FRAGMENT_TYPE:
+                        case REACT_PROFILER_TYPE:
+                        case REACT_STRICT_MODE_TYPE:
+                        case REACT_SUSPENSE_TYPE:
+                            return type;
+                        default:
+                            var $$typeofType = type && type.$$typeof;
+                            switch($$typeofType){
+                                case REACT_CONTEXT_TYPE:
+                                case REACT_FORWARD_REF_TYPE:
+                                case REACT_LAZY_TYPE:
+                                case REACT_MEMO_TYPE:
+                                case REACT_PROVIDER_TYPE:
+                                    return $$typeofType;
+                                default:
+                                    return $$typeof;
+                            }
+                    }
+                case REACT_PORTAL_TYPE:
+                    return $$typeof;
+            }
+        }
+        return undefined;
+    } // AsyncMode is deprecated along with isAsyncMode
+    var AsyncMode = REACT_ASYNC_MODE_TYPE;
+    var ConcurrentMode = REACT_CONCURRENT_MODE_TYPE;
+    var ContextConsumer = REACT_CONTEXT_TYPE;
+    var ContextProvider = REACT_PROVIDER_TYPE;
+    var Element = REACT_ELEMENT_TYPE;
+    var ForwardRef = REACT_FORWARD_REF_TYPE;
+    var Fragment = REACT_FRAGMENT_TYPE;
+    var Lazy = REACT_LAZY_TYPE;
+    var Memo = REACT_MEMO_TYPE;
+    var Portal = REACT_PORTAL_TYPE;
+    var Profiler = REACT_PROFILER_TYPE;
+    var StrictMode = REACT_STRICT_MODE_TYPE;
+    var Suspense = REACT_SUSPENSE_TYPE;
+    var hasWarnedAboutDeprecatedIsAsyncMode = false; // AsyncMode should be deprecated
+    function isAsyncMode(object) {
+        if (!hasWarnedAboutDeprecatedIsAsyncMode) {
+            hasWarnedAboutDeprecatedIsAsyncMode = true; // Using console['warn'] to evade Babel and ESLint
+            console["warn"]("The ReactIs.isAsyncMode() alias has been deprecated, and will be removed in React 17+. Update your code to use ReactIs.isConcurrentMode() instead. It has the exact same API.");
+        }
+        return isConcurrentMode(object) || typeOf(object) === REACT_ASYNC_MODE_TYPE;
+    }
+    function isConcurrentMode(object) {
+        return typeOf(object) === REACT_CONCURRENT_MODE_TYPE;
+    }
+    function isContextConsumer(object) {
+        return typeOf(object) === REACT_CONTEXT_TYPE;
+    }
+    function isContextProvider(object) {
+        return typeOf(object) === REACT_PROVIDER_TYPE;
+    }
+    function isElement(object) {
+        return typeof object === "object" && object !== null && object.$$typeof === REACT_ELEMENT_TYPE;
+    }
+    function isForwardRef(object) {
+        return typeOf(object) === REACT_FORWARD_REF_TYPE;
+    }
+    function isFragment(object) {
+        return typeOf(object) === REACT_FRAGMENT_TYPE;
+    }
+    function isLazy(object) {
+        return typeOf(object) === REACT_LAZY_TYPE;
+    }
+    function isMemo(object) {
+        return typeOf(object) === REACT_MEMO_TYPE;
+    }
+    function isPortal(object) {
+        return typeOf(object) === REACT_PORTAL_TYPE;
+    }
+    function isProfiler(object) {
+        return typeOf(object) === REACT_PROFILER_TYPE;
+    }
+    function isStrictMode(object) {
+        return typeOf(object) === REACT_STRICT_MODE_TYPE;
+    }
+    function isSuspense(object) {
+        return typeOf(object) === REACT_SUSPENSE_TYPE;
+    }
+    exports.AsyncMode = AsyncMode;
+    exports.ConcurrentMode = ConcurrentMode;
+    exports.ContextConsumer = ContextConsumer;
+    exports.ContextProvider = ContextProvider;
+    exports.Element = Element;
+    exports.ForwardRef = ForwardRef;
+    exports.Fragment = Fragment;
+    exports.Lazy = Lazy;
+    exports.Memo = Memo;
+    exports.Portal = Portal;
+    exports.Profiler = Profiler;
+    exports.StrictMode = StrictMode;
+    exports.Suspense = Suspense;
+    exports.isAsyncMode = isAsyncMode;
+    exports.isConcurrentMode = isConcurrentMode;
+    exports.isContextConsumer = isContextConsumer;
+    exports.isContextProvider = isContextProvider;
+    exports.isElement = isElement;
+    exports.isForwardRef = isForwardRef;
+    exports.isFragment = isFragment;
+    exports.isLazy = isLazy;
+    exports.isMemo = isMemo;
+    exports.isPortal = isPortal;
+    exports.isProfiler = isProfiler;
+    exports.isStrictMode = isStrictMode;
+    exports.isSuspense = isSuspense;
+    exports.isValidElementType = isValidElementType;
+    exports.typeOf = typeOf;
+})();
+
+},{}],"bBUgD":[function(require,module,exports) {
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */ "use strict";
+var ReactIs = require("c437388b089702c3");
+var assign = require("c067a60101d8520c");
+var ReactPropTypesSecret = require("74a0f89a70b9f3c2");
+var has = require("18441b11647bc78");
+var checkPropTypes = require("bec3f6ff89f0b072");
+var printWarning = function() {};
+printWarning = function(text) {
+    var message = "Warning: " + text;
+    if (typeof console !== "undefined") console.error(message);
+    try {
+        // --- Welcome to debugging React ---
+        // This error was thrown as a convenience so that you can use this stack
+        // to find the callsite that caused this warning to fire.
+        throw new Error(message);
+    } catch (x) {}
+};
+function emptyFunctionThatReturnsNull() {
+    return null;
+}
+module.exports = function(isValidElement, throwOnDirectAccess) {
+    /* global Symbol */ var ITERATOR_SYMBOL = typeof Symbol === "function" && Symbol.iterator;
+    var FAUX_ITERATOR_SYMBOL = "@@iterator"; // Before Symbol spec.
+    /**
+   * Returns the iterator method function contained on the iterable object.
+   *
+   * Be sure to invoke the function with the iterable as context:
+   *
+   *     var iteratorFn = getIteratorFn(myIterable);
+   *     if (iteratorFn) {
+   *       var iterator = iteratorFn.call(myIterable);
+   *       ...
+   *     }
+   *
+   * @param {?object} maybeIterable
+   * @return {?function}
+   */ function getIteratorFn(maybeIterable) {
+        var iteratorFn = maybeIterable && (ITERATOR_SYMBOL && maybeIterable[ITERATOR_SYMBOL] || maybeIterable[FAUX_ITERATOR_SYMBOL]);
+        if (typeof iteratorFn === "function") return iteratorFn;
+    }
+    /**
+   * Collection of methods that allow declaration and validation of props that are
+   * supplied to React components. Example usage:
+   *
+   *   var Props = require('ReactPropTypes');
+   *   var MyArticle = React.createClass({
+   *     propTypes: {
+   *       // An optional string prop named "description".
+   *       description: Props.string,
+   *
+   *       // A required enum prop named "category".
+   *       category: Props.oneOf(['News','Photos']).isRequired,
+   *
+   *       // A prop named "dialog" that requires an instance of Dialog.
+   *       dialog: Props.instanceOf(Dialog).isRequired
+   *     },
+   *     render: function() { ... }
+   *   });
+   *
+   * A more formal specification of how these methods are used:
+   *
+   *   type := array|bool|func|object|number|string|oneOf([...])|instanceOf(...)
+   *   decl := ReactPropTypes.{type}(.isRequired)?
+   *
+   * Each and every declaration produces a function with the same signature. This
+   * allows the creation of custom validation functions. For example:
+   *
+   *  var MyLink = React.createClass({
+   *    propTypes: {
+   *      // An optional string or URI prop named "href".
+   *      href: function(props, propName, componentName) {
+   *        var propValue = props[propName];
+   *        if (propValue != null && typeof propValue !== 'string' &&
+   *            !(propValue instanceof URI)) {
+   *          return new Error(
+   *            'Expected a string or an URI for ' + propName + ' in ' +
+   *            componentName
+   *          );
+   *        }
+   *      }
+   *    },
+   *    render: function() {...}
+   *  });
+   *
+   * @internal
+   */ var ANONYMOUS = "<<anonymous>>";
+    // Important!
+    // Keep this list in sync with production version in `./factoryWithThrowingShims.js`.
+    var ReactPropTypes = {
+        array: createPrimitiveTypeChecker("array"),
+        bigint: createPrimitiveTypeChecker("bigint"),
+        bool: createPrimitiveTypeChecker("boolean"),
+        func: createPrimitiveTypeChecker("function"),
+        number: createPrimitiveTypeChecker("number"),
+        object: createPrimitiveTypeChecker("object"),
+        string: createPrimitiveTypeChecker("string"),
+        symbol: createPrimitiveTypeChecker("symbol"),
+        any: createAnyTypeChecker(),
+        arrayOf: createArrayOfTypeChecker,
+        element: createElementTypeChecker(),
+        elementType: createElementTypeTypeChecker(),
+        instanceOf: createInstanceTypeChecker,
+        node: createNodeChecker(),
+        objectOf: createObjectOfTypeChecker,
+        oneOf: createEnumTypeChecker,
+        oneOfType: createUnionTypeChecker,
+        shape: createShapeTypeChecker,
+        exact: createStrictShapeTypeChecker
+    };
+    /**
+   * inlined Object.is polyfill to avoid requiring consumers ship their own
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is
+   */ /*eslint-disable no-self-compare*/ function is(x, y) {
+        // SameValue algorithm
+        if (x === y) // Steps 1-5, 7-10
+        // Steps 6.b-6.e: +0 != -0
+        return x !== 0 || 1 / x === 1 / y;
+        else // Step 6.a: NaN == NaN
+        return x !== x && y !== y;
+    }
+    /*eslint-enable no-self-compare*/ /**
+   * We use an Error-like object for backward compatibility as people may call
+   * PropTypes directly and inspect their output. However, we don't use real
+   * Errors anymore. We don't inspect their stack anyway, and creating them
+   * is prohibitively expensive if they are created too often, such as what
+   * happens in oneOfType() for any type before the one that matched.
+   */ function PropTypeError(message, data) {
+        this.message = message;
+        this.data = data && typeof data === "object" ? data : {};
+        this.stack = "";
+    }
+    // Make `instanceof Error` still work for returned errors.
+    PropTypeError.prototype = Error.prototype;
+    function createChainableTypeChecker(validate) {
+        var manualPropTypeCallCache = {};
+        var manualPropTypeWarningCount = 0;
+        function checkType(isRequired, props, propName, componentName, location, propFullName, secret) {
+            componentName = componentName || ANONYMOUS;
+            propFullName = propFullName || propName;
+            if (secret !== ReactPropTypesSecret) {
+                if (throwOnDirectAccess) {
+                    // New behavior only for users of `prop-types` package
+                    var err = new Error("Calling PropTypes validators directly is not supported by the `prop-types` package. Use `PropTypes.checkPropTypes()` to call them. Read more at http://fb.me/use-check-prop-types");
+                    err.name = "Invariant Violation";
+                    throw err;
+                } else if (typeof console !== "undefined") {
+                    // Old behavior for people using React.PropTypes
+                    var cacheKey = componentName + ":" + propName;
+                    if (!manualPropTypeCallCache[cacheKey] && // Avoid spamming the console because they are often not actionable except for lib authors
+                    manualPropTypeWarningCount < 3) {
+                        printWarning("You are manually calling a React.PropTypes validation function for the `" + propFullName + "` prop on `" + componentName + "`. This is deprecated " + "and will throw in the standalone `prop-types` package. " + "You may be seeing this warning due to a third-party PropTypes " + "library. See https://fb.me/react-warning-dont-call-proptypes " + "for details.");
+                        manualPropTypeCallCache[cacheKey] = true;
+                        manualPropTypeWarningCount++;
+                    }
+                }
+            }
+            if (props[propName] == null) {
+                if (isRequired) {
+                    if (props[propName] === null) return new PropTypeError("The " + location + " `" + propFullName + "` is marked as required " + ("in `" + componentName + "`, but its value is `null`."));
+                    return new PropTypeError("The " + location + " `" + propFullName + "` is marked as required in " + ("`" + componentName + "`, but its value is `undefined`."));
+                }
+                return null;
+            } else return validate(props, propName, componentName, location, propFullName);
+        }
+        var chainedCheckType = checkType.bind(null, false);
+        chainedCheckType.isRequired = checkType.bind(null, true);
+        return chainedCheckType;
+    }
+    function createPrimitiveTypeChecker(expectedType) {
+        function validate(props, propName, componentName, location, propFullName, secret) {
+            var propValue = props[propName];
+            var propType = getPropType(propValue);
+            if (propType !== expectedType) {
+                // `propValue` being instance of, say, date/regexp, pass the 'object'
+                // check, but we can offer a more precise error message here rather than
+                // 'of type `object`'.
+                var preciseType = getPreciseType(propValue);
+                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + preciseType + "` supplied to `" + componentName + "`, expected ") + ("`" + expectedType + "`."), {
+                    expectedType: expectedType
+                });
+            }
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createAnyTypeChecker() {
+        return createChainableTypeChecker(emptyFunctionThatReturnsNull);
+    }
+    function createArrayOfTypeChecker(typeChecker) {
+        function validate(props, propName, componentName, location, propFullName) {
+            if (typeof typeChecker !== "function") return new PropTypeError("Property `" + propFullName + "` of component `" + componentName + "` has invalid PropType notation inside arrayOf.");
+            var propValue = props[propName];
+            if (!Array.isArray(propValue)) {
+                var propType = getPropType(propValue);
+                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected an array."));
+            }
+            for(var i = 0; i < propValue.length; i++){
+                var error = typeChecker(propValue, i, componentName, location, propFullName + "[" + i + "]", ReactPropTypesSecret);
+                if (error instanceof Error) return error;
+            }
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createElementTypeChecker() {
+        function validate(props, propName, componentName, location, propFullName) {
+            var propValue = props[propName];
+            if (!isValidElement(propValue)) {
+                var propType = getPropType(propValue);
+                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected a single ReactElement."));
+            }
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createElementTypeTypeChecker() {
+        function validate(props, propName, componentName, location, propFullName) {
+            var propValue = props[propName];
+            if (!ReactIs.isValidElementType(propValue)) {
+                var propType = getPropType(propValue);
+                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected a single ReactElement type."));
+            }
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createInstanceTypeChecker(expectedClass) {
+        function validate(props, propName, componentName, location, propFullName) {
+            if (!(props[propName] instanceof expectedClass)) {
+                var expectedClassName = expectedClass.name || ANONYMOUS;
+                var actualClassName = getClassName(props[propName]);
+                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + actualClassName + "` supplied to `" + componentName + "`, expected ") + ("instance of `" + expectedClassName + "`."));
+            }
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createEnumTypeChecker(expectedValues) {
+        if (!Array.isArray(expectedValues)) {
+            {
+                if (arguments.length > 1) printWarning("Invalid arguments supplied to oneOf, expected an array, got " + arguments.length + " arguments. " + "A common mistake is to write oneOf(x, y, z) instead of oneOf([x, y, z]).");
+                else printWarning("Invalid argument supplied to oneOf, expected an array.");
+            }
+            return emptyFunctionThatReturnsNull;
+        }
+        function validate(props, propName, componentName, location, propFullName) {
+            var propValue = props[propName];
+            for(var i = 0; i < expectedValues.length; i++){
+                if (is(propValue, expectedValues[i])) return null;
+            }
+            var valuesString = JSON.stringify(expectedValues, function replacer(key, value) {
+                var type = getPreciseType(value);
+                if (type === "symbol") return String(value);
+                return value;
+            });
+            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of value `" + String(propValue) + "` " + ("supplied to `" + componentName + "`, expected one of " + valuesString + "."));
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createObjectOfTypeChecker(typeChecker) {
+        function validate(props, propName, componentName, location, propFullName) {
+            if (typeof typeChecker !== "function") return new PropTypeError("Property `" + propFullName + "` of component `" + componentName + "` has invalid PropType notation inside objectOf.");
+            var propValue = props[propName];
+            var propType = getPropType(propValue);
+            if (propType !== "object") return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected an object."));
+            for(var key in propValue)if (has(propValue, key)) {
+                var error = typeChecker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
+                if (error instanceof Error) return error;
+            }
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createUnionTypeChecker(arrayOfTypeCheckers) {
+        if (!Array.isArray(arrayOfTypeCheckers)) {
+            printWarning("Invalid argument supplied to oneOfType, expected an instance of array.");
+            return emptyFunctionThatReturnsNull;
+        }
+        for(var i = 0; i < arrayOfTypeCheckers.length; i++){
+            var checker = arrayOfTypeCheckers[i];
+            if (typeof checker !== "function") {
+                printWarning("Invalid argument supplied to oneOfType. Expected an array of check functions, but received " + getPostfixForTypeWarning(checker) + " at index " + i + ".");
+                return emptyFunctionThatReturnsNull;
+            }
+        }
+        function validate(props, propName, componentName, location, propFullName) {
+            var expectedTypes = [];
+            for(var i = 0; i < arrayOfTypeCheckers.length; i++){
+                var checker = arrayOfTypeCheckers[i];
+                var checkerResult = checker(props, propName, componentName, location, propFullName, ReactPropTypesSecret);
+                if (checkerResult == null) return null;
+                if (checkerResult.data && has(checkerResult.data, "expectedType")) expectedTypes.push(checkerResult.data.expectedType);
+            }
+            var expectedTypesMessage = expectedTypes.length > 0 ? ", expected one of type [" + expectedTypes.join(", ") + "]" : "";
+            return new PropTypeError("Invalid " + location + " `" + propFullName + "` supplied to " + ("`" + componentName + "`" + expectedTypesMessage + "."));
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createNodeChecker() {
+        function validate(props, propName, componentName, location, propFullName) {
+            if (!isNode(props[propName])) return new PropTypeError("Invalid " + location + " `" + propFullName + "` supplied to " + ("`" + componentName + "`, expected a ReactNode."));
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function invalidValidatorError(componentName, location, propFullName, key, type) {
+        return new PropTypeError((componentName || "React class") + ": " + location + " type `" + propFullName + "." + key + "` is invalid; " + "it must be a function, usually from the `prop-types` package, but received `" + type + "`.");
+    }
+    function createShapeTypeChecker(shapeTypes) {
+        function validate(props, propName, componentName, location, propFullName) {
+            var propValue = props[propName];
+            var propType = getPropType(propValue);
+            if (propType !== "object") return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type `" + propType + "` " + ("supplied to `" + componentName + "`, expected `object`."));
+            for(var key in shapeTypes){
+                var checker = shapeTypes[key];
+                if (typeof checker !== "function") return invalidValidatorError(componentName, location, propFullName, key, getPreciseType(checker));
+                var error = checker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
+                if (error) return error;
+            }
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createStrictShapeTypeChecker(shapeTypes) {
+        function validate(props, propName, componentName, location, propFullName) {
+            var propValue = props[propName];
+            var propType = getPropType(propValue);
+            if (propType !== "object") return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type `" + propType + "` " + ("supplied to `" + componentName + "`, expected `object`."));
+            // We need to check all keys in case some are required but missing from props.
+            var allKeys = assign({}, props[propName], shapeTypes);
+            for(var key in allKeys){
+                var checker = shapeTypes[key];
+                if (has(shapeTypes, key) && typeof checker !== "function") return invalidValidatorError(componentName, location, propFullName, key, getPreciseType(checker));
+                if (!checker) return new PropTypeError("Invalid " + location + " `" + propFullName + "` key `" + key + "` supplied to `" + componentName + "`." + "\nBad object: " + JSON.stringify(props[propName], null, "  ") + "\nValid keys: " + JSON.stringify(Object.keys(shapeTypes), null, "  "));
+                var error = checker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
+                if (error) return error;
+            }
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function isNode(propValue) {
+        switch(typeof propValue){
+            case "number":
+            case "string":
+            case "undefined":
+                return true;
+            case "boolean":
+                return !propValue;
+            case "object":
+                if (Array.isArray(propValue)) return propValue.every(isNode);
+                if (propValue === null || isValidElement(propValue)) return true;
+                var iteratorFn = getIteratorFn(propValue);
+                if (iteratorFn) {
+                    var iterator = iteratorFn.call(propValue);
+                    var step;
+                    if (iteratorFn !== propValue.entries) while(!(step = iterator.next()).done){
+                        if (!isNode(step.value)) return false;
+                    }
+                    else // Iterator will provide entry [k,v] tuples rather than values.
+                    while(!(step = iterator.next()).done){
+                        var entry = step.value;
+                        if (entry) {
+                            if (!isNode(entry[1])) return false;
+                        }
+                    }
+                } else return false;
+                return true;
+            default:
+                return false;
+        }
+    }
+    function isSymbol(propType, propValue) {
+        // Native Symbol.
+        if (propType === "symbol") return true;
+        // falsy value can't be a Symbol
+        if (!propValue) return false;
+        // 19.4.3.5 Symbol.prototype[@@toStringTag] === 'Symbol'
+        if (propValue["@@toStringTag"] === "Symbol") return true;
+        // Fallback for non-spec compliant Symbols which are polyfilled.
+        if (typeof Symbol === "function" && propValue instanceof Symbol) return true;
+        return false;
+    }
+    // Equivalent of `typeof` but with special handling for array and regexp.
+    function getPropType(propValue) {
+        var propType = typeof propValue;
+        if (Array.isArray(propValue)) return "array";
+        if (propValue instanceof RegExp) // Old webkits (at least until Android 4.0) return 'function' rather than
+        // 'object' for typeof a RegExp. We'll normalize this here so that /bla/
+        // passes PropTypes.object.
+        return "object";
+        if (isSymbol(propType, propValue)) return "symbol";
+        return propType;
+    }
+    // This handles more types than `getPropType`. Only used for error messages.
+    // See `createPrimitiveTypeChecker`.
+    function getPreciseType(propValue) {
+        if (typeof propValue === "undefined" || propValue === null) return "" + propValue;
+        var propType = getPropType(propValue);
+        if (propType === "object") {
+            if (propValue instanceof Date) return "date";
+            else if (propValue instanceof RegExp) return "regexp";
+        }
+        return propType;
+    }
+    // Returns a string that is postfixed to a warning about an invalid type.
+    // For example, "undefined" or "of type array"
+    function getPostfixForTypeWarning(value) {
+        var type = getPreciseType(value);
+        switch(type){
+            case "array":
+            case "object":
+                return "an " + type;
+            case "boolean":
+            case "date":
+            case "regexp":
+                return "a " + type;
+            default:
+                return type;
+        }
+    }
+    // Returns class name of the object, if any.
+    function getClassName(propValue) {
+        if (!propValue.constructor || !propValue.constructor.name) return ANONYMOUS;
+        return propValue.constructor.name;
+    }
+    ReactPropTypes.checkPropTypes = checkPropTypes;
+    ReactPropTypes.resetWarningCache = checkPropTypes.resetWarningCache;
+    ReactPropTypes.PropTypes = ReactPropTypes;
+    return ReactPropTypes;
+};
+
+},{"c437388b089702c3":"7EuwB","c067a60101d8520c":"7OXxh","74a0f89a70b9f3c2":"jZTZJ","18441b11647bc78":"fqKuf","bec3f6ff89f0b072":"5VwyJ"}],"7OXxh":[function(require,module,exports) {
+/*
+object-assign
+(c) Sindre Sorhus
+@license MIT
+*/ "use strict";
+/* eslint-disable no-unused-vars */ var getOwnPropertySymbols = Object.getOwnPropertySymbols;
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+function toObject(val) {
+    if (val === null || val === undefined) throw new TypeError("Object.assign cannot be called with null or undefined");
+    return Object(val);
+}
+function shouldUseNative() {
+    try {
+        if (!Object.assign) return false;
+        // Detect buggy property enumeration order in older V8 versions.
+        // https://bugs.chromium.org/p/v8/issues/detail?id=4118
+        var test1 = new String("abc"); // eslint-disable-line no-new-wrappers
+        test1[5] = "de";
+        if (Object.getOwnPropertyNames(test1)[0] === "5") return false;
+        // https://bugs.chromium.org/p/v8/issues/detail?id=3056
+        var test2 = {};
+        for(var i = 0; i < 10; i++)test2["_" + String.fromCharCode(i)] = i;
+        var order2 = Object.getOwnPropertyNames(test2).map(function(n) {
+            return test2[n];
+        });
+        if (order2.join("") !== "0123456789") return false;
+        // https://bugs.chromium.org/p/v8/issues/detail?id=3056
+        var test3 = {};
+        "abcdefghijklmnopqrst".split("").forEach(function(letter) {
+            test3[letter] = letter;
+        });
+        if (Object.keys(Object.assign({}, test3)).join("") !== "abcdefghijklmnopqrst") return false;
+        return true;
+    } catch (err) {
+        // We don't expect any of the above to throw, but better to be safe.
+        return false;
+    }
+}
+module.exports = shouldUseNative() ? Object.assign : function(target, source) {
+    var from;
+    var to = toObject(target);
+    var symbols;
+    for(var s = 1; s < arguments.length; s++){
+        from = Object(arguments[s]);
+        for(var key in from)if (hasOwnProperty.call(from, key)) to[key] = from[key];
+        if (getOwnPropertySymbols) {
+            symbols = getOwnPropertySymbols(from);
+            for(var i = 0; i < symbols.length; i++)if (propIsEnumerable.call(from, symbols[i])) to[symbols[i]] = from[symbols[i]];
+        }
+    }
+    return to;
+};
+
+},{}],"jZTZJ":[function(require,module,exports) {
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */ "use strict";
+var ReactPropTypesSecret = "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED";
+module.exports = ReactPropTypesSecret;
+
+},{}],"fqKuf":[function(require,module,exports) {
+module.exports = Function.call.bind(Object.prototype.hasOwnProperty);
+
+},{}],"5VwyJ":[function(require,module,exports) {
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */ "use strict";
+var printWarning = function() {};
+var ReactPropTypesSecret = require("24ba1e58d167a82c");
+var loggedTypeFailures = {};
+var has = require("898bc82f39d83f7c");
+printWarning = function(text) {
+    var message = "Warning: " + text;
+    if (typeof console !== "undefined") console.error(message);
+    try {
+        // --- Welcome to debugging React ---
+        // This error was thrown as a convenience so that you can use this stack
+        // to find the callsite that caused this warning to fire.
+        throw new Error(message);
+    } catch (x) {}
+};
+/**
+ * Assert that the values match with the type specs.
+ * Error messages are memorized and will only be shown once.
+ *
+ * @param {object} typeSpecs Map of name to a ReactPropType
+ * @param {object} values Runtime values that need to be type-checked
+ * @param {string} location e.g. "prop", "context", "child context"
+ * @param {string} componentName Name of the component for error messages.
+ * @param {?Function} getStack Returns the component stack.
+ * @private
+ */ function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
+    for(var typeSpecName in typeSpecs)if (has(typeSpecs, typeSpecName)) {
+        var error;
+        // Prop type validation may throw. In case they do, we don't want to
+        // fail the render phase where it didn't fail before. So we log it.
+        // After these have been cleaned up, we'll let them throw.
+        try {
+            // This is intentionally an invariant that gets caught. It's the same
+            // behavior as without this statement except with a better message.
+            if (typeof typeSpecs[typeSpecName] !== "function") {
+                var err = Error((componentName || "React class") + ": " + location + " type `" + typeSpecName + "` is invalid; " + "it must be a function, usually from the `prop-types` package, but received `" + typeof typeSpecs[typeSpecName] + "`." + "This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`.");
+                err.name = "Invariant Violation";
+                throw err;
+            }
+            error = typeSpecs[typeSpecName](values, typeSpecName, componentName, location, null, ReactPropTypesSecret);
+        } catch (ex) {
+            error = ex;
+        }
+        if (error && !(error instanceof Error)) printWarning((componentName || "React class") + ": type specification of " + location + " `" + typeSpecName + "` is invalid; the type checker " + "function must return `null` or an `Error` but returned a " + typeof error + ". " + "You may have forgotten to pass an argument to the type checker " + "creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and " + "shape all require an argument).");
+        if (error instanceof Error && !(error.message in loggedTypeFailures)) {
+            // Only monitor this failure once because there tends to be a lot of the
+            // same error.
+            loggedTypeFailures[error.message] = true;
+            var stack = getStack ? getStack() : "";
+            printWarning("Failed " + location + " type: " + error.message + (stack != null ? stack : ""));
+        }
+    }
+}
+/**
+ * Resets warning cache when testing.
+ *
+ * @private
+ */ checkPropTypes.resetWarningCache = function() {
+    loggedTypeFailures = {};
+};
+module.exports = checkPropTypes;
+
+},{"24ba1e58d167a82c":"jZTZJ","898bc82f39d83f7c":"fqKuf"}],"2L2I6":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "useCol", ()=>useCol);
@@ -42143,7 +41668,270 @@ as: Component = "div", ...props }, ref)=>{
 Row.displayName = "Row";
 exports.default = Row;
 
-},{"classnames":"jocGM","react":"21dqq","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9YtA0":[function(require,module,exports) {
+},{"classnames":"jocGM","react":"21dqq","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bsPVM":[function(require,module,exports) {
+var $parcel$ReactRefreshHelpers$abf5 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
+var prevRefreshReg = window.$RefreshReg$;
+var prevRefreshSig = window.$RefreshSig$;
+$parcel$ReactRefreshHelpers$abf5.prelude(module);
+
+try {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "NavigationBar", ()=>NavigationBar);
+var _jsxDevRuntime = require("react/jsx-dev-runtime");
+var _reactBootstrap = require("react-bootstrap");
+var _reactRouterDom = require("react-router-dom");
+const NavigationBar = ({ user, onLoggedOut })=>{
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Navbar), {
+        bg: "primary",
+        expand: "lg",
+        fixed: "top",
+        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Container), {
+            children: [
+                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Navbar).Brand, {
+                    as: (0, _reactRouterDom.Link),
+                    to: "/",
+                    children: "MyMovies"
+                }, void 0, false, {
+                    fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                    lineNumber: 8,
+                    columnNumber: 17
+                }, undefined),
+                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Navbar).Toggle, {
+                    "aria-controls": "basic-navbar-nav"
+                }, void 0, false, {
+                    fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                    lineNumber: 11,
+                    columnNumber: 17
+                }, undefined),
+                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Navbar).Collapse, {
+                    id: "-basic-navbar-nav",
+                    children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav), {
+                        className: "me-auto",
+                        children: [
+                            !user && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
+                                children: [
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
+                                        as: (0, _reactRouterDom.Link),
+                                        to: "/login",
+                                        children: "Login"
+                                    }, void 0, false, {
+                                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                                        lineNumber: 16,
+                                        columnNumber: 33
+                                    }, undefined),
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
+                                        as: (0, _reactRouterDom.Link),
+                                        to: "/signup",
+                                        children: "Signup"
+                                    }, void 0, false, {
+                                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                                        lineNumber: 19,
+                                        columnNumber: 33
+                                    }, undefined)
+                                ]
+                            }, void 0, true),
+                            user && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
+                                children: [
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
+                                        as: (0, _reactRouterDom.Link),
+                                        to: "/",
+                                        children: "Home"
+                                    }, void 0, false, {
+                                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                                        lineNumber: 26,
+                                        columnNumber: 33
+                                    }, undefined),
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
+                                        as: (0, _reactRouterDom.Link),
+                                        to: "/profile",
+                                        children: "Profile"
+                                    }, void 0, false, {
+                                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                                        lineNumber: 29,
+                                        columnNumber: 33
+                                    }, undefined),
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
+                                        onClick: onLoggedOut,
+                                        children: "Logout"
+                                    }, void 0, false, {
+                                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                                        lineNumber: 32,
+                                        columnNumber: 33
+                                    }, undefined)
+                                ]
+                            }, void 0, true)
+                        ]
+                    }, void 0, true, {
+                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                        lineNumber: 13,
+                        columnNumber: 21
+                    }, undefined)
+                }, void 0, false, {
+                    fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                    lineNumber: 12,
+                    columnNumber: 17
+                }, undefined)
+            ]
+        }, void 0, true, {
+            fileName: "src/components/navigation-bar/navigation-bar.jsx",
+            lineNumber: 7,
+            columnNumber: 13
+        }, undefined)
+    }, void 0, false, {
+        fileName: "src/components/navigation-bar/navigation-bar.jsx",
+        lineNumber: 6,
+        columnNumber: 9
+    }, undefined);
+};
+_c = NavigationBar;
+var _c;
+$RefreshReg$(_c, "NavigationBar");
+
+  $parcel$ReactRefreshHelpers$abf5.postlude(module);
+} finally {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+},{"react/jsx-dev-runtime":"iTorj","react-bootstrap":"3AD9A","react-router-dom":"9xmpe","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"km3Ru":[function(require,module,exports) {
+"use strict";
+var Refresh = require("7422ead32dcc1e6b");
+function debounce(func, delay) {
+    {
+        let timeout = undefined;
+        let lastTime = 0;
+        return function(args) {
+            // Call immediately if last call was more than the delay ago.
+            // Otherwise, set a timeout. This means the first call is fast
+            // (for the common case of a single update), and subsequent updates
+            // are batched.
+            let now = Date.now();
+            if (now - lastTime > delay) {
+                lastTime = now;
+                func.call(null, args);
+            } else {
+                clearTimeout(timeout);
+                timeout = setTimeout(function() {
+                    timeout = undefined;
+                    lastTime = Date.now();
+                    func.call(null, args);
+                }, delay);
+            }
+        };
+    }
+}
+var enqueueUpdate = debounce(function() {
+    Refresh.performReactRefresh();
+}, 30);
+// Everthing below is either adapted or copied from
+// https://github.com/facebook/metro/blob/61de16bd1edd7e738dd0311c89555a644023ab2d/packages/metro/src/lib/polyfills/require.js
+// MIT License - Copyright (c) Facebook, Inc. and its affiliates.
+module.exports.prelude = function(module1) {
+    window.$RefreshReg$ = function(type, id) {
+        Refresh.register(type, module1.id + " " + id);
+    };
+    window.$RefreshSig$ = Refresh.createSignatureFunctionForTransform;
+};
+module.exports.postlude = function(module1) {
+    if (isReactRefreshBoundary(module1.exports)) {
+        registerExportsForReactRefresh(module1);
+        if (module1.hot) {
+            module1.hot.dispose(function(data) {
+                if (Refresh.hasUnrecoverableErrors()) window.location.reload();
+                data.prevExports = module1.exports;
+            });
+            module1.hot.accept(function(getParents) {
+                var prevExports = module1.hot.data.prevExports;
+                var nextExports = module1.exports;
+                // Since we just executed the code for it, it's possible
+                // that the new exports make it ineligible for being a boundary.
+                var isNoLongerABoundary = !isReactRefreshBoundary(nextExports);
+                // It can also become ineligible if its exports are incompatible
+                // with the previous exports.
+                // For example, if you add/remove/change exports, we'll want
+                // to re-execute the importing modules, and force those components
+                // to re-render. Similarly, if you convert a class component
+                // to a function, we want to invalidate the boundary.
+                var didInvalidate = shouldInvalidateReactRefreshBoundary(prevExports, nextExports);
+                if (isNoLongerABoundary || didInvalidate) {
+                    // We'll be conservative. The only case in which we won't do a full
+                    // reload is if all parent modules are also refresh boundaries.
+                    // In that case we'll add them to the current queue.
+                    var parents = getParents();
+                    if (parents.length === 0) {
+                        // Looks like we bubbled to the root. Can't recover from that.
+                        window.location.reload();
+                        return;
+                    }
+                    return parents;
+                }
+                enqueueUpdate();
+            });
+        }
+    }
+};
+function isReactRefreshBoundary(exports) {
+    if (Refresh.isLikelyComponentType(exports)) return true;
+    if (exports == null || typeof exports !== "object") // Exit if we can't iterate over exports.
+    return false;
+    var hasExports = false;
+    var areAllExportsComponents = true;
+    let isESM = "__esModule" in exports;
+    for(var key in exports){
+        hasExports = true;
+        if (key === "__esModule") continue;
+        var desc = Object.getOwnPropertyDescriptor(exports, key);
+        if (desc && desc.get && !isESM) // Don't invoke getters for CJS as they may have side effects.
+        return false;
+        var exportValue = exports[key];
+        if (!Refresh.isLikelyComponentType(exportValue)) areAllExportsComponents = false;
+    }
+    return hasExports && areAllExportsComponents;
+}
+function shouldInvalidateReactRefreshBoundary(prevExports, nextExports) {
+    var prevSignature = getRefreshBoundarySignature(prevExports);
+    var nextSignature = getRefreshBoundarySignature(nextExports);
+    if (prevSignature.length !== nextSignature.length) return true;
+    for(var i = 0; i < nextSignature.length; i++){
+        if (prevSignature[i] !== nextSignature[i]) return true;
+    }
+    return false;
+}
+// When this signature changes, it's unsafe to stop at this refresh boundary.
+function getRefreshBoundarySignature(exports) {
+    var signature = [];
+    signature.push(Refresh.getFamilyByType(exports));
+    if (exports == null || typeof exports !== "object") // Exit if we can't iterate over exports.
+    // (This is important for legacy environments.)
+    return signature;
+    let isESM = "__esModule" in exports;
+    for(var key in exports){
+        if (key === "__esModule") continue;
+        var desc = Object.getOwnPropertyDescriptor(exports, key);
+        if (desc && desc.get && !isESM) continue;
+        var exportValue = exports[key];
+        signature.push(key);
+        signature.push(Refresh.getFamilyByType(exportValue));
+    }
+    return signature;
+}
+function registerExportsForReactRefresh(module1) {
+    var exports = module1.exports, id = module1.id;
+    Refresh.register(exports, id + " %exports%");
+    if (exports == null || typeof exports !== "object") // Exit if we can't iterate over exports.
+    // (This is important for legacy environments.)
+    return;
+    let isESM = "__esModule" in exports;
+    for(var key in exports){
+        var desc = Object.getOwnPropertyDescriptor(exports, key);
+        if (desc && desc.get && !isESM) continue;
+        var exportValue = exports[key];
+        var typeID = id + " %exports% " + key;
+        Refresh.register(exportValue, typeID);
+    }
+}
+
+},{"7422ead32dcc1e6b":"786KC"}],"9YtA0":[function(require,module,exports) {
 var $parcel$ReactRefreshHelpers$9fee = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -42464,7 +42252,221 @@ $RefreshReg$(_c, "SignupView");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-bootstrap/Button":"aPzUt","react-bootstrap/Form":"iBZ80","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"2vVqf":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-bootstrap/Button":"aPzUt","react-bootstrap/Form":"iBZ80","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"ggaUx":[function(require,module,exports) {
+var $parcel$ReactRefreshHelpers$e9f6 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
+var prevRefreshReg = window.$RefreshReg$;
+var prevRefreshSig = window.$RefreshSig$;
+$parcel$ReactRefreshHelpers$e9f6.prelude(module);
+
+try {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "MovieView", ()=>MovieView);
+var _jsxDevRuntime = require("react/jsx-dev-runtime");
+var _react = require("react");
+var _reactDefault = parcelHelpers.interopDefault(_react);
+var _reactRouter = require("react-router");
+var _reactRouterDom = require("react-router-dom");
+var _reactBootstrap = require("react-bootstrap");
+var _s = $RefreshSig$();
+const MovieView = ({ movies })=>{
+    _s();
+    const { movieId } = (0, _reactRouter.useParams)();
+    const movie = movies.find((movie)=>movie._id === movieId);
+    if (!movie) return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+        children: "Loading..."
+    }, void 0, false, {
+        fileName: "src/components/movie-view/movie-view.jsx",
+        lineNumber: 11,
+        columnNumber: 16
+    }, undefined); // Handle case where movie with movieId is not found
+    const { Title, Description, Genre, Director, Year, ImagePath } = movie;
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Row), {
+        className: "my-5 justify-content-md-center",
+        children: [
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                md: 7,
+                className: "col-12",
+                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("img", {
+                    src: ImagePath,
+                    alt: "movie cover",
+                    className: "mx-auto w-100"
+                }, void 0, false, {
+                    fileName: "src/components/movie-view/movie-view.jsx",
+                    lineNumber: 19,
+                    columnNumber: 17
+                }, undefined)
+            }, void 0, false, {
+                fileName: "src/components/movie-view/movie-view.jsx",
+                lineNumber: 18,
+                columnNumber: 13
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                md: 5,
+                className: "col-12",
+                children: [
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                        className: "my-1",
+                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                            className: "h1",
+                            children: Title
+                        }, void 0, false, {
+                            fileName: "src/components/movie-view/movie-view.jsx",
+                            lineNumber: 23,
+                            columnNumber: 21
+                        }, undefined)
+                    }, void 0, false, {
+                        fileName: "src/components/movie-view/movie-view.jsx",
+                        lineNumber: 22,
+                        columnNumber: 17
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                        className: "my-1",
+                        children: [
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                                className: "h6",
+                                children: "Description: "
+                            }, void 0, false, {
+                                fileName: "src/components/movie-view/movie-view.jsx",
+                                lineNumber: 26,
+                                columnNumber: 21
+                            }, undefined),
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                                children: Description
+                            }, void 0, false, {
+                                fileName: "src/components/movie-view/movie-view.jsx",
+                                lineNumber: 27,
+                                columnNumber: 21
+                            }, undefined)
+                        ]
+                    }, void 0, true, {
+                        fileName: "src/components/movie-view/movie-view.jsx",
+                        lineNumber: 25,
+                        columnNumber: 17
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                        className: "my-1",
+                        children: [
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                                className: "h6",
+                                children: "Director: "
+                            }, void 0, false, {
+                                fileName: "src/components/movie-view/movie-view.jsx",
+                                lineNumber: 30,
+                                columnNumber: 21
+                            }, undefined),
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                                children: Director ? Director.Name : "N/A"
+                            }, void 0, false, {
+                                fileName: "src/components/movie-view/movie-view.jsx",
+                                lineNumber: 32,
+                                columnNumber: 21
+                            }, undefined)
+                        ]
+                    }, void 0, true, {
+                        fileName: "src/components/movie-view/movie-view.jsx",
+                        lineNumber: 29,
+                        columnNumber: 17
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                        className: "my-1",
+                        children: [
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                                className: "h6",
+                                children: "Genre: "
+                            }, void 0, false, {
+                                fileName: "src/components/movie-view/movie-view.jsx",
+                                lineNumber: 35,
+                                columnNumber: 21
+                            }, undefined),
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                                children: Genre ? Genre.Name : "N/A"
+                            }, void 0, false, {
+                                fileName: "src/components/movie-view/movie-view.jsx",
+                                lineNumber: 37,
+                                columnNumber: 21
+                            }, undefined)
+                        ]
+                    }, void 0, true, {
+                        fileName: "src/components/movie-view/movie-view.jsx",
+                        lineNumber: 34,
+                        columnNumber: 17
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                        className: "my-1",
+                        children: [
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                                className: "h6",
+                                children: "Year: "
+                            }, void 0, false, {
+                                fileName: "src/components/movie-view/movie-view.jsx",
+                                lineNumber: 40,
+                                columnNumber: 21
+                            }, undefined),
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+                                children: Year
+                            }, void 0, false, {
+                                fileName: "src/components/movie-view/movie-view.jsx",
+                                lineNumber: 41,
+                                columnNumber: 21
+                            }, undefined)
+                        ]
+                    }, void 0, true, {
+                        fileName: "src/components/movie-view/movie-view.jsx",
+                        lineNumber: 39,
+                        columnNumber: 17
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
+                        className: "my-2 me-2",
+                        children: "Add to Favorite"
+                    }, void 0, false, {
+                        fileName: "src/components/movie-view/movie-view.jsx",
+                        lineNumber: 43,
+                        columnNumber: 17
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Link), {
+                        to: `/`,
+                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
+                            className: "my-2",
+                            children: "Back"
+                        }, void 0, false, {
+                            fileName: "src/components/movie-view/movie-view.jsx",
+                            lineNumber: 45,
+                            columnNumber: 21
+                        }, undefined)
+                    }, void 0, false, {
+                        fileName: "src/components/movie-view/movie-view.jsx",
+                        lineNumber: 44,
+                        columnNumber: 17
+                    }, undefined)
+                ]
+            }, void 0, true, {
+                fileName: "src/components/movie-view/movie-view.jsx",
+                lineNumber: 21,
+                columnNumber: 13
+            }, undefined)
+        ]
+    }, void 0, true, {
+        fileName: "src/components/movie-view/movie-view.jsx",
+        lineNumber: 17,
+        columnNumber: 9
+    }, undefined);
+};
+_s(MovieView, "e2L2DPdRH1AShA7yIOCsYRlzvlI=", false, function() {
+    return [
+        (0, _reactRouter.useParams)
+    ];
+});
+_c = MovieView;
+var _c;
+$RefreshReg$(_c, "MovieView");
+
+  $parcel$ReactRefreshHelpers$e9f6.postlude(module);
+} finally {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-router":"dbWyW","react-router-dom":"9xmpe","react-bootstrap":"3AD9A","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"2vVqf":[function(require,module,exports) {
 var $parcel$ReactRefreshHelpers$3c12 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -42479,355 +42481,200 @@ var _react = require("react");
 var _reactDefault = parcelHelpers.interopDefault(_react);
 var _propTypes = require("prop-types");
 var _propTypesDefault = parcelHelpers.interopDefault(_propTypes);
-var _reactRouterDom = require("react-router-dom");
 var _reactBootstrap = require("react-bootstrap");
-var _reactBootstrapIcons = require("react-bootstrap-icons");
 var _movieCard = require("../movie-card/movie-card");
 var _s = $RefreshSig$();
-const ProfileView = ({ user, movies, setUser, removeFav, addFav })=>{
+const ProfileView = ({ movies, user, setUser, addFav, removeFav })=>{
     _s();
-    const [username, setUsername] = (0, _react.useState)(user.Username || "");
-    const [email, setEmail] = (0, _react.useState)(user.Email || "");
-    const [birthday, setBirthday] = (0, _react.useState)(user.Birthday || "");
-    const navigate = (0, _reactRouterDom.useNavigate)();
-    // Ensure movies and user.FavoriteMovies are defined
-    if (!movies || !user || !user.FavoriteMovies) {
-        console.error("Movies or User or User's FavoriteMovies are undefined");
-        return null; // or handle loading state appropriately
-    }
-    const favoriteMovieList = movies.filter((m)=>user.FavoriteMovies.includes(m._id));
-    const token = localStorage.getItem("token");
-    const handleUpdate = (event)=>{
-        event.preventDefault();
-        const data = {
-            Username: username,
-            Email: email,
-            Birthday: birthday
-        };
-        fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}`, {
-            method: "PUT",
-            body: JSON.stringify(data),
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-            }
-        }).then(async (response)=>{
-            if (response.ok) {
-                const updatedUser = await response.json();
-                localStorage.setItem("user", JSON.stringify(updatedUser));
-                setUser(updatedUser);
-                alert("Update was successful");
-            } else alert("Update failed");
-        }).catch((error)=>{
-            console.error("Error:", error);
-        });
+    const localUser = JSON.parse(localStorage.getItem("user")) || user;
+    const [username, setUsername] = (0, _react.useState)(localUser.Username || "");
+    const [password, setPassword] = (0, _react.useState)(localUser.Password || "");
+    const [email, setEmail] = (0, _react.useState)(localUser.Email || "");
+    (0, _react.useEffect)(()=>{
+        // Update localUser state whenever localStorage changes (e.g., on login or update)
+        const updatedUser = JSON.parse(localStorage.getItem("user")) || user;
+        if (updatedUser) {
+            setUsername(updatedUser.Username || "");
+            setPassword(updatedUser.Password || "");
+            setEmail(updatedUser.Email || "");
+        }
+    }, [
+        user
+    ]);
+    const handleUpdateProfile = (e)=>{
+        e.preventDefault();
+    // Implement update logic here
+    // Example: Call an API to update user profile
     };
-    const handleDelete = ()=>{
-        fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}`, {
-            method: "DELETE",
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }).then((response)=>{
-            if (response.ok) {
-                setUser(null);
-                alert("User has been deleted");
-                localStorage.clear();
-                navigate("/");
-            } else alert("Something went wrong.");
-        }).catch((error)=>{
-            console.error("Error:", error);
-        });
-    };
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Container), {
-        className: "my-5",
+    const fav = movies.filter((movie)=>localUser.FavoriteMovies && localUser.FavoriteMovies.includes(movie._id));
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
         children: [
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("h1", {
+                children: "Profile"
+            }, void 0, false, {
+                fileName: "src/components/profile-view/profile-view.jsx",
+                lineNumber: 32,
+                columnNumber: 13
+            }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Row), {
-                children: [
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                        md: 4,
-                        className: "text-center text-md-start ms-3",
-                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card), {
-                            children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Body, {
+                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                    children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form), {
+                        onSubmit: handleUpdateProfile,
+                        children: [
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Group, {
+                                controlId: "formUsername",
                                 children: [
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Title, {
-                                        children: "My Profile"
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Label, {
+                                        children: "Username"
                                     }, void 0, false, {
                                         fileName: "src/components/profile-view/profile-view.jsx",
-                                        lineNumber: 93,
-                                        columnNumber: 15
+                                        lineNumber: 37,
+                                        columnNumber: 29
                                     }, undefined),
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrapIcons.PersonSquare), {
-                                        variant: "top",
-                                        color: "orange",
-                                        className: "my-4",
-                                        size: 180
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Control, {
+                                        type: "text",
+                                        value: username,
+                                        onChange: (e)=>setUsername(e.target.value)
                                     }, void 0, false, {
                                         fileName: "src/components/profile-view/profile-view.jsx",
-                                        lineNumber: 94,
-                                        columnNumber: 15
-                                    }, undefined),
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Text, {
-                                        children: [
-                                            "Username: ",
-                                            user.Username
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "src/components/profile-view/profile-view.jsx",
-                                        lineNumber: 100,
-                                        columnNumber: 15
-                                    }, undefined),
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Text, {
-                                        children: [
-                                            "Email: ",
-                                            user.Email
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "src/components/profile-view/profile-view.jsx",
-                                        lineNumber: 101,
-                                        columnNumber: 15
-                                    }, undefined),
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Text, {
-                                        children: [
-                                            "Birthday:",
-                                            " ",
-                                            user.Birthday ? moment(user.Birthday).utc().format("YYYY-MM-DD") : ""
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "src/components/profile-view/profile-view.jsx",
-                                        lineNumber: 102,
-                                        columnNumber: 15
+                                        lineNumber: 38,
+                                        columnNumber: 29
                                     }, undefined)
                                 ]
                             }, void 0, true, {
                                 fileName: "src/components/profile-view/profile-view.jsx",
-                                lineNumber: 92,
-                                columnNumber: 13
-                            }, undefined)
-                        }, void 0, false, {
-                            fileName: "src/components/profile-view/profile-view.jsx",
-                            lineNumber: 91,
-                            columnNumber: 11
-                        }, undefined)
-                    }, void 0, false, {
-                        fileName: "src/components/profile-view/profile-view.jsx",
-                        lineNumber: 90,
-                        columnNumber: 9
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                        md: 7,
-                        className: "mt-5",
-                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form), {
-                            onSubmit: handleUpdate,
-                            children: [
-                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Group, {
-                                    controlId: "formUsername",
-                                    children: [
-                                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Label, {
-                                            children: "Username:"
-                                        }, void 0, false, {
-                                            fileName: "src/components/profile-view/profile-view.jsx",
-                                            lineNumber: 114,
-                                            columnNumber: 15
-                                        }, undefined),
-                                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Control, {
-                                            className: "mb-3",
-                                            type: "text",
-                                            value: username,
-                                            onChange: (e)=>setUsername(e.target.value),
-                                            minLength: "5"
-                                        }, void 0, false, {
-                                            fileName: "src/components/profile-view/profile-view.jsx",
-                                            lineNumber: 115,
-                                            columnNumber: 15
-                                        }, undefined)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "src/components/profile-view/profile-view.jsx",
-                                    lineNumber: 113,
-                                    columnNumber: 13
-                                }, undefined),
-                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Group, {
-                                    controlId: "formEmail",
-                                    children: [
-                                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Label, {
-                                            children: "Email:"
-                                        }, void 0, false, {
-                                            fileName: "src/components/profile-view/profile-view.jsx",
-                                            lineNumber: 124,
-                                            columnNumber: 15
-                                        }, undefined),
-                                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Control, {
-                                            className: "mb-3",
-                                            type: "email",
-                                            value: email,
-                                            onChange: (e)=>setEmail(e.target.value)
-                                        }, void 0, false, {
-                                            fileName: "src/components/profile-view/profile-view.jsx",
-                                            lineNumber: 125,
-                                            columnNumber: 15
-                                        }, undefined)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "src/components/profile-view/profile-view.jsx",
-                                    lineNumber: 123,
-                                    columnNumber: 13
-                                }, undefined),
-                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Group, {
-                                    controlId: "formBirthday",
-                                    children: [
-                                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Label, {
-                                            children: "Birthday:"
-                                        }, void 0, false, {
-                                            fileName: "src/components/profile-view/profile-view.jsx",
-                                            lineNumber: 133,
-                                            columnNumber: 15
-                                        }, undefined),
-                                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Control, {
-                                            className: "mb-2",
-                                            type: "date",
-                                            value: birthday,
-                                            onChange: (e)=>setBirthday(e.target.value)
-                                        }, void 0, false, {
-                                            fileName: "src/components/profile-view/profile-view.jsx",
-                                            lineNumber: 134,
-                                            columnNumber: 15
-                                        }, undefined)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "src/components/profile-view/profile-view.jsx",
-                                    lineNumber: 132,
-                                    columnNumber: 13
-                                }, undefined),
-                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
-                                    type: "submit",
-                                    className: "mt-3 me-2",
-                                    children: "Update"
-                                }, void 0, false, {
-                                    fileName: "src/components/profile-view/profile-view.jsx",
-                                    lineNumber: 141,
-                                    columnNumber: 13
-                                }, undefined),
-                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
-                                    onClick: handleDelete,
-                                    className: "mt-3 bg-danger border-danger text-white",
-                                    children: "Delete User"
-                                }, void 0, false, {
-                                    fileName: "src/components/profile-view/profile-view.jsx",
-                                    lineNumber: 144,
-                                    columnNumber: 13
-                                }, undefined)
-                            ]
-                        }, void 0, true, {
-                            fileName: "src/components/profile-view/profile-view.jsx",
-                            lineNumber: 112,
-                            columnNumber: 11
-                        }, undefined)
-                    }, void 0, false, {
-                        fileName: "src/components/profile-view/profile-view.jsx",
-                        lineNumber: 111,
-                        columnNumber: 9
-                    }, undefined)
-                ]
-            }, void 0, true, {
-                fileName: "src/components/profile-view/profile-view.jsx",
-                lineNumber: 89,
-                columnNumber: 7
-            }, undefined),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Row), {
-                children: [
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("h2", {
-                        className: "mt-5 text-center text-md-start",
-                        children: "Favorite Movies"
-                    }, void 0, false, {
-                        fileName: "src/components/profile-view/profile-view.jsx",
-                        lineNumber: 154,
-                        columnNumber: 9
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Row), {
-                        className: "justify-content-center",
-                        children: favoriteMovieList.length !== 0 ? favoriteMovieList.map((movie)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                                sm: 7,
-                                md: 5,
-                                lg: 3,
-                                xl: 2,
-                                className: "mx-2 mt-2 mb-5 col-6 similar-movies-img",
-                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieCard.MovieCard), {
-                                    movie: movie,
-                                    removeFav: removeFav,
-                                    addFav: addFav,
-                                    isFavorite: user.FavoriteMovies.includes(movie._id)
-                                }, void 0, false, {
-                                    fileName: "src/components/profile-view/profile-view.jsx",
-                                    lineNumber: 166,
-                                    columnNumber: 17
-                                }, undefined)
-                            }, movie._id, false, {
+                                lineNumber: 36,
+                                columnNumber: 25
+                            }, undefined),
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Group, {
+                                controlId: "formPassword",
+                                children: [
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Label, {
+                                        children: "Password"
+                                    }, void 0, false, {
+                                        fileName: "src/components/profile-view/profile-view.jsx",
+                                        lineNumber: 45,
+                                        columnNumber: 29
+                                    }, undefined),
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Control, {
+                                        type: "password",
+                                        value: password,
+                                        onChange: (e)=>setPassword(e.target.value)
+                                    }, void 0, false, {
+                                        fileName: "src/components/profile-view/profile-view.jsx",
+                                        lineNumber: 46,
+                                        columnNumber: 29
+                                    }, undefined)
+                                ]
+                            }, void 0, true, {
                                 fileName: "src/components/profile-view/profile-view.jsx",
-                                lineNumber: 158,
-                                columnNumber: 15
-                            }, undefined)) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                            children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
-                                children: "There are no favorite movies"
+                                lineNumber: 44,
+                                columnNumber: 25
+                            }, undefined),
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Group, {
+                                controlId: "formEmail",
+                                children: [
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Label, {
+                                        children: "Email"
+                                    }, void 0, false, {
+                                        fileName: "src/components/profile-view/profile-view.jsx",
+                                        lineNumber: 53,
+                                        columnNumber: 29
+                                    }, undefined),
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Control, {
+                                        type: "email",
+                                        value: email,
+                                        onChange: (e)=>setEmail(e.target.value)
+                                    }, void 0, false, {
+                                        fileName: "src/components/profile-view/profile-view.jsx",
+                                        lineNumber: 54,
+                                        columnNumber: 29
+                                    }, undefined)
+                                ]
+                            }, void 0, true, {
+                                fileName: "src/components/profile-view/profile-view.jsx",
+                                lineNumber: 52,
+                                columnNumber: 25
+                            }, undefined),
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
+                                variant: "primary",
+                                type: "submit",
+                                children: "Update"
                             }, void 0, false, {
                                 fileName: "src/components/profile-view/profile-view.jsx",
-                                lineNumber: 176,
-                                columnNumber: 15
+                                lineNumber: 60,
+                                columnNumber: 25
                             }, undefined)
+                        ]
+                    }, void 0, true, {
+                        fileName: "src/components/profile-view/profile-view.jsx",
+                        lineNumber: 35,
+                        columnNumber: 21
+                    }, undefined)
+                }, void 0, false, {
+                    fileName: "src/components/profile-view/profile-view.jsx",
+                    lineNumber: 34,
+                    columnNumber: 17
+                }, undefined)
+            }, void 0, false, {
+                fileName: "src/components/profile-view/profile-view.jsx",
+                lineNumber: 33,
+                columnNumber: 13
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("h2", {
+                children: "Favorite Movies"
+            }, void 0, false, {
+                fileName: "src/components/profile-view/profile-view.jsx",
+                lineNumber: 66,
+                columnNumber: 13
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Row), {
+                children: fav.map((movie)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                        md: 3,
+                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieCard.MovieCard), {
+                            movie: movie,
+                            onAddToFavorites: addFav,
+                            onMovieClick: ()=>console.log(`Open movie ${movie._id}`)
                         }, void 0, false, {
                             fileName: "src/components/profile-view/profile-view.jsx",
-                            lineNumber: 175,
-                            columnNumber: 13
+                            lineNumber: 70,
+                            columnNumber: 25
                         }, undefined)
-                    }, void 0, false, {
+                    }, movie._id, false, {
                         fileName: "src/components/profile-view/profile-view.jsx",
-                        lineNumber: 155,
-                        columnNumber: 9
-                    }, undefined)
-                ]
-            }, void 0, true, {
+                        lineNumber: 69,
+                        columnNumber: 21
+                    }, undefined))
+            }, void 0, false, {
                 fileName: "src/components/profile-view/profile-view.jsx",
-                lineNumber: 153,
-                columnNumber: 7
+                lineNumber: 67,
+                columnNumber: 13
             }, undefined)
         ]
     }, void 0, true, {
         fileName: "src/components/profile-view/profile-view.jsx",
-        lineNumber: 88,
-        columnNumber: 5
+        lineNumber: 31,
+        columnNumber: 9
     }, undefined);
 };
-_s(ProfileView, "ZCCsGhoeybSui8SwZIhLmaQPnZQ=", false, function() {
-    return [
-        (0, _reactRouterDom.useNavigate)
-    ];
-});
+_s(ProfileView, "Mg63AbZ7NFQ5bMcgJ8OAm6bk65U=");
 _c = ProfileView;
 ProfileView.propTypes = {
-    user: (0, _propTypesDefault.default).shape({
-        Username: (0, _propTypesDefault.default).string.isRequired,
-        Email: (0, _propTypesDefault.default).string.isRequired,
-        Birthday: (0, _propTypesDefault.default).string,
-        FavoriteMovies: (0, _propTypesDefault.default).arrayOf((0, _propTypesDefault.default).string).isRequired
-    }).isRequired,
     movies: (0, _propTypesDefault.default).arrayOf((0, _propTypesDefault.default).shape({
         _id: (0, _propTypesDefault.default).string.isRequired,
         Title: (0, _propTypesDefault.default).string.isRequired,
         Description: (0, _propTypesDefault.default).string.isRequired,
-        ImagePath: (0, _propTypesDefault.default).string.isRequired,
-        Genre: (0, _propTypesDefault.default).shape({
-            Name: (0, _propTypesDefault.default).string.isRequired,
-            Description: (0, _propTypesDefault.default).string.isRequired
-        }),
-        Director: (0, _propTypesDefault.default).shape({
-            Name: (0, _propTypesDefault.default).string.isRequired,
-            Bio: (0, _propTypesDefault.default).string.isRequired,
-            Birth: (0, _propTypesDefault.default).string.isRequired
-        })
+        ImagePath: (0, _propTypesDefault.default).string.isRequired
     })).isRequired,
+    user: (0, _propTypesDefault.default).shape({
+        Username: (0, _propTypesDefault.default).string,
+        Password: (0, _propTypesDefault.default).string,
+        Email: (0, _propTypesDefault.default).string,
+        FavoriteMovies: (0, _propTypesDefault.default).arrayOf((0, _propTypesDefault.default).string)
+    }).isRequired,
     setUser: (0, _propTypesDefault.default).func.isRequired,
-    removeFav: (0, _propTypesDefault.default).func.isRequired,
-    addFav: (0, _propTypesDefault.default).func.isRequired
+    addFav: (0, _propTypesDefault.default).func.isRequired,
+    removeFav: (0, _propTypesDefault.default).func.isRequired
 };
 exports.default = ProfileView;
 var _c;
@@ -42838,6372 +42685,116 @@ $RefreshReg$(_c, "ProfileView");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","prop-types":"7wKI2","react-router-dom":"9xmpe","react-bootstrap":"3AD9A","react-bootstrap-icons":"c9Gza","../movie-card/movie-card":"bwuIu","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"c9Gza":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Icon0CircleFill", ()=>(0, _0CircleFillDefault.default));
-parcelHelpers.export(exports, "Icon0Circle", ()=>(0, _0CircleDefault.default));
-parcelHelpers.export(exports, "Icon0SquareFill", ()=>(0, _0SquareFillDefault.default));
-parcelHelpers.export(exports, "Icon0Square", ()=>(0, _0SquareDefault.default));
-parcelHelpers.export(exports, "Icon1CircleFill", ()=>(0, _1CircleFillDefault.default));
-parcelHelpers.export(exports, "Icon1Circle", ()=>(0, _1CircleDefault.default));
-parcelHelpers.export(exports, "Icon1SquareFill", ()=>(0, _1SquareFillDefault.default));
-parcelHelpers.export(exports, "Icon1Square", ()=>(0, _1SquareDefault.default));
-parcelHelpers.export(exports, "Icon123", ()=>(0, _123Default.default));
-parcelHelpers.export(exports, "Icon2CircleFill", ()=>(0, _2CircleFillDefault.default));
-parcelHelpers.export(exports, "Icon2Circle", ()=>(0, _2CircleDefault.default));
-parcelHelpers.export(exports, "Icon2SquareFill", ()=>(0, _2SquareFillDefault.default));
-parcelHelpers.export(exports, "Icon2Square", ()=>(0, _2SquareDefault.default));
-parcelHelpers.export(exports, "Icon3CircleFill", ()=>(0, _3CircleFillDefault.default));
-parcelHelpers.export(exports, "Icon3Circle", ()=>(0, _3CircleDefault.default));
-parcelHelpers.export(exports, "Icon3SquareFill", ()=>(0, _3SquareFillDefault.default));
-parcelHelpers.export(exports, "Icon3Square", ()=>(0, _3SquareDefault.default));
-parcelHelpers.export(exports, "Icon4CircleFill", ()=>(0, _4CircleFillDefault.default));
-parcelHelpers.export(exports, "Icon4Circle", ()=>(0, _4CircleDefault.default));
-parcelHelpers.export(exports, "Icon4SquareFill", ()=>(0, _4SquareFillDefault.default));
-parcelHelpers.export(exports, "Icon4Square", ()=>(0, _4SquareDefault.default));
-parcelHelpers.export(exports, "Icon5CircleFill", ()=>(0, _5CircleFillDefault.default));
-parcelHelpers.export(exports, "Icon5Circle", ()=>(0, _5CircleDefault.default));
-parcelHelpers.export(exports, "Icon5SquareFill", ()=>(0, _5SquareFillDefault.default));
-parcelHelpers.export(exports, "Icon5Square", ()=>(0, _5SquareDefault.default));
-parcelHelpers.export(exports, "Icon6CircleFill", ()=>(0, _6CircleFillDefault.default));
-parcelHelpers.export(exports, "Icon6Circle", ()=>(0, _6CircleDefault.default));
-parcelHelpers.export(exports, "Icon6SquareFill", ()=>(0, _6SquareFillDefault.default));
-parcelHelpers.export(exports, "Icon6Square", ()=>(0, _6SquareDefault.default));
-parcelHelpers.export(exports, "Icon7CircleFill", ()=>(0, _7CircleFillDefault.default));
-parcelHelpers.export(exports, "Icon7Circle", ()=>(0, _7CircleDefault.default));
-parcelHelpers.export(exports, "Icon7SquareFill", ()=>(0, _7SquareFillDefault.default));
-parcelHelpers.export(exports, "Icon7Square", ()=>(0, _7SquareDefault.default));
-parcelHelpers.export(exports, "Icon8CircleFill", ()=>(0, _8CircleFillDefault.default));
-parcelHelpers.export(exports, "Icon8Circle", ()=>(0, _8CircleDefault.default));
-parcelHelpers.export(exports, "Icon8SquareFill", ()=>(0, _8SquareFillDefault.default));
-parcelHelpers.export(exports, "Icon8Square", ()=>(0, _8SquareDefault.default));
-parcelHelpers.export(exports, "Icon9CircleFill", ()=>(0, _9CircleFillDefault.default));
-parcelHelpers.export(exports, "Icon9Circle", ()=>(0, _9CircleDefault.default));
-parcelHelpers.export(exports, "Icon9SquareFill", ()=>(0, _9SquareFillDefault.default));
-parcelHelpers.export(exports, "Icon9Square", ()=>(0, _9SquareDefault.default));
-parcelHelpers.export(exports, "Activity", ()=>(0, _activityDefault.default));
-parcelHelpers.export(exports, "AirplaneEnginesFill", ()=>(0, _airplaneEnginesFillDefault.default));
-parcelHelpers.export(exports, "AirplaneEngines", ()=>(0, _airplaneEnginesDefault.default));
-parcelHelpers.export(exports, "AirplaneFill", ()=>(0, _airplaneFillDefault.default));
-parcelHelpers.export(exports, "Airplane", ()=>(0, _airplaneDefault.default));
-parcelHelpers.export(exports, "AlarmFill", ()=>(0, _alarmFillDefault.default));
-parcelHelpers.export(exports, "Alarm", ()=>(0, _alarmDefault.default));
-parcelHelpers.export(exports, "Alexa", ()=>(0, _alexaDefault.default));
-parcelHelpers.export(exports, "AlignBottom", ()=>(0, _alignBottomDefault.default));
-parcelHelpers.export(exports, "AlignCenter", ()=>(0, _alignCenterDefault.default));
-parcelHelpers.export(exports, "AlignEnd", ()=>(0, _alignEndDefault.default));
-parcelHelpers.export(exports, "AlignMiddle", ()=>(0, _alignMiddleDefault.default));
-parcelHelpers.export(exports, "AlignStart", ()=>(0, _alignStartDefault.default));
-parcelHelpers.export(exports, "AlignTop", ()=>(0, _alignTopDefault.default));
-parcelHelpers.export(exports, "Alipay", ()=>(0, _alipayDefault.default));
-parcelHelpers.export(exports, "AlphabetUppercase", ()=>(0, _alphabetUppercaseDefault.default));
-parcelHelpers.export(exports, "Alphabet", ()=>(0, _alphabetDefault.default));
-parcelHelpers.export(exports, "Alt", ()=>(0, _altDefault.default));
-parcelHelpers.export(exports, "Amazon", ()=>(0, _amazonDefault.default));
-parcelHelpers.export(exports, "Amd", ()=>(0, _amdDefault.default));
-parcelHelpers.export(exports, "Android", ()=>(0, _androidDefault.default));
-parcelHelpers.export(exports, "Android2", ()=>(0, _android2Default.default));
-parcelHelpers.export(exports, "AppIndicator", ()=>(0, _appIndicatorDefault.default));
-parcelHelpers.export(exports, "App", ()=>(0, _appDefault.default));
-parcelHelpers.export(exports, "Apple", ()=>(0, _appleDefault.default));
-parcelHelpers.export(exports, "ArchiveFill", ()=>(0, _archiveFillDefault.default));
-parcelHelpers.export(exports, "Archive", ()=>(0, _archiveDefault.default));
-parcelHelpers.export(exports, "Arrow90degDown", ()=>(0, _arrow90DegDownDefault.default));
-parcelHelpers.export(exports, "Arrow90degLeft", ()=>(0, _arrow90DegLeftDefault.default));
-parcelHelpers.export(exports, "Arrow90degRight", ()=>(0, _arrow90DegRightDefault.default));
-parcelHelpers.export(exports, "Arrow90degUp", ()=>(0, _arrow90DegUpDefault.default));
-parcelHelpers.export(exports, "ArrowBarDown", ()=>(0, _arrowBarDownDefault.default));
-parcelHelpers.export(exports, "ArrowBarLeft", ()=>(0, _arrowBarLeftDefault.default));
-parcelHelpers.export(exports, "ArrowBarRight", ()=>(0, _arrowBarRightDefault.default));
-parcelHelpers.export(exports, "ArrowBarUp", ()=>(0, _arrowBarUpDefault.default));
-parcelHelpers.export(exports, "ArrowClockwise", ()=>(0, _arrowClockwiseDefault.default));
-parcelHelpers.export(exports, "ArrowCounterclockwise", ()=>(0, _arrowCounterclockwiseDefault.default));
-parcelHelpers.export(exports, "ArrowDownCircleFill", ()=>(0, _arrowDownCircleFillDefault.default));
-parcelHelpers.export(exports, "ArrowDownCircle", ()=>(0, _arrowDownCircleDefault.default));
-parcelHelpers.export(exports, "ArrowDownLeftCircleFill", ()=>(0, _arrowDownLeftCircleFillDefault.default));
-parcelHelpers.export(exports, "ArrowDownLeftCircle", ()=>(0, _arrowDownLeftCircleDefault.default));
-parcelHelpers.export(exports, "ArrowDownLeftSquareFill", ()=>(0, _arrowDownLeftSquareFillDefault.default));
-parcelHelpers.export(exports, "ArrowDownLeftSquare", ()=>(0, _arrowDownLeftSquareDefault.default));
-parcelHelpers.export(exports, "ArrowDownLeft", ()=>(0, _arrowDownLeftDefault.default));
-parcelHelpers.export(exports, "ArrowDownRightCircleFill", ()=>(0, _arrowDownRightCircleFillDefault.default));
-parcelHelpers.export(exports, "ArrowDownRightCircle", ()=>(0, _arrowDownRightCircleDefault.default));
-parcelHelpers.export(exports, "ArrowDownRightSquareFill", ()=>(0, _arrowDownRightSquareFillDefault.default));
-parcelHelpers.export(exports, "ArrowDownRightSquare", ()=>(0, _arrowDownRightSquareDefault.default));
-parcelHelpers.export(exports, "ArrowDownRight", ()=>(0, _arrowDownRightDefault.default));
-parcelHelpers.export(exports, "ArrowDownShort", ()=>(0, _arrowDownShortDefault.default));
-parcelHelpers.export(exports, "ArrowDownSquareFill", ()=>(0, _arrowDownSquareFillDefault.default));
-parcelHelpers.export(exports, "ArrowDownSquare", ()=>(0, _arrowDownSquareDefault.default));
-parcelHelpers.export(exports, "ArrowDownUp", ()=>(0, _arrowDownUpDefault.default));
-parcelHelpers.export(exports, "ArrowDown", ()=>(0, _arrowDownDefault.default));
-parcelHelpers.export(exports, "ArrowLeftCircleFill", ()=>(0, _arrowLeftCircleFillDefault.default));
-parcelHelpers.export(exports, "ArrowLeftCircle", ()=>(0, _arrowLeftCircleDefault.default));
-parcelHelpers.export(exports, "ArrowLeftRight", ()=>(0, _arrowLeftRightDefault.default));
-parcelHelpers.export(exports, "ArrowLeftShort", ()=>(0, _arrowLeftShortDefault.default));
-parcelHelpers.export(exports, "ArrowLeftSquareFill", ()=>(0, _arrowLeftSquareFillDefault.default));
-parcelHelpers.export(exports, "ArrowLeftSquare", ()=>(0, _arrowLeftSquareDefault.default));
-parcelHelpers.export(exports, "ArrowLeft", ()=>(0, _arrowLeftDefault.default));
-parcelHelpers.export(exports, "ArrowRepeat", ()=>(0, _arrowRepeatDefault.default));
-parcelHelpers.export(exports, "ArrowReturnLeft", ()=>(0, _arrowReturnLeftDefault.default));
-parcelHelpers.export(exports, "ArrowReturnRight", ()=>(0, _arrowReturnRightDefault.default));
-parcelHelpers.export(exports, "ArrowRightCircleFill", ()=>(0, _arrowRightCircleFillDefault.default));
-parcelHelpers.export(exports, "ArrowRightCircle", ()=>(0, _arrowRightCircleDefault.default));
-parcelHelpers.export(exports, "ArrowRightShort", ()=>(0, _arrowRightShortDefault.default));
-parcelHelpers.export(exports, "ArrowRightSquareFill", ()=>(0, _arrowRightSquareFillDefault.default));
-parcelHelpers.export(exports, "ArrowRightSquare", ()=>(0, _arrowRightSquareDefault.default));
-parcelHelpers.export(exports, "ArrowRight", ()=>(0, _arrowRightDefault.default));
-parcelHelpers.export(exports, "ArrowThroughHeartFill", ()=>(0, _arrowThroughHeartFillDefault.default));
-parcelHelpers.export(exports, "ArrowThroughHeart", ()=>(0, _arrowThroughHeartDefault.default));
-parcelHelpers.export(exports, "ArrowUpCircleFill", ()=>(0, _arrowUpCircleFillDefault.default));
-parcelHelpers.export(exports, "ArrowUpCircle", ()=>(0, _arrowUpCircleDefault.default));
-parcelHelpers.export(exports, "ArrowUpLeftCircleFill", ()=>(0, _arrowUpLeftCircleFillDefault.default));
-parcelHelpers.export(exports, "ArrowUpLeftCircle", ()=>(0, _arrowUpLeftCircleDefault.default));
-parcelHelpers.export(exports, "ArrowUpLeftSquareFill", ()=>(0, _arrowUpLeftSquareFillDefault.default));
-parcelHelpers.export(exports, "ArrowUpLeftSquare", ()=>(0, _arrowUpLeftSquareDefault.default));
-parcelHelpers.export(exports, "ArrowUpLeft", ()=>(0, _arrowUpLeftDefault.default));
-parcelHelpers.export(exports, "ArrowUpRightCircleFill", ()=>(0, _arrowUpRightCircleFillDefault.default));
-parcelHelpers.export(exports, "ArrowUpRightCircle", ()=>(0, _arrowUpRightCircleDefault.default));
-parcelHelpers.export(exports, "ArrowUpRightSquareFill", ()=>(0, _arrowUpRightSquareFillDefault.default));
-parcelHelpers.export(exports, "ArrowUpRightSquare", ()=>(0, _arrowUpRightSquareDefault.default));
-parcelHelpers.export(exports, "ArrowUpRight", ()=>(0, _arrowUpRightDefault.default));
-parcelHelpers.export(exports, "ArrowUpShort", ()=>(0, _arrowUpShortDefault.default));
-parcelHelpers.export(exports, "ArrowUpSquareFill", ()=>(0, _arrowUpSquareFillDefault.default));
-parcelHelpers.export(exports, "ArrowUpSquare", ()=>(0, _arrowUpSquareDefault.default));
-parcelHelpers.export(exports, "ArrowUp", ()=>(0, _arrowUpDefault.default));
-parcelHelpers.export(exports, "ArrowsAngleContract", ()=>(0, _arrowsAngleContractDefault.default));
-parcelHelpers.export(exports, "ArrowsAngleExpand", ()=>(0, _arrowsAngleExpandDefault.default));
-parcelHelpers.export(exports, "ArrowsCollapseVertical", ()=>(0, _arrowsCollapseVerticalDefault.default));
-parcelHelpers.export(exports, "ArrowsCollapse", ()=>(0, _arrowsCollapseDefault.default));
-parcelHelpers.export(exports, "ArrowsExpandVertical", ()=>(0, _arrowsExpandVerticalDefault.default));
-parcelHelpers.export(exports, "ArrowsExpand", ()=>(0, _arrowsExpandDefault.default));
-parcelHelpers.export(exports, "ArrowsFullscreen", ()=>(0, _arrowsFullscreenDefault.default));
-parcelHelpers.export(exports, "ArrowsMove", ()=>(0, _arrowsMoveDefault.default));
-parcelHelpers.export(exports, "ArrowsVertical", ()=>(0, _arrowsVerticalDefault.default));
-parcelHelpers.export(exports, "Arrows", ()=>(0, _arrowsDefault.default));
-parcelHelpers.export(exports, "AspectRatioFill", ()=>(0, _aspectRatioFillDefault.default));
-parcelHelpers.export(exports, "AspectRatio", ()=>(0, _aspectRatioDefault.default));
-parcelHelpers.export(exports, "Asterisk", ()=>(0, _asteriskDefault.default));
-parcelHelpers.export(exports, "At", ()=>(0, _atDefault.default));
-parcelHelpers.export(exports, "AwardFill", ()=>(0, _awardFillDefault.default));
-parcelHelpers.export(exports, "Award", ()=>(0, _awardDefault.default));
-parcelHelpers.export(exports, "Back", ()=>(0, _backDefault.default));
-parcelHelpers.export(exports, "BackpackFill", ()=>(0, _backpackFillDefault.default));
-parcelHelpers.export(exports, "Backpack", ()=>(0, _backpackDefault.default));
-parcelHelpers.export(exports, "Backpack2Fill", ()=>(0, _backpack2FillDefault.default));
-parcelHelpers.export(exports, "Backpack2", ()=>(0, _backpack2Default.default));
-parcelHelpers.export(exports, "Backpack3Fill", ()=>(0, _backpack3FillDefault.default));
-parcelHelpers.export(exports, "Backpack3", ()=>(0, _backpack3Default.default));
-parcelHelpers.export(exports, "Backpack4Fill", ()=>(0, _backpack4FillDefault.default));
-parcelHelpers.export(exports, "Backpack4", ()=>(0, _backpack4Default.default));
-parcelHelpers.export(exports, "BackspaceFill", ()=>(0, _backspaceFillDefault.default));
-parcelHelpers.export(exports, "BackspaceReverseFill", ()=>(0, _backspaceReverseFillDefault.default));
-parcelHelpers.export(exports, "BackspaceReverse", ()=>(0, _backspaceReverseDefault.default));
-parcelHelpers.export(exports, "Backspace", ()=>(0, _backspaceDefault.default));
-parcelHelpers.export(exports, "Badge3dFill", ()=>(0, _badge3DFillDefault.default));
-parcelHelpers.export(exports, "Badge3d", ()=>(0, _badge3DDefault.default));
-parcelHelpers.export(exports, "Badge4kFill", ()=>(0, _badge4KFillDefault.default));
-parcelHelpers.export(exports, "Badge4k", ()=>(0, _badge4KDefault.default));
-parcelHelpers.export(exports, "Badge8kFill", ()=>(0, _badge8KFillDefault.default));
-parcelHelpers.export(exports, "Badge8k", ()=>(0, _badge8KDefault.default));
-parcelHelpers.export(exports, "BadgeAdFill", ()=>(0, _badgeAdFillDefault.default));
-parcelHelpers.export(exports, "BadgeAd", ()=>(0, _badgeAdDefault.default));
-parcelHelpers.export(exports, "BadgeArFill", ()=>(0, _badgeArFillDefault.default));
-parcelHelpers.export(exports, "BadgeAr", ()=>(0, _badgeArDefault.default));
-parcelHelpers.export(exports, "BadgeCcFill", ()=>(0, _badgeCcFillDefault.default));
-parcelHelpers.export(exports, "BadgeCc", ()=>(0, _badgeCcDefault.default));
-parcelHelpers.export(exports, "BadgeHdFill", ()=>(0, _badgeHdFillDefault.default));
-parcelHelpers.export(exports, "BadgeHd", ()=>(0, _badgeHdDefault.default));
-parcelHelpers.export(exports, "BadgeSdFill", ()=>(0, _badgeSdFillDefault.default));
-parcelHelpers.export(exports, "BadgeSd", ()=>(0, _badgeSdDefault.default));
-parcelHelpers.export(exports, "BadgeTmFill", ()=>(0, _badgeTmFillDefault.default));
-parcelHelpers.export(exports, "BadgeTm", ()=>(0, _badgeTmDefault.default));
-parcelHelpers.export(exports, "BadgeVoFill", ()=>(0, _badgeVoFillDefault.default));
-parcelHelpers.export(exports, "BadgeVo", ()=>(0, _badgeVoDefault.default));
-parcelHelpers.export(exports, "BadgeVrFill", ()=>(0, _badgeVrFillDefault.default));
-parcelHelpers.export(exports, "BadgeVr", ()=>(0, _badgeVrDefault.default));
-parcelHelpers.export(exports, "BadgeWcFill", ()=>(0, _badgeWcFillDefault.default));
-parcelHelpers.export(exports, "BadgeWc", ()=>(0, _badgeWcDefault.default));
-parcelHelpers.export(exports, "BagCheckFill", ()=>(0, _bagCheckFillDefault.default));
-parcelHelpers.export(exports, "BagCheck", ()=>(0, _bagCheckDefault.default));
-parcelHelpers.export(exports, "BagDashFill", ()=>(0, _bagDashFillDefault.default));
-parcelHelpers.export(exports, "BagDash", ()=>(0, _bagDashDefault.default));
-parcelHelpers.export(exports, "BagFill", ()=>(0, _bagFillDefault.default));
-parcelHelpers.export(exports, "BagHeartFill", ()=>(0, _bagHeartFillDefault.default));
-parcelHelpers.export(exports, "BagHeart", ()=>(0, _bagHeartDefault.default));
-parcelHelpers.export(exports, "BagPlusFill", ()=>(0, _bagPlusFillDefault.default));
-parcelHelpers.export(exports, "BagPlus", ()=>(0, _bagPlusDefault.default));
-parcelHelpers.export(exports, "BagXFill", ()=>(0, _bagXFillDefault.default));
-parcelHelpers.export(exports, "BagX", ()=>(0, _bagXDefault.default));
-parcelHelpers.export(exports, "Bag", ()=>(0, _bagDefault.default));
-parcelHelpers.export(exports, "BalloonFill", ()=>(0, _balloonFillDefault.default));
-parcelHelpers.export(exports, "BalloonHeartFill", ()=>(0, _balloonHeartFillDefault.default));
-parcelHelpers.export(exports, "BalloonHeart", ()=>(0, _balloonHeartDefault.default));
-parcelHelpers.export(exports, "Balloon", ()=>(0, _balloonDefault.default));
-parcelHelpers.export(exports, "BanFill", ()=>(0, _banFillDefault.default));
-parcelHelpers.export(exports, "Ban", ()=>(0, _banDefault.default));
-parcelHelpers.export(exports, "BandaidFill", ()=>(0, _bandaidFillDefault.default));
-parcelHelpers.export(exports, "Bandaid", ()=>(0, _bandaidDefault.default));
-parcelHelpers.export(exports, "Bank", ()=>(0, _bankDefault.default));
-parcelHelpers.export(exports, "Bank2", ()=>(0, _bank2Default.default));
-parcelHelpers.export(exports, "BarChartFill", ()=>(0, _barChartFillDefault.default));
-parcelHelpers.export(exports, "BarChartLineFill", ()=>(0, _barChartLineFillDefault.default));
-parcelHelpers.export(exports, "BarChartLine", ()=>(0, _barChartLineDefault.default));
-parcelHelpers.export(exports, "BarChartSteps", ()=>(0, _barChartStepsDefault.default));
-parcelHelpers.export(exports, "BarChart", ()=>(0, _barChartDefault.default));
-parcelHelpers.export(exports, "BasketFill", ()=>(0, _basketFillDefault.default));
-parcelHelpers.export(exports, "Basket", ()=>(0, _basketDefault.default));
-parcelHelpers.export(exports, "Basket2Fill", ()=>(0, _basket2FillDefault.default));
-parcelHelpers.export(exports, "Basket2", ()=>(0, _basket2Default.default));
-parcelHelpers.export(exports, "Basket3Fill", ()=>(0, _basket3FillDefault.default));
-parcelHelpers.export(exports, "Basket3", ()=>(0, _basket3Default.default));
-parcelHelpers.export(exports, "BatteryCharging", ()=>(0, _batteryChargingDefault.default));
-parcelHelpers.export(exports, "BatteryFull", ()=>(0, _batteryFullDefault.default));
-parcelHelpers.export(exports, "BatteryHalf", ()=>(0, _batteryHalfDefault.default));
-parcelHelpers.export(exports, "Battery", ()=>(0, _batteryDefault.default));
-parcelHelpers.export(exports, "Behance", ()=>(0, _behanceDefault.default));
-parcelHelpers.export(exports, "BellFill", ()=>(0, _bellFillDefault.default));
-parcelHelpers.export(exports, "BellSlashFill", ()=>(0, _bellSlashFillDefault.default));
-parcelHelpers.export(exports, "BellSlash", ()=>(0, _bellSlashDefault.default));
-parcelHelpers.export(exports, "Bell", ()=>(0, _bellDefault.default));
-parcelHelpers.export(exports, "Bezier", ()=>(0, _bezierDefault.default));
-parcelHelpers.export(exports, "Bezier2", ()=>(0, _bezier2Default.default));
-parcelHelpers.export(exports, "Bicycle", ()=>(0, _bicycleDefault.default));
-parcelHelpers.export(exports, "Bing", ()=>(0, _bingDefault.default));
-parcelHelpers.export(exports, "BinocularsFill", ()=>(0, _binocularsFillDefault.default));
-parcelHelpers.export(exports, "Binoculars", ()=>(0, _binocularsDefault.default));
-parcelHelpers.export(exports, "BlockquoteLeft", ()=>(0, _blockquoteLeftDefault.default));
-parcelHelpers.export(exports, "BlockquoteRight", ()=>(0, _blockquoteRightDefault.default));
-parcelHelpers.export(exports, "Bluetooth", ()=>(0, _bluetoothDefault.default));
-parcelHelpers.export(exports, "BodyText", ()=>(0, _bodyTextDefault.default));
-parcelHelpers.export(exports, "BookFill", ()=>(0, _bookFillDefault.default));
-parcelHelpers.export(exports, "BookHalf", ()=>(0, _bookHalfDefault.default));
-parcelHelpers.export(exports, "Book", ()=>(0, _bookDefault.default));
-parcelHelpers.export(exports, "BookmarkCheckFill", ()=>(0, _bookmarkCheckFillDefault.default));
-parcelHelpers.export(exports, "BookmarkCheck", ()=>(0, _bookmarkCheckDefault.default));
-parcelHelpers.export(exports, "BookmarkDashFill", ()=>(0, _bookmarkDashFillDefault.default));
-parcelHelpers.export(exports, "BookmarkDash", ()=>(0, _bookmarkDashDefault.default));
-parcelHelpers.export(exports, "BookmarkFill", ()=>(0, _bookmarkFillDefault.default));
-parcelHelpers.export(exports, "BookmarkHeartFill", ()=>(0, _bookmarkHeartFillDefault.default));
-parcelHelpers.export(exports, "BookmarkHeart", ()=>(0, _bookmarkHeartDefault.default));
-parcelHelpers.export(exports, "BookmarkPlusFill", ()=>(0, _bookmarkPlusFillDefault.default));
-parcelHelpers.export(exports, "BookmarkPlus", ()=>(0, _bookmarkPlusDefault.default));
-parcelHelpers.export(exports, "BookmarkStarFill", ()=>(0, _bookmarkStarFillDefault.default));
-parcelHelpers.export(exports, "BookmarkStar", ()=>(0, _bookmarkStarDefault.default));
-parcelHelpers.export(exports, "BookmarkXFill", ()=>(0, _bookmarkXFillDefault.default));
-parcelHelpers.export(exports, "BookmarkX", ()=>(0, _bookmarkXDefault.default));
-parcelHelpers.export(exports, "Bookmark", ()=>(0, _bookmarkDefault.default));
-parcelHelpers.export(exports, "BookmarksFill", ()=>(0, _bookmarksFillDefault.default));
-parcelHelpers.export(exports, "Bookmarks", ()=>(0, _bookmarksDefault.default));
-parcelHelpers.export(exports, "Bookshelf", ()=>(0, _bookshelfDefault.default));
-parcelHelpers.export(exports, "BoomboxFill", ()=>(0, _boomboxFillDefault.default));
-parcelHelpers.export(exports, "Boombox", ()=>(0, _boomboxDefault.default));
-parcelHelpers.export(exports, "BootstrapFill", ()=>(0, _bootstrapFillDefault.default));
-parcelHelpers.export(exports, "BootstrapReboot", ()=>(0, _bootstrapRebootDefault.default));
-parcelHelpers.export(exports, "Bootstrap", ()=>(0, _bootstrapDefault.default));
-parcelHelpers.export(exports, "BorderAll", ()=>(0, _borderAllDefault.default));
-parcelHelpers.export(exports, "BorderBottom", ()=>(0, _borderBottomDefault.default));
-parcelHelpers.export(exports, "BorderCenter", ()=>(0, _borderCenterDefault.default));
-parcelHelpers.export(exports, "BorderInner", ()=>(0, _borderInnerDefault.default));
-parcelHelpers.export(exports, "BorderLeft", ()=>(0, _borderLeftDefault.default));
-parcelHelpers.export(exports, "BorderMiddle", ()=>(0, _borderMiddleDefault.default));
-parcelHelpers.export(exports, "BorderOuter", ()=>(0, _borderOuterDefault.default));
-parcelHelpers.export(exports, "BorderRight", ()=>(0, _borderRightDefault.default));
-parcelHelpers.export(exports, "BorderStyle", ()=>(0, _borderStyleDefault.default));
-parcelHelpers.export(exports, "BorderTop", ()=>(0, _borderTopDefault.default));
-parcelHelpers.export(exports, "BorderWidth", ()=>(0, _borderWidthDefault.default));
-parcelHelpers.export(exports, "Border", ()=>(0, _borderDefault.default));
-parcelHelpers.export(exports, "BoundingBoxCircles", ()=>(0, _boundingBoxCirclesDefault.default));
-parcelHelpers.export(exports, "BoundingBox", ()=>(0, _boundingBoxDefault.default));
-parcelHelpers.export(exports, "BoxArrowDownLeft", ()=>(0, _boxArrowDownLeftDefault.default));
-parcelHelpers.export(exports, "BoxArrowDownRight", ()=>(0, _boxArrowDownRightDefault.default));
-parcelHelpers.export(exports, "BoxArrowDown", ()=>(0, _boxArrowDownDefault.default));
-parcelHelpers.export(exports, "BoxArrowInDownLeft", ()=>(0, _boxArrowInDownLeftDefault.default));
-parcelHelpers.export(exports, "BoxArrowInDownRight", ()=>(0, _boxArrowInDownRightDefault.default));
-parcelHelpers.export(exports, "BoxArrowInDown", ()=>(0, _boxArrowInDownDefault.default));
-parcelHelpers.export(exports, "BoxArrowInLeft", ()=>(0, _boxArrowInLeftDefault.default));
-parcelHelpers.export(exports, "BoxArrowInRight", ()=>(0, _boxArrowInRightDefault.default));
-parcelHelpers.export(exports, "BoxArrowInUpLeft", ()=>(0, _boxArrowInUpLeftDefault.default));
-parcelHelpers.export(exports, "BoxArrowInUpRight", ()=>(0, _boxArrowInUpRightDefault.default));
-parcelHelpers.export(exports, "BoxArrowInUp", ()=>(0, _boxArrowInUpDefault.default));
-parcelHelpers.export(exports, "BoxArrowLeft", ()=>(0, _boxArrowLeftDefault.default));
-parcelHelpers.export(exports, "BoxArrowRight", ()=>(0, _boxArrowRightDefault.default));
-parcelHelpers.export(exports, "BoxArrowUpLeft", ()=>(0, _boxArrowUpLeftDefault.default));
-parcelHelpers.export(exports, "BoxArrowUpRight", ()=>(0, _boxArrowUpRightDefault.default));
-parcelHelpers.export(exports, "BoxArrowUp", ()=>(0, _boxArrowUpDefault.default));
-parcelHelpers.export(exports, "BoxFill", ()=>(0, _boxFillDefault.default));
-parcelHelpers.export(exports, "BoxSeamFill", ()=>(0, _boxSeamFillDefault.default));
-parcelHelpers.export(exports, "BoxSeam", ()=>(0, _boxSeamDefault.default));
-parcelHelpers.export(exports, "Box", ()=>(0, _boxDefault.default));
-parcelHelpers.export(exports, "Box2Fill", ()=>(0, _box2FillDefault.default));
-parcelHelpers.export(exports, "Box2HeartFill", ()=>(0, _box2HeartFillDefault.default));
-parcelHelpers.export(exports, "Box2Heart", ()=>(0, _box2HeartDefault.default));
-parcelHelpers.export(exports, "Box2", ()=>(0, _box2Default.default));
-parcelHelpers.export(exports, "Boxes", ()=>(0, _boxesDefault.default));
-parcelHelpers.export(exports, "BracesAsterisk", ()=>(0, _bracesAsteriskDefault.default));
-parcelHelpers.export(exports, "Braces", ()=>(0, _bracesDefault.default));
-parcelHelpers.export(exports, "Bricks", ()=>(0, _bricksDefault.default));
-parcelHelpers.export(exports, "BriefcaseFill", ()=>(0, _briefcaseFillDefault.default));
-parcelHelpers.export(exports, "Briefcase", ()=>(0, _briefcaseDefault.default));
-parcelHelpers.export(exports, "BrightnessAltHighFill", ()=>(0, _brightnessAltHighFillDefault.default));
-parcelHelpers.export(exports, "BrightnessAltHigh", ()=>(0, _brightnessAltHighDefault.default));
-parcelHelpers.export(exports, "BrightnessAltLowFill", ()=>(0, _brightnessAltLowFillDefault.default));
-parcelHelpers.export(exports, "BrightnessAltLow", ()=>(0, _brightnessAltLowDefault.default));
-parcelHelpers.export(exports, "BrightnessHighFill", ()=>(0, _brightnessHighFillDefault.default));
-parcelHelpers.export(exports, "BrightnessHigh", ()=>(0, _brightnessHighDefault.default));
-parcelHelpers.export(exports, "BrightnessLowFill", ()=>(0, _brightnessLowFillDefault.default));
-parcelHelpers.export(exports, "BrightnessLow", ()=>(0, _brightnessLowDefault.default));
-parcelHelpers.export(exports, "Brilliance", ()=>(0, _brillianceDefault.default));
-parcelHelpers.export(exports, "BroadcastPin", ()=>(0, _broadcastPinDefault.default));
-parcelHelpers.export(exports, "Broadcast", ()=>(0, _broadcastDefault.default));
-parcelHelpers.export(exports, "BrowserChrome", ()=>(0, _browserChromeDefault.default));
-parcelHelpers.export(exports, "BrowserEdge", ()=>(0, _browserEdgeDefault.default));
-parcelHelpers.export(exports, "BrowserFirefox", ()=>(0, _browserFirefoxDefault.default));
-parcelHelpers.export(exports, "BrowserSafari", ()=>(0, _browserSafariDefault.default));
-parcelHelpers.export(exports, "BrushFill", ()=>(0, _brushFillDefault.default));
-parcelHelpers.export(exports, "Brush", ()=>(0, _brushDefault.default));
-parcelHelpers.export(exports, "BucketFill", ()=>(0, _bucketFillDefault.default));
-parcelHelpers.export(exports, "Bucket", ()=>(0, _bucketDefault.default));
-parcelHelpers.export(exports, "BugFill", ()=>(0, _bugFillDefault.default));
-parcelHelpers.export(exports, "Bug", ()=>(0, _bugDefault.default));
-parcelHelpers.export(exports, "BuildingAdd", ()=>(0, _buildingAddDefault.default));
-parcelHelpers.export(exports, "BuildingCheck", ()=>(0, _buildingCheckDefault.default));
-parcelHelpers.export(exports, "BuildingDash", ()=>(0, _buildingDashDefault.default));
-parcelHelpers.export(exports, "BuildingDown", ()=>(0, _buildingDownDefault.default));
-parcelHelpers.export(exports, "BuildingExclamation", ()=>(0, _buildingExclamationDefault.default));
-parcelHelpers.export(exports, "BuildingFillAdd", ()=>(0, _buildingFillAddDefault.default));
-parcelHelpers.export(exports, "BuildingFillCheck", ()=>(0, _buildingFillCheckDefault.default));
-parcelHelpers.export(exports, "BuildingFillDash", ()=>(0, _buildingFillDashDefault.default));
-parcelHelpers.export(exports, "BuildingFillDown", ()=>(0, _buildingFillDownDefault.default));
-parcelHelpers.export(exports, "BuildingFillExclamation", ()=>(0, _buildingFillExclamationDefault.default));
-parcelHelpers.export(exports, "BuildingFillGear", ()=>(0, _buildingFillGearDefault.default));
-parcelHelpers.export(exports, "BuildingFillLock", ()=>(0, _buildingFillLockDefault.default));
-parcelHelpers.export(exports, "BuildingFillSlash", ()=>(0, _buildingFillSlashDefault.default));
-parcelHelpers.export(exports, "BuildingFillUp", ()=>(0, _buildingFillUpDefault.default));
-parcelHelpers.export(exports, "BuildingFillX", ()=>(0, _buildingFillXDefault.default));
-parcelHelpers.export(exports, "BuildingFill", ()=>(0, _buildingFillDefault.default));
-parcelHelpers.export(exports, "BuildingGear", ()=>(0, _buildingGearDefault.default));
-parcelHelpers.export(exports, "BuildingLock", ()=>(0, _buildingLockDefault.default));
-parcelHelpers.export(exports, "BuildingSlash", ()=>(0, _buildingSlashDefault.default));
-parcelHelpers.export(exports, "BuildingUp", ()=>(0, _buildingUpDefault.default));
-parcelHelpers.export(exports, "BuildingX", ()=>(0, _buildingXDefault.default));
-parcelHelpers.export(exports, "Building", ()=>(0, _buildingDefault.default));
-parcelHelpers.export(exports, "BuildingsFill", ()=>(0, _buildingsFillDefault.default));
-parcelHelpers.export(exports, "Buildings", ()=>(0, _buildingsDefault.default));
-parcelHelpers.export(exports, "Bullseye", ()=>(0, _bullseyeDefault.default));
-parcelHelpers.export(exports, "BusFrontFill", ()=>(0, _busFrontFillDefault.default));
-parcelHelpers.export(exports, "BusFront", ()=>(0, _busFrontDefault.default));
-parcelHelpers.export(exports, "CCircleFill", ()=>(0, _cCircleFillDefault.default));
-parcelHelpers.export(exports, "CCircle", ()=>(0, _cCircleDefault.default));
-parcelHelpers.export(exports, "CSquareFill", ()=>(0, _cSquareFillDefault.default));
-parcelHelpers.export(exports, "CSquare", ()=>(0, _cSquareDefault.default));
-parcelHelpers.export(exports, "CakeFill", ()=>(0, _cakeFillDefault.default));
-parcelHelpers.export(exports, "Cake", ()=>(0, _cakeDefault.default));
-parcelHelpers.export(exports, "Cake2Fill", ()=>(0, _cake2FillDefault.default));
-parcelHelpers.export(exports, "Cake2", ()=>(0, _cake2Default.default));
-parcelHelpers.export(exports, "CalculatorFill", ()=>(0, _calculatorFillDefault.default));
-parcelHelpers.export(exports, "Calculator", ()=>(0, _calculatorDefault.default));
-parcelHelpers.export(exports, "CalendarCheckFill", ()=>(0, _calendarCheckFillDefault.default));
-parcelHelpers.export(exports, "CalendarCheck", ()=>(0, _calendarCheckDefault.default));
-parcelHelpers.export(exports, "CalendarDateFill", ()=>(0, _calendarDateFillDefault.default));
-parcelHelpers.export(exports, "CalendarDate", ()=>(0, _calendarDateDefault.default));
-parcelHelpers.export(exports, "CalendarDayFill", ()=>(0, _calendarDayFillDefault.default));
-parcelHelpers.export(exports, "CalendarDay", ()=>(0, _calendarDayDefault.default));
-parcelHelpers.export(exports, "CalendarEventFill", ()=>(0, _calendarEventFillDefault.default));
-parcelHelpers.export(exports, "CalendarEvent", ()=>(0, _calendarEventDefault.default));
-parcelHelpers.export(exports, "CalendarFill", ()=>(0, _calendarFillDefault.default));
-parcelHelpers.export(exports, "CalendarHeartFill", ()=>(0, _calendarHeartFillDefault.default));
-parcelHelpers.export(exports, "CalendarHeart", ()=>(0, _calendarHeartDefault.default));
-parcelHelpers.export(exports, "CalendarMinusFill", ()=>(0, _calendarMinusFillDefault.default));
-parcelHelpers.export(exports, "CalendarMinus", ()=>(0, _calendarMinusDefault.default));
-parcelHelpers.export(exports, "CalendarMonthFill", ()=>(0, _calendarMonthFillDefault.default));
-parcelHelpers.export(exports, "CalendarMonth", ()=>(0, _calendarMonthDefault.default));
-parcelHelpers.export(exports, "CalendarPlusFill", ()=>(0, _calendarPlusFillDefault.default));
-parcelHelpers.export(exports, "CalendarPlus", ()=>(0, _calendarPlusDefault.default));
-parcelHelpers.export(exports, "CalendarRangeFill", ()=>(0, _calendarRangeFillDefault.default));
-parcelHelpers.export(exports, "CalendarRange", ()=>(0, _calendarRangeDefault.default));
-parcelHelpers.export(exports, "CalendarWeekFill", ()=>(0, _calendarWeekFillDefault.default));
-parcelHelpers.export(exports, "CalendarWeek", ()=>(0, _calendarWeekDefault.default));
-parcelHelpers.export(exports, "CalendarXFill", ()=>(0, _calendarXFillDefault.default));
-parcelHelpers.export(exports, "CalendarX", ()=>(0, _calendarXDefault.default));
-parcelHelpers.export(exports, "Calendar", ()=>(0, _calendarDefault.default));
-parcelHelpers.export(exports, "Calendar2CheckFill", ()=>(0, _calendar2CheckFillDefault.default));
-parcelHelpers.export(exports, "Calendar2Check", ()=>(0, _calendar2CheckDefault.default));
-parcelHelpers.export(exports, "Calendar2DateFill", ()=>(0, _calendar2DateFillDefault.default));
-parcelHelpers.export(exports, "Calendar2Date", ()=>(0, _calendar2DateDefault.default));
-parcelHelpers.export(exports, "Calendar2DayFill", ()=>(0, _calendar2DayFillDefault.default));
-parcelHelpers.export(exports, "Calendar2Day", ()=>(0, _calendar2DayDefault.default));
-parcelHelpers.export(exports, "Calendar2EventFill", ()=>(0, _calendar2EventFillDefault.default));
-parcelHelpers.export(exports, "Calendar2Event", ()=>(0, _calendar2EventDefault.default));
-parcelHelpers.export(exports, "Calendar2Fill", ()=>(0, _calendar2FillDefault.default));
-parcelHelpers.export(exports, "Calendar2HeartFill", ()=>(0, _calendar2HeartFillDefault.default));
-parcelHelpers.export(exports, "Calendar2Heart", ()=>(0, _calendar2HeartDefault.default));
-parcelHelpers.export(exports, "Calendar2MinusFill", ()=>(0, _calendar2MinusFillDefault.default));
-parcelHelpers.export(exports, "Calendar2Minus", ()=>(0, _calendar2MinusDefault.default));
-parcelHelpers.export(exports, "Calendar2MonthFill", ()=>(0, _calendar2MonthFillDefault.default));
-parcelHelpers.export(exports, "Calendar2Month", ()=>(0, _calendar2MonthDefault.default));
-parcelHelpers.export(exports, "Calendar2PlusFill", ()=>(0, _calendar2PlusFillDefault.default));
-parcelHelpers.export(exports, "Calendar2Plus", ()=>(0, _calendar2PlusDefault.default));
-parcelHelpers.export(exports, "Calendar2RangeFill", ()=>(0, _calendar2RangeFillDefault.default));
-parcelHelpers.export(exports, "Calendar2Range", ()=>(0, _calendar2RangeDefault.default));
-parcelHelpers.export(exports, "Calendar2WeekFill", ()=>(0, _calendar2WeekFillDefault.default));
-parcelHelpers.export(exports, "Calendar2Week", ()=>(0, _calendar2WeekDefault.default));
-parcelHelpers.export(exports, "Calendar2XFill", ()=>(0, _calendar2XFillDefault.default));
-parcelHelpers.export(exports, "Calendar2X", ()=>(0, _calendar2XDefault.default));
-parcelHelpers.export(exports, "Calendar2", ()=>(0, _calendar2Default.default));
-parcelHelpers.export(exports, "Calendar3EventFill", ()=>(0, _calendar3EventFillDefault.default));
-parcelHelpers.export(exports, "Calendar3Event", ()=>(0, _calendar3EventDefault.default));
-parcelHelpers.export(exports, "Calendar3Fill", ()=>(0, _calendar3FillDefault.default));
-parcelHelpers.export(exports, "Calendar3RangeFill", ()=>(0, _calendar3RangeFillDefault.default));
-parcelHelpers.export(exports, "Calendar3Range", ()=>(0, _calendar3RangeDefault.default));
-parcelHelpers.export(exports, "Calendar3WeekFill", ()=>(0, _calendar3WeekFillDefault.default));
-parcelHelpers.export(exports, "Calendar3Week", ()=>(0, _calendar3WeekDefault.default));
-parcelHelpers.export(exports, "Calendar3", ()=>(0, _calendar3Default.default));
-parcelHelpers.export(exports, "Calendar4Event", ()=>(0, _calendar4EventDefault.default));
-parcelHelpers.export(exports, "Calendar4Range", ()=>(0, _calendar4RangeDefault.default));
-parcelHelpers.export(exports, "Calendar4Week", ()=>(0, _calendar4WeekDefault.default));
-parcelHelpers.export(exports, "Calendar4", ()=>(0, _calendar4Default.default));
-parcelHelpers.export(exports, "CameraFill", ()=>(0, _cameraFillDefault.default));
-parcelHelpers.export(exports, "CameraReelsFill", ()=>(0, _cameraReelsFillDefault.default));
-parcelHelpers.export(exports, "CameraReels", ()=>(0, _cameraReelsDefault.default));
-parcelHelpers.export(exports, "CameraVideoFill", ()=>(0, _cameraVideoFillDefault.default));
-parcelHelpers.export(exports, "CameraVideoOffFill", ()=>(0, _cameraVideoOffFillDefault.default));
-parcelHelpers.export(exports, "CameraVideoOff", ()=>(0, _cameraVideoOffDefault.default));
-parcelHelpers.export(exports, "CameraVideo", ()=>(0, _cameraVideoDefault.default));
-parcelHelpers.export(exports, "Camera", ()=>(0, _cameraDefault.default));
-parcelHelpers.export(exports, "Camera2", ()=>(0, _camera2Default.default));
-parcelHelpers.export(exports, "CapslockFill", ()=>(0, _capslockFillDefault.default));
-parcelHelpers.export(exports, "Capslock", ()=>(0, _capslockDefault.default));
-parcelHelpers.export(exports, "CapsulePill", ()=>(0, _capsulePillDefault.default));
-parcelHelpers.export(exports, "Capsule", ()=>(0, _capsuleDefault.default));
-parcelHelpers.export(exports, "CarFrontFill", ()=>(0, _carFrontFillDefault.default));
-parcelHelpers.export(exports, "CarFront", ()=>(0, _carFrontDefault.default));
-parcelHelpers.export(exports, "CardChecklist", ()=>(0, _cardChecklistDefault.default));
-parcelHelpers.export(exports, "CardHeading", ()=>(0, _cardHeadingDefault.default));
-parcelHelpers.export(exports, "CardImage", ()=>(0, _cardImageDefault.default));
-parcelHelpers.export(exports, "CardList", ()=>(0, _cardListDefault.default));
-parcelHelpers.export(exports, "CardText", ()=>(0, _cardTextDefault.default));
-parcelHelpers.export(exports, "CaretDownFill", ()=>(0, _caretDownFillDefault.default));
-parcelHelpers.export(exports, "CaretDownSquareFill", ()=>(0, _caretDownSquareFillDefault.default));
-parcelHelpers.export(exports, "CaretDownSquare", ()=>(0, _caretDownSquareDefault.default));
-parcelHelpers.export(exports, "CaretDown", ()=>(0, _caretDownDefault.default));
-parcelHelpers.export(exports, "CaretLeftFill", ()=>(0, _caretLeftFillDefault.default));
-parcelHelpers.export(exports, "CaretLeftSquareFill", ()=>(0, _caretLeftSquareFillDefault.default));
-parcelHelpers.export(exports, "CaretLeftSquare", ()=>(0, _caretLeftSquareDefault.default));
-parcelHelpers.export(exports, "CaretLeft", ()=>(0, _caretLeftDefault.default));
-parcelHelpers.export(exports, "CaretRightFill", ()=>(0, _caretRightFillDefault.default));
-parcelHelpers.export(exports, "CaretRightSquareFill", ()=>(0, _caretRightSquareFillDefault.default));
-parcelHelpers.export(exports, "CaretRightSquare", ()=>(0, _caretRightSquareDefault.default));
-parcelHelpers.export(exports, "CaretRight", ()=>(0, _caretRightDefault.default));
-parcelHelpers.export(exports, "CaretUpFill", ()=>(0, _caretUpFillDefault.default));
-parcelHelpers.export(exports, "CaretUpSquareFill", ()=>(0, _caretUpSquareFillDefault.default));
-parcelHelpers.export(exports, "CaretUpSquare", ()=>(0, _caretUpSquareDefault.default));
-parcelHelpers.export(exports, "CaretUp", ()=>(0, _caretUpDefault.default));
-parcelHelpers.export(exports, "CartCheckFill", ()=>(0, _cartCheckFillDefault.default));
-parcelHelpers.export(exports, "CartCheck", ()=>(0, _cartCheckDefault.default));
-parcelHelpers.export(exports, "CartDashFill", ()=>(0, _cartDashFillDefault.default));
-parcelHelpers.export(exports, "CartDash", ()=>(0, _cartDashDefault.default));
-parcelHelpers.export(exports, "CartFill", ()=>(0, _cartFillDefault.default));
-parcelHelpers.export(exports, "CartPlusFill", ()=>(0, _cartPlusFillDefault.default));
-parcelHelpers.export(exports, "CartPlus", ()=>(0, _cartPlusDefault.default));
-parcelHelpers.export(exports, "CartXFill", ()=>(0, _cartXFillDefault.default));
-parcelHelpers.export(exports, "CartX", ()=>(0, _cartXDefault.default));
-parcelHelpers.export(exports, "Cart", ()=>(0, _cartDefault.default));
-parcelHelpers.export(exports, "Cart2", ()=>(0, _cart2Default.default));
-parcelHelpers.export(exports, "Cart3", ()=>(0, _cart3Default.default));
-parcelHelpers.export(exports, "Cart4", ()=>(0, _cart4Default.default));
-parcelHelpers.export(exports, "CashCoin", ()=>(0, _cashCoinDefault.default));
-parcelHelpers.export(exports, "CashStack", ()=>(0, _cashStackDefault.default));
-parcelHelpers.export(exports, "Cash", ()=>(0, _cashDefault.default));
-parcelHelpers.export(exports, "CassetteFill", ()=>(0, _cassetteFillDefault.default));
-parcelHelpers.export(exports, "Cassette", ()=>(0, _cassetteDefault.default));
-parcelHelpers.export(exports, "Cast", ()=>(0, _castDefault.default));
-parcelHelpers.export(exports, "CcCircleFill", ()=>(0, _ccCircleFillDefault.default));
-parcelHelpers.export(exports, "CcCircle", ()=>(0, _ccCircleDefault.default));
-parcelHelpers.export(exports, "CcSquareFill", ()=>(0, _ccSquareFillDefault.default));
-parcelHelpers.export(exports, "CcSquare", ()=>(0, _ccSquareDefault.default));
-parcelHelpers.export(exports, "ChatDotsFill", ()=>(0, _chatDotsFillDefault.default));
-parcelHelpers.export(exports, "ChatDots", ()=>(0, _chatDotsDefault.default));
-parcelHelpers.export(exports, "ChatFill", ()=>(0, _chatFillDefault.default));
-parcelHelpers.export(exports, "ChatHeartFill", ()=>(0, _chatHeartFillDefault.default));
-parcelHelpers.export(exports, "ChatHeart", ()=>(0, _chatHeartDefault.default));
-parcelHelpers.export(exports, "ChatLeftDotsFill", ()=>(0, _chatLeftDotsFillDefault.default));
-parcelHelpers.export(exports, "ChatLeftDots", ()=>(0, _chatLeftDotsDefault.default));
-parcelHelpers.export(exports, "ChatLeftFill", ()=>(0, _chatLeftFillDefault.default));
-parcelHelpers.export(exports, "ChatLeftHeartFill", ()=>(0, _chatLeftHeartFillDefault.default));
-parcelHelpers.export(exports, "ChatLeftHeart", ()=>(0, _chatLeftHeartDefault.default));
-parcelHelpers.export(exports, "ChatLeftQuoteFill", ()=>(0, _chatLeftQuoteFillDefault.default));
-parcelHelpers.export(exports, "ChatLeftQuote", ()=>(0, _chatLeftQuoteDefault.default));
-parcelHelpers.export(exports, "ChatLeftTextFill", ()=>(0, _chatLeftTextFillDefault.default));
-parcelHelpers.export(exports, "ChatLeftText", ()=>(0, _chatLeftTextDefault.default));
-parcelHelpers.export(exports, "ChatLeft", ()=>(0, _chatLeftDefault.default));
-parcelHelpers.export(exports, "ChatQuoteFill", ()=>(0, _chatQuoteFillDefault.default));
-parcelHelpers.export(exports, "ChatQuote", ()=>(0, _chatQuoteDefault.default));
-parcelHelpers.export(exports, "ChatRightDotsFill", ()=>(0, _chatRightDotsFillDefault.default));
-parcelHelpers.export(exports, "ChatRightDots", ()=>(0, _chatRightDotsDefault.default));
-parcelHelpers.export(exports, "ChatRightFill", ()=>(0, _chatRightFillDefault.default));
-parcelHelpers.export(exports, "ChatRightHeartFill", ()=>(0, _chatRightHeartFillDefault.default));
-parcelHelpers.export(exports, "ChatRightHeart", ()=>(0, _chatRightHeartDefault.default));
-parcelHelpers.export(exports, "ChatRightQuoteFill", ()=>(0, _chatRightQuoteFillDefault.default));
-parcelHelpers.export(exports, "ChatRightQuote", ()=>(0, _chatRightQuoteDefault.default));
-parcelHelpers.export(exports, "ChatRightTextFill", ()=>(0, _chatRightTextFillDefault.default));
-parcelHelpers.export(exports, "ChatRightText", ()=>(0, _chatRightTextDefault.default));
-parcelHelpers.export(exports, "ChatRight", ()=>(0, _chatRightDefault.default));
-parcelHelpers.export(exports, "ChatSquareDotsFill", ()=>(0, _chatSquareDotsFillDefault.default));
-parcelHelpers.export(exports, "ChatSquareDots", ()=>(0, _chatSquareDotsDefault.default));
-parcelHelpers.export(exports, "ChatSquareFill", ()=>(0, _chatSquareFillDefault.default));
-parcelHelpers.export(exports, "ChatSquareHeartFill", ()=>(0, _chatSquareHeartFillDefault.default));
-parcelHelpers.export(exports, "ChatSquareHeart", ()=>(0, _chatSquareHeartDefault.default));
-parcelHelpers.export(exports, "ChatSquareQuoteFill", ()=>(0, _chatSquareQuoteFillDefault.default));
-parcelHelpers.export(exports, "ChatSquareQuote", ()=>(0, _chatSquareQuoteDefault.default));
-parcelHelpers.export(exports, "ChatSquareTextFill", ()=>(0, _chatSquareTextFillDefault.default));
-parcelHelpers.export(exports, "ChatSquareText", ()=>(0, _chatSquareTextDefault.default));
-parcelHelpers.export(exports, "ChatSquare", ()=>(0, _chatSquareDefault.default));
-parcelHelpers.export(exports, "ChatTextFill", ()=>(0, _chatTextFillDefault.default));
-parcelHelpers.export(exports, "ChatText", ()=>(0, _chatTextDefault.default));
-parcelHelpers.export(exports, "Chat", ()=>(0, _chatDefault.default));
-parcelHelpers.export(exports, "CheckAll", ()=>(0, _checkAllDefault.default));
-parcelHelpers.export(exports, "CheckCircleFill", ()=>(0, _checkCircleFillDefault.default));
-parcelHelpers.export(exports, "CheckCircle", ()=>(0, _checkCircleDefault.default));
-parcelHelpers.export(exports, "CheckLg", ()=>(0, _checkLgDefault.default));
-parcelHelpers.export(exports, "CheckSquareFill", ()=>(0, _checkSquareFillDefault.default));
-parcelHelpers.export(exports, "CheckSquare", ()=>(0, _checkSquareDefault.default));
-parcelHelpers.export(exports, "Check", ()=>(0, _checkDefault.default));
-parcelHelpers.export(exports, "Check2All", ()=>(0, _check2AllDefault.default));
-parcelHelpers.export(exports, "Check2Circle", ()=>(0, _check2CircleDefault.default));
-parcelHelpers.export(exports, "Check2Square", ()=>(0, _check2SquareDefault.default));
-parcelHelpers.export(exports, "Check2", ()=>(0, _check2Default.default));
-parcelHelpers.export(exports, "ChevronBarContract", ()=>(0, _chevronBarContractDefault.default));
-parcelHelpers.export(exports, "ChevronBarDown", ()=>(0, _chevronBarDownDefault.default));
-parcelHelpers.export(exports, "ChevronBarExpand", ()=>(0, _chevronBarExpandDefault.default));
-parcelHelpers.export(exports, "ChevronBarLeft", ()=>(0, _chevronBarLeftDefault.default));
-parcelHelpers.export(exports, "ChevronBarRight", ()=>(0, _chevronBarRightDefault.default));
-parcelHelpers.export(exports, "ChevronBarUp", ()=>(0, _chevronBarUpDefault.default));
-parcelHelpers.export(exports, "ChevronCompactDown", ()=>(0, _chevronCompactDownDefault.default));
-parcelHelpers.export(exports, "ChevronCompactLeft", ()=>(0, _chevronCompactLeftDefault.default));
-parcelHelpers.export(exports, "ChevronCompactRight", ()=>(0, _chevronCompactRightDefault.default));
-parcelHelpers.export(exports, "ChevronCompactUp", ()=>(0, _chevronCompactUpDefault.default));
-parcelHelpers.export(exports, "ChevronContract", ()=>(0, _chevronContractDefault.default));
-parcelHelpers.export(exports, "ChevronDoubleDown", ()=>(0, _chevronDoubleDownDefault.default));
-parcelHelpers.export(exports, "ChevronDoubleLeft", ()=>(0, _chevronDoubleLeftDefault.default));
-parcelHelpers.export(exports, "ChevronDoubleRight", ()=>(0, _chevronDoubleRightDefault.default));
-parcelHelpers.export(exports, "ChevronDoubleUp", ()=>(0, _chevronDoubleUpDefault.default));
-parcelHelpers.export(exports, "ChevronDown", ()=>(0, _chevronDownDefault.default));
-parcelHelpers.export(exports, "ChevronExpand", ()=>(0, _chevronExpandDefault.default));
-parcelHelpers.export(exports, "ChevronLeft", ()=>(0, _chevronLeftDefault.default));
-parcelHelpers.export(exports, "ChevronRight", ()=>(0, _chevronRightDefault.default));
-parcelHelpers.export(exports, "ChevronUp", ()=>(0, _chevronUpDefault.default));
-parcelHelpers.export(exports, "CircleFill", ()=>(0, _circleFillDefault.default));
-parcelHelpers.export(exports, "CircleHalf", ()=>(0, _circleHalfDefault.default));
-parcelHelpers.export(exports, "CircleSquare", ()=>(0, _circleSquareDefault.default));
-parcelHelpers.export(exports, "Circle", ()=>(0, _circleDefault.default));
-parcelHelpers.export(exports, "ClipboardCheckFill", ()=>(0, _clipboardCheckFillDefault.default));
-parcelHelpers.export(exports, "ClipboardCheck", ()=>(0, _clipboardCheckDefault.default));
-parcelHelpers.export(exports, "ClipboardDataFill", ()=>(0, _clipboardDataFillDefault.default));
-parcelHelpers.export(exports, "ClipboardData", ()=>(0, _clipboardDataDefault.default));
-parcelHelpers.export(exports, "ClipboardFill", ()=>(0, _clipboardFillDefault.default));
-parcelHelpers.export(exports, "ClipboardHeartFill", ()=>(0, _clipboardHeartFillDefault.default));
-parcelHelpers.export(exports, "ClipboardHeart", ()=>(0, _clipboardHeartDefault.default));
-parcelHelpers.export(exports, "ClipboardMinusFill", ()=>(0, _clipboardMinusFillDefault.default));
-parcelHelpers.export(exports, "ClipboardMinus", ()=>(0, _clipboardMinusDefault.default));
-parcelHelpers.export(exports, "ClipboardPlusFill", ()=>(0, _clipboardPlusFillDefault.default));
-parcelHelpers.export(exports, "ClipboardPlus", ()=>(0, _clipboardPlusDefault.default));
-parcelHelpers.export(exports, "ClipboardPulse", ()=>(0, _clipboardPulseDefault.default));
-parcelHelpers.export(exports, "ClipboardXFill", ()=>(0, _clipboardXFillDefault.default));
-parcelHelpers.export(exports, "ClipboardX", ()=>(0, _clipboardXDefault.default));
-parcelHelpers.export(exports, "Clipboard", ()=>(0, _clipboardDefault.default));
-parcelHelpers.export(exports, "Clipboard2CheckFill", ()=>(0, _clipboard2CheckFillDefault.default));
-parcelHelpers.export(exports, "Clipboard2Check", ()=>(0, _clipboard2CheckDefault.default));
-parcelHelpers.export(exports, "Clipboard2DataFill", ()=>(0, _clipboard2DataFillDefault.default));
-parcelHelpers.export(exports, "Clipboard2Data", ()=>(0, _clipboard2DataDefault.default));
-parcelHelpers.export(exports, "Clipboard2Fill", ()=>(0, _clipboard2FillDefault.default));
-parcelHelpers.export(exports, "Clipboard2HeartFill", ()=>(0, _clipboard2HeartFillDefault.default));
-parcelHelpers.export(exports, "Clipboard2Heart", ()=>(0, _clipboard2HeartDefault.default));
-parcelHelpers.export(exports, "Clipboard2MinusFill", ()=>(0, _clipboard2MinusFillDefault.default));
-parcelHelpers.export(exports, "Clipboard2Minus", ()=>(0, _clipboard2MinusDefault.default));
-parcelHelpers.export(exports, "Clipboard2PlusFill", ()=>(0, _clipboard2PlusFillDefault.default));
-parcelHelpers.export(exports, "Clipboard2Plus", ()=>(0, _clipboard2PlusDefault.default));
-parcelHelpers.export(exports, "Clipboard2PulseFill", ()=>(0, _clipboard2PulseFillDefault.default));
-parcelHelpers.export(exports, "Clipboard2Pulse", ()=>(0, _clipboard2PulseDefault.default));
-parcelHelpers.export(exports, "Clipboard2XFill", ()=>(0, _clipboard2XFillDefault.default));
-parcelHelpers.export(exports, "Clipboard2X", ()=>(0, _clipboard2XDefault.default));
-parcelHelpers.export(exports, "Clipboard2", ()=>(0, _clipboard2Default.default));
-parcelHelpers.export(exports, "ClockFill", ()=>(0, _clockFillDefault.default));
-parcelHelpers.export(exports, "ClockHistory", ()=>(0, _clockHistoryDefault.default));
-parcelHelpers.export(exports, "Clock", ()=>(0, _clockDefault.default));
-parcelHelpers.export(exports, "CloudArrowDownFill", ()=>(0, _cloudArrowDownFillDefault.default));
-parcelHelpers.export(exports, "CloudArrowDown", ()=>(0, _cloudArrowDownDefault.default));
-parcelHelpers.export(exports, "CloudArrowUpFill", ()=>(0, _cloudArrowUpFillDefault.default));
-parcelHelpers.export(exports, "CloudArrowUp", ()=>(0, _cloudArrowUpDefault.default));
-parcelHelpers.export(exports, "CloudCheckFill", ()=>(0, _cloudCheckFillDefault.default));
-parcelHelpers.export(exports, "CloudCheck", ()=>(0, _cloudCheckDefault.default));
-parcelHelpers.export(exports, "CloudDownloadFill", ()=>(0, _cloudDownloadFillDefault.default));
-parcelHelpers.export(exports, "CloudDownload", ()=>(0, _cloudDownloadDefault.default));
-parcelHelpers.export(exports, "CloudDrizzleFill", ()=>(0, _cloudDrizzleFillDefault.default));
-parcelHelpers.export(exports, "CloudDrizzle", ()=>(0, _cloudDrizzleDefault.default));
-parcelHelpers.export(exports, "CloudFill", ()=>(0, _cloudFillDefault.default));
-parcelHelpers.export(exports, "CloudFogFill", ()=>(0, _cloudFogFillDefault.default));
-parcelHelpers.export(exports, "CloudFog", ()=>(0, _cloudFogDefault.default));
-parcelHelpers.export(exports, "CloudFog2Fill", ()=>(0, _cloudFog2FillDefault.default));
-parcelHelpers.export(exports, "CloudFog2", ()=>(0, _cloudFog2Default.default));
-parcelHelpers.export(exports, "CloudHailFill", ()=>(0, _cloudHailFillDefault.default));
-parcelHelpers.export(exports, "CloudHail", ()=>(0, _cloudHailDefault.default));
-parcelHelpers.export(exports, "CloudHazeFill", ()=>(0, _cloudHazeFillDefault.default));
-parcelHelpers.export(exports, "CloudHaze", ()=>(0, _cloudHazeDefault.default));
-parcelHelpers.export(exports, "CloudHaze2Fill", ()=>(0, _cloudHaze2FillDefault.default));
-parcelHelpers.export(exports, "CloudHaze2", ()=>(0, _cloudHaze2Default.default));
-parcelHelpers.export(exports, "CloudLightningFill", ()=>(0, _cloudLightningFillDefault.default));
-parcelHelpers.export(exports, "CloudLightningRainFill", ()=>(0, _cloudLightningRainFillDefault.default));
-parcelHelpers.export(exports, "CloudLightningRain", ()=>(0, _cloudLightningRainDefault.default));
-parcelHelpers.export(exports, "CloudLightning", ()=>(0, _cloudLightningDefault.default));
-parcelHelpers.export(exports, "CloudMinusFill", ()=>(0, _cloudMinusFillDefault.default));
-parcelHelpers.export(exports, "CloudMinus", ()=>(0, _cloudMinusDefault.default));
-parcelHelpers.export(exports, "CloudMoonFill", ()=>(0, _cloudMoonFillDefault.default));
-parcelHelpers.export(exports, "CloudMoon", ()=>(0, _cloudMoonDefault.default));
-parcelHelpers.export(exports, "CloudPlusFill", ()=>(0, _cloudPlusFillDefault.default));
-parcelHelpers.export(exports, "CloudPlus", ()=>(0, _cloudPlusDefault.default));
-parcelHelpers.export(exports, "CloudRainFill", ()=>(0, _cloudRainFillDefault.default));
-parcelHelpers.export(exports, "CloudRainHeavyFill", ()=>(0, _cloudRainHeavyFillDefault.default));
-parcelHelpers.export(exports, "CloudRainHeavy", ()=>(0, _cloudRainHeavyDefault.default));
-parcelHelpers.export(exports, "CloudRain", ()=>(0, _cloudRainDefault.default));
-parcelHelpers.export(exports, "CloudSlashFill", ()=>(0, _cloudSlashFillDefault.default));
-parcelHelpers.export(exports, "CloudSlash", ()=>(0, _cloudSlashDefault.default));
-parcelHelpers.export(exports, "CloudSleetFill", ()=>(0, _cloudSleetFillDefault.default));
-parcelHelpers.export(exports, "CloudSleet", ()=>(0, _cloudSleetDefault.default));
-parcelHelpers.export(exports, "CloudSnowFill", ()=>(0, _cloudSnowFillDefault.default));
-parcelHelpers.export(exports, "CloudSnow", ()=>(0, _cloudSnowDefault.default));
-parcelHelpers.export(exports, "CloudSunFill", ()=>(0, _cloudSunFillDefault.default));
-parcelHelpers.export(exports, "CloudSun", ()=>(0, _cloudSunDefault.default));
-parcelHelpers.export(exports, "CloudUploadFill", ()=>(0, _cloudUploadFillDefault.default));
-parcelHelpers.export(exports, "CloudUpload", ()=>(0, _cloudUploadDefault.default));
-parcelHelpers.export(exports, "Cloud", ()=>(0, _cloudDefault.default));
-parcelHelpers.export(exports, "CloudsFill", ()=>(0, _cloudsFillDefault.default));
-parcelHelpers.export(exports, "Clouds", ()=>(0, _cloudsDefault.default));
-parcelHelpers.export(exports, "CloudyFill", ()=>(0, _cloudyFillDefault.default));
-parcelHelpers.export(exports, "Cloudy", ()=>(0, _cloudyDefault.default));
-parcelHelpers.export(exports, "CodeSlash", ()=>(0, _codeSlashDefault.default));
-parcelHelpers.export(exports, "CodeSquare", ()=>(0, _codeSquareDefault.default));
-parcelHelpers.export(exports, "Code", ()=>(0, _codeDefault.default));
-parcelHelpers.export(exports, "Coin", ()=>(0, _coinDefault.default));
-parcelHelpers.export(exports, "CollectionFill", ()=>(0, _collectionFillDefault.default));
-parcelHelpers.export(exports, "CollectionPlayFill", ()=>(0, _collectionPlayFillDefault.default));
-parcelHelpers.export(exports, "CollectionPlay", ()=>(0, _collectionPlayDefault.default));
-parcelHelpers.export(exports, "Collection", ()=>(0, _collectionDefault.default));
-parcelHelpers.export(exports, "ColumnsGap", ()=>(0, _columnsGapDefault.default));
-parcelHelpers.export(exports, "Columns", ()=>(0, _columnsDefault.default));
-parcelHelpers.export(exports, "Command", ()=>(0, _commandDefault.default));
-parcelHelpers.export(exports, "CompassFill", ()=>(0, _compassFillDefault.default));
-parcelHelpers.export(exports, "Compass", ()=>(0, _compassDefault.default));
-parcelHelpers.export(exports, "ConeStriped", ()=>(0, _coneStripedDefault.default));
-parcelHelpers.export(exports, "Cone", ()=>(0, _coneDefault.default));
-parcelHelpers.export(exports, "Controller", ()=>(0, _controllerDefault.default));
-parcelHelpers.export(exports, "Cookie", ()=>(0, _cookieDefault.default));
-parcelHelpers.export(exports, "Copy", ()=>(0, _copyDefault.default));
-parcelHelpers.export(exports, "CpuFill", ()=>(0, _cpuFillDefault.default));
-parcelHelpers.export(exports, "Cpu", ()=>(0, _cpuDefault.default));
-parcelHelpers.export(exports, "CreditCard2BackFill", ()=>(0, _creditCard2BackFillDefault.default));
-parcelHelpers.export(exports, "CreditCard2Back", ()=>(0, _creditCard2BackDefault.default));
-parcelHelpers.export(exports, "CreditCard2FrontFill", ()=>(0, _creditCard2FrontFillDefault.default));
-parcelHelpers.export(exports, "CreditCard2Front", ()=>(0, _creditCard2FrontDefault.default));
-parcelHelpers.export(exports, "CreditCardFill", ()=>(0, _creditCardFillDefault.default));
-parcelHelpers.export(exports, "CreditCard", ()=>(0, _creditCardDefault.default));
-parcelHelpers.export(exports, "Crop", ()=>(0, _cropDefault.default));
-parcelHelpers.export(exports, "Crosshair", ()=>(0, _crosshairDefault.default));
-parcelHelpers.export(exports, "Crosshair2", ()=>(0, _crosshair2Default.default));
-parcelHelpers.export(exports, "CupFill", ()=>(0, _cupFillDefault.default));
-parcelHelpers.export(exports, "CupHotFill", ()=>(0, _cupHotFillDefault.default));
-parcelHelpers.export(exports, "CupHot", ()=>(0, _cupHotDefault.default));
-parcelHelpers.export(exports, "CupStraw", ()=>(0, _cupStrawDefault.default));
-parcelHelpers.export(exports, "Cup", ()=>(0, _cupDefault.default));
-parcelHelpers.export(exports, "CurrencyBitcoin", ()=>(0, _currencyBitcoinDefault.default));
-parcelHelpers.export(exports, "CurrencyDollar", ()=>(0, _currencyDollarDefault.default));
-parcelHelpers.export(exports, "CurrencyEuro", ()=>(0, _currencyEuroDefault.default));
-parcelHelpers.export(exports, "CurrencyExchange", ()=>(0, _currencyExchangeDefault.default));
-parcelHelpers.export(exports, "CurrencyPound", ()=>(0, _currencyPoundDefault.default));
-parcelHelpers.export(exports, "CurrencyRupee", ()=>(0, _currencyRupeeDefault.default));
-parcelHelpers.export(exports, "CurrencyYen", ()=>(0, _currencyYenDefault.default));
-parcelHelpers.export(exports, "CursorFill", ()=>(0, _cursorFillDefault.default));
-parcelHelpers.export(exports, "CursorText", ()=>(0, _cursorTextDefault.default));
-parcelHelpers.export(exports, "Cursor", ()=>(0, _cursorDefault.default));
-parcelHelpers.export(exports, "DashCircleDotted", ()=>(0, _dashCircleDottedDefault.default));
-parcelHelpers.export(exports, "DashCircleFill", ()=>(0, _dashCircleFillDefault.default));
-parcelHelpers.export(exports, "DashCircle", ()=>(0, _dashCircleDefault.default));
-parcelHelpers.export(exports, "DashLg", ()=>(0, _dashLgDefault.default));
-parcelHelpers.export(exports, "DashSquareDotted", ()=>(0, _dashSquareDottedDefault.default));
-parcelHelpers.export(exports, "DashSquareFill", ()=>(0, _dashSquareFillDefault.default));
-parcelHelpers.export(exports, "DashSquare", ()=>(0, _dashSquareDefault.default));
-parcelHelpers.export(exports, "Dash", ()=>(0, _dashDefault.default));
-parcelHelpers.export(exports, "DatabaseAdd", ()=>(0, _databaseAddDefault.default));
-parcelHelpers.export(exports, "DatabaseCheck", ()=>(0, _databaseCheckDefault.default));
-parcelHelpers.export(exports, "DatabaseDash", ()=>(0, _databaseDashDefault.default));
-parcelHelpers.export(exports, "DatabaseDown", ()=>(0, _databaseDownDefault.default));
-parcelHelpers.export(exports, "DatabaseExclamation", ()=>(0, _databaseExclamationDefault.default));
-parcelHelpers.export(exports, "DatabaseFillAdd", ()=>(0, _databaseFillAddDefault.default));
-parcelHelpers.export(exports, "DatabaseFillCheck", ()=>(0, _databaseFillCheckDefault.default));
-parcelHelpers.export(exports, "DatabaseFillDash", ()=>(0, _databaseFillDashDefault.default));
-parcelHelpers.export(exports, "DatabaseFillDown", ()=>(0, _databaseFillDownDefault.default));
-parcelHelpers.export(exports, "DatabaseFillExclamation", ()=>(0, _databaseFillExclamationDefault.default));
-parcelHelpers.export(exports, "DatabaseFillGear", ()=>(0, _databaseFillGearDefault.default));
-parcelHelpers.export(exports, "DatabaseFillLock", ()=>(0, _databaseFillLockDefault.default));
-parcelHelpers.export(exports, "DatabaseFillSlash", ()=>(0, _databaseFillSlashDefault.default));
-parcelHelpers.export(exports, "DatabaseFillUp", ()=>(0, _databaseFillUpDefault.default));
-parcelHelpers.export(exports, "DatabaseFillX", ()=>(0, _databaseFillXDefault.default));
-parcelHelpers.export(exports, "DatabaseFill", ()=>(0, _databaseFillDefault.default));
-parcelHelpers.export(exports, "DatabaseGear", ()=>(0, _databaseGearDefault.default));
-parcelHelpers.export(exports, "DatabaseLock", ()=>(0, _databaseLockDefault.default));
-parcelHelpers.export(exports, "DatabaseSlash", ()=>(0, _databaseSlashDefault.default));
-parcelHelpers.export(exports, "DatabaseUp", ()=>(0, _databaseUpDefault.default));
-parcelHelpers.export(exports, "DatabaseX", ()=>(0, _databaseXDefault.default));
-parcelHelpers.export(exports, "Database", ()=>(0, _databaseDefault.default));
-parcelHelpers.export(exports, "DeviceHddFill", ()=>(0, _deviceHddFillDefault.default));
-parcelHelpers.export(exports, "DeviceHdd", ()=>(0, _deviceHddDefault.default));
-parcelHelpers.export(exports, "DeviceSsdFill", ()=>(0, _deviceSsdFillDefault.default));
-parcelHelpers.export(exports, "DeviceSsd", ()=>(0, _deviceSsdDefault.default));
-parcelHelpers.export(exports, "Diagram2Fill", ()=>(0, _diagram2FillDefault.default));
-parcelHelpers.export(exports, "Diagram2", ()=>(0, _diagram2Default.default));
-parcelHelpers.export(exports, "Diagram3Fill", ()=>(0, _diagram3FillDefault.default));
-parcelHelpers.export(exports, "Diagram3", ()=>(0, _diagram3Default.default));
-parcelHelpers.export(exports, "DiamondFill", ()=>(0, _diamondFillDefault.default));
-parcelHelpers.export(exports, "DiamondHalf", ()=>(0, _diamondHalfDefault.default));
-parcelHelpers.export(exports, "Diamond", ()=>(0, _diamondDefault.default));
-parcelHelpers.export(exports, "Dice1Fill", ()=>(0, _dice1FillDefault.default));
-parcelHelpers.export(exports, "Dice1", ()=>(0, _dice1Default.default));
-parcelHelpers.export(exports, "Dice2Fill", ()=>(0, _dice2FillDefault.default));
-parcelHelpers.export(exports, "Dice2", ()=>(0, _dice2Default.default));
-parcelHelpers.export(exports, "Dice3Fill", ()=>(0, _dice3FillDefault.default));
-parcelHelpers.export(exports, "Dice3", ()=>(0, _dice3Default.default));
-parcelHelpers.export(exports, "Dice4Fill", ()=>(0, _dice4FillDefault.default));
-parcelHelpers.export(exports, "Dice4", ()=>(0, _dice4Default.default));
-parcelHelpers.export(exports, "Dice5Fill", ()=>(0, _dice5FillDefault.default));
-parcelHelpers.export(exports, "Dice5", ()=>(0, _dice5Default.default));
-parcelHelpers.export(exports, "Dice6Fill", ()=>(0, _dice6FillDefault.default));
-parcelHelpers.export(exports, "Dice6", ()=>(0, _dice6Default.default));
-parcelHelpers.export(exports, "DiscFill", ()=>(0, _discFillDefault.default));
-parcelHelpers.export(exports, "Disc", ()=>(0, _discDefault.default));
-parcelHelpers.export(exports, "Discord", ()=>(0, _discordDefault.default));
-parcelHelpers.export(exports, "DisplayFill", ()=>(0, _displayFillDefault.default));
-parcelHelpers.export(exports, "Display", ()=>(0, _displayDefault.default));
-parcelHelpers.export(exports, "DisplayportFill", ()=>(0, _displayportFillDefault.default));
-parcelHelpers.export(exports, "Displayport", ()=>(0, _displayportDefault.default));
-parcelHelpers.export(exports, "DistributeHorizontal", ()=>(0, _distributeHorizontalDefault.default));
-parcelHelpers.export(exports, "DistributeVertical", ()=>(0, _distributeVerticalDefault.default));
-parcelHelpers.export(exports, "DoorClosedFill", ()=>(0, _doorClosedFillDefault.default));
-parcelHelpers.export(exports, "DoorClosed", ()=>(0, _doorClosedDefault.default));
-parcelHelpers.export(exports, "DoorOpenFill", ()=>(0, _doorOpenFillDefault.default));
-parcelHelpers.export(exports, "DoorOpen", ()=>(0, _doorOpenDefault.default));
-parcelHelpers.export(exports, "Dot", ()=>(0, _dotDefault.default));
-parcelHelpers.export(exports, "Download", ()=>(0, _downloadDefault.default));
-parcelHelpers.export(exports, "DpadFill", ()=>(0, _dpadFillDefault.default));
-parcelHelpers.export(exports, "Dpad", ()=>(0, _dpadDefault.default));
-parcelHelpers.export(exports, "Dribbble", ()=>(0, _dribbbleDefault.default));
-parcelHelpers.export(exports, "Dropbox", ()=>(0, _dropboxDefault.default));
-parcelHelpers.export(exports, "DropletFill", ()=>(0, _dropletFillDefault.default));
-parcelHelpers.export(exports, "DropletHalf", ()=>(0, _dropletHalfDefault.default));
-parcelHelpers.export(exports, "Droplet", ()=>(0, _dropletDefault.default));
-parcelHelpers.export(exports, "DuffleFill", ()=>(0, _duffleFillDefault.default));
-parcelHelpers.export(exports, "Duffle", ()=>(0, _duffleDefault.default));
-parcelHelpers.export(exports, "EarFill", ()=>(0, _earFillDefault.default));
-parcelHelpers.export(exports, "Ear", ()=>(0, _earDefault.default));
-parcelHelpers.export(exports, "Earbuds", ()=>(0, _earbudsDefault.default));
-parcelHelpers.export(exports, "EaselFill", ()=>(0, _easelFillDefault.default));
-parcelHelpers.export(exports, "Easel", ()=>(0, _easelDefault.default));
-parcelHelpers.export(exports, "Easel2Fill", ()=>(0, _easel2FillDefault.default));
-parcelHelpers.export(exports, "Easel2", ()=>(0, _easel2Default.default));
-parcelHelpers.export(exports, "Easel3Fill", ()=>(0, _easel3FillDefault.default));
-parcelHelpers.export(exports, "Easel3", ()=>(0, _easel3Default.default));
-parcelHelpers.export(exports, "EggFill", ()=>(0, _eggFillDefault.default));
-parcelHelpers.export(exports, "EggFried", ()=>(0, _eggFriedDefault.default));
-parcelHelpers.export(exports, "Egg", ()=>(0, _eggDefault.default));
-parcelHelpers.export(exports, "EjectFill", ()=>(0, _ejectFillDefault.default));
-parcelHelpers.export(exports, "Eject", ()=>(0, _ejectDefault.default));
-parcelHelpers.export(exports, "EmojiAngryFill", ()=>(0, _emojiAngryFillDefault.default));
-parcelHelpers.export(exports, "EmojiAngry", ()=>(0, _emojiAngryDefault.default));
-parcelHelpers.export(exports, "EmojiAstonishedFill", ()=>(0, _emojiAstonishedFillDefault.default));
-parcelHelpers.export(exports, "EmojiAstonished", ()=>(0, _emojiAstonishedDefault.default));
-parcelHelpers.export(exports, "EmojiDizzyFill", ()=>(0, _emojiDizzyFillDefault.default));
-parcelHelpers.export(exports, "EmojiDizzy", ()=>(0, _emojiDizzyDefault.default));
-parcelHelpers.export(exports, "EmojiExpressionlessFill", ()=>(0, _emojiExpressionlessFillDefault.default));
-parcelHelpers.export(exports, "EmojiExpressionless", ()=>(0, _emojiExpressionlessDefault.default));
-parcelHelpers.export(exports, "EmojiFrownFill", ()=>(0, _emojiFrownFillDefault.default));
-parcelHelpers.export(exports, "EmojiFrown", ()=>(0, _emojiFrownDefault.default));
-parcelHelpers.export(exports, "EmojiGrimaceFill", ()=>(0, _emojiGrimaceFillDefault.default));
-parcelHelpers.export(exports, "EmojiGrimace", ()=>(0, _emojiGrimaceDefault.default));
-parcelHelpers.export(exports, "EmojiGrinFill", ()=>(0, _emojiGrinFillDefault.default));
-parcelHelpers.export(exports, "EmojiGrin", ()=>(0, _emojiGrinDefault.default));
-parcelHelpers.export(exports, "EmojiHeartEyesFill", ()=>(0, _emojiHeartEyesFillDefault.default));
-parcelHelpers.export(exports, "EmojiHeartEyes", ()=>(0, _emojiHeartEyesDefault.default));
-parcelHelpers.export(exports, "EmojiKissFill", ()=>(0, _emojiKissFillDefault.default));
-parcelHelpers.export(exports, "EmojiKiss", ()=>(0, _emojiKissDefault.default));
-parcelHelpers.export(exports, "EmojiLaughingFill", ()=>(0, _emojiLaughingFillDefault.default));
-parcelHelpers.export(exports, "EmojiLaughing", ()=>(0, _emojiLaughingDefault.default));
-parcelHelpers.export(exports, "EmojiNeutralFill", ()=>(0, _emojiNeutralFillDefault.default));
-parcelHelpers.export(exports, "EmojiNeutral", ()=>(0, _emojiNeutralDefault.default));
-parcelHelpers.export(exports, "EmojiSmileFill", ()=>(0, _emojiSmileFillDefault.default));
-parcelHelpers.export(exports, "EmojiSmileUpsideDownFill", ()=>(0, _emojiSmileUpsideDownFillDefault.default));
-parcelHelpers.export(exports, "EmojiSmileUpsideDown", ()=>(0, _emojiSmileUpsideDownDefault.default));
-parcelHelpers.export(exports, "EmojiSmile", ()=>(0, _emojiSmileDefault.default));
-parcelHelpers.export(exports, "EmojiSunglassesFill", ()=>(0, _emojiSunglassesFillDefault.default));
-parcelHelpers.export(exports, "EmojiSunglasses", ()=>(0, _emojiSunglassesDefault.default));
-parcelHelpers.export(exports, "EmojiSurpriseFill", ()=>(0, _emojiSurpriseFillDefault.default));
-parcelHelpers.export(exports, "EmojiSurprise", ()=>(0, _emojiSurpriseDefault.default));
-parcelHelpers.export(exports, "EmojiTearFill", ()=>(0, _emojiTearFillDefault.default));
-parcelHelpers.export(exports, "EmojiTear", ()=>(0, _emojiTearDefault.default));
-parcelHelpers.export(exports, "EmojiWinkFill", ()=>(0, _emojiWinkFillDefault.default));
-parcelHelpers.export(exports, "EmojiWink", ()=>(0, _emojiWinkDefault.default));
-parcelHelpers.export(exports, "EnvelopeArrowDownFill", ()=>(0, _envelopeArrowDownFillDefault.default));
-parcelHelpers.export(exports, "EnvelopeArrowDown", ()=>(0, _envelopeArrowDownDefault.default));
-parcelHelpers.export(exports, "EnvelopeArrowUpFill", ()=>(0, _envelopeArrowUpFillDefault.default));
-parcelHelpers.export(exports, "EnvelopeArrowUp", ()=>(0, _envelopeArrowUpDefault.default));
-parcelHelpers.export(exports, "EnvelopeAtFill", ()=>(0, _envelopeAtFillDefault.default));
-parcelHelpers.export(exports, "EnvelopeAt", ()=>(0, _envelopeAtDefault.default));
-parcelHelpers.export(exports, "EnvelopeCheckFill", ()=>(0, _envelopeCheckFillDefault.default));
-parcelHelpers.export(exports, "EnvelopeCheck", ()=>(0, _envelopeCheckDefault.default));
-parcelHelpers.export(exports, "EnvelopeDashFill", ()=>(0, _envelopeDashFillDefault.default));
-parcelHelpers.export(exports, "EnvelopeDash", ()=>(0, _envelopeDashDefault.default));
-parcelHelpers.export(exports, "EnvelopeExclamationFill", ()=>(0, _envelopeExclamationFillDefault.default));
-parcelHelpers.export(exports, "EnvelopeExclamation", ()=>(0, _envelopeExclamationDefault.default));
-parcelHelpers.export(exports, "EnvelopeFill", ()=>(0, _envelopeFillDefault.default));
-parcelHelpers.export(exports, "EnvelopeHeartFill", ()=>(0, _envelopeHeartFillDefault.default));
-parcelHelpers.export(exports, "EnvelopeHeart", ()=>(0, _envelopeHeartDefault.default));
-parcelHelpers.export(exports, "EnvelopeOpenFill", ()=>(0, _envelopeOpenFillDefault.default));
-parcelHelpers.export(exports, "EnvelopeOpenHeartFill", ()=>(0, _envelopeOpenHeartFillDefault.default));
-parcelHelpers.export(exports, "EnvelopeOpenHeart", ()=>(0, _envelopeOpenHeartDefault.default));
-parcelHelpers.export(exports, "EnvelopeOpen", ()=>(0, _envelopeOpenDefault.default));
-parcelHelpers.export(exports, "EnvelopePaperFill", ()=>(0, _envelopePaperFillDefault.default));
-parcelHelpers.export(exports, "EnvelopePaperHeartFill", ()=>(0, _envelopePaperHeartFillDefault.default));
-parcelHelpers.export(exports, "EnvelopePaperHeart", ()=>(0, _envelopePaperHeartDefault.default));
-parcelHelpers.export(exports, "EnvelopePaper", ()=>(0, _envelopePaperDefault.default));
-parcelHelpers.export(exports, "EnvelopePlusFill", ()=>(0, _envelopePlusFillDefault.default));
-parcelHelpers.export(exports, "EnvelopePlus", ()=>(0, _envelopePlusDefault.default));
-parcelHelpers.export(exports, "EnvelopeSlashFill", ()=>(0, _envelopeSlashFillDefault.default));
-parcelHelpers.export(exports, "EnvelopeSlash", ()=>(0, _envelopeSlashDefault.default));
-parcelHelpers.export(exports, "EnvelopeXFill", ()=>(0, _envelopeXFillDefault.default));
-parcelHelpers.export(exports, "EnvelopeX", ()=>(0, _envelopeXDefault.default));
-parcelHelpers.export(exports, "Envelope", ()=>(0, _envelopeDefault.default));
-parcelHelpers.export(exports, "EraserFill", ()=>(0, _eraserFillDefault.default));
-parcelHelpers.export(exports, "Eraser", ()=>(0, _eraserDefault.default));
-parcelHelpers.export(exports, "Escape", ()=>(0, _escapeDefault.default));
-parcelHelpers.export(exports, "Ethernet", ()=>(0, _ethernetDefault.default));
-parcelHelpers.export(exports, "EvFrontFill", ()=>(0, _evFrontFillDefault.default));
-parcelHelpers.export(exports, "EvFront", ()=>(0, _evFrontDefault.default));
-parcelHelpers.export(exports, "EvStationFill", ()=>(0, _evStationFillDefault.default));
-parcelHelpers.export(exports, "EvStation", ()=>(0, _evStationDefault.default));
-parcelHelpers.export(exports, "ExclamationCircleFill", ()=>(0, _exclamationCircleFillDefault.default));
-parcelHelpers.export(exports, "ExclamationCircle", ()=>(0, _exclamationCircleDefault.default));
-parcelHelpers.export(exports, "ExclamationDiamondFill", ()=>(0, _exclamationDiamondFillDefault.default));
-parcelHelpers.export(exports, "ExclamationDiamond", ()=>(0, _exclamationDiamondDefault.default));
-parcelHelpers.export(exports, "ExclamationLg", ()=>(0, _exclamationLgDefault.default));
-parcelHelpers.export(exports, "ExclamationOctagonFill", ()=>(0, _exclamationOctagonFillDefault.default));
-parcelHelpers.export(exports, "ExclamationOctagon", ()=>(0, _exclamationOctagonDefault.default));
-parcelHelpers.export(exports, "ExclamationSquareFill", ()=>(0, _exclamationSquareFillDefault.default));
-parcelHelpers.export(exports, "ExclamationSquare", ()=>(0, _exclamationSquareDefault.default));
-parcelHelpers.export(exports, "ExclamationTriangleFill", ()=>(0, _exclamationTriangleFillDefault.default));
-parcelHelpers.export(exports, "ExclamationTriangle", ()=>(0, _exclamationTriangleDefault.default));
-parcelHelpers.export(exports, "Exclamation", ()=>(0, _exclamationDefault.default));
-parcelHelpers.export(exports, "Exclude", ()=>(0, _excludeDefault.default));
-parcelHelpers.export(exports, "ExplicitFill", ()=>(0, _explicitFillDefault.default));
-parcelHelpers.export(exports, "Explicit", ()=>(0, _explicitDefault.default));
-parcelHelpers.export(exports, "Exposure", ()=>(0, _exposureDefault.default));
-parcelHelpers.export(exports, "EyeFill", ()=>(0, _eyeFillDefault.default));
-parcelHelpers.export(exports, "EyeSlashFill", ()=>(0, _eyeSlashFillDefault.default));
-parcelHelpers.export(exports, "EyeSlash", ()=>(0, _eyeSlashDefault.default));
-parcelHelpers.export(exports, "Eye", ()=>(0, _eyeDefault.default));
-parcelHelpers.export(exports, "Eyedropper", ()=>(0, _eyedropperDefault.default));
-parcelHelpers.export(exports, "Eyeglasses", ()=>(0, _eyeglassesDefault.default));
-parcelHelpers.export(exports, "Facebook", ()=>(0, _facebookDefault.default));
-parcelHelpers.export(exports, "Fan", ()=>(0, _fanDefault.default));
-parcelHelpers.export(exports, "FastForwardBtnFill", ()=>(0, _fastForwardBtnFillDefault.default));
-parcelHelpers.export(exports, "FastForwardBtn", ()=>(0, _fastForwardBtnDefault.default));
-parcelHelpers.export(exports, "FastForwardCircleFill", ()=>(0, _fastForwardCircleFillDefault.default));
-parcelHelpers.export(exports, "FastForwardCircle", ()=>(0, _fastForwardCircleDefault.default));
-parcelHelpers.export(exports, "FastForwardFill", ()=>(0, _fastForwardFillDefault.default));
-parcelHelpers.export(exports, "FastForward", ()=>(0, _fastForwardDefault.default));
-parcelHelpers.export(exports, "Feather", ()=>(0, _featherDefault.default));
-parcelHelpers.export(exports, "Feather2", ()=>(0, _feather2Default.default));
-parcelHelpers.export(exports, "FileArrowDownFill", ()=>(0, _fileArrowDownFillDefault.default));
-parcelHelpers.export(exports, "FileArrowDown", ()=>(0, _fileArrowDownDefault.default));
-parcelHelpers.export(exports, "FileArrowUpFill", ()=>(0, _fileArrowUpFillDefault.default));
-parcelHelpers.export(exports, "FileArrowUp", ()=>(0, _fileArrowUpDefault.default));
-parcelHelpers.export(exports, "FileBarGraphFill", ()=>(0, _fileBarGraphFillDefault.default));
-parcelHelpers.export(exports, "FileBarGraph", ()=>(0, _fileBarGraphDefault.default));
-parcelHelpers.export(exports, "FileBinaryFill", ()=>(0, _fileBinaryFillDefault.default));
-parcelHelpers.export(exports, "FileBinary", ()=>(0, _fileBinaryDefault.default));
-parcelHelpers.export(exports, "FileBreakFill", ()=>(0, _fileBreakFillDefault.default));
-parcelHelpers.export(exports, "FileBreak", ()=>(0, _fileBreakDefault.default));
-parcelHelpers.export(exports, "FileCheckFill", ()=>(0, _fileCheckFillDefault.default));
-parcelHelpers.export(exports, "FileCheck", ()=>(0, _fileCheckDefault.default));
-parcelHelpers.export(exports, "FileCodeFill", ()=>(0, _fileCodeFillDefault.default));
-parcelHelpers.export(exports, "FileCode", ()=>(0, _fileCodeDefault.default));
-parcelHelpers.export(exports, "FileDiffFill", ()=>(0, _fileDiffFillDefault.default));
-parcelHelpers.export(exports, "FileDiff", ()=>(0, _fileDiffDefault.default));
-parcelHelpers.export(exports, "FileEarmarkArrowDownFill", ()=>(0, _fileEarmarkArrowDownFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkArrowDown", ()=>(0, _fileEarmarkArrowDownDefault.default));
-parcelHelpers.export(exports, "FileEarmarkArrowUpFill", ()=>(0, _fileEarmarkArrowUpFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkArrowUp", ()=>(0, _fileEarmarkArrowUpDefault.default));
-parcelHelpers.export(exports, "FileEarmarkBarGraphFill", ()=>(0, _fileEarmarkBarGraphFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkBarGraph", ()=>(0, _fileEarmarkBarGraphDefault.default));
-parcelHelpers.export(exports, "FileEarmarkBinaryFill", ()=>(0, _fileEarmarkBinaryFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkBinary", ()=>(0, _fileEarmarkBinaryDefault.default));
-parcelHelpers.export(exports, "FileEarmarkBreakFill", ()=>(0, _fileEarmarkBreakFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkBreak", ()=>(0, _fileEarmarkBreakDefault.default));
-parcelHelpers.export(exports, "FileEarmarkCheckFill", ()=>(0, _fileEarmarkCheckFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkCheck", ()=>(0, _fileEarmarkCheckDefault.default));
-parcelHelpers.export(exports, "FileEarmarkCodeFill", ()=>(0, _fileEarmarkCodeFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkCode", ()=>(0, _fileEarmarkCodeDefault.default));
-parcelHelpers.export(exports, "FileEarmarkDiffFill", ()=>(0, _fileEarmarkDiffFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkDiff", ()=>(0, _fileEarmarkDiffDefault.default));
-parcelHelpers.export(exports, "FileEarmarkEaselFill", ()=>(0, _fileEarmarkEaselFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkEasel", ()=>(0, _fileEarmarkEaselDefault.default));
-parcelHelpers.export(exports, "FileEarmarkExcelFill", ()=>(0, _fileEarmarkExcelFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkExcel", ()=>(0, _fileEarmarkExcelDefault.default));
-parcelHelpers.export(exports, "FileEarmarkFill", ()=>(0, _fileEarmarkFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkFontFill", ()=>(0, _fileEarmarkFontFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkFont", ()=>(0, _fileEarmarkFontDefault.default));
-parcelHelpers.export(exports, "FileEarmarkImageFill", ()=>(0, _fileEarmarkImageFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkImage", ()=>(0, _fileEarmarkImageDefault.default));
-parcelHelpers.export(exports, "FileEarmarkLockFill", ()=>(0, _fileEarmarkLockFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkLock", ()=>(0, _fileEarmarkLockDefault.default));
-parcelHelpers.export(exports, "FileEarmarkLock2Fill", ()=>(0, _fileEarmarkLock2FillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkLock2", ()=>(0, _fileEarmarkLock2Default.default));
-parcelHelpers.export(exports, "FileEarmarkMedicalFill", ()=>(0, _fileEarmarkMedicalFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkMedical", ()=>(0, _fileEarmarkMedicalDefault.default));
-parcelHelpers.export(exports, "FileEarmarkMinusFill", ()=>(0, _fileEarmarkMinusFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkMinus", ()=>(0, _fileEarmarkMinusDefault.default));
-parcelHelpers.export(exports, "FileEarmarkMusicFill", ()=>(0, _fileEarmarkMusicFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkMusic", ()=>(0, _fileEarmarkMusicDefault.default));
-parcelHelpers.export(exports, "FileEarmarkPdfFill", ()=>(0, _fileEarmarkPdfFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkPdf", ()=>(0, _fileEarmarkPdfDefault.default));
-parcelHelpers.export(exports, "FileEarmarkPersonFill", ()=>(0, _fileEarmarkPersonFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkPerson", ()=>(0, _fileEarmarkPersonDefault.default));
-parcelHelpers.export(exports, "FileEarmarkPlayFill", ()=>(0, _fileEarmarkPlayFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkPlay", ()=>(0, _fileEarmarkPlayDefault.default));
-parcelHelpers.export(exports, "FileEarmarkPlusFill", ()=>(0, _fileEarmarkPlusFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkPlus", ()=>(0, _fileEarmarkPlusDefault.default));
-parcelHelpers.export(exports, "FileEarmarkPostFill", ()=>(0, _fileEarmarkPostFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkPost", ()=>(0, _fileEarmarkPostDefault.default));
-parcelHelpers.export(exports, "FileEarmarkPptFill", ()=>(0, _fileEarmarkPptFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkPpt", ()=>(0, _fileEarmarkPptDefault.default));
-parcelHelpers.export(exports, "FileEarmarkRichtextFill", ()=>(0, _fileEarmarkRichtextFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkRichtext", ()=>(0, _fileEarmarkRichtextDefault.default));
-parcelHelpers.export(exports, "FileEarmarkRuledFill", ()=>(0, _fileEarmarkRuledFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkRuled", ()=>(0, _fileEarmarkRuledDefault.default));
-parcelHelpers.export(exports, "FileEarmarkSlidesFill", ()=>(0, _fileEarmarkSlidesFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkSlides", ()=>(0, _fileEarmarkSlidesDefault.default));
-parcelHelpers.export(exports, "FileEarmarkSpreadsheetFill", ()=>(0, _fileEarmarkSpreadsheetFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkSpreadsheet", ()=>(0, _fileEarmarkSpreadsheetDefault.default));
-parcelHelpers.export(exports, "FileEarmarkTextFill", ()=>(0, _fileEarmarkTextFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkText", ()=>(0, _fileEarmarkTextDefault.default));
-parcelHelpers.export(exports, "FileEarmarkWordFill", ()=>(0, _fileEarmarkWordFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkWord", ()=>(0, _fileEarmarkWordDefault.default));
-parcelHelpers.export(exports, "FileEarmarkXFill", ()=>(0, _fileEarmarkXFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkX", ()=>(0, _fileEarmarkXDefault.default));
-parcelHelpers.export(exports, "FileEarmarkZipFill", ()=>(0, _fileEarmarkZipFillDefault.default));
-parcelHelpers.export(exports, "FileEarmarkZip", ()=>(0, _fileEarmarkZipDefault.default));
-parcelHelpers.export(exports, "FileEarmark", ()=>(0, _fileEarmarkDefault.default));
-parcelHelpers.export(exports, "FileEaselFill", ()=>(0, _fileEaselFillDefault.default));
-parcelHelpers.export(exports, "FileEasel", ()=>(0, _fileEaselDefault.default));
-parcelHelpers.export(exports, "FileExcelFill", ()=>(0, _fileExcelFillDefault.default));
-parcelHelpers.export(exports, "FileExcel", ()=>(0, _fileExcelDefault.default));
-parcelHelpers.export(exports, "FileFill", ()=>(0, _fileFillDefault.default));
-parcelHelpers.export(exports, "FileFontFill", ()=>(0, _fileFontFillDefault.default));
-parcelHelpers.export(exports, "FileFont", ()=>(0, _fileFontDefault.default));
-parcelHelpers.export(exports, "FileImageFill", ()=>(0, _fileImageFillDefault.default));
-parcelHelpers.export(exports, "FileImage", ()=>(0, _fileImageDefault.default));
-parcelHelpers.export(exports, "FileLockFill", ()=>(0, _fileLockFillDefault.default));
-parcelHelpers.export(exports, "FileLock", ()=>(0, _fileLockDefault.default));
-parcelHelpers.export(exports, "FileLock2Fill", ()=>(0, _fileLock2FillDefault.default));
-parcelHelpers.export(exports, "FileLock2", ()=>(0, _fileLock2Default.default));
-parcelHelpers.export(exports, "FileMedicalFill", ()=>(0, _fileMedicalFillDefault.default));
-parcelHelpers.export(exports, "FileMedical", ()=>(0, _fileMedicalDefault.default));
-parcelHelpers.export(exports, "FileMinusFill", ()=>(0, _fileMinusFillDefault.default));
-parcelHelpers.export(exports, "FileMinus", ()=>(0, _fileMinusDefault.default));
-parcelHelpers.export(exports, "FileMusicFill", ()=>(0, _fileMusicFillDefault.default));
-parcelHelpers.export(exports, "FileMusic", ()=>(0, _fileMusicDefault.default));
-parcelHelpers.export(exports, "FilePdfFill", ()=>(0, _filePdfFillDefault.default));
-parcelHelpers.export(exports, "FilePdf", ()=>(0, _filePdfDefault.default));
-parcelHelpers.export(exports, "FilePersonFill", ()=>(0, _filePersonFillDefault.default));
-parcelHelpers.export(exports, "FilePerson", ()=>(0, _filePersonDefault.default));
-parcelHelpers.export(exports, "FilePlayFill", ()=>(0, _filePlayFillDefault.default));
-parcelHelpers.export(exports, "FilePlay", ()=>(0, _filePlayDefault.default));
-parcelHelpers.export(exports, "FilePlusFill", ()=>(0, _filePlusFillDefault.default));
-parcelHelpers.export(exports, "FilePlus", ()=>(0, _filePlusDefault.default));
-parcelHelpers.export(exports, "FilePostFill", ()=>(0, _filePostFillDefault.default));
-parcelHelpers.export(exports, "FilePost", ()=>(0, _filePostDefault.default));
-parcelHelpers.export(exports, "FilePptFill", ()=>(0, _filePptFillDefault.default));
-parcelHelpers.export(exports, "FilePpt", ()=>(0, _filePptDefault.default));
-parcelHelpers.export(exports, "FileRichtextFill", ()=>(0, _fileRichtextFillDefault.default));
-parcelHelpers.export(exports, "FileRichtext", ()=>(0, _fileRichtextDefault.default));
-parcelHelpers.export(exports, "FileRuledFill", ()=>(0, _fileRuledFillDefault.default));
-parcelHelpers.export(exports, "FileRuled", ()=>(0, _fileRuledDefault.default));
-parcelHelpers.export(exports, "FileSlidesFill", ()=>(0, _fileSlidesFillDefault.default));
-parcelHelpers.export(exports, "FileSlides", ()=>(0, _fileSlidesDefault.default));
-parcelHelpers.export(exports, "FileSpreadsheetFill", ()=>(0, _fileSpreadsheetFillDefault.default));
-parcelHelpers.export(exports, "FileSpreadsheet", ()=>(0, _fileSpreadsheetDefault.default));
-parcelHelpers.export(exports, "FileTextFill", ()=>(0, _fileTextFillDefault.default));
-parcelHelpers.export(exports, "FileText", ()=>(0, _fileTextDefault.default));
-parcelHelpers.export(exports, "FileWordFill", ()=>(0, _fileWordFillDefault.default));
-parcelHelpers.export(exports, "FileWord", ()=>(0, _fileWordDefault.default));
-parcelHelpers.export(exports, "FileXFill", ()=>(0, _fileXFillDefault.default));
-parcelHelpers.export(exports, "FileX", ()=>(0, _fileXDefault.default));
-parcelHelpers.export(exports, "FileZipFill", ()=>(0, _fileZipFillDefault.default));
-parcelHelpers.export(exports, "FileZip", ()=>(0, _fileZipDefault.default));
-parcelHelpers.export(exports, "File", ()=>(0, _fileDefault.default));
-parcelHelpers.export(exports, "FilesAlt", ()=>(0, _filesAltDefault.default));
-parcelHelpers.export(exports, "Files", ()=>(0, _filesDefault.default));
-parcelHelpers.export(exports, "FiletypeAac", ()=>(0, _filetypeAacDefault.default));
-parcelHelpers.export(exports, "FiletypeAi", ()=>(0, _filetypeAiDefault.default));
-parcelHelpers.export(exports, "FiletypeBmp", ()=>(0, _filetypeBmpDefault.default));
-parcelHelpers.export(exports, "FiletypeCs", ()=>(0, _filetypeCsDefault.default));
-parcelHelpers.export(exports, "FiletypeCss", ()=>(0, _filetypeCssDefault.default));
-parcelHelpers.export(exports, "FiletypeCsv", ()=>(0, _filetypeCsvDefault.default));
-parcelHelpers.export(exports, "FiletypeDoc", ()=>(0, _filetypeDocDefault.default));
-parcelHelpers.export(exports, "FiletypeDocx", ()=>(0, _filetypeDocxDefault.default));
-parcelHelpers.export(exports, "FiletypeExe", ()=>(0, _filetypeExeDefault.default));
-parcelHelpers.export(exports, "FiletypeGif", ()=>(0, _filetypeGifDefault.default));
-parcelHelpers.export(exports, "FiletypeHeic", ()=>(0, _filetypeHeicDefault.default));
-parcelHelpers.export(exports, "FiletypeHtml", ()=>(0, _filetypeHtmlDefault.default));
-parcelHelpers.export(exports, "FiletypeJava", ()=>(0, _filetypeJavaDefault.default));
-parcelHelpers.export(exports, "FiletypeJpg", ()=>(0, _filetypeJpgDefault.default));
-parcelHelpers.export(exports, "FiletypeJs", ()=>(0, _filetypeJsDefault.default));
-parcelHelpers.export(exports, "FiletypeJson", ()=>(0, _filetypeJsonDefault.default));
-parcelHelpers.export(exports, "FiletypeJsx", ()=>(0, _filetypeJsxDefault.default));
-parcelHelpers.export(exports, "FiletypeKey", ()=>(0, _filetypeKeyDefault.default));
-parcelHelpers.export(exports, "FiletypeM4p", ()=>(0, _filetypeM4PDefault.default));
-parcelHelpers.export(exports, "FiletypeMd", ()=>(0, _filetypeMdDefault.default));
-parcelHelpers.export(exports, "FiletypeMdx", ()=>(0, _filetypeMdxDefault.default));
-parcelHelpers.export(exports, "FiletypeMov", ()=>(0, _filetypeMovDefault.default));
-parcelHelpers.export(exports, "FiletypeMp3", ()=>(0, _filetypeMp3Default.default));
-parcelHelpers.export(exports, "FiletypeMp4", ()=>(0, _filetypeMp4Default.default));
-parcelHelpers.export(exports, "FiletypeOtf", ()=>(0, _filetypeOtfDefault.default));
-parcelHelpers.export(exports, "FiletypePdf", ()=>(0, _filetypePdfDefault.default));
-parcelHelpers.export(exports, "FiletypePhp", ()=>(0, _filetypePhpDefault.default));
-parcelHelpers.export(exports, "FiletypePng", ()=>(0, _filetypePngDefault.default));
-parcelHelpers.export(exports, "FiletypePpt", ()=>(0, _filetypePptDefault.default));
-parcelHelpers.export(exports, "FiletypePptx", ()=>(0, _filetypePptxDefault.default));
-parcelHelpers.export(exports, "FiletypePsd", ()=>(0, _filetypePsdDefault.default));
-parcelHelpers.export(exports, "FiletypePy", ()=>(0, _filetypePyDefault.default));
-parcelHelpers.export(exports, "FiletypeRaw", ()=>(0, _filetypeRawDefault.default));
-parcelHelpers.export(exports, "FiletypeRb", ()=>(0, _filetypeRbDefault.default));
-parcelHelpers.export(exports, "FiletypeSass", ()=>(0, _filetypeSassDefault.default));
-parcelHelpers.export(exports, "FiletypeScss", ()=>(0, _filetypeScssDefault.default));
-parcelHelpers.export(exports, "FiletypeSh", ()=>(0, _filetypeShDefault.default));
-parcelHelpers.export(exports, "FiletypeSql", ()=>(0, _filetypeSqlDefault.default));
-parcelHelpers.export(exports, "FiletypeSvg", ()=>(0, _filetypeSvgDefault.default));
-parcelHelpers.export(exports, "FiletypeTiff", ()=>(0, _filetypeTiffDefault.default));
-parcelHelpers.export(exports, "FiletypeTsx", ()=>(0, _filetypeTsxDefault.default));
-parcelHelpers.export(exports, "FiletypeTtf", ()=>(0, _filetypeTtfDefault.default));
-parcelHelpers.export(exports, "FiletypeTxt", ()=>(0, _filetypeTxtDefault.default));
-parcelHelpers.export(exports, "FiletypeWav", ()=>(0, _filetypeWavDefault.default));
-parcelHelpers.export(exports, "FiletypeWoff", ()=>(0, _filetypeWoffDefault.default));
-parcelHelpers.export(exports, "FiletypeXls", ()=>(0, _filetypeXlsDefault.default));
-parcelHelpers.export(exports, "FiletypeXlsx", ()=>(0, _filetypeXlsxDefault.default));
-parcelHelpers.export(exports, "FiletypeXml", ()=>(0, _filetypeXmlDefault.default));
-parcelHelpers.export(exports, "FiletypeYml", ()=>(0, _filetypeYmlDefault.default));
-parcelHelpers.export(exports, "Film", ()=>(0, _filmDefault.default));
-parcelHelpers.export(exports, "FilterCircleFill", ()=>(0, _filterCircleFillDefault.default));
-parcelHelpers.export(exports, "FilterCircle", ()=>(0, _filterCircleDefault.default));
-parcelHelpers.export(exports, "FilterLeft", ()=>(0, _filterLeftDefault.default));
-parcelHelpers.export(exports, "FilterRight", ()=>(0, _filterRightDefault.default));
-parcelHelpers.export(exports, "FilterSquareFill", ()=>(0, _filterSquareFillDefault.default));
-parcelHelpers.export(exports, "FilterSquare", ()=>(0, _filterSquareDefault.default));
-parcelHelpers.export(exports, "Filter", ()=>(0, _filterDefault.default));
-parcelHelpers.export(exports, "Fingerprint", ()=>(0, _fingerprintDefault.default));
-parcelHelpers.export(exports, "Fire", ()=>(0, _fireDefault.default));
-parcelHelpers.export(exports, "FlagFill", ()=>(0, _flagFillDefault.default));
-parcelHelpers.export(exports, "Flag", ()=>(0, _flagDefault.default));
-parcelHelpers.export(exports, "FloppyFill", ()=>(0, _floppyFillDefault.default));
-parcelHelpers.export(exports, "Floppy", ()=>(0, _floppyDefault.default));
-parcelHelpers.export(exports, "Floppy2Fill", ()=>(0, _floppy2FillDefault.default));
-parcelHelpers.export(exports, "Floppy2", ()=>(0, _floppy2Default.default));
-parcelHelpers.export(exports, "Flower1", ()=>(0, _flower1Default.default));
-parcelHelpers.export(exports, "Flower2", ()=>(0, _flower2Default.default));
-parcelHelpers.export(exports, "Flower3", ()=>(0, _flower3Default.default));
-parcelHelpers.export(exports, "FolderCheck", ()=>(0, _folderCheckDefault.default));
-parcelHelpers.export(exports, "FolderFill", ()=>(0, _folderFillDefault.default));
-parcelHelpers.export(exports, "FolderMinus", ()=>(0, _folderMinusDefault.default));
-parcelHelpers.export(exports, "FolderPlus", ()=>(0, _folderPlusDefault.default));
-parcelHelpers.export(exports, "FolderSymlinkFill", ()=>(0, _folderSymlinkFillDefault.default));
-parcelHelpers.export(exports, "FolderSymlink", ()=>(0, _folderSymlinkDefault.default));
-parcelHelpers.export(exports, "FolderX", ()=>(0, _folderXDefault.default));
-parcelHelpers.export(exports, "Folder", ()=>(0, _folderDefault.default));
-parcelHelpers.export(exports, "Folder2Open", ()=>(0, _folder2OpenDefault.default));
-parcelHelpers.export(exports, "Folder2", ()=>(0, _folder2Default.default));
-parcelHelpers.export(exports, "Fonts", ()=>(0, _fontsDefault.default));
-parcelHelpers.export(exports, "ForwardFill", ()=>(0, _forwardFillDefault.default));
-parcelHelpers.export(exports, "Forward", ()=>(0, _forwardDefault.default));
-parcelHelpers.export(exports, "Front", ()=>(0, _frontDefault.default));
-parcelHelpers.export(exports, "FuelPumpDieselFill", ()=>(0, _fuelPumpDieselFillDefault.default));
-parcelHelpers.export(exports, "FuelPumpDiesel", ()=>(0, _fuelPumpDieselDefault.default));
-parcelHelpers.export(exports, "FuelPumpFill", ()=>(0, _fuelPumpFillDefault.default));
-parcelHelpers.export(exports, "FuelPump", ()=>(0, _fuelPumpDefault.default));
-parcelHelpers.export(exports, "FullscreenExit", ()=>(0, _fullscreenExitDefault.default));
-parcelHelpers.export(exports, "Fullscreen", ()=>(0, _fullscreenDefault.default));
-parcelHelpers.export(exports, "FunnelFill", ()=>(0, _funnelFillDefault.default));
-parcelHelpers.export(exports, "Funnel", ()=>(0, _funnelDefault.default));
-parcelHelpers.export(exports, "GearFill", ()=>(0, _gearFillDefault.default));
-parcelHelpers.export(exports, "GearWideConnected", ()=>(0, _gearWideConnectedDefault.default));
-parcelHelpers.export(exports, "GearWide", ()=>(0, _gearWideDefault.default));
-parcelHelpers.export(exports, "Gear", ()=>(0, _gearDefault.default));
-parcelHelpers.export(exports, "Gem", ()=>(0, _gemDefault.default));
-parcelHelpers.export(exports, "GenderAmbiguous", ()=>(0, _genderAmbiguousDefault.default));
-parcelHelpers.export(exports, "GenderFemale", ()=>(0, _genderFemaleDefault.default));
-parcelHelpers.export(exports, "GenderMale", ()=>(0, _genderMaleDefault.default));
-parcelHelpers.export(exports, "GenderNeuter", ()=>(0, _genderNeuterDefault.default));
-parcelHelpers.export(exports, "GenderTrans", ()=>(0, _genderTransDefault.default));
-parcelHelpers.export(exports, "GeoAltFill", ()=>(0, _geoAltFillDefault.default));
-parcelHelpers.export(exports, "GeoAlt", ()=>(0, _geoAltDefault.default));
-parcelHelpers.export(exports, "GeoFill", ()=>(0, _geoFillDefault.default));
-parcelHelpers.export(exports, "Geo", ()=>(0, _geoDefault.default));
-parcelHelpers.export(exports, "GiftFill", ()=>(0, _giftFillDefault.default));
-parcelHelpers.export(exports, "Gift", ()=>(0, _giftDefault.default));
-parcelHelpers.export(exports, "Git", ()=>(0, _gitDefault.default));
-parcelHelpers.export(exports, "Github", ()=>(0, _githubDefault.default));
-parcelHelpers.export(exports, "Gitlab", ()=>(0, _gitlabDefault.default));
-parcelHelpers.export(exports, "GlobeAmericas", ()=>(0, _globeAmericasDefault.default));
-parcelHelpers.export(exports, "GlobeAsiaAustralia", ()=>(0, _globeAsiaAustraliaDefault.default));
-parcelHelpers.export(exports, "GlobeCentralSouthAsia", ()=>(0, _globeCentralSouthAsiaDefault.default));
-parcelHelpers.export(exports, "GlobeEuropeAfrica", ()=>(0, _globeEuropeAfricaDefault.default));
-parcelHelpers.export(exports, "Globe", ()=>(0, _globeDefault.default));
-parcelHelpers.export(exports, "Globe2", ()=>(0, _globe2Default.default));
-parcelHelpers.export(exports, "GooglePlay", ()=>(0, _googlePlayDefault.default));
-parcelHelpers.export(exports, "Google", ()=>(0, _googleDefault.default));
-parcelHelpers.export(exports, "GpuCard", ()=>(0, _gpuCardDefault.default));
-parcelHelpers.export(exports, "GraphDownArrow", ()=>(0, _graphDownArrowDefault.default));
-parcelHelpers.export(exports, "GraphDown", ()=>(0, _graphDownDefault.default));
-parcelHelpers.export(exports, "GraphUpArrow", ()=>(0, _graphUpArrowDefault.default));
-parcelHelpers.export(exports, "GraphUp", ()=>(0, _graphUpDefault.default));
-parcelHelpers.export(exports, "Grid1x2Fill", ()=>(0, _grid1X2FillDefault.default));
-parcelHelpers.export(exports, "Grid1x2", ()=>(0, _grid1X2Default.default));
-parcelHelpers.export(exports, "Grid3x2GapFill", ()=>(0, _grid3X2GapFillDefault.default));
-parcelHelpers.export(exports, "Grid3x2Gap", ()=>(0, _grid3X2GapDefault.default));
-parcelHelpers.export(exports, "Grid3x2", ()=>(0, _grid3X2Default.default));
-parcelHelpers.export(exports, "Grid3x3GapFill", ()=>(0, _grid3X3GapFillDefault.default));
-parcelHelpers.export(exports, "Grid3x3Gap", ()=>(0, _grid3X3GapDefault.default));
-parcelHelpers.export(exports, "Grid3x3", ()=>(0, _grid3X3Default.default));
-parcelHelpers.export(exports, "GridFill", ()=>(0, _gridFillDefault.default));
-parcelHelpers.export(exports, "Grid", ()=>(0, _gridDefault.default));
-parcelHelpers.export(exports, "GripHorizontal", ()=>(0, _gripHorizontalDefault.default));
-parcelHelpers.export(exports, "GripVertical", ()=>(0, _gripVerticalDefault.default));
-parcelHelpers.export(exports, "HCircleFill", ()=>(0, _hCircleFillDefault.default));
-parcelHelpers.export(exports, "HCircle", ()=>(0, _hCircleDefault.default));
-parcelHelpers.export(exports, "HSquareFill", ()=>(0, _hSquareFillDefault.default));
-parcelHelpers.export(exports, "HSquare", ()=>(0, _hSquareDefault.default));
-parcelHelpers.export(exports, "Hammer", ()=>(0, _hammerDefault.default));
-parcelHelpers.export(exports, "HandIndexFill", ()=>(0, _handIndexFillDefault.default));
-parcelHelpers.export(exports, "HandIndexThumbFill", ()=>(0, _handIndexThumbFillDefault.default));
-parcelHelpers.export(exports, "HandIndexThumb", ()=>(0, _handIndexThumbDefault.default));
-parcelHelpers.export(exports, "HandIndex", ()=>(0, _handIndexDefault.default));
-parcelHelpers.export(exports, "HandThumbsDownFill", ()=>(0, _handThumbsDownFillDefault.default));
-parcelHelpers.export(exports, "HandThumbsDown", ()=>(0, _handThumbsDownDefault.default));
-parcelHelpers.export(exports, "HandThumbsUpFill", ()=>(0, _handThumbsUpFillDefault.default));
-parcelHelpers.export(exports, "HandThumbsUp", ()=>(0, _handThumbsUpDefault.default));
-parcelHelpers.export(exports, "HandbagFill", ()=>(0, _handbagFillDefault.default));
-parcelHelpers.export(exports, "Handbag", ()=>(0, _handbagDefault.default));
-parcelHelpers.export(exports, "Hash", ()=>(0, _hashDefault.default));
-parcelHelpers.export(exports, "HddFill", ()=>(0, _hddFillDefault.default));
-parcelHelpers.export(exports, "HddNetworkFill", ()=>(0, _hddNetworkFillDefault.default));
-parcelHelpers.export(exports, "HddNetwork", ()=>(0, _hddNetworkDefault.default));
-parcelHelpers.export(exports, "HddRackFill", ()=>(0, _hddRackFillDefault.default));
-parcelHelpers.export(exports, "HddRack", ()=>(0, _hddRackDefault.default));
-parcelHelpers.export(exports, "HddStackFill", ()=>(0, _hddStackFillDefault.default));
-parcelHelpers.export(exports, "HddStack", ()=>(0, _hddStackDefault.default));
-parcelHelpers.export(exports, "Hdd", ()=>(0, _hddDefault.default));
-parcelHelpers.export(exports, "HdmiFill", ()=>(0, _hdmiFillDefault.default));
-parcelHelpers.export(exports, "Hdmi", ()=>(0, _hdmiDefault.default));
-parcelHelpers.export(exports, "Headphones", ()=>(0, _headphonesDefault.default));
-parcelHelpers.export(exports, "HeadsetVr", ()=>(0, _headsetVrDefault.default));
-parcelHelpers.export(exports, "Headset", ()=>(0, _headsetDefault.default));
-parcelHelpers.export(exports, "HeartArrow", ()=>(0, _heartArrowDefault.default));
-parcelHelpers.export(exports, "HeartFill", ()=>(0, _heartFillDefault.default));
-parcelHelpers.export(exports, "HeartHalf", ()=>(0, _heartHalfDefault.default));
-parcelHelpers.export(exports, "HeartPulseFill", ()=>(0, _heartPulseFillDefault.default));
-parcelHelpers.export(exports, "HeartPulse", ()=>(0, _heartPulseDefault.default));
-parcelHelpers.export(exports, "Heart", ()=>(0, _heartDefault.default));
-parcelHelpers.export(exports, "HeartbreakFill", ()=>(0, _heartbreakFillDefault.default));
-parcelHelpers.export(exports, "Heartbreak", ()=>(0, _heartbreakDefault.default));
-parcelHelpers.export(exports, "Hearts", ()=>(0, _heartsDefault.default));
-parcelHelpers.export(exports, "HeptagonFill", ()=>(0, _heptagonFillDefault.default));
-parcelHelpers.export(exports, "HeptagonHalf", ()=>(0, _heptagonHalfDefault.default));
-parcelHelpers.export(exports, "Heptagon", ()=>(0, _heptagonDefault.default));
-parcelHelpers.export(exports, "HexagonFill", ()=>(0, _hexagonFillDefault.default));
-parcelHelpers.export(exports, "HexagonHalf", ()=>(0, _hexagonHalfDefault.default));
-parcelHelpers.export(exports, "Hexagon", ()=>(0, _hexagonDefault.default));
-parcelHelpers.export(exports, "Highlighter", ()=>(0, _highlighterDefault.default));
-parcelHelpers.export(exports, "Highlights", ()=>(0, _highlightsDefault.default));
-parcelHelpers.export(exports, "HospitalFill", ()=>(0, _hospitalFillDefault.default));
-parcelHelpers.export(exports, "Hospital", ()=>(0, _hospitalDefault.default));
-parcelHelpers.export(exports, "HourglassBottom", ()=>(0, _hourglassBottomDefault.default));
-parcelHelpers.export(exports, "HourglassSplit", ()=>(0, _hourglassSplitDefault.default));
-parcelHelpers.export(exports, "HourglassTop", ()=>(0, _hourglassTopDefault.default));
-parcelHelpers.export(exports, "Hourglass", ()=>(0, _hourglassDefault.default));
-parcelHelpers.export(exports, "HouseAddFill", ()=>(0, _houseAddFillDefault.default));
-parcelHelpers.export(exports, "HouseAdd", ()=>(0, _houseAddDefault.default));
-parcelHelpers.export(exports, "HouseCheckFill", ()=>(0, _houseCheckFillDefault.default));
-parcelHelpers.export(exports, "HouseCheck", ()=>(0, _houseCheckDefault.default));
-parcelHelpers.export(exports, "HouseDashFill", ()=>(0, _houseDashFillDefault.default));
-parcelHelpers.export(exports, "HouseDash", ()=>(0, _houseDashDefault.default));
-parcelHelpers.export(exports, "HouseDoorFill", ()=>(0, _houseDoorFillDefault.default));
-parcelHelpers.export(exports, "HouseDoor", ()=>(0, _houseDoorDefault.default));
-parcelHelpers.export(exports, "HouseDownFill", ()=>(0, _houseDownFillDefault.default));
-parcelHelpers.export(exports, "HouseDown", ()=>(0, _houseDownDefault.default));
-parcelHelpers.export(exports, "HouseExclamationFill", ()=>(0, _houseExclamationFillDefault.default));
-parcelHelpers.export(exports, "HouseExclamation", ()=>(0, _houseExclamationDefault.default));
-parcelHelpers.export(exports, "HouseFill", ()=>(0, _houseFillDefault.default));
-parcelHelpers.export(exports, "HouseGearFill", ()=>(0, _houseGearFillDefault.default));
-parcelHelpers.export(exports, "HouseGear", ()=>(0, _houseGearDefault.default));
-parcelHelpers.export(exports, "HouseHeartFill", ()=>(0, _houseHeartFillDefault.default));
-parcelHelpers.export(exports, "HouseHeart", ()=>(0, _houseHeartDefault.default));
-parcelHelpers.export(exports, "HouseLockFill", ()=>(0, _houseLockFillDefault.default));
-parcelHelpers.export(exports, "HouseLock", ()=>(0, _houseLockDefault.default));
-parcelHelpers.export(exports, "HouseSlashFill", ()=>(0, _houseSlashFillDefault.default));
-parcelHelpers.export(exports, "HouseSlash", ()=>(0, _houseSlashDefault.default));
-parcelHelpers.export(exports, "HouseUpFill", ()=>(0, _houseUpFillDefault.default));
-parcelHelpers.export(exports, "HouseUp", ()=>(0, _houseUpDefault.default));
-parcelHelpers.export(exports, "HouseXFill", ()=>(0, _houseXFillDefault.default));
-parcelHelpers.export(exports, "HouseX", ()=>(0, _houseXDefault.default));
-parcelHelpers.export(exports, "House", ()=>(0, _houseDefault.default));
-parcelHelpers.export(exports, "HousesFill", ()=>(0, _housesFillDefault.default));
-parcelHelpers.export(exports, "Houses", ()=>(0, _housesDefault.default));
-parcelHelpers.export(exports, "Hr", ()=>(0, _hrDefault.default));
-parcelHelpers.export(exports, "Hurricane", ()=>(0, _hurricaneDefault.default));
-parcelHelpers.export(exports, "Hypnotize", ()=>(0, _hypnotizeDefault.default));
-parcelHelpers.export(exports, "ImageAlt", ()=>(0, _imageAltDefault.default));
-parcelHelpers.export(exports, "ImageFill", ()=>(0, _imageFillDefault.default));
-parcelHelpers.export(exports, "Image", ()=>(0, _imageDefault.default));
-parcelHelpers.export(exports, "Images", ()=>(0, _imagesDefault.default));
-parcelHelpers.export(exports, "InboxFill", ()=>(0, _inboxFillDefault.default));
-parcelHelpers.export(exports, "Inbox", ()=>(0, _inboxDefault.default));
-parcelHelpers.export(exports, "InboxesFill", ()=>(0, _inboxesFillDefault.default));
-parcelHelpers.export(exports, "Inboxes", ()=>(0, _inboxesDefault.default));
-parcelHelpers.export(exports, "Incognito", ()=>(0, _incognitoDefault.default));
-parcelHelpers.export(exports, "Indent", ()=>(0, _indentDefault.default));
-parcelHelpers.export(exports, "Infinity", ()=>(0, _infinityDefault.default));
-parcelHelpers.export(exports, "InfoCircleFill", ()=>(0, _infoCircleFillDefault.default));
-parcelHelpers.export(exports, "InfoCircle", ()=>(0, _infoCircleDefault.default));
-parcelHelpers.export(exports, "InfoLg", ()=>(0, _infoLgDefault.default));
-parcelHelpers.export(exports, "InfoSquareFill", ()=>(0, _infoSquareFillDefault.default));
-parcelHelpers.export(exports, "InfoSquare", ()=>(0, _infoSquareDefault.default));
-parcelHelpers.export(exports, "Info", ()=>(0, _infoDefault.default));
-parcelHelpers.export(exports, "InputCursorText", ()=>(0, _inputCursorTextDefault.default));
-parcelHelpers.export(exports, "InputCursor", ()=>(0, _inputCursorDefault.default));
-parcelHelpers.export(exports, "Instagram", ()=>(0, _instagramDefault.default));
-parcelHelpers.export(exports, "Intersect", ()=>(0, _intersectDefault.default));
-parcelHelpers.export(exports, "JournalAlbum", ()=>(0, _journalAlbumDefault.default));
-parcelHelpers.export(exports, "JournalArrowDown", ()=>(0, _journalArrowDownDefault.default));
-parcelHelpers.export(exports, "JournalArrowUp", ()=>(0, _journalArrowUpDefault.default));
-parcelHelpers.export(exports, "JournalBookmarkFill", ()=>(0, _journalBookmarkFillDefault.default));
-parcelHelpers.export(exports, "JournalBookmark", ()=>(0, _journalBookmarkDefault.default));
-parcelHelpers.export(exports, "JournalCheck", ()=>(0, _journalCheckDefault.default));
-parcelHelpers.export(exports, "JournalCode", ()=>(0, _journalCodeDefault.default));
-parcelHelpers.export(exports, "JournalMedical", ()=>(0, _journalMedicalDefault.default));
-parcelHelpers.export(exports, "JournalMinus", ()=>(0, _journalMinusDefault.default));
-parcelHelpers.export(exports, "JournalPlus", ()=>(0, _journalPlusDefault.default));
-parcelHelpers.export(exports, "JournalRichtext", ()=>(0, _journalRichtextDefault.default));
-parcelHelpers.export(exports, "JournalText", ()=>(0, _journalTextDefault.default));
-parcelHelpers.export(exports, "JournalX", ()=>(0, _journalXDefault.default));
-parcelHelpers.export(exports, "Journal", ()=>(0, _journalDefault.default));
-parcelHelpers.export(exports, "Journals", ()=>(0, _journalsDefault.default));
-parcelHelpers.export(exports, "Joystick", ()=>(0, _joystickDefault.default));
-parcelHelpers.export(exports, "JustifyLeft", ()=>(0, _justifyLeftDefault.default));
-parcelHelpers.export(exports, "JustifyRight", ()=>(0, _justifyRightDefault.default));
-parcelHelpers.export(exports, "Justify", ()=>(0, _justifyDefault.default));
-parcelHelpers.export(exports, "KanbanFill", ()=>(0, _kanbanFillDefault.default));
-parcelHelpers.export(exports, "Kanban", ()=>(0, _kanbanDefault.default));
-parcelHelpers.export(exports, "KeyFill", ()=>(0, _keyFillDefault.default));
-parcelHelpers.export(exports, "Key", ()=>(0, _keyDefault.default));
-parcelHelpers.export(exports, "KeyboardFill", ()=>(0, _keyboardFillDefault.default));
-parcelHelpers.export(exports, "Keyboard", ()=>(0, _keyboardDefault.default));
-parcelHelpers.export(exports, "Ladder", ()=>(0, _ladderDefault.default));
-parcelHelpers.export(exports, "LampFill", ()=>(0, _lampFillDefault.default));
-parcelHelpers.export(exports, "Lamp", ()=>(0, _lampDefault.default));
-parcelHelpers.export(exports, "LaptopFill", ()=>(0, _laptopFillDefault.default));
-parcelHelpers.export(exports, "Laptop", ()=>(0, _laptopDefault.default));
-parcelHelpers.export(exports, "LayerBackward", ()=>(0, _layerBackwardDefault.default));
-parcelHelpers.export(exports, "LayerForward", ()=>(0, _layerForwardDefault.default));
-parcelHelpers.export(exports, "LayersFill", ()=>(0, _layersFillDefault.default));
-parcelHelpers.export(exports, "LayersHalf", ()=>(0, _layersHalfDefault.default));
-parcelHelpers.export(exports, "Layers", ()=>(0, _layersDefault.default));
-parcelHelpers.export(exports, "LayoutSidebarInsetReverse", ()=>(0, _layoutSidebarInsetReverseDefault.default));
-parcelHelpers.export(exports, "LayoutSidebarInset", ()=>(0, _layoutSidebarInsetDefault.default));
-parcelHelpers.export(exports, "LayoutSidebarReverse", ()=>(0, _layoutSidebarReverseDefault.default));
-parcelHelpers.export(exports, "LayoutSidebar", ()=>(0, _layoutSidebarDefault.default));
-parcelHelpers.export(exports, "LayoutSplit", ()=>(0, _layoutSplitDefault.default));
-parcelHelpers.export(exports, "LayoutTextSidebarReverse", ()=>(0, _layoutTextSidebarReverseDefault.default));
-parcelHelpers.export(exports, "LayoutTextSidebar", ()=>(0, _layoutTextSidebarDefault.default));
-parcelHelpers.export(exports, "LayoutTextWindowReverse", ()=>(0, _layoutTextWindowReverseDefault.default));
-parcelHelpers.export(exports, "LayoutTextWindow", ()=>(0, _layoutTextWindowDefault.default));
-parcelHelpers.export(exports, "LayoutThreeColumns", ()=>(0, _layoutThreeColumnsDefault.default));
-parcelHelpers.export(exports, "LayoutWtf", ()=>(0, _layoutWtfDefault.default));
-parcelHelpers.export(exports, "LifePreserver", ()=>(0, _lifePreserverDefault.default));
-parcelHelpers.export(exports, "LightbulbFill", ()=>(0, _lightbulbFillDefault.default));
-parcelHelpers.export(exports, "LightbulbOffFill", ()=>(0, _lightbulbOffFillDefault.default));
-parcelHelpers.export(exports, "LightbulbOff", ()=>(0, _lightbulbOffDefault.default));
-parcelHelpers.export(exports, "Lightbulb", ()=>(0, _lightbulbDefault.default));
-parcelHelpers.export(exports, "LightningChargeFill", ()=>(0, _lightningChargeFillDefault.default));
-parcelHelpers.export(exports, "LightningCharge", ()=>(0, _lightningChargeDefault.default));
-parcelHelpers.export(exports, "LightningFill", ()=>(0, _lightningFillDefault.default));
-parcelHelpers.export(exports, "Lightning", ()=>(0, _lightningDefault.default));
-parcelHelpers.export(exports, "Line", ()=>(0, _lineDefault.default));
-parcelHelpers.export(exports, "Link45deg", ()=>(0, _link45DegDefault.default));
-parcelHelpers.export(exports, "Link", ()=>(0, _linkDefault.default));
-parcelHelpers.export(exports, "Linkedin", ()=>(0, _linkedinDefault.default));
-parcelHelpers.export(exports, "ListCheck", ()=>(0, _listCheckDefault.default));
-parcelHelpers.export(exports, "ListColumnsReverse", ()=>(0, _listColumnsReverseDefault.default));
-parcelHelpers.export(exports, "ListColumns", ()=>(0, _listColumnsDefault.default));
-parcelHelpers.export(exports, "ListNested", ()=>(0, _listNestedDefault.default));
-parcelHelpers.export(exports, "ListOl", ()=>(0, _listOlDefault.default));
-parcelHelpers.export(exports, "ListStars", ()=>(0, _listStarsDefault.default));
-parcelHelpers.export(exports, "ListTask", ()=>(0, _listTaskDefault.default));
-parcelHelpers.export(exports, "ListUl", ()=>(0, _listUlDefault.default));
-parcelHelpers.export(exports, "List", ()=>(0, _listDefault.default));
-parcelHelpers.export(exports, "LockFill", ()=>(0, _lockFillDefault.default));
-parcelHelpers.export(exports, "Lock", ()=>(0, _lockDefault.default));
-parcelHelpers.export(exports, "LuggageFill", ()=>(0, _luggageFillDefault.default));
-parcelHelpers.export(exports, "Luggage", ()=>(0, _luggageDefault.default));
-parcelHelpers.export(exports, "LungsFill", ()=>(0, _lungsFillDefault.default));
-parcelHelpers.export(exports, "Lungs", ()=>(0, _lungsDefault.default));
-parcelHelpers.export(exports, "Magic", ()=>(0, _magicDefault.default));
-parcelHelpers.export(exports, "MagnetFill", ()=>(0, _magnetFillDefault.default));
-parcelHelpers.export(exports, "Magnet", ()=>(0, _magnetDefault.default));
-parcelHelpers.export(exports, "MailboxFlag", ()=>(0, _mailboxFlagDefault.default));
-parcelHelpers.export(exports, "Mailbox", ()=>(0, _mailboxDefault.default));
-parcelHelpers.export(exports, "Mailbox2Flag", ()=>(0, _mailbox2FlagDefault.default));
-parcelHelpers.export(exports, "Mailbox2", ()=>(0, _mailbox2Default.default));
-parcelHelpers.export(exports, "MapFill", ()=>(0, _mapFillDefault.default));
-parcelHelpers.export(exports, "Map", ()=>(0, _mapDefault.default));
-parcelHelpers.export(exports, "MarkdownFill", ()=>(0, _markdownFillDefault.default));
-parcelHelpers.export(exports, "Markdown", ()=>(0, _markdownDefault.default));
-parcelHelpers.export(exports, "MarkerTip", ()=>(0, _markerTipDefault.default));
-parcelHelpers.export(exports, "Mask", ()=>(0, _maskDefault.default));
-parcelHelpers.export(exports, "Mastodon", ()=>(0, _mastodonDefault.default));
-parcelHelpers.export(exports, "Medium", ()=>(0, _mediumDefault.default));
-parcelHelpers.export(exports, "MegaphoneFill", ()=>(0, _megaphoneFillDefault.default));
-parcelHelpers.export(exports, "Megaphone", ()=>(0, _megaphoneDefault.default));
-parcelHelpers.export(exports, "Memory", ()=>(0, _memoryDefault.default));
-parcelHelpers.export(exports, "MenuAppFill", ()=>(0, _menuAppFillDefault.default));
-parcelHelpers.export(exports, "MenuApp", ()=>(0, _menuAppDefault.default));
-parcelHelpers.export(exports, "MenuButtonFill", ()=>(0, _menuButtonFillDefault.default));
-parcelHelpers.export(exports, "MenuButtonWideFill", ()=>(0, _menuButtonWideFillDefault.default));
-parcelHelpers.export(exports, "MenuButtonWide", ()=>(0, _menuButtonWideDefault.default));
-parcelHelpers.export(exports, "MenuButton", ()=>(0, _menuButtonDefault.default));
-parcelHelpers.export(exports, "MenuDown", ()=>(0, _menuDownDefault.default));
-parcelHelpers.export(exports, "MenuUp", ()=>(0, _menuUpDefault.default));
-parcelHelpers.export(exports, "Messenger", ()=>(0, _messengerDefault.default));
-parcelHelpers.export(exports, "Meta", ()=>(0, _metaDefault.default));
-parcelHelpers.export(exports, "MicFill", ()=>(0, _micFillDefault.default));
-parcelHelpers.export(exports, "MicMuteFill", ()=>(0, _micMuteFillDefault.default));
-parcelHelpers.export(exports, "MicMute", ()=>(0, _micMuteDefault.default));
-parcelHelpers.export(exports, "Mic", ()=>(0, _micDefault.default));
-parcelHelpers.export(exports, "MicrosoftTeams", ()=>(0, _microsoftTeamsDefault.default));
-parcelHelpers.export(exports, "Microsoft", ()=>(0, _microsoftDefault.default));
-parcelHelpers.export(exports, "MinecartLoaded", ()=>(0, _minecartLoadedDefault.default));
-parcelHelpers.export(exports, "Minecart", ()=>(0, _minecartDefault.default));
-parcelHelpers.export(exports, "ModemFill", ()=>(0, _modemFillDefault.default));
-parcelHelpers.export(exports, "Modem", ()=>(0, _modemDefault.default));
-parcelHelpers.export(exports, "Moisture", ()=>(0, _moistureDefault.default));
-parcelHelpers.export(exports, "MoonFill", ()=>(0, _moonFillDefault.default));
-parcelHelpers.export(exports, "MoonStarsFill", ()=>(0, _moonStarsFillDefault.default));
-parcelHelpers.export(exports, "MoonStars", ()=>(0, _moonStarsDefault.default));
-parcelHelpers.export(exports, "Moon", ()=>(0, _moonDefault.default));
-parcelHelpers.export(exports, "MortarboardFill", ()=>(0, _mortarboardFillDefault.default));
-parcelHelpers.export(exports, "Mortarboard", ()=>(0, _mortarboardDefault.default));
-parcelHelpers.export(exports, "MotherboardFill", ()=>(0, _motherboardFillDefault.default));
-parcelHelpers.export(exports, "Motherboard", ()=>(0, _motherboardDefault.default));
-parcelHelpers.export(exports, "MouseFill", ()=>(0, _mouseFillDefault.default));
-parcelHelpers.export(exports, "Mouse", ()=>(0, _mouseDefault.default));
-parcelHelpers.export(exports, "Mouse2Fill", ()=>(0, _mouse2FillDefault.default));
-parcelHelpers.export(exports, "Mouse2", ()=>(0, _mouse2Default.default));
-parcelHelpers.export(exports, "Mouse3Fill", ()=>(0, _mouse3FillDefault.default));
-parcelHelpers.export(exports, "Mouse3", ()=>(0, _mouse3Default.default));
-parcelHelpers.export(exports, "MusicNoteBeamed", ()=>(0, _musicNoteBeamedDefault.default));
-parcelHelpers.export(exports, "MusicNoteList", ()=>(0, _musicNoteListDefault.default));
-parcelHelpers.export(exports, "MusicNote", ()=>(0, _musicNoteDefault.default));
-parcelHelpers.export(exports, "MusicPlayerFill", ()=>(0, _musicPlayerFillDefault.default));
-parcelHelpers.export(exports, "MusicPlayer", ()=>(0, _musicPlayerDefault.default));
-parcelHelpers.export(exports, "Newspaper", ()=>(0, _newspaperDefault.default));
-parcelHelpers.export(exports, "NintendoSwitch", ()=>(0, _nintendoSwitchDefault.default));
-parcelHelpers.export(exports, "NodeMinusFill", ()=>(0, _nodeMinusFillDefault.default));
-parcelHelpers.export(exports, "NodeMinus", ()=>(0, _nodeMinusDefault.default));
-parcelHelpers.export(exports, "NodePlusFill", ()=>(0, _nodePlusFillDefault.default));
-parcelHelpers.export(exports, "NodePlus", ()=>(0, _nodePlusDefault.default));
-parcelHelpers.export(exports, "NoiseReduction", ()=>(0, _noiseReductionDefault.default));
-parcelHelpers.export(exports, "NutFill", ()=>(0, _nutFillDefault.default));
-parcelHelpers.export(exports, "Nut", ()=>(0, _nutDefault.default));
-parcelHelpers.export(exports, "Nvidia", ()=>(0, _nvidiaDefault.default));
-parcelHelpers.export(exports, "NvmeFill", ()=>(0, _nvmeFillDefault.default));
-parcelHelpers.export(exports, "Nvme", ()=>(0, _nvmeDefault.default));
-parcelHelpers.export(exports, "OctagonFill", ()=>(0, _octagonFillDefault.default));
-parcelHelpers.export(exports, "OctagonHalf", ()=>(0, _octagonHalfDefault.default));
-parcelHelpers.export(exports, "Octagon", ()=>(0, _octagonDefault.default));
-parcelHelpers.export(exports, "Opencollective", ()=>(0, _opencollectiveDefault.default));
-parcelHelpers.export(exports, "OpticalAudioFill", ()=>(0, _opticalAudioFillDefault.default));
-parcelHelpers.export(exports, "OpticalAudio", ()=>(0, _opticalAudioDefault.default));
-parcelHelpers.export(exports, "Option", ()=>(0, _optionDefault.default));
-parcelHelpers.export(exports, "Outlet", ()=>(0, _outletDefault.default));
-parcelHelpers.export(exports, "PCircleFill", ()=>(0, _pCircleFillDefault.default));
-parcelHelpers.export(exports, "PCircle", ()=>(0, _pCircleDefault.default));
-parcelHelpers.export(exports, "PSquareFill", ()=>(0, _pSquareFillDefault.default));
-parcelHelpers.export(exports, "PSquare", ()=>(0, _pSquareDefault.default));
-parcelHelpers.export(exports, "PaintBucket", ()=>(0, _paintBucketDefault.default));
-parcelHelpers.export(exports, "PaletteFill", ()=>(0, _paletteFillDefault.default));
-parcelHelpers.export(exports, "Palette", ()=>(0, _paletteDefault.default));
-parcelHelpers.export(exports, "Palette2", ()=>(0, _palette2Default.default));
-parcelHelpers.export(exports, "Paperclip", ()=>(0, _paperclipDefault.default));
-parcelHelpers.export(exports, "Paragraph", ()=>(0, _paragraphDefault.default));
-parcelHelpers.export(exports, "PassFill", ()=>(0, _passFillDefault.default));
-parcelHelpers.export(exports, "Pass", ()=>(0, _passDefault.default));
-parcelHelpers.export(exports, "PassportFill", ()=>(0, _passportFillDefault.default));
-parcelHelpers.export(exports, "Passport", ()=>(0, _passportDefault.default));
-parcelHelpers.export(exports, "PatchCheckFill", ()=>(0, _patchCheckFillDefault.default));
-parcelHelpers.export(exports, "PatchCheck", ()=>(0, _patchCheckDefault.default));
-parcelHelpers.export(exports, "PatchExclamationFill", ()=>(0, _patchExclamationFillDefault.default));
-parcelHelpers.export(exports, "PatchExclamation", ()=>(0, _patchExclamationDefault.default));
-parcelHelpers.export(exports, "PatchMinusFill", ()=>(0, _patchMinusFillDefault.default));
-parcelHelpers.export(exports, "PatchMinus", ()=>(0, _patchMinusDefault.default));
-parcelHelpers.export(exports, "PatchPlusFill", ()=>(0, _patchPlusFillDefault.default));
-parcelHelpers.export(exports, "PatchPlus", ()=>(0, _patchPlusDefault.default));
-parcelHelpers.export(exports, "PatchQuestionFill", ()=>(0, _patchQuestionFillDefault.default));
-parcelHelpers.export(exports, "PatchQuestion", ()=>(0, _patchQuestionDefault.default));
-parcelHelpers.export(exports, "PauseBtnFill", ()=>(0, _pauseBtnFillDefault.default));
-parcelHelpers.export(exports, "PauseBtn", ()=>(0, _pauseBtnDefault.default));
-parcelHelpers.export(exports, "PauseCircleFill", ()=>(0, _pauseCircleFillDefault.default));
-parcelHelpers.export(exports, "PauseCircle", ()=>(0, _pauseCircleDefault.default));
-parcelHelpers.export(exports, "PauseFill", ()=>(0, _pauseFillDefault.default));
-parcelHelpers.export(exports, "Pause", ()=>(0, _pauseDefault.default));
-parcelHelpers.export(exports, "Paypal", ()=>(0, _paypalDefault.default));
-parcelHelpers.export(exports, "PcDisplayHorizontal", ()=>(0, _pcDisplayHorizontalDefault.default));
-parcelHelpers.export(exports, "PcDisplay", ()=>(0, _pcDisplayDefault.default));
-parcelHelpers.export(exports, "PcHorizontal", ()=>(0, _pcHorizontalDefault.default));
-parcelHelpers.export(exports, "Pc", ()=>(0, _pcDefault.default));
-parcelHelpers.export(exports, "PciCardNetwork", ()=>(0, _pciCardNetworkDefault.default));
-parcelHelpers.export(exports, "PciCardSound", ()=>(0, _pciCardSoundDefault.default));
-parcelHelpers.export(exports, "PciCard", ()=>(0, _pciCardDefault.default));
-parcelHelpers.export(exports, "PeaceFill", ()=>(0, _peaceFillDefault.default));
-parcelHelpers.export(exports, "Peace", ()=>(0, _peaceDefault.default));
-parcelHelpers.export(exports, "PenFill", ()=>(0, _penFillDefault.default));
-parcelHelpers.export(exports, "Pen", ()=>(0, _penDefault.default));
-parcelHelpers.export(exports, "PencilFill", ()=>(0, _pencilFillDefault.default));
-parcelHelpers.export(exports, "PencilSquare", ()=>(0, _pencilSquareDefault.default));
-parcelHelpers.export(exports, "Pencil", ()=>(0, _pencilDefault.default));
-parcelHelpers.export(exports, "PentagonFill", ()=>(0, _pentagonFillDefault.default));
-parcelHelpers.export(exports, "PentagonHalf", ()=>(0, _pentagonHalfDefault.default));
-parcelHelpers.export(exports, "Pentagon", ()=>(0, _pentagonDefault.default));
-parcelHelpers.export(exports, "PeopleFill", ()=>(0, _peopleFillDefault.default));
-parcelHelpers.export(exports, "People", ()=>(0, _peopleDefault.default));
-parcelHelpers.export(exports, "Percent", ()=>(0, _percentDefault.default));
-parcelHelpers.export(exports, "PersonAdd", ()=>(0, _personAddDefault.default));
-parcelHelpers.export(exports, "PersonArmsUp", ()=>(0, _personArmsUpDefault.default));
-parcelHelpers.export(exports, "PersonBadgeFill", ()=>(0, _personBadgeFillDefault.default));
-parcelHelpers.export(exports, "PersonBadge", ()=>(0, _personBadgeDefault.default));
-parcelHelpers.export(exports, "PersonBoundingBox", ()=>(0, _personBoundingBoxDefault.default));
-parcelHelpers.export(exports, "PersonCheckFill", ()=>(0, _personCheckFillDefault.default));
-parcelHelpers.export(exports, "PersonCheck", ()=>(0, _personCheckDefault.default));
-parcelHelpers.export(exports, "PersonCircle", ()=>(0, _personCircleDefault.default));
-parcelHelpers.export(exports, "PersonDashFill", ()=>(0, _personDashFillDefault.default));
-parcelHelpers.export(exports, "PersonDash", ()=>(0, _personDashDefault.default));
-parcelHelpers.export(exports, "PersonDown", ()=>(0, _personDownDefault.default));
-parcelHelpers.export(exports, "PersonExclamation", ()=>(0, _personExclamationDefault.default));
-parcelHelpers.export(exports, "PersonFillAdd", ()=>(0, _personFillAddDefault.default));
-parcelHelpers.export(exports, "PersonFillCheck", ()=>(0, _personFillCheckDefault.default));
-parcelHelpers.export(exports, "PersonFillDash", ()=>(0, _personFillDashDefault.default));
-parcelHelpers.export(exports, "PersonFillDown", ()=>(0, _personFillDownDefault.default));
-parcelHelpers.export(exports, "PersonFillExclamation", ()=>(0, _personFillExclamationDefault.default));
-parcelHelpers.export(exports, "PersonFillGear", ()=>(0, _personFillGearDefault.default));
-parcelHelpers.export(exports, "PersonFillLock", ()=>(0, _personFillLockDefault.default));
-parcelHelpers.export(exports, "PersonFillSlash", ()=>(0, _personFillSlashDefault.default));
-parcelHelpers.export(exports, "PersonFillUp", ()=>(0, _personFillUpDefault.default));
-parcelHelpers.export(exports, "PersonFillX", ()=>(0, _personFillXDefault.default));
-parcelHelpers.export(exports, "PersonFill", ()=>(0, _personFillDefault.default));
-parcelHelpers.export(exports, "PersonGear", ()=>(0, _personGearDefault.default));
-parcelHelpers.export(exports, "PersonHeart", ()=>(0, _personHeartDefault.default));
-parcelHelpers.export(exports, "PersonHearts", ()=>(0, _personHeartsDefault.default));
-parcelHelpers.export(exports, "PersonLinesFill", ()=>(0, _personLinesFillDefault.default));
-parcelHelpers.export(exports, "PersonLock", ()=>(0, _personLockDefault.default));
-parcelHelpers.export(exports, "PersonPlusFill", ()=>(0, _personPlusFillDefault.default));
-parcelHelpers.export(exports, "PersonPlus", ()=>(0, _personPlusDefault.default));
-parcelHelpers.export(exports, "PersonRaisedHand", ()=>(0, _personRaisedHandDefault.default));
-parcelHelpers.export(exports, "PersonRolodex", ()=>(0, _personRolodexDefault.default));
-parcelHelpers.export(exports, "PersonSlash", ()=>(0, _personSlashDefault.default));
-parcelHelpers.export(exports, "PersonSquare", ()=>(0, _personSquareDefault.default));
-parcelHelpers.export(exports, "PersonStandingDress", ()=>(0, _personStandingDressDefault.default));
-parcelHelpers.export(exports, "PersonStanding", ()=>(0, _personStandingDefault.default));
-parcelHelpers.export(exports, "PersonUp", ()=>(0, _personUpDefault.default));
-parcelHelpers.export(exports, "PersonVcardFill", ()=>(0, _personVcardFillDefault.default));
-parcelHelpers.export(exports, "PersonVcard", ()=>(0, _personVcardDefault.default));
-parcelHelpers.export(exports, "PersonVideo", ()=>(0, _personVideoDefault.default));
-parcelHelpers.export(exports, "PersonVideo2", ()=>(0, _personVideo2Default.default));
-parcelHelpers.export(exports, "PersonVideo3", ()=>(0, _personVideo3Default.default));
-parcelHelpers.export(exports, "PersonWalking", ()=>(0, _personWalkingDefault.default));
-parcelHelpers.export(exports, "PersonWheelchair", ()=>(0, _personWheelchairDefault.default));
-parcelHelpers.export(exports, "PersonWorkspace", ()=>(0, _personWorkspaceDefault.default));
-parcelHelpers.export(exports, "PersonXFill", ()=>(0, _personXFillDefault.default));
-parcelHelpers.export(exports, "PersonX", ()=>(0, _personXDefault.default));
-parcelHelpers.export(exports, "Person", ()=>(0, _personDefault.default));
-parcelHelpers.export(exports, "PhoneFill", ()=>(0, _phoneFillDefault.default));
-parcelHelpers.export(exports, "PhoneFlip", ()=>(0, _phoneFlipDefault.default));
-parcelHelpers.export(exports, "PhoneLandscapeFill", ()=>(0, _phoneLandscapeFillDefault.default));
-parcelHelpers.export(exports, "PhoneLandscape", ()=>(0, _phoneLandscapeDefault.default));
-parcelHelpers.export(exports, "PhoneVibrateFill", ()=>(0, _phoneVibrateFillDefault.default));
-parcelHelpers.export(exports, "PhoneVibrate", ()=>(0, _phoneVibrateDefault.default));
-parcelHelpers.export(exports, "Phone", ()=>(0, _phoneDefault.default));
-parcelHelpers.export(exports, "PieChartFill", ()=>(0, _pieChartFillDefault.default));
-parcelHelpers.export(exports, "PieChart", ()=>(0, _pieChartDefault.default));
-parcelHelpers.export(exports, "PiggyBankFill", ()=>(0, _piggyBankFillDefault.default));
-parcelHelpers.export(exports, "PiggyBank", ()=>(0, _piggyBankDefault.default));
-parcelHelpers.export(exports, "PinAngleFill", ()=>(0, _pinAngleFillDefault.default));
-parcelHelpers.export(exports, "PinAngle", ()=>(0, _pinAngleDefault.default));
-parcelHelpers.export(exports, "PinFill", ()=>(0, _pinFillDefault.default));
-parcelHelpers.export(exports, "PinMapFill", ()=>(0, _pinMapFillDefault.default));
-parcelHelpers.export(exports, "PinMap", ()=>(0, _pinMapDefault.default));
-parcelHelpers.export(exports, "Pin", ()=>(0, _pinDefault.default));
-parcelHelpers.export(exports, "Pinterest", ()=>(0, _pinterestDefault.default));
-parcelHelpers.export(exports, "PipFill", ()=>(0, _pipFillDefault.default));
-parcelHelpers.export(exports, "Pip", ()=>(0, _pipDefault.default));
-parcelHelpers.export(exports, "PlayBtnFill", ()=>(0, _playBtnFillDefault.default));
-parcelHelpers.export(exports, "PlayBtn", ()=>(0, _playBtnDefault.default));
-parcelHelpers.export(exports, "PlayCircleFill", ()=>(0, _playCircleFillDefault.default));
-parcelHelpers.export(exports, "PlayCircle", ()=>(0, _playCircleDefault.default));
-parcelHelpers.export(exports, "PlayFill", ()=>(0, _playFillDefault.default));
-parcelHelpers.export(exports, "Play", ()=>(0, _playDefault.default));
-parcelHelpers.export(exports, "Playstation", ()=>(0, _playstationDefault.default));
-parcelHelpers.export(exports, "PlugFill", ()=>(0, _plugFillDefault.default));
-parcelHelpers.export(exports, "Plug", ()=>(0, _plugDefault.default));
-parcelHelpers.export(exports, "Plugin", ()=>(0, _pluginDefault.default));
-parcelHelpers.export(exports, "PlusCircleDotted", ()=>(0, _plusCircleDottedDefault.default));
-parcelHelpers.export(exports, "PlusCircleFill", ()=>(0, _plusCircleFillDefault.default));
-parcelHelpers.export(exports, "PlusCircle", ()=>(0, _plusCircleDefault.default));
-parcelHelpers.export(exports, "PlusLg", ()=>(0, _plusLgDefault.default));
-parcelHelpers.export(exports, "PlusSlashMinus", ()=>(0, _plusSlashMinusDefault.default));
-parcelHelpers.export(exports, "PlusSquareDotted", ()=>(0, _plusSquareDottedDefault.default));
-parcelHelpers.export(exports, "PlusSquareFill", ()=>(0, _plusSquareFillDefault.default));
-parcelHelpers.export(exports, "PlusSquare", ()=>(0, _plusSquareDefault.default));
-parcelHelpers.export(exports, "Plus", ()=>(0, _plusDefault.default));
-parcelHelpers.export(exports, "PostageFill", ()=>(0, _postageFillDefault.default));
-parcelHelpers.export(exports, "PostageHeartFill", ()=>(0, _postageHeartFillDefault.default));
-parcelHelpers.export(exports, "PostageHeart", ()=>(0, _postageHeartDefault.default));
-parcelHelpers.export(exports, "Postage", ()=>(0, _postageDefault.default));
-parcelHelpers.export(exports, "PostcardFill", ()=>(0, _postcardFillDefault.default));
-parcelHelpers.export(exports, "PostcardHeartFill", ()=>(0, _postcardHeartFillDefault.default));
-parcelHelpers.export(exports, "PostcardHeart", ()=>(0, _postcardHeartDefault.default));
-parcelHelpers.export(exports, "Postcard", ()=>(0, _postcardDefault.default));
-parcelHelpers.export(exports, "Power", ()=>(0, _powerDefault.default));
-parcelHelpers.export(exports, "Prescription", ()=>(0, _prescriptionDefault.default));
-parcelHelpers.export(exports, "Prescription2", ()=>(0, _prescription2Default.default));
-parcelHelpers.export(exports, "PrinterFill", ()=>(0, _printerFillDefault.default));
-parcelHelpers.export(exports, "Printer", ()=>(0, _printerDefault.default));
-parcelHelpers.export(exports, "ProjectorFill", ()=>(0, _projectorFillDefault.default));
-parcelHelpers.export(exports, "Projector", ()=>(0, _projectorDefault.default));
-parcelHelpers.export(exports, "PuzzleFill", ()=>(0, _puzzleFillDefault.default));
-parcelHelpers.export(exports, "Puzzle", ()=>(0, _puzzleDefault.default));
-parcelHelpers.export(exports, "QrCodeScan", ()=>(0, _qrCodeScanDefault.default));
-parcelHelpers.export(exports, "QrCode", ()=>(0, _qrCodeDefault.default));
-parcelHelpers.export(exports, "QuestionCircleFill", ()=>(0, _questionCircleFillDefault.default));
-parcelHelpers.export(exports, "QuestionCircle", ()=>(0, _questionCircleDefault.default));
-parcelHelpers.export(exports, "QuestionDiamondFill", ()=>(0, _questionDiamondFillDefault.default));
-parcelHelpers.export(exports, "QuestionDiamond", ()=>(0, _questionDiamondDefault.default));
-parcelHelpers.export(exports, "QuestionLg", ()=>(0, _questionLgDefault.default));
-parcelHelpers.export(exports, "QuestionOctagonFill", ()=>(0, _questionOctagonFillDefault.default));
-parcelHelpers.export(exports, "QuestionOctagon", ()=>(0, _questionOctagonDefault.default));
-parcelHelpers.export(exports, "QuestionSquareFill", ()=>(0, _questionSquareFillDefault.default));
-parcelHelpers.export(exports, "QuestionSquare", ()=>(0, _questionSquareDefault.default));
-parcelHelpers.export(exports, "Question", ()=>(0, _questionDefault.default));
-parcelHelpers.export(exports, "Quora", ()=>(0, _quoraDefault.default));
-parcelHelpers.export(exports, "Quote", ()=>(0, _quoteDefault.default));
-parcelHelpers.export(exports, "RCircleFill", ()=>(0, _rCircleFillDefault.default));
-parcelHelpers.export(exports, "RCircle", ()=>(0, _rCircleDefault.default));
-parcelHelpers.export(exports, "RSquareFill", ()=>(0, _rSquareFillDefault.default));
-parcelHelpers.export(exports, "RSquare", ()=>(0, _rSquareDefault.default));
-parcelHelpers.export(exports, "Radar", ()=>(0, _radarDefault.default));
-parcelHelpers.export(exports, "Radioactive", ()=>(0, _radioactiveDefault.default));
-parcelHelpers.export(exports, "Rainbow", ()=>(0, _rainbowDefault.default));
-parcelHelpers.export(exports, "ReceiptCutoff", ()=>(0, _receiptCutoffDefault.default));
-parcelHelpers.export(exports, "Receipt", ()=>(0, _receiptDefault.default));
-parcelHelpers.export(exports, "Reception0", ()=>(0, _reception0Default.default));
-parcelHelpers.export(exports, "Reception1", ()=>(0, _reception1Default.default));
-parcelHelpers.export(exports, "Reception2", ()=>(0, _reception2Default.default));
-parcelHelpers.export(exports, "Reception3", ()=>(0, _reception3Default.default));
-parcelHelpers.export(exports, "Reception4", ()=>(0, _reception4Default.default));
-parcelHelpers.export(exports, "RecordBtnFill", ()=>(0, _recordBtnFillDefault.default));
-parcelHelpers.export(exports, "RecordBtn", ()=>(0, _recordBtnDefault.default));
-parcelHelpers.export(exports, "RecordCircleFill", ()=>(0, _recordCircleFillDefault.default));
-parcelHelpers.export(exports, "RecordCircle", ()=>(0, _recordCircleDefault.default));
-parcelHelpers.export(exports, "RecordFill", ()=>(0, _recordFillDefault.default));
-parcelHelpers.export(exports, "Record", ()=>(0, _recordDefault.default));
-parcelHelpers.export(exports, "Record2Fill", ()=>(0, _record2FillDefault.default));
-parcelHelpers.export(exports, "Record2", ()=>(0, _record2Default.default));
-parcelHelpers.export(exports, "Recycle", ()=>(0, _recycleDefault.default));
-parcelHelpers.export(exports, "Reddit", ()=>(0, _redditDefault.default));
-parcelHelpers.export(exports, "Regex", ()=>(0, _regexDefault.default));
-parcelHelpers.export(exports, "Repeat1", ()=>(0, _repeat1Default.default));
-parcelHelpers.export(exports, "Repeat", ()=>(0, _repeatDefault.default));
-parcelHelpers.export(exports, "ReplyAllFill", ()=>(0, _replyAllFillDefault.default));
-parcelHelpers.export(exports, "ReplyAll", ()=>(0, _replyAllDefault.default));
-parcelHelpers.export(exports, "ReplyFill", ()=>(0, _replyFillDefault.default));
-parcelHelpers.export(exports, "Reply", ()=>(0, _replyDefault.default));
-parcelHelpers.export(exports, "RewindBtnFill", ()=>(0, _rewindBtnFillDefault.default));
-parcelHelpers.export(exports, "RewindBtn", ()=>(0, _rewindBtnDefault.default));
-parcelHelpers.export(exports, "RewindCircleFill", ()=>(0, _rewindCircleFillDefault.default));
-parcelHelpers.export(exports, "RewindCircle", ()=>(0, _rewindCircleDefault.default));
-parcelHelpers.export(exports, "RewindFill", ()=>(0, _rewindFillDefault.default));
-parcelHelpers.export(exports, "Rewind", ()=>(0, _rewindDefault.default));
-parcelHelpers.export(exports, "Robot", ()=>(0, _robotDefault.default));
-parcelHelpers.export(exports, "RocketFill", ()=>(0, _rocketFillDefault.default));
-parcelHelpers.export(exports, "RocketTakeoffFill", ()=>(0, _rocketTakeoffFillDefault.default));
-parcelHelpers.export(exports, "RocketTakeoff", ()=>(0, _rocketTakeoffDefault.default));
-parcelHelpers.export(exports, "Rocket", ()=>(0, _rocketDefault.default));
-parcelHelpers.export(exports, "RouterFill", ()=>(0, _routerFillDefault.default));
-parcelHelpers.export(exports, "Router", ()=>(0, _routerDefault.default));
-parcelHelpers.export(exports, "RssFill", ()=>(0, _rssFillDefault.default));
-parcelHelpers.export(exports, "Rss", ()=>(0, _rssDefault.default));
-parcelHelpers.export(exports, "Rulers", ()=>(0, _rulersDefault.default));
-parcelHelpers.export(exports, "SafeFill", ()=>(0, _safeFillDefault.default));
-parcelHelpers.export(exports, "Safe", ()=>(0, _safeDefault.default));
-parcelHelpers.export(exports, "Safe2Fill", ()=>(0, _safe2FillDefault.default));
-parcelHelpers.export(exports, "Safe2", ()=>(0, _safe2Default.default));
-parcelHelpers.export(exports, "SaveFill", ()=>(0, _saveFillDefault.default));
-parcelHelpers.export(exports, "Save", ()=>(0, _saveDefault.default));
-parcelHelpers.export(exports, "Save2Fill", ()=>(0, _save2FillDefault.default));
-parcelHelpers.export(exports, "Save2", ()=>(0, _save2Default.default));
-parcelHelpers.export(exports, "Scissors", ()=>(0, _scissorsDefault.default));
-parcelHelpers.export(exports, "Scooter", ()=>(0, _scooterDefault.default));
-parcelHelpers.export(exports, "Screwdriver", ()=>(0, _screwdriverDefault.default));
-parcelHelpers.export(exports, "SdCardFill", ()=>(0, _sdCardFillDefault.default));
-parcelHelpers.export(exports, "SdCard", ()=>(0, _sdCardDefault.default));
-parcelHelpers.export(exports, "SearchHeartFill", ()=>(0, _searchHeartFillDefault.default));
-parcelHelpers.export(exports, "SearchHeart", ()=>(0, _searchHeartDefault.default));
-parcelHelpers.export(exports, "Search", ()=>(0, _searchDefault.default));
-parcelHelpers.export(exports, "SegmentedNav", ()=>(0, _segmentedNavDefault.default));
-parcelHelpers.export(exports, "SendArrowDownFill", ()=>(0, _sendArrowDownFillDefault.default));
-parcelHelpers.export(exports, "SendArrowDown", ()=>(0, _sendArrowDownDefault.default));
-parcelHelpers.export(exports, "SendArrowUpFill", ()=>(0, _sendArrowUpFillDefault.default));
-parcelHelpers.export(exports, "SendArrowUp", ()=>(0, _sendArrowUpDefault.default));
-parcelHelpers.export(exports, "SendCheckFill", ()=>(0, _sendCheckFillDefault.default));
-parcelHelpers.export(exports, "SendCheck", ()=>(0, _sendCheckDefault.default));
-parcelHelpers.export(exports, "SendDashFill", ()=>(0, _sendDashFillDefault.default));
-parcelHelpers.export(exports, "SendDash", ()=>(0, _sendDashDefault.default));
-parcelHelpers.export(exports, "SendExclamationFill", ()=>(0, _sendExclamationFillDefault.default));
-parcelHelpers.export(exports, "SendExclamation", ()=>(0, _sendExclamationDefault.default));
-parcelHelpers.export(exports, "SendFill", ()=>(0, _sendFillDefault.default));
-parcelHelpers.export(exports, "SendPlusFill", ()=>(0, _sendPlusFillDefault.default));
-parcelHelpers.export(exports, "SendPlus", ()=>(0, _sendPlusDefault.default));
-parcelHelpers.export(exports, "SendSlashFill", ()=>(0, _sendSlashFillDefault.default));
-parcelHelpers.export(exports, "SendSlash", ()=>(0, _sendSlashDefault.default));
-parcelHelpers.export(exports, "SendXFill", ()=>(0, _sendXFillDefault.default));
-parcelHelpers.export(exports, "SendX", ()=>(0, _sendXDefault.default));
-parcelHelpers.export(exports, "Send", ()=>(0, _sendDefault.default));
-parcelHelpers.export(exports, "Server", ()=>(0, _serverDefault.default));
-parcelHelpers.export(exports, "Shadows", ()=>(0, _shadowsDefault.default));
-parcelHelpers.export(exports, "ShareFill", ()=>(0, _shareFillDefault.default));
-parcelHelpers.export(exports, "Share", ()=>(0, _shareDefault.default));
-parcelHelpers.export(exports, "ShieldCheck", ()=>(0, _shieldCheckDefault.default));
-parcelHelpers.export(exports, "ShieldExclamation", ()=>(0, _shieldExclamationDefault.default));
-parcelHelpers.export(exports, "ShieldFillCheck", ()=>(0, _shieldFillCheckDefault.default));
-parcelHelpers.export(exports, "ShieldFillExclamation", ()=>(0, _shieldFillExclamationDefault.default));
-parcelHelpers.export(exports, "ShieldFillMinus", ()=>(0, _shieldFillMinusDefault.default));
-parcelHelpers.export(exports, "ShieldFillPlus", ()=>(0, _shieldFillPlusDefault.default));
-parcelHelpers.export(exports, "ShieldFillX", ()=>(0, _shieldFillXDefault.default));
-parcelHelpers.export(exports, "ShieldFill", ()=>(0, _shieldFillDefault.default));
-parcelHelpers.export(exports, "ShieldLockFill", ()=>(0, _shieldLockFillDefault.default));
-parcelHelpers.export(exports, "ShieldLock", ()=>(0, _shieldLockDefault.default));
-parcelHelpers.export(exports, "ShieldMinus", ()=>(0, _shieldMinusDefault.default));
-parcelHelpers.export(exports, "ShieldPlus", ()=>(0, _shieldPlusDefault.default));
-parcelHelpers.export(exports, "ShieldShaded", ()=>(0, _shieldShadedDefault.default));
-parcelHelpers.export(exports, "ShieldSlashFill", ()=>(0, _shieldSlashFillDefault.default));
-parcelHelpers.export(exports, "ShieldSlash", ()=>(0, _shieldSlashDefault.default));
-parcelHelpers.export(exports, "ShieldX", ()=>(0, _shieldXDefault.default));
-parcelHelpers.export(exports, "Shield", ()=>(0, _shieldDefault.default));
-parcelHelpers.export(exports, "ShiftFill", ()=>(0, _shiftFillDefault.default));
-parcelHelpers.export(exports, "Shift", ()=>(0, _shiftDefault.default));
-parcelHelpers.export(exports, "ShopWindow", ()=>(0, _shopWindowDefault.default));
-parcelHelpers.export(exports, "Shop", ()=>(0, _shopDefault.default));
-parcelHelpers.export(exports, "Shuffle", ()=>(0, _shuffleDefault.default));
-parcelHelpers.export(exports, "SignDeadEndFill", ()=>(0, _signDeadEndFillDefault.default));
-parcelHelpers.export(exports, "SignDeadEnd", ()=>(0, _signDeadEndDefault.default));
-parcelHelpers.export(exports, "SignDoNotEnterFill", ()=>(0, _signDoNotEnterFillDefault.default));
-parcelHelpers.export(exports, "SignDoNotEnter", ()=>(0, _signDoNotEnterDefault.default));
-parcelHelpers.export(exports, "SignIntersectionFill", ()=>(0, _signIntersectionFillDefault.default));
-parcelHelpers.export(exports, "SignIntersectionSideFill", ()=>(0, _signIntersectionSideFillDefault.default));
-parcelHelpers.export(exports, "SignIntersectionSide", ()=>(0, _signIntersectionSideDefault.default));
-parcelHelpers.export(exports, "SignIntersectionTFill", ()=>(0, _signIntersectionTFillDefault.default));
-parcelHelpers.export(exports, "SignIntersectionT", ()=>(0, _signIntersectionTDefault.default));
-parcelHelpers.export(exports, "SignIntersectionYFill", ()=>(0, _signIntersectionYFillDefault.default));
-parcelHelpers.export(exports, "SignIntersectionY", ()=>(0, _signIntersectionYDefault.default));
-parcelHelpers.export(exports, "SignIntersection", ()=>(0, _signIntersectionDefault.default));
-parcelHelpers.export(exports, "SignMergeLeftFill", ()=>(0, _signMergeLeftFillDefault.default));
-parcelHelpers.export(exports, "SignMergeLeft", ()=>(0, _signMergeLeftDefault.default));
-parcelHelpers.export(exports, "SignMergeRightFill", ()=>(0, _signMergeRightFillDefault.default));
-parcelHelpers.export(exports, "SignMergeRight", ()=>(0, _signMergeRightDefault.default));
-parcelHelpers.export(exports, "SignNoLeftTurnFill", ()=>(0, _signNoLeftTurnFillDefault.default));
-parcelHelpers.export(exports, "SignNoLeftTurn", ()=>(0, _signNoLeftTurnDefault.default));
-parcelHelpers.export(exports, "SignNoParkingFill", ()=>(0, _signNoParkingFillDefault.default));
-parcelHelpers.export(exports, "SignNoParking", ()=>(0, _signNoParkingDefault.default));
-parcelHelpers.export(exports, "SignNoRightTurnFill", ()=>(0, _signNoRightTurnFillDefault.default));
-parcelHelpers.export(exports, "SignNoRightTurn", ()=>(0, _signNoRightTurnDefault.default));
-parcelHelpers.export(exports, "SignRailroadFill", ()=>(0, _signRailroadFillDefault.default));
-parcelHelpers.export(exports, "SignRailroad", ()=>(0, _signRailroadDefault.default));
-parcelHelpers.export(exports, "SignStopFill", ()=>(0, _signStopFillDefault.default));
-parcelHelpers.export(exports, "SignStopLightsFill", ()=>(0, _signStopLightsFillDefault.default));
-parcelHelpers.export(exports, "SignStopLights", ()=>(0, _signStopLightsDefault.default));
-parcelHelpers.export(exports, "SignStop", ()=>(0, _signStopDefault.default));
-parcelHelpers.export(exports, "SignTurnLeftFill", ()=>(0, _signTurnLeftFillDefault.default));
-parcelHelpers.export(exports, "SignTurnLeft", ()=>(0, _signTurnLeftDefault.default));
-parcelHelpers.export(exports, "SignTurnRightFill", ()=>(0, _signTurnRightFillDefault.default));
-parcelHelpers.export(exports, "SignTurnRight", ()=>(0, _signTurnRightDefault.default));
-parcelHelpers.export(exports, "SignTurnSlightLeftFill", ()=>(0, _signTurnSlightLeftFillDefault.default));
-parcelHelpers.export(exports, "SignTurnSlightLeft", ()=>(0, _signTurnSlightLeftDefault.default));
-parcelHelpers.export(exports, "SignTurnSlightRightFill", ()=>(0, _signTurnSlightRightFillDefault.default));
-parcelHelpers.export(exports, "SignTurnSlightRight", ()=>(0, _signTurnSlightRightDefault.default));
-parcelHelpers.export(exports, "SignYieldFill", ()=>(0, _signYieldFillDefault.default));
-parcelHelpers.export(exports, "SignYield", ()=>(0, _signYieldDefault.default));
-parcelHelpers.export(exports, "Signal", ()=>(0, _signalDefault.default));
-parcelHelpers.export(exports, "Signpost2Fill", ()=>(0, _signpost2FillDefault.default));
-parcelHelpers.export(exports, "Signpost2", ()=>(0, _signpost2Default.default));
-parcelHelpers.export(exports, "SignpostFill", ()=>(0, _signpostFillDefault.default));
-parcelHelpers.export(exports, "SignpostSplitFill", ()=>(0, _signpostSplitFillDefault.default));
-parcelHelpers.export(exports, "SignpostSplit", ()=>(0, _signpostSplitDefault.default));
-parcelHelpers.export(exports, "Signpost", ()=>(0, _signpostDefault.default));
-parcelHelpers.export(exports, "SimFill", ()=>(0, _simFillDefault.default));
-parcelHelpers.export(exports, "SimSlashFill", ()=>(0, _simSlashFillDefault.default));
-parcelHelpers.export(exports, "SimSlash", ()=>(0, _simSlashDefault.default));
-parcelHelpers.export(exports, "Sim", ()=>(0, _simDefault.default));
-parcelHelpers.export(exports, "SinaWeibo", ()=>(0, _sinaWeiboDefault.default));
-parcelHelpers.export(exports, "SkipBackwardBtnFill", ()=>(0, _skipBackwardBtnFillDefault.default));
-parcelHelpers.export(exports, "SkipBackwardBtn", ()=>(0, _skipBackwardBtnDefault.default));
-parcelHelpers.export(exports, "SkipBackwardCircleFill", ()=>(0, _skipBackwardCircleFillDefault.default));
-parcelHelpers.export(exports, "SkipBackwardCircle", ()=>(0, _skipBackwardCircleDefault.default));
-parcelHelpers.export(exports, "SkipBackwardFill", ()=>(0, _skipBackwardFillDefault.default));
-parcelHelpers.export(exports, "SkipBackward", ()=>(0, _skipBackwardDefault.default));
-parcelHelpers.export(exports, "SkipEndBtnFill", ()=>(0, _skipEndBtnFillDefault.default));
-parcelHelpers.export(exports, "SkipEndBtn", ()=>(0, _skipEndBtnDefault.default));
-parcelHelpers.export(exports, "SkipEndCircleFill", ()=>(0, _skipEndCircleFillDefault.default));
-parcelHelpers.export(exports, "SkipEndCircle", ()=>(0, _skipEndCircleDefault.default));
-parcelHelpers.export(exports, "SkipEndFill", ()=>(0, _skipEndFillDefault.default));
-parcelHelpers.export(exports, "SkipEnd", ()=>(0, _skipEndDefault.default));
-parcelHelpers.export(exports, "SkipForwardBtnFill", ()=>(0, _skipForwardBtnFillDefault.default));
-parcelHelpers.export(exports, "SkipForwardBtn", ()=>(0, _skipForwardBtnDefault.default));
-parcelHelpers.export(exports, "SkipForwardCircleFill", ()=>(0, _skipForwardCircleFillDefault.default));
-parcelHelpers.export(exports, "SkipForwardCircle", ()=>(0, _skipForwardCircleDefault.default));
-parcelHelpers.export(exports, "SkipForwardFill", ()=>(0, _skipForwardFillDefault.default));
-parcelHelpers.export(exports, "SkipForward", ()=>(0, _skipForwardDefault.default));
-parcelHelpers.export(exports, "SkipStartBtnFill", ()=>(0, _skipStartBtnFillDefault.default));
-parcelHelpers.export(exports, "SkipStartBtn", ()=>(0, _skipStartBtnDefault.default));
-parcelHelpers.export(exports, "SkipStartCircleFill", ()=>(0, _skipStartCircleFillDefault.default));
-parcelHelpers.export(exports, "SkipStartCircle", ()=>(0, _skipStartCircleDefault.default));
-parcelHelpers.export(exports, "SkipStartFill", ()=>(0, _skipStartFillDefault.default));
-parcelHelpers.export(exports, "SkipStart", ()=>(0, _skipStartDefault.default));
-parcelHelpers.export(exports, "Skype", ()=>(0, _skypeDefault.default));
-parcelHelpers.export(exports, "Slack", ()=>(0, _slackDefault.default));
-parcelHelpers.export(exports, "SlashCircleFill", ()=>(0, _slashCircleFillDefault.default));
-parcelHelpers.export(exports, "SlashCircle", ()=>(0, _slashCircleDefault.default));
-parcelHelpers.export(exports, "SlashLg", ()=>(0, _slashLgDefault.default));
-parcelHelpers.export(exports, "SlashSquareFill", ()=>(0, _slashSquareFillDefault.default));
-parcelHelpers.export(exports, "SlashSquare", ()=>(0, _slashSquareDefault.default));
-parcelHelpers.export(exports, "Slash", ()=>(0, _slashDefault.default));
-parcelHelpers.export(exports, "Sliders", ()=>(0, _slidersDefault.default));
-parcelHelpers.export(exports, "Sliders2Vertical", ()=>(0, _sliders2VerticalDefault.default));
-parcelHelpers.export(exports, "Sliders2", ()=>(0, _sliders2Default.default));
-parcelHelpers.export(exports, "Smartwatch", ()=>(0, _smartwatchDefault.default));
-parcelHelpers.export(exports, "Snapchat", ()=>(0, _snapchatDefault.default));
-parcelHelpers.export(exports, "Snow", ()=>(0, _snowDefault.default));
-parcelHelpers.export(exports, "Snow2", ()=>(0, _snow2Default.default));
-parcelHelpers.export(exports, "Snow3", ()=>(0, _snow3Default.default));
-parcelHelpers.export(exports, "SortAlphaDownAlt", ()=>(0, _sortAlphaDownAltDefault.default));
-parcelHelpers.export(exports, "SortAlphaDown", ()=>(0, _sortAlphaDownDefault.default));
-parcelHelpers.export(exports, "SortAlphaUpAlt", ()=>(0, _sortAlphaUpAltDefault.default));
-parcelHelpers.export(exports, "SortAlphaUp", ()=>(0, _sortAlphaUpDefault.default));
-parcelHelpers.export(exports, "SortDownAlt", ()=>(0, _sortDownAltDefault.default));
-parcelHelpers.export(exports, "SortDown", ()=>(0, _sortDownDefault.default));
-parcelHelpers.export(exports, "SortNumericDownAlt", ()=>(0, _sortNumericDownAltDefault.default));
-parcelHelpers.export(exports, "SortNumericDown", ()=>(0, _sortNumericDownDefault.default));
-parcelHelpers.export(exports, "SortNumericUpAlt", ()=>(0, _sortNumericUpAltDefault.default));
-parcelHelpers.export(exports, "SortNumericUp", ()=>(0, _sortNumericUpDefault.default));
-parcelHelpers.export(exports, "SortUpAlt", ()=>(0, _sortUpAltDefault.default));
-parcelHelpers.export(exports, "SortUp", ()=>(0, _sortUpDefault.default));
-parcelHelpers.export(exports, "Soundwave", ()=>(0, _soundwaveDefault.default));
-parcelHelpers.export(exports, "Sourceforge", ()=>(0, _sourceforgeDefault.default));
-parcelHelpers.export(exports, "SpeakerFill", ()=>(0, _speakerFillDefault.default));
-parcelHelpers.export(exports, "Speaker", ()=>(0, _speakerDefault.default));
-parcelHelpers.export(exports, "Speedometer", ()=>(0, _speedometerDefault.default));
-parcelHelpers.export(exports, "Speedometer2", ()=>(0, _speedometer2Default.default));
-parcelHelpers.export(exports, "Spellcheck", ()=>(0, _spellcheckDefault.default));
-parcelHelpers.export(exports, "Spotify", ()=>(0, _spotifyDefault.default));
-parcelHelpers.export(exports, "SquareFill", ()=>(0, _squareFillDefault.default));
-parcelHelpers.export(exports, "SquareHalf", ()=>(0, _squareHalfDefault.default));
-parcelHelpers.export(exports, "Square", ()=>(0, _squareDefault.default));
-parcelHelpers.export(exports, "StackOverflow", ()=>(0, _stackOverflowDefault.default));
-parcelHelpers.export(exports, "Stack", ()=>(0, _stackDefault.default));
-parcelHelpers.export(exports, "StarFill", ()=>(0, _starFillDefault.default));
-parcelHelpers.export(exports, "StarHalf", ()=>(0, _starHalfDefault.default));
-parcelHelpers.export(exports, "Star", ()=>(0, _starDefault.default));
-parcelHelpers.export(exports, "Stars", ()=>(0, _starsDefault.default));
-parcelHelpers.export(exports, "Steam", ()=>(0, _steamDefault.default));
-parcelHelpers.export(exports, "StickiesFill", ()=>(0, _stickiesFillDefault.default));
-parcelHelpers.export(exports, "Stickies", ()=>(0, _stickiesDefault.default));
-parcelHelpers.export(exports, "StickyFill", ()=>(0, _stickyFillDefault.default));
-parcelHelpers.export(exports, "Sticky", ()=>(0, _stickyDefault.default));
-parcelHelpers.export(exports, "StopBtnFill", ()=>(0, _stopBtnFillDefault.default));
-parcelHelpers.export(exports, "StopBtn", ()=>(0, _stopBtnDefault.default));
-parcelHelpers.export(exports, "StopCircleFill", ()=>(0, _stopCircleFillDefault.default));
-parcelHelpers.export(exports, "StopCircle", ()=>(0, _stopCircleDefault.default));
-parcelHelpers.export(exports, "StopFill", ()=>(0, _stopFillDefault.default));
-parcelHelpers.export(exports, "Stop", ()=>(0, _stopDefault.default));
-parcelHelpers.export(exports, "StoplightsFill", ()=>(0, _stoplightsFillDefault.default));
-parcelHelpers.export(exports, "Stoplights", ()=>(0, _stoplightsDefault.default));
-parcelHelpers.export(exports, "StopwatchFill", ()=>(0, _stopwatchFillDefault.default));
-parcelHelpers.export(exports, "Stopwatch", ()=>(0, _stopwatchDefault.default));
-parcelHelpers.export(exports, "Strava", ()=>(0, _stravaDefault.default));
-parcelHelpers.export(exports, "Stripe", ()=>(0, _stripeDefault.default));
-parcelHelpers.export(exports, "Subscript", ()=>(0, _subscriptDefault.default));
-parcelHelpers.export(exports, "Substack", ()=>(0, _substackDefault.default));
-parcelHelpers.export(exports, "Subtract", ()=>(0, _subtractDefault.default));
-parcelHelpers.export(exports, "SuitClubFill", ()=>(0, _suitClubFillDefault.default));
-parcelHelpers.export(exports, "SuitClub", ()=>(0, _suitClubDefault.default));
-parcelHelpers.export(exports, "SuitDiamondFill", ()=>(0, _suitDiamondFillDefault.default));
-parcelHelpers.export(exports, "SuitDiamond", ()=>(0, _suitDiamondDefault.default));
-parcelHelpers.export(exports, "SuitHeartFill", ()=>(0, _suitHeartFillDefault.default));
-parcelHelpers.export(exports, "SuitHeart", ()=>(0, _suitHeartDefault.default));
-parcelHelpers.export(exports, "SuitSpadeFill", ()=>(0, _suitSpadeFillDefault.default));
-parcelHelpers.export(exports, "SuitSpade", ()=>(0, _suitSpadeDefault.default));
-parcelHelpers.export(exports, "SuitcaseFill", ()=>(0, _suitcaseFillDefault.default));
-parcelHelpers.export(exports, "SuitcaseLgFill", ()=>(0, _suitcaseLgFillDefault.default));
-parcelHelpers.export(exports, "SuitcaseLg", ()=>(0, _suitcaseLgDefault.default));
-parcelHelpers.export(exports, "Suitcase", ()=>(0, _suitcaseDefault.default));
-parcelHelpers.export(exports, "Suitcase2Fill", ()=>(0, _suitcase2FillDefault.default));
-parcelHelpers.export(exports, "Suitcase2", ()=>(0, _suitcase2Default.default));
-parcelHelpers.export(exports, "SunFill", ()=>(0, _sunFillDefault.default));
-parcelHelpers.export(exports, "Sun", ()=>(0, _sunDefault.default));
-parcelHelpers.export(exports, "Sunglasses", ()=>(0, _sunglassesDefault.default));
-parcelHelpers.export(exports, "SunriseFill", ()=>(0, _sunriseFillDefault.default));
-parcelHelpers.export(exports, "Sunrise", ()=>(0, _sunriseDefault.default));
-parcelHelpers.export(exports, "SunsetFill", ()=>(0, _sunsetFillDefault.default));
-parcelHelpers.export(exports, "Sunset", ()=>(0, _sunsetDefault.default));
-parcelHelpers.export(exports, "Superscript", ()=>(0, _superscriptDefault.default));
-parcelHelpers.export(exports, "SymmetryHorizontal", ()=>(0, _symmetryHorizontalDefault.default));
-parcelHelpers.export(exports, "SymmetryVertical", ()=>(0, _symmetryVerticalDefault.default));
-parcelHelpers.export(exports, "Table", ()=>(0, _tableDefault.default));
-parcelHelpers.export(exports, "TabletFill", ()=>(0, _tabletFillDefault.default));
-parcelHelpers.export(exports, "TabletLandscapeFill", ()=>(0, _tabletLandscapeFillDefault.default));
-parcelHelpers.export(exports, "TabletLandscape", ()=>(0, _tabletLandscapeDefault.default));
-parcelHelpers.export(exports, "Tablet", ()=>(0, _tabletDefault.default));
-parcelHelpers.export(exports, "TagFill", ()=>(0, _tagFillDefault.default));
-parcelHelpers.export(exports, "Tag", ()=>(0, _tagDefault.default));
-parcelHelpers.export(exports, "TagsFill", ()=>(0, _tagsFillDefault.default));
-parcelHelpers.export(exports, "Tags", ()=>(0, _tagsDefault.default));
-parcelHelpers.export(exports, "TaxiFrontFill", ()=>(0, _taxiFrontFillDefault.default));
-parcelHelpers.export(exports, "TaxiFront", ()=>(0, _taxiFrontDefault.default));
-parcelHelpers.export(exports, "Telegram", ()=>(0, _telegramDefault.default));
-parcelHelpers.export(exports, "TelephoneFill", ()=>(0, _telephoneFillDefault.default));
-parcelHelpers.export(exports, "TelephoneForwardFill", ()=>(0, _telephoneForwardFillDefault.default));
-parcelHelpers.export(exports, "TelephoneForward", ()=>(0, _telephoneForwardDefault.default));
-parcelHelpers.export(exports, "TelephoneInboundFill", ()=>(0, _telephoneInboundFillDefault.default));
-parcelHelpers.export(exports, "TelephoneInbound", ()=>(0, _telephoneInboundDefault.default));
-parcelHelpers.export(exports, "TelephoneMinusFill", ()=>(0, _telephoneMinusFillDefault.default));
-parcelHelpers.export(exports, "TelephoneMinus", ()=>(0, _telephoneMinusDefault.default));
-parcelHelpers.export(exports, "TelephoneOutboundFill", ()=>(0, _telephoneOutboundFillDefault.default));
-parcelHelpers.export(exports, "TelephoneOutbound", ()=>(0, _telephoneOutboundDefault.default));
-parcelHelpers.export(exports, "TelephonePlusFill", ()=>(0, _telephonePlusFillDefault.default));
-parcelHelpers.export(exports, "TelephonePlus", ()=>(0, _telephonePlusDefault.default));
-parcelHelpers.export(exports, "TelephoneXFill", ()=>(0, _telephoneXFillDefault.default));
-parcelHelpers.export(exports, "TelephoneX", ()=>(0, _telephoneXDefault.default));
-parcelHelpers.export(exports, "Telephone", ()=>(0, _telephoneDefault.default));
-parcelHelpers.export(exports, "TencentQq", ()=>(0, _tencentQqDefault.default));
-parcelHelpers.export(exports, "TerminalDash", ()=>(0, _terminalDashDefault.default));
-parcelHelpers.export(exports, "TerminalFill", ()=>(0, _terminalFillDefault.default));
-parcelHelpers.export(exports, "TerminalPlus", ()=>(0, _terminalPlusDefault.default));
-parcelHelpers.export(exports, "TerminalSplit", ()=>(0, _terminalSplitDefault.default));
-parcelHelpers.export(exports, "TerminalX", ()=>(0, _terminalXDefault.default));
-parcelHelpers.export(exports, "Terminal", ()=>(0, _terminalDefault.default));
-parcelHelpers.export(exports, "TextCenter", ()=>(0, _textCenterDefault.default));
-parcelHelpers.export(exports, "TextIndentLeft", ()=>(0, _textIndentLeftDefault.default));
-parcelHelpers.export(exports, "TextIndentRight", ()=>(0, _textIndentRightDefault.default));
-parcelHelpers.export(exports, "TextLeft", ()=>(0, _textLeftDefault.default));
-parcelHelpers.export(exports, "TextParagraph", ()=>(0, _textParagraphDefault.default));
-parcelHelpers.export(exports, "TextRight", ()=>(0, _textRightDefault.default));
-parcelHelpers.export(exports, "TextWrap", ()=>(0, _textWrapDefault.default));
-parcelHelpers.export(exports, "TextareaResize", ()=>(0, _textareaResizeDefault.default));
-parcelHelpers.export(exports, "TextareaT", ()=>(0, _textareaTDefault.default));
-parcelHelpers.export(exports, "Textarea", ()=>(0, _textareaDefault.default));
-parcelHelpers.export(exports, "ThermometerHalf", ()=>(0, _thermometerHalfDefault.default));
-parcelHelpers.export(exports, "ThermometerHigh", ()=>(0, _thermometerHighDefault.default));
-parcelHelpers.export(exports, "ThermometerLow", ()=>(0, _thermometerLowDefault.default));
-parcelHelpers.export(exports, "ThermometerSnow", ()=>(0, _thermometerSnowDefault.default));
-parcelHelpers.export(exports, "ThermometerSun", ()=>(0, _thermometerSunDefault.default));
-parcelHelpers.export(exports, "Thermometer", ()=>(0, _thermometerDefault.default));
-parcelHelpers.export(exports, "ThreadsFill", ()=>(0, _threadsFillDefault.default));
-parcelHelpers.export(exports, "Threads", ()=>(0, _threadsDefault.default));
-parcelHelpers.export(exports, "ThreeDotsVertical", ()=>(0, _threeDotsVerticalDefault.default));
-parcelHelpers.export(exports, "ThreeDots", ()=>(0, _threeDotsDefault.default));
-parcelHelpers.export(exports, "ThunderboltFill", ()=>(0, _thunderboltFillDefault.default));
-parcelHelpers.export(exports, "Thunderbolt", ()=>(0, _thunderboltDefault.default));
-parcelHelpers.export(exports, "TicketDetailedFill", ()=>(0, _ticketDetailedFillDefault.default));
-parcelHelpers.export(exports, "TicketDetailed", ()=>(0, _ticketDetailedDefault.default));
-parcelHelpers.export(exports, "TicketFill", ()=>(0, _ticketFillDefault.default));
-parcelHelpers.export(exports, "TicketPerforatedFill", ()=>(0, _ticketPerforatedFillDefault.default));
-parcelHelpers.export(exports, "TicketPerforated", ()=>(0, _ticketPerforatedDefault.default));
-parcelHelpers.export(exports, "Ticket", ()=>(0, _ticketDefault.default));
-parcelHelpers.export(exports, "Tiktok", ()=>(0, _tiktokDefault.default));
-parcelHelpers.export(exports, "ToggleOff", ()=>(0, _toggleOffDefault.default));
-parcelHelpers.export(exports, "ToggleOn", ()=>(0, _toggleOnDefault.default));
-parcelHelpers.export(exports, "Toggle2Off", ()=>(0, _toggle2OffDefault.default));
-parcelHelpers.export(exports, "Toggle2On", ()=>(0, _toggle2OnDefault.default));
-parcelHelpers.export(exports, "Toggles", ()=>(0, _togglesDefault.default));
-parcelHelpers.export(exports, "Toggles2", ()=>(0, _toggles2Default.default));
-parcelHelpers.export(exports, "Tools", ()=>(0, _toolsDefault.default));
-parcelHelpers.export(exports, "Tornado", ()=>(0, _tornadoDefault.default));
-parcelHelpers.export(exports, "TrainFreightFrontFill", ()=>(0, _trainFreightFrontFillDefault.default));
-parcelHelpers.export(exports, "TrainFreightFront", ()=>(0, _trainFreightFrontDefault.default));
-parcelHelpers.export(exports, "TrainFrontFill", ()=>(0, _trainFrontFillDefault.default));
-parcelHelpers.export(exports, "TrainFront", ()=>(0, _trainFrontDefault.default));
-parcelHelpers.export(exports, "TrainLightrailFrontFill", ()=>(0, _trainLightrailFrontFillDefault.default));
-parcelHelpers.export(exports, "TrainLightrailFront", ()=>(0, _trainLightrailFrontDefault.default));
-parcelHelpers.export(exports, "Translate", ()=>(0, _translateDefault.default));
-parcelHelpers.export(exports, "Transparency", ()=>(0, _transparencyDefault.default));
-parcelHelpers.export(exports, "TrashFill", ()=>(0, _trashFillDefault.default));
-parcelHelpers.export(exports, "Trash", ()=>(0, _trashDefault.default));
-parcelHelpers.export(exports, "Trash2Fill", ()=>(0, _trash2FillDefault.default));
-parcelHelpers.export(exports, "Trash2", ()=>(0, _trash2Default.default));
-parcelHelpers.export(exports, "Trash3Fill", ()=>(0, _trash3FillDefault.default));
-parcelHelpers.export(exports, "Trash3", ()=>(0, _trash3Default.default));
-parcelHelpers.export(exports, "TreeFill", ()=>(0, _treeFillDefault.default));
-parcelHelpers.export(exports, "Tree", ()=>(0, _treeDefault.default));
-parcelHelpers.export(exports, "Trello", ()=>(0, _trelloDefault.default));
-parcelHelpers.export(exports, "TriangleFill", ()=>(0, _triangleFillDefault.default));
-parcelHelpers.export(exports, "TriangleHalf", ()=>(0, _triangleHalfDefault.default));
-parcelHelpers.export(exports, "Triangle", ()=>(0, _triangleDefault.default));
-parcelHelpers.export(exports, "TrophyFill", ()=>(0, _trophyFillDefault.default));
-parcelHelpers.export(exports, "Trophy", ()=>(0, _trophyDefault.default));
-parcelHelpers.export(exports, "TropicalStorm", ()=>(0, _tropicalStormDefault.default));
-parcelHelpers.export(exports, "TruckFlatbed", ()=>(0, _truckFlatbedDefault.default));
-parcelHelpers.export(exports, "TruckFrontFill", ()=>(0, _truckFrontFillDefault.default));
-parcelHelpers.export(exports, "TruckFront", ()=>(0, _truckFrontDefault.default));
-parcelHelpers.export(exports, "Truck", ()=>(0, _truckDefault.default));
-parcelHelpers.export(exports, "Tsunami", ()=>(0, _tsunamiDefault.default));
-parcelHelpers.export(exports, "TvFill", ()=>(0, _tvFillDefault.default));
-parcelHelpers.export(exports, "Tv", ()=>(0, _tvDefault.default));
-parcelHelpers.export(exports, "Twitch", ()=>(0, _twitchDefault.default));
-parcelHelpers.export(exports, "TwitterX", ()=>(0, _twitterXDefault.default));
-parcelHelpers.export(exports, "Twitter", ()=>(0, _twitterDefault.default));
-parcelHelpers.export(exports, "TypeBold", ()=>(0, _typeBoldDefault.default));
-parcelHelpers.export(exports, "TypeH1", ()=>(0, _typeH1Default.default));
-parcelHelpers.export(exports, "TypeH2", ()=>(0, _typeH2Default.default));
-parcelHelpers.export(exports, "TypeH3", ()=>(0, _typeH3Default.default));
-parcelHelpers.export(exports, "TypeH4", ()=>(0, _typeH4Default.default));
-parcelHelpers.export(exports, "TypeH5", ()=>(0, _typeH5Default.default));
-parcelHelpers.export(exports, "TypeH6", ()=>(0, _typeH6Default.default));
-parcelHelpers.export(exports, "TypeItalic", ()=>(0, _typeItalicDefault.default));
-parcelHelpers.export(exports, "TypeStrikethrough", ()=>(0, _typeStrikethroughDefault.default));
-parcelHelpers.export(exports, "TypeUnderline", ()=>(0, _typeUnderlineDefault.default));
-parcelHelpers.export(exports, "Type", ()=>(0, _typeDefault.default));
-parcelHelpers.export(exports, "Ubuntu", ()=>(0, _ubuntuDefault.default));
-parcelHelpers.export(exports, "UiChecksGrid", ()=>(0, _uiChecksGridDefault.default));
-parcelHelpers.export(exports, "UiChecks", ()=>(0, _uiChecksDefault.default));
-parcelHelpers.export(exports, "UiRadiosGrid", ()=>(0, _uiRadiosGridDefault.default));
-parcelHelpers.export(exports, "UiRadios", ()=>(0, _uiRadiosDefault.default));
-parcelHelpers.export(exports, "UmbrellaFill", ()=>(0, _umbrellaFillDefault.default));
-parcelHelpers.export(exports, "Umbrella", ()=>(0, _umbrellaDefault.default));
-parcelHelpers.export(exports, "Unindent", ()=>(0, _unindentDefault.default));
-parcelHelpers.export(exports, "Union", ()=>(0, _unionDefault.default));
-parcelHelpers.export(exports, "Unity", ()=>(0, _unityDefault.default));
-parcelHelpers.export(exports, "UniversalAccessCircle", ()=>(0, _universalAccessCircleDefault.default));
-parcelHelpers.export(exports, "UniversalAccess", ()=>(0, _universalAccessDefault.default));
-parcelHelpers.export(exports, "UnlockFill", ()=>(0, _unlockFillDefault.default));
-parcelHelpers.export(exports, "Unlock", ()=>(0, _unlockDefault.default));
-parcelHelpers.export(exports, "UpcScan", ()=>(0, _upcScanDefault.default));
-parcelHelpers.export(exports, "Upc", ()=>(0, _upcDefault.default));
-parcelHelpers.export(exports, "Upload", ()=>(0, _uploadDefault.default));
-parcelHelpers.export(exports, "UsbCFill", ()=>(0, _usbCFillDefault.default));
-parcelHelpers.export(exports, "UsbC", ()=>(0, _usbCDefault.default));
-parcelHelpers.export(exports, "UsbDriveFill", ()=>(0, _usbDriveFillDefault.default));
-parcelHelpers.export(exports, "UsbDrive", ()=>(0, _usbDriveDefault.default));
-parcelHelpers.export(exports, "UsbFill", ()=>(0, _usbFillDefault.default));
-parcelHelpers.export(exports, "UsbMicroFill", ()=>(0, _usbMicroFillDefault.default));
-parcelHelpers.export(exports, "UsbMicro", ()=>(0, _usbMicroDefault.default));
-parcelHelpers.export(exports, "UsbMiniFill", ()=>(0, _usbMiniFillDefault.default));
-parcelHelpers.export(exports, "UsbMini", ()=>(0, _usbMiniDefault.default));
-parcelHelpers.export(exports, "UsbPlugFill", ()=>(0, _usbPlugFillDefault.default));
-parcelHelpers.export(exports, "UsbPlug", ()=>(0, _usbPlugDefault.default));
-parcelHelpers.export(exports, "UsbSymbol", ()=>(0, _usbSymbolDefault.default));
-parcelHelpers.export(exports, "Usb", ()=>(0, _usbDefault.default));
-parcelHelpers.export(exports, "Valentine", ()=>(0, _valentineDefault.default));
-parcelHelpers.export(exports, "Valentine2", ()=>(0, _valentine2Default.default));
-parcelHelpers.export(exports, "VectorPen", ()=>(0, _vectorPenDefault.default));
-parcelHelpers.export(exports, "ViewList", ()=>(0, _viewListDefault.default));
-parcelHelpers.export(exports, "ViewStacked", ()=>(0, _viewStackedDefault.default));
-parcelHelpers.export(exports, "Vignette", ()=>(0, _vignetteDefault.default));
-parcelHelpers.export(exports, "Vimeo", ()=>(0, _vimeoDefault.default));
-parcelHelpers.export(exports, "VinylFill", ()=>(0, _vinylFillDefault.default));
-parcelHelpers.export(exports, "Vinyl", ()=>(0, _vinylDefault.default));
-parcelHelpers.export(exports, "Virus", ()=>(0, _virusDefault.default));
-parcelHelpers.export(exports, "Virus2", ()=>(0, _virus2Default.default));
-parcelHelpers.export(exports, "Voicemail", ()=>(0, _voicemailDefault.default));
-parcelHelpers.export(exports, "VolumeDownFill", ()=>(0, _volumeDownFillDefault.default));
-parcelHelpers.export(exports, "VolumeDown", ()=>(0, _volumeDownDefault.default));
-parcelHelpers.export(exports, "VolumeMuteFill", ()=>(0, _volumeMuteFillDefault.default));
-parcelHelpers.export(exports, "VolumeMute", ()=>(0, _volumeMuteDefault.default));
-parcelHelpers.export(exports, "VolumeOffFill", ()=>(0, _volumeOffFillDefault.default));
-parcelHelpers.export(exports, "VolumeOff", ()=>(0, _volumeOffDefault.default));
-parcelHelpers.export(exports, "VolumeUpFill", ()=>(0, _volumeUpFillDefault.default));
-parcelHelpers.export(exports, "VolumeUp", ()=>(0, _volumeUpDefault.default));
-parcelHelpers.export(exports, "Vr", ()=>(0, _vrDefault.default));
-parcelHelpers.export(exports, "WalletFill", ()=>(0, _walletFillDefault.default));
-parcelHelpers.export(exports, "Wallet", ()=>(0, _walletDefault.default));
-parcelHelpers.export(exports, "Wallet2", ()=>(0, _wallet2Default.default));
-parcelHelpers.export(exports, "Watch", ()=>(0, _watchDefault.default));
-parcelHelpers.export(exports, "Water", ()=>(0, _waterDefault.default));
-parcelHelpers.export(exports, "WebcamFill", ()=>(0, _webcamFillDefault.default));
-parcelHelpers.export(exports, "Webcam", ()=>(0, _webcamDefault.default));
-parcelHelpers.export(exports, "Wechat", ()=>(0, _wechatDefault.default));
-parcelHelpers.export(exports, "Whatsapp", ()=>(0, _whatsappDefault.default));
-parcelHelpers.export(exports, "Wifi1", ()=>(0, _wifi1Default.default));
-parcelHelpers.export(exports, "Wifi2", ()=>(0, _wifi2Default.default));
-parcelHelpers.export(exports, "WifiOff", ()=>(0, _wifiOffDefault.default));
-parcelHelpers.export(exports, "Wifi", ()=>(0, _wifiDefault.default));
-parcelHelpers.export(exports, "Wikipedia", ()=>(0, _wikipediaDefault.default));
-parcelHelpers.export(exports, "Wind", ()=>(0, _windDefault.default));
-parcelHelpers.export(exports, "WindowDash", ()=>(0, _windowDashDefault.default));
-parcelHelpers.export(exports, "WindowDesktop", ()=>(0, _windowDesktopDefault.default));
-parcelHelpers.export(exports, "WindowDock", ()=>(0, _windowDockDefault.default));
-parcelHelpers.export(exports, "WindowFullscreen", ()=>(0, _windowFullscreenDefault.default));
-parcelHelpers.export(exports, "WindowPlus", ()=>(0, _windowPlusDefault.default));
-parcelHelpers.export(exports, "WindowSidebar", ()=>(0, _windowSidebarDefault.default));
-parcelHelpers.export(exports, "WindowSplit", ()=>(0, _windowSplitDefault.default));
-parcelHelpers.export(exports, "WindowStack", ()=>(0, _windowStackDefault.default));
-parcelHelpers.export(exports, "WindowX", ()=>(0, _windowXDefault.default));
-parcelHelpers.export(exports, "Window", ()=>(0, _windowDefault.default));
-parcelHelpers.export(exports, "Windows", ()=>(0, _windowsDefault.default));
-parcelHelpers.export(exports, "Wordpress", ()=>(0, _wordpressDefault.default));
-parcelHelpers.export(exports, "WrenchAdjustableCircleFill", ()=>(0, _wrenchAdjustableCircleFillDefault.default));
-parcelHelpers.export(exports, "WrenchAdjustableCircle", ()=>(0, _wrenchAdjustableCircleDefault.default));
-parcelHelpers.export(exports, "WrenchAdjustable", ()=>(0, _wrenchAdjustableDefault.default));
-parcelHelpers.export(exports, "Wrench", ()=>(0, _wrenchDefault.default));
-parcelHelpers.export(exports, "XCircleFill", ()=>(0, _xCircleFillDefault.default));
-parcelHelpers.export(exports, "XCircle", ()=>(0, _xCircleDefault.default));
-parcelHelpers.export(exports, "XDiamondFill", ()=>(0, _xDiamondFillDefault.default));
-parcelHelpers.export(exports, "XDiamond", ()=>(0, _xDiamondDefault.default));
-parcelHelpers.export(exports, "XLg", ()=>(0, _xLgDefault.default));
-parcelHelpers.export(exports, "XOctagonFill", ()=>(0, _xOctagonFillDefault.default));
-parcelHelpers.export(exports, "XOctagon", ()=>(0, _xOctagonDefault.default));
-parcelHelpers.export(exports, "XSquareFill", ()=>(0, _xSquareFillDefault.default));
-parcelHelpers.export(exports, "XSquare", ()=>(0, _xSquareDefault.default));
-parcelHelpers.export(exports, "X", ()=>(0, _xDefault.default));
-parcelHelpers.export(exports, "Xbox", ()=>(0, _xboxDefault.default));
-parcelHelpers.export(exports, "Yelp", ()=>(0, _yelpDefault.default));
-parcelHelpers.export(exports, "YinYang", ()=>(0, _yinYangDefault.default));
-parcelHelpers.export(exports, "Youtube", ()=>(0, _youtubeDefault.default));
-parcelHelpers.export(exports, "ZoomIn", ()=>(0, _zoomInDefault.default));
-parcelHelpers.export(exports, "ZoomOut", ()=>(0, _zoomOutDefault.default));
-var _0CircleFill = require("./icons/0-circle-fill");
-var _0CircleFillDefault = parcelHelpers.interopDefault(_0CircleFill);
-var _0Circle = require("./icons/0-circle");
-var _0CircleDefault = parcelHelpers.interopDefault(_0Circle);
-var _0SquareFill = require("./icons/0-square-fill");
-var _0SquareFillDefault = parcelHelpers.interopDefault(_0SquareFill);
-var _0Square = require("./icons/0-square");
-var _0SquareDefault = parcelHelpers.interopDefault(_0Square);
-var _1CircleFill = require("./icons/1-circle-fill");
-var _1CircleFillDefault = parcelHelpers.interopDefault(_1CircleFill);
-var _1Circle = require("./icons/1-circle");
-var _1CircleDefault = parcelHelpers.interopDefault(_1Circle);
-var _1SquareFill = require("./icons/1-square-fill");
-var _1SquareFillDefault = parcelHelpers.interopDefault(_1SquareFill);
-var _1Square = require("./icons/1-square");
-var _1SquareDefault = parcelHelpers.interopDefault(_1Square);
-var _123 = require("./icons/123");
-var _123Default = parcelHelpers.interopDefault(_123);
-var _2CircleFill = require("./icons/2-circle-fill");
-var _2CircleFillDefault = parcelHelpers.interopDefault(_2CircleFill);
-var _2Circle = require("./icons/2-circle");
-var _2CircleDefault = parcelHelpers.interopDefault(_2Circle);
-var _2SquareFill = require("./icons/2-square-fill");
-var _2SquareFillDefault = parcelHelpers.interopDefault(_2SquareFill);
-var _2Square = require("./icons/2-square");
-var _2SquareDefault = parcelHelpers.interopDefault(_2Square);
-var _3CircleFill = require("./icons/3-circle-fill");
-var _3CircleFillDefault = parcelHelpers.interopDefault(_3CircleFill);
-var _3Circle = require("./icons/3-circle");
-var _3CircleDefault = parcelHelpers.interopDefault(_3Circle);
-var _3SquareFill = require("./icons/3-square-fill");
-var _3SquareFillDefault = parcelHelpers.interopDefault(_3SquareFill);
-var _3Square = require("./icons/3-square");
-var _3SquareDefault = parcelHelpers.interopDefault(_3Square);
-var _4CircleFill = require("./icons/4-circle-fill");
-var _4CircleFillDefault = parcelHelpers.interopDefault(_4CircleFill);
-var _4Circle = require("./icons/4-circle");
-var _4CircleDefault = parcelHelpers.interopDefault(_4Circle);
-var _4SquareFill = require("./icons/4-square-fill");
-var _4SquareFillDefault = parcelHelpers.interopDefault(_4SquareFill);
-var _4Square = require("./icons/4-square");
-var _4SquareDefault = parcelHelpers.interopDefault(_4Square);
-var _5CircleFill = require("./icons/5-circle-fill");
-var _5CircleFillDefault = parcelHelpers.interopDefault(_5CircleFill);
-var _5Circle = require("./icons/5-circle");
-var _5CircleDefault = parcelHelpers.interopDefault(_5Circle);
-var _5SquareFill = require("./icons/5-square-fill");
-var _5SquareFillDefault = parcelHelpers.interopDefault(_5SquareFill);
-var _5Square = require("./icons/5-square");
-var _5SquareDefault = parcelHelpers.interopDefault(_5Square);
-var _6CircleFill = require("./icons/6-circle-fill");
-var _6CircleFillDefault = parcelHelpers.interopDefault(_6CircleFill);
-var _6Circle = require("./icons/6-circle");
-var _6CircleDefault = parcelHelpers.interopDefault(_6Circle);
-var _6SquareFill = require("./icons/6-square-fill");
-var _6SquareFillDefault = parcelHelpers.interopDefault(_6SquareFill);
-var _6Square = require("./icons/6-square");
-var _6SquareDefault = parcelHelpers.interopDefault(_6Square);
-var _7CircleFill = require("./icons/7-circle-fill");
-var _7CircleFillDefault = parcelHelpers.interopDefault(_7CircleFill);
-var _7Circle = require("./icons/7-circle");
-var _7CircleDefault = parcelHelpers.interopDefault(_7Circle);
-var _7SquareFill = require("./icons/7-square-fill");
-var _7SquareFillDefault = parcelHelpers.interopDefault(_7SquareFill);
-var _7Square = require("./icons/7-square");
-var _7SquareDefault = parcelHelpers.interopDefault(_7Square);
-var _8CircleFill = require("./icons/8-circle-fill");
-var _8CircleFillDefault = parcelHelpers.interopDefault(_8CircleFill);
-var _8Circle = require("./icons/8-circle");
-var _8CircleDefault = parcelHelpers.interopDefault(_8Circle);
-var _8SquareFill = require("./icons/8-square-fill");
-var _8SquareFillDefault = parcelHelpers.interopDefault(_8SquareFill);
-var _8Square = require("./icons/8-square");
-var _8SquareDefault = parcelHelpers.interopDefault(_8Square);
-var _9CircleFill = require("./icons/9-circle-fill");
-var _9CircleFillDefault = parcelHelpers.interopDefault(_9CircleFill);
-var _9Circle = require("./icons/9-circle");
-var _9CircleDefault = parcelHelpers.interopDefault(_9Circle);
-var _9SquareFill = require("./icons/9-square-fill");
-var _9SquareFillDefault = parcelHelpers.interopDefault(_9SquareFill);
-var _9Square = require("./icons/9-square");
-var _9SquareDefault = parcelHelpers.interopDefault(_9Square);
-var _activity = require("./icons/activity");
-var _activityDefault = parcelHelpers.interopDefault(_activity);
-var _airplaneEnginesFill = require("./icons/airplane-engines-fill");
-var _airplaneEnginesFillDefault = parcelHelpers.interopDefault(_airplaneEnginesFill);
-var _airplaneEngines = require("./icons/airplane-engines");
-var _airplaneEnginesDefault = parcelHelpers.interopDefault(_airplaneEngines);
-var _airplaneFill = require("./icons/airplane-fill");
-var _airplaneFillDefault = parcelHelpers.interopDefault(_airplaneFill);
-var _airplane = require("./icons/airplane");
-var _airplaneDefault = parcelHelpers.interopDefault(_airplane);
-var _alarmFill = require("./icons/alarm-fill");
-var _alarmFillDefault = parcelHelpers.interopDefault(_alarmFill);
-var _alarm = require("./icons/alarm");
-var _alarmDefault = parcelHelpers.interopDefault(_alarm);
-var _alexa = require("./icons/alexa");
-var _alexaDefault = parcelHelpers.interopDefault(_alexa);
-var _alignBottom = require("./icons/align-bottom");
-var _alignBottomDefault = parcelHelpers.interopDefault(_alignBottom);
-var _alignCenter = require("./icons/align-center");
-var _alignCenterDefault = parcelHelpers.interopDefault(_alignCenter);
-var _alignEnd = require("./icons/align-end");
-var _alignEndDefault = parcelHelpers.interopDefault(_alignEnd);
-var _alignMiddle = require("./icons/align-middle");
-var _alignMiddleDefault = parcelHelpers.interopDefault(_alignMiddle);
-var _alignStart = require("./icons/align-start");
-var _alignStartDefault = parcelHelpers.interopDefault(_alignStart);
-var _alignTop = require("./icons/align-top");
-var _alignTopDefault = parcelHelpers.interopDefault(_alignTop);
-var _alipay = require("./icons/alipay");
-var _alipayDefault = parcelHelpers.interopDefault(_alipay);
-var _alphabetUppercase = require("./icons/alphabet-uppercase");
-var _alphabetUppercaseDefault = parcelHelpers.interopDefault(_alphabetUppercase);
-var _alphabet = require("./icons/alphabet");
-var _alphabetDefault = parcelHelpers.interopDefault(_alphabet);
-var _alt = require("./icons/alt");
-var _altDefault = parcelHelpers.interopDefault(_alt);
-var _amazon = require("./icons/amazon");
-var _amazonDefault = parcelHelpers.interopDefault(_amazon);
-var _amd = require("./icons/amd");
-var _amdDefault = parcelHelpers.interopDefault(_amd);
-var _android = require("./icons/android");
-var _androidDefault = parcelHelpers.interopDefault(_android);
-var _android2 = require("./icons/android2");
-var _android2Default = parcelHelpers.interopDefault(_android2);
-var _appIndicator = require("./icons/app-indicator");
-var _appIndicatorDefault = parcelHelpers.interopDefault(_appIndicator);
-var _app = require("./icons/app");
-var _appDefault = parcelHelpers.interopDefault(_app);
-var _apple = require("./icons/apple");
-var _appleDefault = parcelHelpers.interopDefault(_apple);
-var _archiveFill = require("./icons/archive-fill");
-var _archiveFillDefault = parcelHelpers.interopDefault(_archiveFill);
-var _archive = require("./icons/archive");
-var _archiveDefault = parcelHelpers.interopDefault(_archive);
-var _arrow90DegDown = require("./icons/arrow-90deg-down");
-var _arrow90DegDownDefault = parcelHelpers.interopDefault(_arrow90DegDown);
-var _arrow90DegLeft = require("./icons/arrow-90deg-left");
-var _arrow90DegLeftDefault = parcelHelpers.interopDefault(_arrow90DegLeft);
-var _arrow90DegRight = require("./icons/arrow-90deg-right");
-var _arrow90DegRightDefault = parcelHelpers.interopDefault(_arrow90DegRight);
-var _arrow90DegUp = require("./icons/arrow-90deg-up");
-var _arrow90DegUpDefault = parcelHelpers.interopDefault(_arrow90DegUp);
-var _arrowBarDown = require("./icons/arrow-bar-down");
-var _arrowBarDownDefault = parcelHelpers.interopDefault(_arrowBarDown);
-var _arrowBarLeft = require("./icons/arrow-bar-left");
-var _arrowBarLeftDefault = parcelHelpers.interopDefault(_arrowBarLeft);
-var _arrowBarRight = require("./icons/arrow-bar-right");
-var _arrowBarRightDefault = parcelHelpers.interopDefault(_arrowBarRight);
-var _arrowBarUp = require("./icons/arrow-bar-up");
-var _arrowBarUpDefault = parcelHelpers.interopDefault(_arrowBarUp);
-var _arrowClockwise = require("./icons/arrow-clockwise");
-var _arrowClockwiseDefault = parcelHelpers.interopDefault(_arrowClockwise);
-var _arrowCounterclockwise = require("./icons/arrow-counterclockwise");
-var _arrowCounterclockwiseDefault = parcelHelpers.interopDefault(_arrowCounterclockwise);
-var _arrowDownCircleFill = require("./icons/arrow-down-circle-fill");
-var _arrowDownCircleFillDefault = parcelHelpers.interopDefault(_arrowDownCircleFill);
-var _arrowDownCircle = require("./icons/arrow-down-circle");
-var _arrowDownCircleDefault = parcelHelpers.interopDefault(_arrowDownCircle);
-var _arrowDownLeftCircleFill = require("./icons/arrow-down-left-circle-fill");
-var _arrowDownLeftCircleFillDefault = parcelHelpers.interopDefault(_arrowDownLeftCircleFill);
-var _arrowDownLeftCircle = require("./icons/arrow-down-left-circle");
-var _arrowDownLeftCircleDefault = parcelHelpers.interopDefault(_arrowDownLeftCircle);
-var _arrowDownLeftSquareFill = require("./icons/arrow-down-left-square-fill");
-var _arrowDownLeftSquareFillDefault = parcelHelpers.interopDefault(_arrowDownLeftSquareFill);
-var _arrowDownLeftSquare = require("./icons/arrow-down-left-square");
-var _arrowDownLeftSquareDefault = parcelHelpers.interopDefault(_arrowDownLeftSquare);
-var _arrowDownLeft = require("./icons/arrow-down-left");
-var _arrowDownLeftDefault = parcelHelpers.interopDefault(_arrowDownLeft);
-var _arrowDownRightCircleFill = require("./icons/arrow-down-right-circle-fill");
-var _arrowDownRightCircleFillDefault = parcelHelpers.interopDefault(_arrowDownRightCircleFill);
-var _arrowDownRightCircle = require("./icons/arrow-down-right-circle");
-var _arrowDownRightCircleDefault = parcelHelpers.interopDefault(_arrowDownRightCircle);
-var _arrowDownRightSquareFill = require("./icons/arrow-down-right-square-fill");
-var _arrowDownRightSquareFillDefault = parcelHelpers.interopDefault(_arrowDownRightSquareFill);
-var _arrowDownRightSquare = require("./icons/arrow-down-right-square");
-var _arrowDownRightSquareDefault = parcelHelpers.interopDefault(_arrowDownRightSquare);
-var _arrowDownRight = require("./icons/arrow-down-right");
-var _arrowDownRightDefault = parcelHelpers.interopDefault(_arrowDownRight);
-var _arrowDownShort = require("./icons/arrow-down-short");
-var _arrowDownShortDefault = parcelHelpers.interopDefault(_arrowDownShort);
-var _arrowDownSquareFill = require("./icons/arrow-down-square-fill");
-var _arrowDownSquareFillDefault = parcelHelpers.interopDefault(_arrowDownSquareFill);
-var _arrowDownSquare = require("./icons/arrow-down-square");
-var _arrowDownSquareDefault = parcelHelpers.interopDefault(_arrowDownSquare);
-var _arrowDownUp = require("./icons/arrow-down-up");
-var _arrowDownUpDefault = parcelHelpers.interopDefault(_arrowDownUp);
-var _arrowDown = require("./icons/arrow-down");
-var _arrowDownDefault = parcelHelpers.interopDefault(_arrowDown);
-var _arrowLeftCircleFill = require("./icons/arrow-left-circle-fill");
-var _arrowLeftCircleFillDefault = parcelHelpers.interopDefault(_arrowLeftCircleFill);
-var _arrowLeftCircle = require("./icons/arrow-left-circle");
-var _arrowLeftCircleDefault = parcelHelpers.interopDefault(_arrowLeftCircle);
-var _arrowLeftRight = require("./icons/arrow-left-right");
-var _arrowLeftRightDefault = parcelHelpers.interopDefault(_arrowLeftRight);
-var _arrowLeftShort = require("./icons/arrow-left-short");
-var _arrowLeftShortDefault = parcelHelpers.interopDefault(_arrowLeftShort);
-var _arrowLeftSquareFill = require("./icons/arrow-left-square-fill");
-var _arrowLeftSquareFillDefault = parcelHelpers.interopDefault(_arrowLeftSquareFill);
-var _arrowLeftSquare = require("./icons/arrow-left-square");
-var _arrowLeftSquareDefault = parcelHelpers.interopDefault(_arrowLeftSquare);
-var _arrowLeft = require("./icons/arrow-left");
-var _arrowLeftDefault = parcelHelpers.interopDefault(_arrowLeft);
-var _arrowRepeat = require("./icons/arrow-repeat");
-var _arrowRepeatDefault = parcelHelpers.interopDefault(_arrowRepeat);
-var _arrowReturnLeft = require("./icons/arrow-return-left");
-var _arrowReturnLeftDefault = parcelHelpers.interopDefault(_arrowReturnLeft);
-var _arrowReturnRight = require("./icons/arrow-return-right");
-var _arrowReturnRightDefault = parcelHelpers.interopDefault(_arrowReturnRight);
-var _arrowRightCircleFill = require("./icons/arrow-right-circle-fill");
-var _arrowRightCircleFillDefault = parcelHelpers.interopDefault(_arrowRightCircleFill);
-var _arrowRightCircle = require("./icons/arrow-right-circle");
-var _arrowRightCircleDefault = parcelHelpers.interopDefault(_arrowRightCircle);
-var _arrowRightShort = require("./icons/arrow-right-short");
-var _arrowRightShortDefault = parcelHelpers.interopDefault(_arrowRightShort);
-var _arrowRightSquareFill = require("./icons/arrow-right-square-fill");
-var _arrowRightSquareFillDefault = parcelHelpers.interopDefault(_arrowRightSquareFill);
-var _arrowRightSquare = require("./icons/arrow-right-square");
-var _arrowRightSquareDefault = parcelHelpers.interopDefault(_arrowRightSquare);
-var _arrowRight = require("./icons/arrow-right");
-var _arrowRightDefault = parcelHelpers.interopDefault(_arrowRight);
-var _arrowThroughHeartFill = require("./icons/arrow-through-heart-fill");
-var _arrowThroughHeartFillDefault = parcelHelpers.interopDefault(_arrowThroughHeartFill);
-var _arrowThroughHeart = require("./icons/arrow-through-heart");
-var _arrowThroughHeartDefault = parcelHelpers.interopDefault(_arrowThroughHeart);
-var _arrowUpCircleFill = require("./icons/arrow-up-circle-fill");
-var _arrowUpCircleFillDefault = parcelHelpers.interopDefault(_arrowUpCircleFill);
-var _arrowUpCircle = require("./icons/arrow-up-circle");
-var _arrowUpCircleDefault = parcelHelpers.interopDefault(_arrowUpCircle);
-var _arrowUpLeftCircleFill = require("./icons/arrow-up-left-circle-fill");
-var _arrowUpLeftCircleFillDefault = parcelHelpers.interopDefault(_arrowUpLeftCircleFill);
-var _arrowUpLeftCircle = require("./icons/arrow-up-left-circle");
-var _arrowUpLeftCircleDefault = parcelHelpers.interopDefault(_arrowUpLeftCircle);
-var _arrowUpLeftSquareFill = require("./icons/arrow-up-left-square-fill");
-var _arrowUpLeftSquareFillDefault = parcelHelpers.interopDefault(_arrowUpLeftSquareFill);
-var _arrowUpLeftSquare = require("./icons/arrow-up-left-square");
-var _arrowUpLeftSquareDefault = parcelHelpers.interopDefault(_arrowUpLeftSquare);
-var _arrowUpLeft = require("./icons/arrow-up-left");
-var _arrowUpLeftDefault = parcelHelpers.interopDefault(_arrowUpLeft);
-var _arrowUpRightCircleFill = require("./icons/arrow-up-right-circle-fill");
-var _arrowUpRightCircleFillDefault = parcelHelpers.interopDefault(_arrowUpRightCircleFill);
-var _arrowUpRightCircle = require("./icons/arrow-up-right-circle");
-var _arrowUpRightCircleDefault = parcelHelpers.interopDefault(_arrowUpRightCircle);
-var _arrowUpRightSquareFill = require("./icons/arrow-up-right-square-fill");
-var _arrowUpRightSquareFillDefault = parcelHelpers.interopDefault(_arrowUpRightSquareFill);
-var _arrowUpRightSquare = require("./icons/arrow-up-right-square");
-var _arrowUpRightSquareDefault = parcelHelpers.interopDefault(_arrowUpRightSquare);
-var _arrowUpRight = require("./icons/arrow-up-right");
-var _arrowUpRightDefault = parcelHelpers.interopDefault(_arrowUpRight);
-var _arrowUpShort = require("./icons/arrow-up-short");
-var _arrowUpShortDefault = parcelHelpers.interopDefault(_arrowUpShort);
-var _arrowUpSquareFill = require("./icons/arrow-up-square-fill");
-var _arrowUpSquareFillDefault = parcelHelpers.interopDefault(_arrowUpSquareFill);
-var _arrowUpSquare = require("./icons/arrow-up-square");
-var _arrowUpSquareDefault = parcelHelpers.interopDefault(_arrowUpSquare);
-var _arrowUp = require("./icons/arrow-up");
-var _arrowUpDefault = parcelHelpers.interopDefault(_arrowUp);
-var _arrowsAngleContract = require("./icons/arrows-angle-contract");
-var _arrowsAngleContractDefault = parcelHelpers.interopDefault(_arrowsAngleContract);
-var _arrowsAngleExpand = require("./icons/arrows-angle-expand");
-var _arrowsAngleExpandDefault = parcelHelpers.interopDefault(_arrowsAngleExpand);
-var _arrowsCollapseVertical = require("./icons/arrows-collapse-vertical");
-var _arrowsCollapseVerticalDefault = parcelHelpers.interopDefault(_arrowsCollapseVertical);
-var _arrowsCollapse = require("./icons/arrows-collapse");
-var _arrowsCollapseDefault = parcelHelpers.interopDefault(_arrowsCollapse);
-var _arrowsExpandVertical = require("./icons/arrows-expand-vertical");
-var _arrowsExpandVerticalDefault = parcelHelpers.interopDefault(_arrowsExpandVertical);
-var _arrowsExpand = require("./icons/arrows-expand");
-var _arrowsExpandDefault = parcelHelpers.interopDefault(_arrowsExpand);
-var _arrowsFullscreen = require("./icons/arrows-fullscreen");
-var _arrowsFullscreenDefault = parcelHelpers.interopDefault(_arrowsFullscreen);
-var _arrowsMove = require("./icons/arrows-move");
-var _arrowsMoveDefault = parcelHelpers.interopDefault(_arrowsMove);
-var _arrowsVertical = require("./icons/arrows-vertical");
-var _arrowsVerticalDefault = parcelHelpers.interopDefault(_arrowsVertical);
-var _arrows = require("./icons/arrows");
-var _arrowsDefault = parcelHelpers.interopDefault(_arrows);
-var _aspectRatioFill = require("./icons/aspect-ratio-fill");
-var _aspectRatioFillDefault = parcelHelpers.interopDefault(_aspectRatioFill);
-var _aspectRatio = require("./icons/aspect-ratio");
-var _aspectRatioDefault = parcelHelpers.interopDefault(_aspectRatio);
-var _asterisk = require("./icons/asterisk");
-var _asteriskDefault = parcelHelpers.interopDefault(_asterisk);
-var _at = require("./icons/at");
-var _atDefault = parcelHelpers.interopDefault(_at);
-var _awardFill = require("./icons/award-fill");
-var _awardFillDefault = parcelHelpers.interopDefault(_awardFill);
-var _award = require("./icons/award");
-var _awardDefault = parcelHelpers.interopDefault(_award);
-var _back = require("./icons/back");
-var _backDefault = parcelHelpers.interopDefault(_back);
-var _backpackFill = require("./icons/backpack-fill");
-var _backpackFillDefault = parcelHelpers.interopDefault(_backpackFill);
-var _backpack = require("./icons/backpack");
-var _backpackDefault = parcelHelpers.interopDefault(_backpack);
-var _backpack2Fill = require("./icons/backpack2-fill");
-var _backpack2FillDefault = parcelHelpers.interopDefault(_backpack2Fill);
-var _backpack2 = require("./icons/backpack2");
-var _backpack2Default = parcelHelpers.interopDefault(_backpack2);
-var _backpack3Fill = require("./icons/backpack3-fill");
-var _backpack3FillDefault = parcelHelpers.interopDefault(_backpack3Fill);
-var _backpack3 = require("./icons/backpack3");
-var _backpack3Default = parcelHelpers.interopDefault(_backpack3);
-var _backpack4Fill = require("./icons/backpack4-fill");
-var _backpack4FillDefault = parcelHelpers.interopDefault(_backpack4Fill);
-var _backpack4 = require("./icons/backpack4");
-var _backpack4Default = parcelHelpers.interopDefault(_backpack4);
-var _backspaceFill = require("./icons/backspace-fill");
-var _backspaceFillDefault = parcelHelpers.interopDefault(_backspaceFill);
-var _backspaceReverseFill = require("./icons/backspace-reverse-fill");
-var _backspaceReverseFillDefault = parcelHelpers.interopDefault(_backspaceReverseFill);
-var _backspaceReverse = require("./icons/backspace-reverse");
-var _backspaceReverseDefault = parcelHelpers.interopDefault(_backspaceReverse);
-var _backspace = require("./icons/backspace");
-var _backspaceDefault = parcelHelpers.interopDefault(_backspace);
-var _badge3DFill = require("./icons/badge-3d-fill");
-var _badge3DFillDefault = parcelHelpers.interopDefault(_badge3DFill);
-var _badge3D = require("./icons/badge-3d");
-var _badge3DDefault = parcelHelpers.interopDefault(_badge3D);
-var _badge4KFill = require("./icons/badge-4k-fill");
-var _badge4KFillDefault = parcelHelpers.interopDefault(_badge4KFill);
-var _badge4K = require("./icons/badge-4k");
-var _badge4KDefault = parcelHelpers.interopDefault(_badge4K);
-var _badge8KFill = require("./icons/badge-8k-fill");
-var _badge8KFillDefault = parcelHelpers.interopDefault(_badge8KFill);
-var _badge8K = require("./icons/badge-8k");
-var _badge8KDefault = parcelHelpers.interopDefault(_badge8K);
-var _badgeAdFill = require("./icons/badge-ad-fill");
-var _badgeAdFillDefault = parcelHelpers.interopDefault(_badgeAdFill);
-var _badgeAd = require("./icons/badge-ad");
-var _badgeAdDefault = parcelHelpers.interopDefault(_badgeAd);
-var _badgeArFill = require("./icons/badge-ar-fill");
-var _badgeArFillDefault = parcelHelpers.interopDefault(_badgeArFill);
-var _badgeAr = require("./icons/badge-ar");
-var _badgeArDefault = parcelHelpers.interopDefault(_badgeAr);
-var _badgeCcFill = require("./icons/badge-cc-fill");
-var _badgeCcFillDefault = parcelHelpers.interopDefault(_badgeCcFill);
-var _badgeCc = require("./icons/badge-cc");
-var _badgeCcDefault = parcelHelpers.interopDefault(_badgeCc);
-var _badgeHdFill = require("./icons/badge-hd-fill");
-var _badgeHdFillDefault = parcelHelpers.interopDefault(_badgeHdFill);
-var _badgeHd = require("./icons/badge-hd");
-var _badgeHdDefault = parcelHelpers.interopDefault(_badgeHd);
-var _badgeSdFill = require("./icons/badge-sd-fill");
-var _badgeSdFillDefault = parcelHelpers.interopDefault(_badgeSdFill);
-var _badgeSd = require("./icons/badge-sd");
-var _badgeSdDefault = parcelHelpers.interopDefault(_badgeSd);
-var _badgeTmFill = require("./icons/badge-tm-fill");
-var _badgeTmFillDefault = parcelHelpers.interopDefault(_badgeTmFill);
-var _badgeTm = require("./icons/badge-tm");
-var _badgeTmDefault = parcelHelpers.interopDefault(_badgeTm);
-var _badgeVoFill = require("./icons/badge-vo-fill");
-var _badgeVoFillDefault = parcelHelpers.interopDefault(_badgeVoFill);
-var _badgeVo = require("./icons/badge-vo");
-var _badgeVoDefault = parcelHelpers.interopDefault(_badgeVo);
-var _badgeVrFill = require("./icons/badge-vr-fill");
-var _badgeVrFillDefault = parcelHelpers.interopDefault(_badgeVrFill);
-var _badgeVr = require("./icons/badge-vr");
-var _badgeVrDefault = parcelHelpers.interopDefault(_badgeVr);
-var _badgeWcFill = require("./icons/badge-wc-fill");
-var _badgeWcFillDefault = parcelHelpers.interopDefault(_badgeWcFill);
-var _badgeWc = require("./icons/badge-wc");
-var _badgeWcDefault = parcelHelpers.interopDefault(_badgeWc);
-var _bagCheckFill = require("./icons/bag-check-fill");
-var _bagCheckFillDefault = parcelHelpers.interopDefault(_bagCheckFill);
-var _bagCheck = require("./icons/bag-check");
-var _bagCheckDefault = parcelHelpers.interopDefault(_bagCheck);
-var _bagDashFill = require("./icons/bag-dash-fill");
-var _bagDashFillDefault = parcelHelpers.interopDefault(_bagDashFill);
-var _bagDash = require("./icons/bag-dash");
-var _bagDashDefault = parcelHelpers.interopDefault(_bagDash);
-var _bagFill = require("./icons/bag-fill");
-var _bagFillDefault = parcelHelpers.interopDefault(_bagFill);
-var _bagHeartFill = require("./icons/bag-heart-fill");
-var _bagHeartFillDefault = parcelHelpers.interopDefault(_bagHeartFill);
-var _bagHeart = require("./icons/bag-heart");
-var _bagHeartDefault = parcelHelpers.interopDefault(_bagHeart);
-var _bagPlusFill = require("./icons/bag-plus-fill");
-var _bagPlusFillDefault = parcelHelpers.interopDefault(_bagPlusFill);
-var _bagPlus = require("./icons/bag-plus");
-var _bagPlusDefault = parcelHelpers.interopDefault(_bagPlus);
-var _bagXFill = require("./icons/bag-x-fill");
-var _bagXFillDefault = parcelHelpers.interopDefault(_bagXFill);
-var _bagX = require("./icons/bag-x");
-var _bagXDefault = parcelHelpers.interopDefault(_bagX);
-var _bag = require("./icons/bag");
-var _bagDefault = parcelHelpers.interopDefault(_bag);
-var _balloonFill = require("./icons/balloon-fill");
-var _balloonFillDefault = parcelHelpers.interopDefault(_balloonFill);
-var _balloonHeartFill = require("./icons/balloon-heart-fill");
-var _balloonHeartFillDefault = parcelHelpers.interopDefault(_balloonHeartFill);
-var _balloonHeart = require("./icons/balloon-heart");
-var _balloonHeartDefault = parcelHelpers.interopDefault(_balloonHeart);
-var _balloon = require("./icons/balloon");
-var _balloonDefault = parcelHelpers.interopDefault(_balloon);
-var _banFill = require("./icons/ban-fill");
-var _banFillDefault = parcelHelpers.interopDefault(_banFill);
-var _ban = require("./icons/ban");
-var _banDefault = parcelHelpers.interopDefault(_ban);
-var _bandaidFill = require("./icons/bandaid-fill");
-var _bandaidFillDefault = parcelHelpers.interopDefault(_bandaidFill);
-var _bandaid = require("./icons/bandaid");
-var _bandaidDefault = parcelHelpers.interopDefault(_bandaid);
-var _bank = require("./icons/bank");
-var _bankDefault = parcelHelpers.interopDefault(_bank);
-var _bank2 = require("./icons/bank2");
-var _bank2Default = parcelHelpers.interopDefault(_bank2);
-var _barChartFill = require("./icons/bar-chart-fill");
-var _barChartFillDefault = parcelHelpers.interopDefault(_barChartFill);
-var _barChartLineFill = require("./icons/bar-chart-line-fill");
-var _barChartLineFillDefault = parcelHelpers.interopDefault(_barChartLineFill);
-var _barChartLine = require("./icons/bar-chart-line");
-var _barChartLineDefault = parcelHelpers.interopDefault(_barChartLine);
-var _barChartSteps = require("./icons/bar-chart-steps");
-var _barChartStepsDefault = parcelHelpers.interopDefault(_barChartSteps);
-var _barChart = require("./icons/bar-chart");
-var _barChartDefault = parcelHelpers.interopDefault(_barChart);
-var _basketFill = require("./icons/basket-fill");
-var _basketFillDefault = parcelHelpers.interopDefault(_basketFill);
-var _basket = require("./icons/basket");
-var _basketDefault = parcelHelpers.interopDefault(_basket);
-var _basket2Fill = require("./icons/basket2-fill");
-var _basket2FillDefault = parcelHelpers.interopDefault(_basket2Fill);
-var _basket2 = require("./icons/basket2");
-var _basket2Default = parcelHelpers.interopDefault(_basket2);
-var _basket3Fill = require("./icons/basket3-fill");
-var _basket3FillDefault = parcelHelpers.interopDefault(_basket3Fill);
-var _basket3 = require("./icons/basket3");
-var _basket3Default = parcelHelpers.interopDefault(_basket3);
-var _batteryCharging = require("./icons/battery-charging");
-var _batteryChargingDefault = parcelHelpers.interopDefault(_batteryCharging);
-var _batteryFull = require("./icons/battery-full");
-var _batteryFullDefault = parcelHelpers.interopDefault(_batteryFull);
-var _batteryHalf = require("./icons/battery-half");
-var _batteryHalfDefault = parcelHelpers.interopDefault(_batteryHalf);
-var _battery = require("./icons/battery");
-var _batteryDefault = parcelHelpers.interopDefault(_battery);
-var _behance = require("./icons/behance");
-var _behanceDefault = parcelHelpers.interopDefault(_behance);
-var _bellFill = require("./icons/bell-fill");
-var _bellFillDefault = parcelHelpers.interopDefault(_bellFill);
-var _bellSlashFill = require("./icons/bell-slash-fill");
-var _bellSlashFillDefault = parcelHelpers.interopDefault(_bellSlashFill);
-var _bellSlash = require("./icons/bell-slash");
-var _bellSlashDefault = parcelHelpers.interopDefault(_bellSlash);
-var _bell = require("./icons/bell");
-var _bellDefault = parcelHelpers.interopDefault(_bell);
-var _bezier = require("./icons/bezier");
-var _bezierDefault = parcelHelpers.interopDefault(_bezier);
-var _bezier2 = require("./icons/bezier2");
-var _bezier2Default = parcelHelpers.interopDefault(_bezier2);
-var _bicycle = require("./icons/bicycle");
-var _bicycleDefault = parcelHelpers.interopDefault(_bicycle);
-var _bing = require("./icons/bing");
-var _bingDefault = parcelHelpers.interopDefault(_bing);
-var _binocularsFill = require("./icons/binoculars-fill");
-var _binocularsFillDefault = parcelHelpers.interopDefault(_binocularsFill);
-var _binoculars = require("./icons/binoculars");
-var _binocularsDefault = parcelHelpers.interopDefault(_binoculars);
-var _blockquoteLeft = require("./icons/blockquote-left");
-var _blockquoteLeftDefault = parcelHelpers.interopDefault(_blockquoteLeft);
-var _blockquoteRight = require("./icons/blockquote-right");
-var _blockquoteRightDefault = parcelHelpers.interopDefault(_blockquoteRight);
-var _bluetooth = require("./icons/bluetooth");
-var _bluetoothDefault = parcelHelpers.interopDefault(_bluetooth);
-var _bodyText = require("./icons/body-text");
-var _bodyTextDefault = parcelHelpers.interopDefault(_bodyText);
-var _bookFill = require("./icons/book-fill");
-var _bookFillDefault = parcelHelpers.interopDefault(_bookFill);
-var _bookHalf = require("./icons/book-half");
-var _bookHalfDefault = parcelHelpers.interopDefault(_bookHalf);
-var _book = require("./icons/book");
-var _bookDefault = parcelHelpers.interopDefault(_book);
-var _bookmarkCheckFill = require("./icons/bookmark-check-fill");
-var _bookmarkCheckFillDefault = parcelHelpers.interopDefault(_bookmarkCheckFill);
-var _bookmarkCheck = require("./icons/bookmark-check");
-var _bookmarkCheckDefault = parcelHelpers.interopDefault(_bookmarkCheck);
-var _bookmarkDashFill = require("./icons/bookmark-dash-fill");
-var _bookmarkDashFillDefault = parcelHelpers.interopDefault(_bookmarkDashFill);
-var _bookmarkDash = require("./icons/bookmark-dash");
-var _bookmarkDashDefault = parcelHelpers.interopDefault(_bookmarkDash);
-var _bookmarkFill = require("./icons/bookmark-fill");
-var _bookmarkFillDefault = parcelHelpers.interopDefault(_bookmarkFill);
-var _bookmarkHeartFill = require("./icons/bookmark-heart-fill");
-var _bookmarkHeartFillDefault = parcelHelpers.interopDefault(_bookmarkHeartFill);
-var _bookmarkHeart = require("./icons/bookmark-heart");
-var _bookmarkHeartDefault = parcelHelpers.interopDefault(_bookmarkHeart);
-var _bookmarkPlusFill = require("./icons/bookmark-plus-fill");
-var _bookmarkPlusFillDefault = parcelHelpers.interopDefault(_bookmarkPlusFill);
-var _bookmarkPlus = require("./icons/bookmark-plus");
-var _bookmarkPlusDefault = parcelHelpers.interopDefault(_bookmarkPlus);
-var _bookmarkStarFill = require("./icons/bookmark-star-fill");
-var _bookmarkStarFillDefault = parcelHelpers.interopDefault(_bookmarkStarFill);
-var _bookmarkStar = require("./icons/bookmark-star");
-var _bookmarkStarDefault = parcelHelpers.interopDefault(_bookmarkStar);
-var _bookmarkXFill = require("./icons/bookmark-x-fill");
-var _bookmarkXFillDefault = parcelHelpers.interopDefault(_bookmarkXFill);
-var _bookmarkX = require("./icons/bookmark-x");
-var _bookmarkXDefault = parcelHelpers.interopDefault(_bookmarkX);
-var _bookmark = require("./icons/bookmark");
-var _bookmarkDefault = parcelHelpers.interopDefault(_bookmark);
-var _bookmarksFill = require("./icons/bookmarks-fill");
-var _bookmarksFillDefault = parcelHelpers.interopDefault(_bookmarksFill);
-var _bookmarks = require("./icons/bookmarks");
-var _bookmarksDefault = parcelHelpers.interopDefault(_bookmarks);
-var _bookshelf = require("./icons/bookshelf");
-var _bookshelfDefault = parcelHelpers.interopDefault(_bookshelf);
-var _boomboxFill = require("./icons/boombox-fill");
-var _boomboxFillDefault = parcelHelpers.interopDefault(_boomboxFill);
-var _boombox = require("./icons/boombox");
-var _boomboxDefault = parcelHelpers.interopDefault(_boombox);
-var _bootstrapFill = require("./icons/bootstrap-fill");
-var _bootstrapFillDefault = parcelHelpers.interopDefault(_bootstrapFill);
-var _bootstrapReboot = require("./icons/bootstrap-reboot");
-var _bootstrapRebootDefault = parcelHelpers.interopDefault(_bootstrapReboot);
-var _bootstrap = require("./icons/bootstrap");
-var _bootstrapDefault = parcelHelpers.interopDefault(_bootstrap);
-var _borderAll = require("./icons/border-all");
-var _borderAllDefault = parcelHelpers.interopDefault(_borderAll);
-var _borderBottom = require("./icons/border-bottom");
-var _borderBottomDefault = parcelHelpers.interopDefault(_borderBottom);
-var _borderCenter = require("./icons/border-center");
-var _borderCenterDefault = parcelHelpers.interopDefault(_borderCenter);
-var _borderInner = require("./icons/border-inner");
-var _borderInnerDefault = parcelHelpers.interopDefault(_borderInner);
-var _borderLeft = require("./icons/border-left");
-var _borderLeftDefault = parcelHelpers.interopDefault(_borderLeft);
-var _borderMiddle = require("./icons/border-middle");
-var _borderMiddleDefault = parcelHelpers.interopDefault(_borderMiddle);
-var _borderOuter = require("./icons/border-outer");
-var _borderOuterDefault = parcelHelpers.interopDefault(_borderOuter);
-var _borderRight = require("./icons/border-right");
-var _borderRightDefault = parcelHelpers.interopDefault(_borderRight);
-var _borderStyle = require("./icons/border-style");
-var _borderStyleDefault = parcelHelpers.interopDefault(_borderStyle);
-var _borderTop = require("./icons/border-top");
-var _borderTopDefault = parcelHelpers.interopDefault(_borderTop);
-var _borderWidth = require("./icons/border-width");
-var _borderWidthDefault = parcelHelpers.interopDefault(_borderWidth);
-var _border = require("./icons/border");
-var _borderDefault = parcelHelpers.interopDefault(_border);
-var _boundingBoxCircles = require("./icons/bounding-box-circles");
-var _boundingBoxCirclesDefault = parcelHelpers.interopDefault(_boundingBoxCircles);
-var _boundingBox = require("./icons/bounding-box");
-var _boundingBoxDefault = parcelHelpers.interopDefault(_boundingBox);
-var _boxArrowDownLeft = require("./icons/box-arrow-down-left");
-var _boxArrowDownLeftDefault = parcelHelpers.interopDefault(_boxArrowDownLeft);
-var _boxArrowDownRight = require("./icons/box-arrow-down-right");
-var _boxArrowDownRightDefault = parcelHelpers.interopDefault(_boxArrowDownRight);
-var _boxArrowDown = require("./icons/box-arrow-down");
-var _boxArrowDownDefault = parcelHelpers.interopDefault(_boxArrowDown);
-var _boxArrowInDownLeft = require("./icons/box-arrow-in-down-left");
-var _boxArrowInDownLeftDefault = parcelHelpers.interopDefault(_boxArrowInDownLeft);
-var _boxArrowInDownRight = require("./icons/box-arrow-in-down-right");
-var _boxArrowInDownRightDefault = parcelHelpers.interopDefault(_boxArrowInDownRight);
-var _boxArrowInDown = require("./icons/box-arrow-in-down");
-var _boxArrowInDownDefault = parcelHelpers.interopDefault(_boxArrowInDown);
-var _boxArrowInLeft = require("./icons/box-arrow-in-left");
-var _boxArrowInLeftDefault = parcelHelpers.interopDefault(_boxArrowInLeft);
-var _boxArrowInRight = require("./icons/box-arrow-in-right");
-var _boxArrowInRightDefault = parcelHelpers.interopDefault(_boxArrowInRight);
-var _boxArrowInUpLeft = require("./icons/box-arrow-in-up-left");
-var _boxArrowInUpLeftDefault = parcelHelpers.interopDefault(_boxArrowInUpLeft);
-var _boxArrowInUpRight = require("./icons/box-arrow-in-up-right");
-var _boxArrowInUpRightDefault = parcelHelpers.interopDefault(_boxArrowInUpRight);
-var _boxArrowInUp = require("./icons/box-arrow-in-up");
-var _boxArrowInUpDefault = parcelHelpers.interopDefault(_boxArrowInUp);
-var _boxArrowLeft = require("./icons/box-arrow-left");
-var _boxArrowLeftDefault = parcelHelpers.interopDefault(_boxArrowLeft);
-var _boxArrowRight = require("./icons/box-arrow-right");
-var _boxArrowRightDefault = parcelHelpers.interopDefault(_boxArrowRight);
-var _boxArrowUpLeft = require("./icons/box-arrow-up-left");
-var _boxArrowUpLeftDefault = parcelHelpers.interopDefault(_boxArrowUpLeft);
-var _boxArrowUpRight = require("./icons/box-arrow-up-right");
-var _boxArrowUpRightDefault = parcelHelpers.interopDefault(_boxArrowUpRight);
-var _boxArrowUp = require("./icons/box-arrow-up");
-var _boxArrowUpDefault = parcelHelpers.interopDefault(_boxArrowUp);
-var _boxFill = require("./icons/box-fill");
-var _boxFillDefault = parcelHelpers.interopDefault(_boxFill);
-var _boxSeamFill = require("./icons/box-seam-fill");
-var _boxSeamFillDefault = parcelHelpers.interopDefault(_boxSeamFill);
-var _boxSeam = require("./icons/box-seam");
-var _boxSeamDefault = parcelHelpers.interopDefault(_boxSeam);
-var _box = require("./icons/box");
-var _boxDefault = parcelHelpers.interopDefault(_box);
-var _box2Fill = require("./icons/box2-fill");
-var _box2FillDefault = parcelHelpers.interopDefault(_box2Fill);
-var _box2HeartFill = require("./icons/box2-heart-fill");
-var _box2HeartFillDefault = parcelHelpers.interopDefault(_box2HeartFill);
-var _box2Heart = require("./icons/box2-heart");
-var _box2HeartDefault = parcelHelpers.interopDefault(_box2Heart);
-var _box2 = require("./icons/box2");
-var _box2Default = parcelHelpers.interopDefault(_box2);
-var _boxes = require("./icons/boxes");
-var _boxesDefault = parcelHelpers.interopDefault(_boxes);
-var _bracesAsterisk = require("./icons/braces-asterisk");
-var _bracesAsteriskDefault = parcelHelpers.interopDefault(_bracesAsterisk);
-var _braces = require("./icons/braces");
-var _bracesDefault = parcelHelpers.interopDefault(_braces);
-var _bricks = require("./icons/bricks");
-var _bricksDefault = parcelHelpers.interopDefault(_bricks);
-var _briefcaseFill = require("./icons/briefcase-fill");
-var _briefcaseFillDefault = parcelHelpers.interopDefault(_briefcaseFill);
-var _briefcase = require("./icons/briefcase");
-var _briefcaseDefault = parcelHelpers.interopDefault(_briefcase);
-var _brightnessAltHighFill = require("./icons/brightness-alt-high-fill");
-var _brightnessAltHighFillDefault = parcelHelpers.interopDefault(_brightnessAltHighFill);
-var _brightnessAltHigh = require("./icons/brightness-alt-high");
-var _brightnessAltHighDefault = parcelHelpers.interopDefault(_brightnessAltHigh);
-var _brightnessAltLowFill = require("./icons/brightness-alt-low-fill");
-var _brightnessAltLowFillDefault = parcelHelpers.interopDefault(_brightnessAltLowFill);
-var _brightnessAltLow = require("./icons/brightness-alt-low");
-var _brightnessAltLowDefault = parcelHelpers.interopDefault(_brightnessAltLow);
-var _brightnessHighFill = require("./icons/brightness-high-fill");
-var _brightnessHighFillDefault = parcelHelpers.interopDefault(_brightnessHighFill);
-var _brightnessHigh = require("./icons/brightness-high");
-var _brightnessHighDefault = parcelHelpers.interopDefault(_brightnessHigh);
-var _brightnessLowFill = require("./icons/brightness-low-fill");
-var _brightnessLowFillDefault = parcelHelpers.interopDefault(_brightnessLowFill);
-var _brightnessLow = require("./icons/brightness-low");
-var _brightnessLowDefault = parcelHelpers.interopDefault(_brightnessLow);
-var _brilliance = require("./icons/brilliance");
-var _brillianceDefault = parcelHelpers.interopDefault(_brilliance);
-var _broadcastPin = require("./icons/broadcast-pin");
-var _broadcastPinDefault = parcelHelpers.interopDefault(_broadcastPin);
-var _broadcast = require("./icons/broadcast");
-var _broadcastDefault = parcelHelpers.interopDefault(_broadcast);
-var _browserChrome = require("./icons/browser-chrome");
-var _browserChromeDefault = parcelHelpers.interopDefault(_browserChrome);
-var _browserEdge = require("./icons/browser-edge");
-var _browserEdgeDefault = parcelHelpers.interopDefault(_browserEdge);
-var _browserFirefox = require("./icons/browser-firefox");
-var _browserFirefoxDefault = parcelHelpers.interopDefault(_browserFirefox);
-var _browserSafari = require("./icons/browser-safari");
-var _browserSafariDefault = parcelHelpers.interopDefault(_browserSafari);
-var _brushFill = require("./icons/brush-fill");
-var _brushFillDefault = parcelHelpers.interopDefault(_brushFill);
-var _brush = require("./icons/brush");
-var _brushDefault = parcelHelpers.interopDefault(_brush);
-var _bucketFill = require("./icons/bucket-fill");
-var _bucketFillDefault = parcelHelpers.interopDefault(_bucketFill);
-var _bucket = require("./icons/bucket");
-var _bucketDefault = parcelHelpers.interopDefault(_bucket);
-var _bugFill = require("./icons/bug-fill");
-var _bugFillDefault = parcelHelpers.interopDefault(_bugFill);
-var _bug = require("./icons/bug");
-var _bugDefault = parcelHelpers.interopDefault(_bug);
-var _buildingAdd = require("./icons/building-add");
-var _buildingAddDefault = parcelHelpers.interopDefault(_buildingAdd);
-var _buildingCheck = require("./icons/building-check");
-var _buildingCheckDefault = parcelHelpers.interopDefault(_buildingCheck);
-var _buildingDash = require("./icons/building-dash");
-var _buildingDashDefault = parcelHelpers.interopDefault(_buildingDash);
-var _buildingDown = require("./icons/building-down");
-var _buildingDownDefault = parcelHelpers.interopDefault(_buildingDown);
-var _buildingExclamation = require("./icons/building-exclamation");
-var _buildingExclamationDefault = parcelHelpers.interopDefault(_buildingExclamation);
-var _buildingFillAdd = require("./icons/building-fill-add");
-var _buildingFillAddDefault = parcelHelpers.interopDefault(_buildingFillAdd);
-var _buildingFillCheck = require("./icons/building-fill-check");
-var _buildingFillCheckDefault = parcelHelpers.interopDefault(_buildingFillCheck);
-var _buildingFillDash = require("./icons/building-fill-dash");
-var _buildingFillDashDefault = parcelHelpers.interopDefault(_buildingFillDash);
-var _buildingFillDown = require("./icons/building-fill-down");
-var _buildingFillDownDefault = parcelHelpers.interopDefault(_buildingFillDown);
-var _buildingFillExclamation = require("./icons/building-fill-exclamation");
-var _buildingFillExclamationDefault = parcelHelpers.interopDefault(_buildingFillExclamation);
-var _buildingFillGear = require("./icons/building-fill-gear");
-var _buildingFillGearDefault = parcelHelpers.interopDefault(_buildingFillGear);
-var _buildingFillLock = require("./icons/building-fill-lock");
-var _buildingFillLockDefault = parcelHelpers.interopDefault(_buildingFillLock);
-var _buildingFillSlash = require("./icons/building-fill-slash");
-var _buildingFillSlashDefault = parcelHelpers.interopDefault(_buildingFillSlash);
-var _buildingFillUp = require("./icons/building-fill-up");
-var _buildingFillUpDefault = parcelHelpers.interopDefault(_buildingFillUp);
-var _buildingFillX = require("./icons/building-fill-x");
-var _buildingFillXDefault = parcelHelpers.interopDefault(_buildingFillX);
-var _buildingFill = require("./icons/building-fill");
-var _buildingFillDefault = parcelHelpers.interopDefault(_buildingFill);
-var _buildingGear = require("./icons/building-gear");
-var _buildingGearDefault = parcelHelpers.interopDefault(_buildingGear);
-var _buildingLock = require("./icons/building-lock");
-var _buildingLockDefault = parcelHelpers.interopDefault(_buildingLock);
-var _buildingSlash = require("./icons/building-slash");
-var _buildingSlashDefault = parcelHelpers.interopDefault(_buildingSlash);
-var _buildingUp = require("./icons/building-up");
-var _buildingUpDefault = parcelHelpers.interopDefault(_buildingUp);
-var _buildingX = require("./icons/building-x");
-var _buildingXDefault = parcelHelpers.interopDefault(_buildingX);
-var _building = require("./icons/building");
-var _buildingDefault = parcelHelpers.interopDefault(_building);
-var _buildingsFill = require("./icons/buildings-fill");
-var _buildingsFillDefault = parcelHelpers.interopDefault(_buildingsFill);
-var _buildings = require("./icons/buildings");
-var _buildingsDefault = parcelHelpers.interopDefault(_buildings);
-var _bullseye = require("./icons/bullseye");
-var _bullseyeDefault = parcelHelpers.interopDefault(_bullseye);
-var _busFrontFill = require("./icons/bus-front-fill");
-var _busFrontFillDefault = parcelHelpers.interopDefault(_busFrontFill);
-var _busFront = require("./icons/bus-front");
-var _busFrontDefault = parcelHelpers.interopDefault(_busFront);
-var _cCircleFill = require("./icons/c-circle-fill");
-var _cCircleFillDefault = parcelHelpers.interopDefault(_cCircleFill);
-var _cCircle = require("./icons/c-circle");
-var _cCircleDefault = parcelHelpers.interopDefault(_cCircle);
-var _cSquareFill = require("./icons/c-square-fill");
-var _cSquareFillDefault = parcelHelpers.interopDefault(_cSquareFill);
-var _cSquare = require("./icons/c-square");
-var _cSquareDefault = parcelHelpers.interopDefault(_cSquare);
-var _cakeFill = require("./icons/cake-fill");
-var _cakeFillDefault = parcelHelpers.interopDefault(_cakeFill);
-var _cake = require("./icons/cake");
-var _cakeDefault = parcelHelpers.interopDefault(_cake);
-var _cake2Fill = require("./icons/cake2-fill");
-var _cake2FillDefault = parcelHelpers.interopDefault(_cake2Fill);
-var _cake2 = require("./icons/cake2");
-var _cake2Default = parcelHelpers.interopDefault(_cake2);
-var _calculatorFill = require("./icons/calculator-fill");
-var _calculatorFillDefault = parcelHelpers.interopDefault(_calculatorFill);
-var _calculator = require("./icons/calculator");
-var _calculatorDefault = parcelHelpers.interopDefault(_calculator);
-var _calendarCheckFill = require("./icons/calendar-check-fill");
-var _calendarCheckFillDefault = parcelHelpers.interopDefault(_calendarCheckFill);
-var _calendarCheck = require("./icons/calendar-check");
-var _calendarCheckDefault = parcelHelpers.interopDefault(_calendarCheck);
-var _calendarDateFill = require("./icons/calendar-date-fill");
-var _calendarDateFillDefault = parcelHelpers.interopDefault(_calendarDateFill);
-var _calendarDate = require("./icons/calendar-date");
-var _calendarDateDefault = parcelHelpers.interopDefault(_calendarDate);
-var _calendarDayFill = require("./icons/calendar-day-fill");
-var _calendarDayFillDefault = parcelHelpers.interopDefault(_calendarDayFill);
-var _calendarDay = require("./icons/calendar-day");
-var _calendarDayDefault = parcelHelpers.interopDefault(_calendarDay);
-var _calendarEventFill = require("./icons/calendar-event-fill");
-var _calendarEventFillDefault = parcelHelpers.interopDefault(_calendarEventFill);
-var _calendarEvent = require("./icons/calendar-event");
-var _calendarEventDefault = parcelHelpers.interopDefault(_calendarEvent);
-var _calendarFill = require("./icons/calendar-fill");
-var _calendarFillDefault = parcelHelpers.interopDefault(_calendarFill);
-var _calendarHeartFill = require("./icons/calendar-heart-fill");
-var _calendarHeartFillDefault = parcelHelpers.interopDefault(_calendarHeartFill);
-var _calendarHeart = require("./icons/calendar-heart");
-var _calendarHeartDefault = parcelHelpers.interopDefault(_calendarHeart);
-var _calendarMinusFill = require("./icons/calendar-minus-fill");
-var _calendarMinusFillDefault = parcelHelpers.interopDefault(_calendarMinusFill);
-var _calendarMinus = require("./icons/calendar-minus");
-var _calendarMinusDefault = parcelHelpers.interopDefault(_calendarMinus);
-var _calendarMonthFill = require("./icons/calendar-month-fill");
-var _calendarMonthFillDefault = parcelHelpers.interopDefault(_calendarMonthFill);
-var _calendarMonth = require("./icons/calendar-month");
-var _calendarMonthDefault = parcelHelpers.interopDefault(_calendarMonth);
-var _calendarPlusFill = require("./icons/calendar-plus-fill");
-var _calendarPlusFillDefault = parcelHelpers.interopDefault(_calendarPlusFill);
-var _calendarPlus = require("./icons/calendar-plus");
-var _calendarPlusDefault = parcelHelpers.interopDefault(_calendarPlus);
-var _calendarRangeFill = require("./icons/calendar-range-fill");
-var _calendarRangeFillDefault = parcelHelpers.interopDefault(_calendarRangeFill);
-var _calendarRange = require("./icons/calendar-range");
-var _calendarRangeDefault = parcelHelpers.interopDefault(_calendarRange);
-var _calendarWeekFill = require("./icons/calendar-week-fill");
-var _calendarWeekFillDefault = parcelHelpers.interopDefault(_calendarWeekFill);
-var _calendarWeek = require("./icons/calendar-week");
-var _calendarWeekDefault = parcelHelpers.interopDefault(_calendarWeek);
-var _calendarXFill = require("./icons/calendar-x-fill");
-var _calendarXFillDefault = parcelHelpers.interopDefault(_calendarXFill);
-var _calendarX = require("./icons/calendar-x");
-var _calendarXDefault = parcelHelpers.interopDefault(_calendarX);
-var _calendar = require("./icons/calendar");
-var _calendarDefault = parcelHelpers.interopDefault(_calendar);
-var _calendar2CheckFill = require("./icons/calendar2-check-fill");
-var _calendar2CheckFillDefault = parcelHelpers.interopDefault(_calendar2CheckFill);
-var _calendar2Check = require("./icons/calendar2-check");
-var _calendar2CheckDefault = parcelHelpers.interopDefault(_calendar2Check);
-var _calendar2DateFill = require("./icons/calendar2-date-fill");
-var _calendar2DateFillDefault = parcelHelpers.interopDefault(_calendar2DateFill);
-var _calendar2Date = require("./icons/calendar2-date");
-var _calendar2DateDefault = parcelHelpers.interopDefault(_calendar2Date);
-var _calendar2DayFill = require("./icons/calendar2-day-fill");
-var _calendar2DayFillDefault = parcelHelpers.interopDefault(_calendar2DayFill);
-var _calendar2Day = require("./icons/calendar2-day");
-var _calendar2DayDefault = parcelHelpers.interopDefault(_calendar2Day);
-var _calendar2EventFill = require("./icons/calendar2-event-fill");
-var _calendar2EventFillDefault = parcelHelpers.interopDefault(_calendar2EventFill);
-var _calendar2Event = require("./icons/calendar2-event");
-var _calendar2EventDefault = parcelHelpers.interopDefault(_calendar2Event);
-var _calendar2Fill = require("./icons/calendar2-fill");
-var _calendar2FillDefault = parcelHelpers.interopDefault(_calendar2Fill);
-var _calendar2HeartFill = require("./icons/calendar2-heart-fill");
-var _calendar2HeartFillDefault = parcelHelpers.interopDefault(_calendar2HeartFill);
-var _calendar2Heart = require("./icons/calendar2-heart");
-var _calendar2HeartDefault = parcelHelpers.interopDefault(_calendar2Heart);
-var _calendar2MinusFill = require("./icons/calendar2-minus-fill");
-var _calendar2MinusFillDefault = parcelHelpers.interopDefault(_calendar2MinusFill);
-var _calendar2Minus = require("./icons/calendar2-minus");
-var _calendar2MinusDefault = parcelHelpers.interopDefault(_calendar2Minus);
-var _calendar2MonthFill = require("./icons/calendar2-month-fill");
-var _calendar2MonthFillDefault = parcelHelpers.interopDefault(_calendar2MonthFill);
-var _calendar2Month = require("./icons/calendar2-month");
-var _calendar2MonthDefault = parcelHelpers.interopDefault(_calendar2Month);
-var _calendar2PlusFill = require("./icons/calendar2-plus-fill");
-var _calendar2PlusFillDefault = parcelHelpers.interopDefault(_calendar2PlusFill);
-var _calendar2Plus = require("./icons/calendar2-plus");
-var _calendar2PlusDefault = parcelHelpers.interopDefault(_calendar2Plus);
-var _calendar2RangeFill = require("./icons/calendar2-range-fill");
-var _calendar2RangeFillDefault = parcelHelpers.interopDefault(_calendar2RangeFill);
-var _calendar2Range = require("./icons/calendar2-range");
-var _calendar2RangeDefault = parcelHelpers.interopDefault(_calendar2Range);
-var _calendar2WeekFill = require("./icons/calendar2-week-fill");
-var _calendar2WeekFillDefault = parcelHelpers.interopDefault(_calendar2WeekFill);
-var _calendar2Week = require("./icons/calendar2-week");
-var _calendar2WeekDefault = parcelHelpers.interopDefault(_calendar2Week);
-var _calendar2XFill = require("./icons/calendar2-x-fill");
-var _calendar2XFillDefault = parcelHelpers.interopDefault(_calendar2XFill);
-var _calendar2X = require("./icons/calendar2-x");
-var _calendar2XDefault = parcelHelpers.interopDefault(_calendar2X);
-var _calendar2 = require("./icons/calendar2");
-var _calendar2Default = parcelHelpers.interopDefault(_calendar2);
-var _calendar3EventFill = require("./icons/calendar3-event-fill");
-var _calendar3EventFillDefault = parcelHelpers.interopDefault(_calendar3EventFill);
-var _calendar3Event = require("./icons/calendar3-event");
-var _calendar3EventDefault = parcelHelpers.interopDefault(_calendar3Event);
-var _calendar3Fill = require("./icons/calendar3-fill");
-var _calendar3FillDefault = parcelHelpers.interopDefault(_calendar3Fill);
-var _calendar3RangeFill = require("./icons/calendar3-range-fill");
-var _calendar3RangeFillDefault = parcelHelpers.interopDefault(_calendar3RangeFill);
-var _calendar3Range = require("./icons/calendar3-range");
-var _calendar3RangeDefault = parcelHelpers.interopDefault(_calendar3Range);
-var _calendar3WeekFill = require("./icons/calendar3-week-fill");
-var _calendar3WeekFillDefault = parcelHelpers.interopDefault(_calendar3WeekFill);
-var _calendar3Week = require("./icons/calendar3-week");
-var _calendar3WeekDefault = parcelHelpers.interopDefault(_calendar3Week);
-var _calendar3 = require("./icons/calendar3");
-var _calendar3Default = parcelHelpers.interopDefault(_calendar3);
-var _calendar4Event = require("./icons/calendar4-event");
-var _calendar4EventDefault = parcelHelpers.interopDefault(_calendar4Event);
-var _calendar4Range = require("./icons/calendar4-range");
-var _calendar4RangeDefault = parcelHelpers.interopDefault(_calendar4Range);
-var _calendar4Week = require("./icons/calendar4-week");
-var _calendar4WeekDefault = parcelHelpers.interopDefault(_calendar4Week);
-var _calendar4 = require("./icons/calendar4");
-var _calendar4Default = parcelHelpers.interopDefault(_calendar4);
-var _cameraFill = require("./icons/camera-fill");
-var _cameraFillDefault = parcelHelpers.interopDefault(_cameraFill);
-var _cameraReelsFill = require("./icons/camera-reels-fill");
-var _cameraReelsFillDefault = parcelHelpers.interopDefault(_cameraReelsFill);
-var _cameraReels = require("./icons/camera-reels");
-var _cameraReelsDefault = parcelHelpers.interopDefault(_cameraReels);
-var _cameraVideoFill = require("./icons/camera-video-fill");
-var _cameraVideoFillDefault = parcelHelpers.interopDefault(_cameraVideoFill);
-var _cameraVideoOffFill = require("./icons/camera-video-off-fill");
-var _cameraVideoOffFillDefault = parcelHelpers.interopDefault(_cameraVideoOffFill);
-var _cameraVideoOff = require("./icons/camera-video-off");
-var _cameraVideoOffDefault = parcelHelpers.interopDefault(_cameraVideoOff);
-var _cameraVideo = require("./icons/camera-video");
-var _cameraVideoDefault = parcelHelpers.interopDefault(_cameraVideo);
-var _camera = require("./icons/camera");
-var _cameraDefault = parcelHelpers.interopDefault(_camera);
-var _camera2 = require("./icons/camera2");
-var _camera2Default = parcelHelpers.interopDefault(_camera2);
-var _capslockFill = require("./icons/capslock-fill");
-var _capslockFillDefault = parcelHelpers.interopDefault(_capslockFill);
-var _capslock = require("./icons/capslock");
-var _capslockDefault = parcelHelpers.interopDefault(_capslock);
-var _capsulePill = require("./icons/capsule-pill");
-var _capsulePillDefault = parcelHelpers.interopDefault(_capsulePill);
-var _capsule = require("./icons/capsule");
-var _capsuleDefault = parcelHelpers.interopDefault(_capsule);
-var _carFrontFill = require("./icons/car-front-fill");
-var _carFrontFillDefault = parcelHelpers.interopDefault(_carFrontFill);
-var _carFront = require("./icons/car-front");
-var _carFrontDefault = parcelHelpers.interopDefault(_carFront);
-var _cardChecklist = require("./icons/card-checklist");
-var _cardChecklistDefault = parcelHelpers.interopDefault(_cardChecklist);
-var _cardHeading = require("./icons/card-heading");
-var _cardHeadingDefault = parcelHelpers.interopDefault(_cardHeading);
-var _cardImage = require("./icons/card-image");
-var _cardImageDefault = parcelHelpers.interopDefault(_cardImage);
-var _cardList = require("./icons/card-list");
-var _cardListDefault = parcelHelpers.interopDefault(_cardList);
-var _cardText = require("./icons/card-text");
-var _cardTextDefault = parcelHelpers.interopDefault(_cardText);
-var _caretDownFill = require("./icons/caret-down-fill");
-var _caretDownFillDefault = parcelHelpers.interopDefault(_caretDownFill);
-var _caretDownSquareFill = require("./icons/caret-down-square-fill");
-var _caretDownSquareFillDefault = parcelHelpers.interopDefault(_caretDownSquareFill);
-var _caretDownSquare = require("./icons/caret-down-square");
-var _caretDownSquareDefault = parcelHelpers.interopDefault(_caretDownSquare);
-var _caretDown = require("./icons/caret-down");
-var _caretDownDefault = parcelHelpers.interopDefault(_caretDown);
-var _caretLeftFill = require("./icons/caret-left-fill");
-var _caretLeftFillDefault = parcelHelpers.interopDefault(_caretLeftFill);
-var _caretLeftSquareFill = require("./icons/caret-left-square-fill");
-var _caretLeftSquareFillDefault = parcelHelpers.interopDefault(_caretLeftSquareFill);
-var _caretLeftSquare = require("./icons/caret-left-square");
-var _caretLeftSquareDefault = parcelHelpers.interopDefault(_caretLeftSquare);
-var _caretLeft = require("./icons/caret-left");
-var _caretLeftDefault = parcelHelpers.interopDefault(_caretLeft);
-var _caretRightFill = require("./icons/caret-right-fill");
-var _caretRightFillDefault = parcelHelpers.interopDefault(_caretRightFill);
-var _caretRightSquareFill = require("./icons/caret-right-square-fill");
-var _caretRightSquareFillDefault = parcelHelpers.interopDefault(_caretRightSquareFill);
-var _caretRightSquare = require("./icons/caret-right-square");
-var _caretRightSquareDefault = parcelHelpers.interopDefault(_caretRightSquare);
-var _caretRight = require("./icons/caret-right");
-var _caretRightDefault = parcelHelpers.interopDefault(_caretRight);
-var _caretUpFill = require("./icons/caret-up-fill");
-var _caretUpFillDefault = parcelHelpers.interopDefault(_caretUpFill);
-var _caretUpSquareFill = require("./icons/caret-up-square-fill");
-var _caretUpSquareFillDefault = parcelHelpers.interopDefault(_caretUpSquareFill);
-var _caretUpSquare = require("./icons/caret-up-square");
-var _caretUpSquareDefault = parcelHelpers.interopDefault(_caretUpSquare);
-var _caretUp = require("./icons/caret-up");
-var _caretUpDefault = parcelHelpers.interopDefault(_caretUp);
-var _cartCheckFill = require("./icons/cart-check-fill");
-var _cartCheckFillDefault = parcelHelpers.interopDefault(_cartCheckFill);
-var _cartCheck = require("./icons/cart-check");
-var _cartCheckDefault = parcelHelpers.interopDefault(_cartCheck);
-var _cartDashFill = require("./icons/cart-dash-fill");
-var _cartDashFillDefault = parcelHelpers.interopDefault(_cartDashFill);
-var _cartDash = require("./icons/cart-dash");
-var _cartDashDefault = parcelHelpers.interopDefault(_cartDash);
-var _cartFill = require("./icons/cart-fill");
-var _cartFillDefault = parcelHelpers.interopDefault(_cartFill);
-var _cartPlusFill = require("./icons/cart-plus-fill");
-var _cartPlusFillDefault = parcelHelpers.interopDefault(_cartPlusFill);
-var _cartPlus = require("./icons/cart-plus");
-var _cartPlusDefault = parcelHelpers.interopDefault(_cartPlus);
-var _cartXFill = require("./icons/cart-x-fill");
-var _cartXFillDefault = parcelHelpers.interopDefault(_cartXFill);
-var _cartX = require("./icons/cart-x");
-var _cartXDefault = parcelHelpers.interopDefault(_cartX);
-var _cart = require("./icons/cart");
-var _cartDefault = parcelHelpers.interopDefault(_cart);
-var _cart2 = require("./icons/cart2");
-var _cart2Default = parcelHelpers.interopDefault(_cart2);
-var _cart3 = require("./icons/cart3");
-var _cart3Default = parcelHelpers.interopDefault(_cart3);
-var _cart4 = require("./icons/cart4");
-var _cart4Default = parcelHelpers.interopDefault(_cart4);
-var _cashCoin = require("./icons/cash-coin");
-var _cashCoinDefault = parcelHelpers.interopDefault(_cashCoin);
-var _cashStack = require("./icons/cash-stack");
-var _cashStackDefault = parcelHelpers.interopDefault(_cashStack);
-var _cash = require("./icons/cash");
-var _cashDefault = parcelHelpers.interopDefault(_cash);
-var _cassetteFill = require("./icons/cassette-fill");
-var _cassetteFillDefault = parcelHelpers.interopDefault(_cassetteFill);
-var _cassette = require("./icons/cassette");
-var _cassetteDefault = parcelHelpers.interopDefault(_cassette);
-var _cast = require("./icons/cast");
-var _castDefault = parcelHelpers.interopDefault(_cast);
-var _ccCircleFill = require("./icons/cc-circle-fill");
-var _ccCircleFillDefault = parcelHelpers.interopDefault(_ccCircleFill);
-var _ccCircle = require("./icons/cc-circle");
-var _ccCircleDefault = parcelHelpers.interopDefault(_ccCircle);
-var _ccSquareFill = require("./icons/cc-square-fill");
-var _ccSquareFillDefault = parcelHelpers.interopDefault(_ccSquareFill);
-var _ccSquare = require("./icons/cc-square");
-var _ccSquareDefault = parcelHelpers.interopDefault(_ccSquare);
-var _chatDotsFill = require("./icons/chat-dots-fill");
-var _chatDotsFillDefault = parcelHelpers.interopDefault(_chatDotsFill);
-var _chatDots = require("./icons/chat-dots");
-var _chatDotsDefault = parcelHelpers.interopDefault(_chatDots);
-var _chatFill = require("./icons/chat-fill");
-var _chatFillDefault = parcelHelpers.interopDefault(_chatFill);
-var _chatHeartFill = require("./icons/chat-heart-fill");
-var _chatHeartFillDefault = parcelHelpers.interopDefault(_chatHeartFill);
-var _chatHeart = require("./icons/chat-heart");
-var _chatHeartDefault = parcelHelpers.interopDefault(_chatHeart);
-var _chatLeftDotsFill = require("./icons/chat-left-dots-fill");
-var _chatLeftDotsFillDefault = parcelHelpers.interopDefault(_chatLeftDotsFill);
-var _chatLeftDots = require("./icons/chat-left-dots");
-var _chatLeftDotsDefault = parcelHelpers.interopDefault(_chatLeftDots);
-var _chatLeftFill = require("./icons/chat-left-fill");
-var _chatLeftFillDefault = parcelHelpers.interopDefault(_chatLeftFill);
-var _chatLeftHeartFill = require("./icons/chat-left-heart-fill");
-var _chatLeftHeartFillDefault = parcelHelpers.interopDefault(_chatLeftHeartFill);
-var _chatLeftHeart = require("./icons/chat-left-heart");
-var _chatLeftHeartDefault = parcelHelpers.interopDefault(_chatLeftHeart);
-var _chatLeftQuoteFill = require("./icons/chat-left-quote-fill");
-var _chatLeftQuoteFillDefault = parcelHelpers.interopDefault(_chatLeftQuoteFill);
-var _chatLeftQuote = require("./icons/chat-left-quote");
-var _chatLeftQuoteDefault = parcelHelpers.interopDefault(_chatLeftQuote);
-var _chatLeftTextFill = require("./icons/chat-left-text-fill");
-var _chatLeftTextFillDefault = parcelHelpers.interopDefault(_chatLeftTextFill);
-var _chatLeftText = require("./icons/chat-left-text");
-var _chatLeftTextDefault = parcelHelpers.interopDefault(_chatLeftText);
-var _chatLeft = require("./icons/chat-left");
-var _chatLeftDefault = parcelHelpers.interopDefault(_chatLeft);
-var _chatQuoteFill = require("./icons/chat-quote-fill");
-var _chatQuoteFillDefault = parcelHelpers.interopDefault(_chatQuoteFill);
-var _chatQuote = require("./icons/chat-quote");
-var _chatQuoteDefault = parcelHelpers.interopDefault(_chatQuote);
-var _chatRightDotsFill = require("./icons/chat-right-dots-fill");
-var _chatRightDotsFillDefault = parcelHelpers.interopDefault(_chatRightDotsFill);
-var _chatRightDots = require("./icons/chat-right-dots");
-var _chatRightDotsDefault = parcelHelpers.interopDefault(_chatRightDots);
-var _chatRightFill = require("./icons/chat-right-fill");
-var _chatRightFillDefault = parcelHelpers.interopDefault(_chatRightFill);
-var _chatRightHeartFill = require("./icons/chat-right-heart-fill");
-var _chatRightHeartFillDefault = parcelHelpers.interopDefault(_chatRightHeartFill);
-var _chatRightHeart = require("./icons/chat-right-heart");
-var _chatRightHeartDefault = parcelHelpers.interopDefault(_chatRightHeart);
-var _chatRightQuoteFill = require("./icons/chat-right-quote-fill");
-var _chatRightQuoteFillDefault = parcelHelpers.interopDefault(_chatRightQuoteFill);
-var _chatRightQuote = require("./icons/chat-right-quote");
-var _chatRightQuoteDefault = parcelHelpers.interopDefault(_chatRightQuote);
-var _chatRightTextFill = require("./icons/chat-right-text-fill");
-var _chatRightTextFillDefault = parcelHelpers.interopDefault(_chatRightTextFill);
-var _chatRightText = require("./icons/chat-right-text");
-var _chatRightTextDefault = parcelHelpers.interopDefault(_chatRightText);
-var _chatRight = require("./icons/chat-right");
-var _chatRightDefault = parcelHelpers.interopDefault(_chatRight);
-var _chatSquareDotsFill = require("./icons/chat-square-dots-fill");
-var _chatSquareDotsFillDefault = parcelHelpers.interopDefault(_chatSquareDotsFill);
-var _chatSquareDots = require("./icons/chat-square-dots");
-var _chatSquareDotsDefault = parcelHelpers.interopDefault(_chatSquareDots);
-var _chatSquareFill = require("./icons/chat-square-fill");
-var _chatSquareFillDefault = parcelHelpers.interopDefault(_chatSquareFill);
-var _chatSquareHeartFill = require("./icons/chat-square-heart-fill");
-var _chatSquareHeartFillDefault = parcelHelpers.interopDefault(_chatSquareHeartFill);
-var _chatSquareHeart = require("./icons/chat-square-heart");
-var _chatSquareHeartDefault = parcelHelpers.interopDefault(_chatSquareHeart);
-var _chatSquareQuoteFill = require("./icons/chat-square-quote-fill");
-var _chatSquareQuoteFillDefault = parcelHelpers.interopDefault(_chatSquareQuoteFill);
-var _chatSquareQuote = require("./icons/chat-square-quote");
-var _chatSquareQuoteDefault = parcelHelpers.interopDefault(_chatSquareQuote);
-var _chatSquareTextFill = require("./icons/chat-square-text-fill");
-var _chatSquareTextFillDefault = parcelHelpers.interopDefault(_chatSquareTextFill);
-var _chatSquareText = require("./icons/chat-square-text");
-var _chatSquareTextDefault = parcelHelpers.interopDefault(_chatSquareText);
-var _chatSquare = require("./icons/chat-square");
-var _chatSquareDefault = parcelHelpers.interopDefault(_chatSquare);
-var _chatTextFill = require("./icons/chat-text-fill");
-var _chatTextFillDefault = parcelHelpers.interopDefault(_chatTextFill);
-var _chatText = require("./icons/chat-text");
-var _chatTextDefault = parcelHelpers.interopDefault(_chatText);
-var _chat = require("./icons/chat");
-var _chatDefault = parcelHelpers.interopDefault(_chat);
-var _checkAll = require("./icons/check-all");
-var _checkAllDefault = parcelHelpers.interopDefault(_checkAll);
-var _checkCircleFill = require("./icons/check-circle-fill");
-var _checkCircleFillDefault = parcelHelpers.interopDefault(_checkCircleFill);
-var _checkCircle = require("./icons/check-circle");
-var _checkCircleDefault = parcelHelpers.interopDefault(_checkCircle);
-var _checkLg = require("./icons/check-lg");
-var _checkLgDefault = parcelHelpers.interopDefault(_checkLg);
-var _checkSquareFill = require("./icons/check-square-fill");
-var _checkSquareFillDefault = parcelHelpers.interopDefault(_checkSquareFill);
-var _checkSquare = require("./icons/check-square");
-var _checkSquareDefault = parcelHelpers.interopDefault(_checkSquare);
-var _check = require("./icons/check");
-var _checkDefault = parcelHelpers.interopDefault(_check);
-var _check2All = require("./icons/check2-all");
-var _check2AllDefault = parcelHelpers.interopDefault(_check2All);
-var _check2Circle = require("./icons/check2-circle");
-var _check2CircleDefault = parcelHelpers.interopDefault(_check2Circle);
-var _check2Square = require("./icons/check2-square");
-var _check2SquareDefault = parcelHelpers.interopDefault(_check2Square);
-var _check2 = require("./icons/check2");
-var _check2Default = parcelHelpers.interopDefault(_check2);
-var _chevronBarContract = require("./icons/chevron-bar-contract");
-var _chevronBarContractDefault = parcelHelpers.interopDefault(_chevronBarContract);
-var _chevronBarDown = require("./icons/chevron-bar-down");
-var _chevronBarDownDefault = parcelHelpers.interopDefault(_chevronBarDown);
-var _chevronBarExpand = require("./icons/chevron-bar-expand");
-var _chevronBarExpandDefault = parcelHelpers.interopDefault(_chevronBarExpand);
-var _chevronBarLeft = require("./icons/chevron-bar-left");
-var _chevronBarLeftDefault = parcelHelpers.interopDefault(_chevronBarLeft);
-var _chevronBarRight = require("./icons/chevron-bar-right");
-var _chevronBarRightDefault = parcelHelpers.interopDefault(_chevronBarRight);
-var _chevronBarUp = require("./icons/chevron-bar-up");
-var _chevronBarUpDefault = parcelHelpers.interopDefault(_chevronBarUp);
-var _chevronCompactDown = require("./icons/chevron-compact-down");
-var _chevronCompactDownDefault = parcelHelpers.interopDefault(_chevronCompactDown);
-var _chevronCompactLeft = require("./icons/chevron-compact-left");
-var _chevronCompactLeftDefault = parcelHelpers.interopDefault(_chevronCompactLeft);
-var _chevronCompactRight = require("./icons/chevron-compact-right");
-var _chevronCompactRightDefault = parcelHelpers.interopDefault(_chevronCompactRight);
-var _chevronCompactUp = require("./icons/chevron-compact-up");
-var _chevronCompactUpDefault = parcelHelpers.interopDefault(_chevronCompactUp);
-var _chevronContract = require("./icons/chevron-contract");
-var _chevronContractDefault = parcelHelpers.interopDefault(_chevronContract);
-var _chevronDoubleDown = require("./icons/chevron-double-down");
-var _chevronDoubleDownDefault = parcelHelpers.interopDefault(_chevronDoubleDown);
-var _chevronDoubleLeft = require("./icons/chevron-double-left");
-var _chevronDoubleLeftDefault = parcelHelpers.interopDefault(_chevronDoubleLeft);
-var _chevronDoubleRight = require("./icons/chevron-double-right");
-var _chevronDoubleRightDefault = parcelHelpers.interopDefault(_chevronDoubleRight);
-var _chevronDoubleUp = require("./icons/chevron-double-up");
-var _chevronDoubleUpDefault = parcelHelpers.interopDefault(_chevronDoubleUp);
-var _chevronDown = require("./icons/chevron-down");
-var _chevronDownDefault = parcelHelpers.interopDefault(_chevronDown);
-var _chevronExpand = require("./icons/chevron-expand");
-var _chevronExpandDefault = parcelHelpers.interopDefault(_chevronExpand);
-var _chevronLeft = require("./icons/chevron-left");
-var _chevronLeftDefault = parcelHelpers.interopDefault(_chevronLeft);
-var _chevronRight = require("./icons/chevron-right");
-var _chevronRightDefault = parcelHelpers.interopDefault(_chevronRight);
-var _chevronUp = require("./icons/chevron-up");
-var _chevronUpDefault = parcelHelpers.interopDefault(_chevronUp);
-var _circleFill = require("./icons/circle-fill");
-var _circleFillDefault = parcelHelpers.interopDefault(_circleFill);
-var _circleHalf = require("./icons/circle-half");
-var _circleHalfDefault = parcelHelpers.interopDefault(_circleHalf);
-var _circleSquare = require("./icons/circle-square");
-var _circleSquareDefault = parcelHelpers.interopDefault(_circleSquare);
-var _circle = require("./icons/circle");
-var _circleDefault = parcelHelpers.interopDefault(_circle);
-var _clipboardCheckFill = require("./icons/clipboard-check-fill");
-var _clipboardCheckFillDefault = parcelHelpers.interopDefault(_clipboardCheckFill);
-var _clipboardCheck = require("./icons/clipboard-check");
-var _clipboardCheckDefault = parcelHelpers.interopDefault(_clipboardCheck);
-var _clipboardDataFill = require("./icons/clipboard-data-fill");
-var _clipboardDataFillDefault = parcelHelpers.interopDefault(_clipboardDataFill);
-var _clipboardData = require("./icons/clipboard-data");
-var _clipboardDataDefault = parcelHelpers.interopDefault(_clipboardData);
-var _clipboardFill = require("./icons/clipboard-fill");
-var _clipboardFillDefault = parcelHelpers.interopDefault(_clipboardFill);
-var _clipboardHeartFill = require("./icons/clipboard-heart-fill");
-var _clipboardHeartFillDefault = parcelHelpers.interopDefault(_clipboardHeartFill);
-var _clipboardHeart = require("./icons/clipboard-heart");
-var _clipboardHeartDefault = parcelHelpers.interopDefault(_clipboardHeart);
-var _clipboardMinusFill = require("./icons/clipboard-minus-fill");
-var _clipboardMinusFillDefault = parcelHelpers.interopDefault(_clipboardMinusFill);
-var _clipboardMinus = require("./icons/clipboard-minus");
-var _clipboardMinusDefault = parcelHelpers.interopDefault(_clipboardMinus);
-var _clipboardPlusFill = require("./icons/clipboard-plus-fill");
-var _clipboardPlusFillDefault = parcelHelpers.interopDefault(_clipboardPlusFill);
-var _clipboardPlus = require("./icons/clipboard-plus");
-var _clipboardPlusDefault = parcelHelpers.interopDefault(_clipboardPlus);
-var _clipboardPulse = require("./icons/clipboard-pulse");
-var _clipboardPulseDefault = parcelHelpers.interopDefault(_clipboardPulse);
-var _clipboardXFill = require("./icons/clipboard-x-fill");
-var _clipboardXFillDefault = parcelHelpers.interopDefault(_clipboardXFill);
-var _clipboardX = require("./icons/clipboard-x");
-var _clipboardXDefault = parcelHelpers.interopDefault(_clipboardX);
-var _clipboard = require("./icons/clipboard");
-var _clipboardDefault = parcelHelpers.interopDefault(_clipboard);
-var _clipboard2CheckFill = require("./icons/clipboard2-check-fill");
-var _clipboard2CheckFillDefault = parcelHelpers.interopDefault(_clipboard2CheckFill);
-var _clipboard2Check = require("./icons/clipboard2-check");
-var _clipboard2CheckDefault = parcelHelpers.interopDefault(_clipboard2Check);
-var _clipboard2DataFill = require("./icons/clipboard2-data-fill");
-var _clipboard2DataFillDefault = parcelHelpers.interopDefault(_clipboard2DataFill);
-var _clipboard2Data = require("./icons/clipboard2-data");
-var _clipboard2DataDefault = parcelHelpers.interopDefault(_clipboard2Data);
-var _clipboard2Fill = require("./icons/clipboard2-fill");
-var _clipboard2FillDefault = parcelHelpers.interopDefault(_clipboard2Fill);
-var _clipboard2HeartFill = require("./icons/clipboard2-heart-fill");
-var _clipboard2HeartFillDefault = parcelHelpers.interopDefault(_clipboard2HeartFill);
-var _clipboard2Heart = require("./icons/clipboard2-heart");
-var _clipboard2HeartDefault = parcelHelpers.interopDefault(_clipboard2Heart);
-var _clipboard2MinusFill = require("./icons/clipboard2-minus-fill");
-var _clipboard2MinusFillDefault = parcelHelpers.interopDefault(_clipboard2MinusFill);
-var _clipboard2Minus = require("./icons/clipboard2-minus");
-var _clipboard2MinusDefault = parcelHelpers.interopDefault(_clipboard2Minus);
-var _clipboard2PlusFill = require("./icons/clipboard2-plus-fill");
-var _clipboard2PlusFillDefault = parcelHelpers.interopDefault(_clipboard2PlusFill);
-var _clipboard2Plus = require("./icons/clipboard2-plus");
-var _clipboard2PlusDefault = parcelHelpers.interopDefault(_clipboard2Plus);
-var _clipboard2PulseFill = require("./icons/clipboard2-pulse-fill");
-var _clipboard2PulseFillDefault = parcelHelpers.interopDefault(_clipboard2PulseFill);
-var _clipboard2Pulse = require("./icons/clipboard2-pulse");
-var _clipboard2PulseDefault = parcelHelpers.interopDefault(_clipboard2Pulse);
-var _clipboard2XFill = require("./icons/clipboard2-x-fill");
-var _clipboard2XFillDefault = parcelHelpers.interopDefault(_clipboard2XFill);
-var _clipboard2X = require("./icons/clipboard2-x");
-var _clipboard2XDefault = parcelHelpers.interopDefault(_clipboard2X);
-var _clipboard2 = require("./icons/clipboard2");
-var _clipboard2Default = parcelHelpers.interopDefault(_clipboard2);
-var _clockFill = require("./icons/clock-fill");
-var _clockFillDefault = parcelHelpers.interopDefault(_clockFill);
-var _clockHistory = require("./icons/clock-history");
-var _clockHistoryDefault = parcelHelpers.interopDefault(_clockHistory);
-var _clock = require("./icons/clock");
-var _clockDefault = parcelHelpers.interopDefault(_clock);
-var _cloudArrowDownFill = require("./icons/cloud-arrow-down-fill");
-var _cloudArrowDownFillDefault = parcelHelpers.interopDefault(_cloudArrowDownFill);
-var _cloudArrowDown = require("./icons/cloud-arrow-down");
-var _cloudArrowDownDefault = parcelHelpers.interopDefault(_cloudArrowDown);
-var _cloudArrowUpFill = require("./icons/cloud-arrow-up-fill");
-var _cloudArrowUpFillDefault = parcelHelpers.interopDefault(_cloudArrowUpFill);
-var _cloudArrowUp = require("./icons/cloud-arrow-up");
-var _cloudArrowUpDefault = parcelHelpers.interopDefault(_cloudArrowUp);
-var _cloudCheckFill = require("./icons/cloud-check-fill");
-var _cloudCheckFillDefault = parcelHelpers.interopDefault(_cloudCheckFill);
-var _cloudCheck = require("./icons/cloud-check");
-var _cloudCheckDefault = parcelHelpers.interopDefault(_cloudCheck);
-var _cloudDownloadFill = require("./icons/cloud-download-fill");
-var _cloudDownloadFillDefault = parcelHelpers.interopDefault(_cloudDownloadFill);
-var _cloudDownload = require("./icons/cloud-download");
-var _cloudDownloadDefault = parcelHelpers.interopDefault(_cloudDownload);
-var _cloudDrizzleFill = require("./icons/cloud-drizzle-fill");
-var _cloudDrizzleFillDefault = parcelHelpers.interopDefault(_cloudDrizzleFill);
-var _cloudDrizzle = require("./icons/cloud-drizzle");
-var _cloudDrizzleDefault = parcelHelpers.interopDefault(_cloudDrizzle);
-var _cloudFill = require("./icons/cloud-fill");
-var _cloudFillDefault = parcelHelpers.interopDefault(_cloudFill);
-var _cloudFogFill = require("./icons/cloud-fog-fill");
-var _cloudFogFillDefault = parcelHelpers.interopDefault(_cloudFogFill);
-var _cloudFog = require("./icons/cloud-fog");
-var _cloudFogDefault = parcelHelpers.interopDefault(_cloudFog);
-var _cloudFog2Fill = require("./icons/cloud-fog2-fill");
-var _cloudFog2FillDefault = parcelHelpers.interopDefault(_cloudFog2Fill);
-var _cloudFog2 = require("./icons/cloud-fog2");
-var _cloudFog2Default = parcelHelpers.interopDefault(_cloudFog2);
-var _cloudHailFill = require("./icons/cloud-hail-fill");
-var _cloudHailFillDefault = parcelHelpers.interopDefault(_cloudHailFill);
-var _cloudHail = require("./icons/cloud-hail");
-var _cloudHailDefault = parcelHelpers.interopDefault(_cloudHail);
-var _cloudHazeFill = require("./icons/cloud-haze-fill");
-var _cloudHazeFillDefault = parcelHelpers.interopDefault(_cloudHazeFill);
-var _cloudHaze = require("./icons/cloud-haze");
-var _cloudHazeDefault = parcelHelpers.interopDefault(_cloudHaze);
-var _cloudHaze2Fill = require("./icons/cloud-haze2-fill");
-var _cloudHaze2FillDefault = parcelHelpers.interopDefault(_cloudHaze2Fill);
-var _cloudHaze2 = require("./icons/cloud-haze2");
-var _cloudHaze2Default = parcelHelpers.interopDefault(_cloudHaze2);
-var _cloudLightningFill = require("./icons/cloud-lightning-fill");
-var _cloudLightningFillDefault = parcelHelpers.interopDefault(_cloudLightningFill);
-var _cloudLightningRainFill = require("./icons/cloud-lightning-rain-fill");
-var _cloudLightningRainFillDefault = parcelHelpers.interopDefault(_cloudLightningRainFill);
-var _cloudLightningRain = require("./icons/cloud-lightning-rain");
-var _cloudLightningRainDefault = parcelHelpers.interopDefault(_cloudLightningRain);
-var _cloudLightning = require("./icons/cloud-lightning");
-var _cloudLightningDefault = parcelHelpers.interopDefault(_cloudLightning);
-var _cloudMinusFill = require("./icons/cloud-minus-fill");
-var _cloudMinusFillDefault = parcelHelpers.interopDefault(_cloudMinusFill);
-var _cloudMinus = require("./icons/cloud-minus");
-var _cloudMinusDefault = parcelHelpers.interopDefault(_cloudMinus);
-var _cloudMoonFill = require("./icons/cloud-moon-fill");
-var _cloudMoonFillDefault = parcelHelpers.interopDefault(_cloudMoonFill);
-var _cloudMoon = require("./icons/cloud-moon");
-var _cloudMoonDefault = parcelHelpers.interopDefault(_cloudMoon);
-var _cloudPlusFill = require("./icons/cloud-plus-fill");
-var _cloudPlusFillDefault = parcelHelpers.interopDefault(_cloudPlusFill);
-var _cloudPlus = require("./icons/cloud-plus");
-var _cloudPlusDefault = parcelHelpers.interopDefault(_cloudPlus);
-var _cloudRainFill = require("./icons/cloud-rain-fill");
-var _cloudRainFillDefault = parcelHelpers.interopDefault(_cloudRainFill);
-var _cloudRainHeavyFill = require("./icons/cloud-rain-heavy-fill");
-var _cloudRainHeavyFillDefault = parcelHelpers.interopDefault(_cloudRainHeavyFill);
-var _cloudRainHeavy = require("./icons/cloud-rain-heavy");
-var _cloudRainHeavyDefault = parcelHelpers.interopDefault(_cloudRainHeavy);
-var _cloudRain = require("./icons/cloud-rain");
-var _cloudRainDefault = parcelHelpers.interopDefault(_cloudRain);
-var _cloudSlashFill = require("./icons/cloud-slash-fill");
-var _cloudSlashFillDefault = parcelHelpers.interopDefault(_cloudSlashFill);
-var _cloudSlash = require("./icons/cloud-slash");
-var _cloudSlashDefault = parcelHelpers.interopDefault(_cloudSlash);
-var _cloudSleetFill = require("./icons/cloud-sleet-fill");
-var _cloudSleetFillDefault = parcelHelpers.interopDefault(_cloudSleetFill);
-var _cloudSleet = require("./icons/cloud-sleet");
-var _cloudSleetDefault = parcelHelpers.interopDefault(_cloudSleet);
-var _cloudSnowFill = require("./icons/cloud-snow-fill");
-var _cloudSnowFillDefault = parcelHelpers.interopDefault(_cloudSnowFill);
-var _cloudSnow = require("./icons/cloud-snow");
-var _cloudSnowDefault = parcelHelpers.interopDefault(_cloudSnow);
-var _cloudSunFill = require("./icons/cloud-sun-fill");
-var _cloudSunFillDefault = parcelHelpers.interopDefault(_cloudSunFill);
-var _cloudSun = require("./icons/cloud-sun");
-var _cloudSunDefault = parcelHelpers.interopDefault(_cloudSun);
-var _cloudUploadFill = require("./icons/cloud-upload-fill");
-var _cloudUploadFillDefault = parcelHelpers.interopDefault(_cloudUploadFill);
-var _cloudUpload = require("./icons/cloud-upload");
-var _cloudUploadDefault = parcelHelpers.interopDefault(_cloudUpload);
-var _cloud = require("./icons/cloud");
-var _cloudDefault = parcelHelpers.interopDefault(_cloud);
-var _cloudsFill = require("./icons/clouds-fill");
-var _cloudsFillDefault = parcelHelpers.interopDefault(_cloudsFill);
-var _clouds = require("./icons/clouds");
-var _cloudsDefault = parcelHelpers.interopDefault(_clouds);
-var _cloudyFill = require("./icons/cloudy-fill");
-var _cloudyFillDefault = parcelHelpers.interopDefault(_cloudyFill);
-var _cloudy = require("./icons/cloudy");
-var _cloudyDefault = parcelHelpers.interopDefault(_cloudy);
-var _codeSlash = require("./icons/code-slash");
-var _codeSlashDefault = parcelHelpers.interopDefault(_codeSlash);
-var _codeSquare = require("./icons/code-square");
-var _codeSquareDefault = parcelHelpers.interopDefault(_codeSquare);
-var _code = require("./icons/code");
-var _codeDefault = parcelHelpers.interopDefault(_code);
-var _coin = require("./icons/coin");
-var _coinDefault = parcelHelpers.interopDefault(_coin);
-var _collectionFill = require("./icons/collection-fill");
-var _collectionFillDefault = parcelHelpers.interopDefault(_collectionFill);
-var _collectionPlayFill = require("./icons/collection-play-fill");
-var _collectionPlayFillDefault = parcelHelpers.interopDefault(_collectionPlayFill);
-var _collectionPlay = require("./icons/collection-play");
-var _collectionPlayDefault = parcelHelpers.interopDefault(_collectionPlay);
-var _collection = require("./icons/collection");
-var _collectionDefault = parcelHelpers.interopDefault(_collection);
-var _columnsGap = require("./icons/columns-gap");
-var _columnsGapDefault = parcelHelpers.interopDefault(_columnsGap);
-var _columns = require("./icons/columns");
-var _columnsDefault = parcelHelpers.interopDefault(_columns);
-var _command = require("./icons/command");
-var _commandDefault = parcelHelpers.interopDefault(_command);
-var _compassFill = require("./icons/compass-fill");
-var _compassFillDefault = parcelHelpers.interopDefault(_compassFill);
-var _compass = require("./icons/compass");
-var _compassDefault = parcelHelpers.interopDefault(_compass);
-var _coneStriped = require("./icons/cone-striped");
-var _coneStripedDefault = parcelHelpers.interopDefault(_coneStriped);
-var _cone = require("./icons/cone");
-var _coneDefault = parcelHelpers.interopDefault(_cone);
-var _controller = require("./icons/controller");
-var _controllerDefault = parcelHelpers.interopDefault(_controller);
-var _cookie = require("./icons/cookie");
-var _cookieDefault = parcelHelpers.interopDefault(_cookie);
-var _copy = require("./icons/copy");
-var _copyDefault = parcelHelpers.interopDefault(_copy);
-var _cpuFill = require("./icons/cpu-fill");
-var _cpuFillDefault = parcelHelpers.interopDefault(_cpuFill);
-var _cpu = require("./icons/cpu");
-var _cpuDefault = parcelHelpers.interopDefault(_cpu);
-var _creditCard2BackFill = require("./icons/credit-card-2-back-fill");
-var _creditCard2BackFillDefault = parcelHelpers.interopDefault(_creditCard2BackFill);
-var _creditCard2Back = require("./icons/credit-card-2-back");
-var _creditCard2BackDefault = parcelHelpers.interopDefault(_creditCard2Back);
-var _creditCard2FrontFill = require("./icons/credit-card-2-front-fill");
-var _creditCard2FrontFillDefault = parcelHelpers.interopDefault(_creditCard2FrontFill);
-var _creditCard2Front = require("./icons/credit-card-2-front");
-var _creditCard2FrontDefault = parcelHelpers.interopDefault(_creditCard2Front);
-var _creditCardFill = require("./icons/credit-card-fill");
-var _creditCardFillDefault = parcelHelpers.interopDefault(_creditCardFill);
-var _creditCard = require("./icons/credit-card");
-var _creditCardDefault = parcelHelpers.interopDefault(_creditCard);
-var _crop = require("./icons/crop");
-var _cropDefault = parcelHelpers.interopDefault(_crop);
-var _crosshair = require("./icons/crosshair");
-var _crosshairDefault = parcelHelpers.interopDefault(_crosshair);
-var _crosshair2 = require("./icons/crosshair2");
-var _crosshair2Default = parcelHelpers.interopDefault(_crosshair2);
-var _cupFill = require("./icons/cup-fill");
-var _cupFillDefault = parcelHelpers.interopDefault(_cupFill);
-var _cupHotFill = require("./icons/cup-hot-fill");
-var _cupHotFillDefault = parcelHelpers.interopDefault(_cupHotFill);
-var _cupHot = require("./icons/cup-hot");
-var _cupHotDefault = parcelHelpers.interopDefault(_cupHot);
-var _cupStraw = require("./icons/cup-straw");
-var _cupStrawDefault = parcelHelpers.interopDefault(_cupStraw);
-var _cup = require("./icons/cup");
-var _cupDefault = parcelHelpers.interopDefault(_cup);
-var _currencyBitcoin = require("./icons/currency-bitcoin");
-var _currencyBitcoinDefault = parcelHelpers.interopDefault(_currencyBitcoin);
-var _currencyDollar = require("./icons/currency-dollar");
-var _currencyDollarDefault = parcelHelpers.interopDefault(_currencyDollar);
-var _currencyEuro = require("./icons/currency-euro");
-var _currencyEuroDefault = parcelHelpers.interopDefault(_currencyEuro);
-var _currencyExchange = require("./icons/currency-exchange");
-var _currencyExchangeDefault = parcelHelpers.interopDefault(_currencyExchange);
-var _currencyPound = require("./icons/currency-pound");
-var _currencyPoundDefault = parcelHelpers.interopDefault(_currencyPound);
-var _currencyRupee = require("./icons/currency-rupee");
-var _currencyRupeeDefault = parcelHelpers.interopDefault(_currencyRupee);
-var _currencyYen = require("./icons/currency-yen");
-var _currencyYenDefault = parcelHelpers.interopDefault(_currencyYen);
-var _cursorFill = require("./icons/cursor-fill");
-var _cursorFillDefault = parcelHelpers.interopDefault(_cursorFill);
-var _cursorText = require("./icons/cursor-text");
-var _cursorTextDefault = parcelHelpers.interopDefault(_cursorText);
-var _cursor = require("./icons/cursor");
-var _cursorDefault = parcelHelpers.interopDefault(_cursor);
-var _dashCircleDotted = require("./icons/dash-circle-dotted");
-var _dashCircleDottedDefault = parcelHelpers.interopDefault(_dashCircleDotted);
-var _dashCircleFill = require("./icons/dash-circle-fill");
-var _dashCircleFillDefault = parcelHelpers.interopDefault(_dashCircleFill);
-var _dashCircle = require("./icons/dash-circle");
-var _dashCircleDefault = parcelHelpers.interopDefault(_dashCircle);
-var _dashLg = require("./icons/dash-lg");
-var _dashLgDefault = parcelHelpers.interopDefault(_dashLg);
-var _dashSquareDotted = require("./icons/dash-square-dotted");
-var _dashSquareDottedDefault = parcelHelpers.interopDefault(_dashSquareDotted);
-var _dashSquareFill = require("./icons/dash-square-fill");
-var _dashSquareFillDefault = parcelHelpers.interopDefault(_dashSquareFill);
-var _dashSquare = require("./icons/dash-square");
-var _dashSquareDefault = parcelHelpers.interopDefault(_dashSquare);
-var _dash = require("./icons/dash");
-var _dashDefault = parcelHelpers.interopDefault(_dash);
-var _databaseAdd = require("./icons/database-add");
-var _databaseAddDefault = parcelHelpers.interopDefault(_databaseAdd);
-var _databaseCheck = require("./icons/database-check");
-var _databaseCheckDefault = parcelHelpers.interopDefault(_databaseCheck);
-var _databaseDash = require("./icons/database-dash");
-var _databaseDashDefault = parcelHelpers.interopDefault(_databaseDash);
-var _databaseDown = require("./icons/database-down");
-var _databaseDownDefault = parcelHelpers.interopDefault(_databaseDown);
-var _databaseExclamation = require("./icons/database-exclamation");
-var _databaseExclamationDefault = parcelHelpers.interopDefault(_databaseExclamation);
-var _databaseFillAdd = require("./icons/database-fill-add");
-var _databaseFillAddDefault = parcelHelpers.interopDefault(_databaseFillAdd);
-var _databaseFillCheck = require("./icons/database-fill-check");
-var _databaseFillCheckDefault = parcelHelpers.interopDefault(_databaseFillCheck);
-var _databaseFillDash = require("./icons/database-fill-dash");
-var _databaseFillDashDefault = parcelHelpers.interopDefault(_databaseFillDash);
-var _databaseFillDown = require("./icons/database-fill-down");
-var _databaseFillDownDefault = parcelHelpers.interopDefault(_databaseFillDown);
-var _databaseFillExclamation = require("./icons/database-fill-exclamation");
-var _databaseFillExclamationDefault = parcelHelpers.interopDefault(_databaseFillExclamation);
-var _databaseFillGear = require("./icons/database-fill-gear");
-var _databaseFillGearDefault = parcelHelpers.interopDefault(_databaseFillGear);
-var _databaseFillLock = require("./icons/database-fill-lock");
-var _databaseFillLockDefault = parcelHelpers.interopDefault(_databaseFillLock);
-var _databaseFillSlash = require("./icons/database-fill-slash");
-var _databaseFillSlashDefault = parcelHelpers.interopDefault(_databaseFillSlash);
-var _databaseFillUp = require("./icons/database-fill-up");
-var _databaseFillUpDefault = parcelHelpers.interopDefault(_databaseFillUp);
-var _databaseFillX = require("./icons/database-fill-x");
-var _databaseFillXDefault = parcelHelpers.interopDefault(_databaseFillX);
-var _databaseFill = require("./icons/database-fill");
-var _databaseFillDefault = parcelHelpers.interopDefault(_databaseFill);
-var _databaseGear = require("./icons/database-gear");
-var _databaseGearDefault = parcelHelpers.interopDefault(_databaseGear);
-var _databaseLock = require("./icons/database-lock");
-var _databaseLockDefault = parcelHelpers.interopDefault(_databaseLock);
-var _databaseSlash = require("./icons/database-slash");
-var _databaseSlashDefault = parcelHelpers.interopDefault(_databaseSlash);
-var _databaseUp = require("./icons/database-up");
-var _databaseUpDefault = parcelHelpers.interopDefault(_databaseUp);
-var _databaseX = require("./icons/database-x");
-var _databaseXDefault = parcelHelpers.interopDefault(_databaseX);
-var _database = require("./icons/database");
-var _databaseDefault = parcelHelpers.interopDefault(_database);
-var _deviceHddFill = require("./icons/device-hdd-fill");
-var _deviceHddFillDefault = parcelHelpers.interopDefault(_deviceHddFill);
-var _deviceHdd = require("./icons/device-hdd");
-var _deviceHddDefault = parcelHelpers.interopDefault(_deviceHdd);
-var _deviceSsdFill = require("./icons/device-ssd-fill");
-var _deviceSsdFillDefault = parcelHelpers.interopDefault(_deviceSsdFill);
-var _deviceSsd = require("./icons/device-ssd");
-var _deviceSsdDefault = parcelHelpers.interopDefault(_deviceSsd);
-var _diagram2Fill = require("./icons/diagram-2-fill");
-var _diagram2FillDefault = parcelHelpers.interopDefault(_diagram2Fill);
-var _diagram2 = require("./icons/diagram-2");
-var _diagram2Default = parcelHelpers.interopDefault(_diagram2);
-var _diagram3Fill = require("./icons/diagram-3-fill");
-var _diagram3FillDefault = parcelHelpers.interopDefault(_diagram3Fill);
-var _diagram3 = require("./icons/diagram-3");
-var _diagram3Default = parcelHelpers.interopDefault(_diagram3);
-var _diamondFill = require("./icons/diamond-fill");
-var _diamondFillDefault = parcelHelpers.interopDefault(_diamondFill);
-var _diamondHalf = require("./icons/diamond-half");
-var _diamondHalfDefault = parcelHelpers.interopDefault(_diamondHalf);
-var _diamond = require("./icons/diamond");
-var _diamondDefault = parcelHelpers.interopDefault(_diamond);
-var _dice1Fill = require("./icons/dice-1-fill");
-var _dice1FillDefault = parcelHelpers.interopDefault(_dice1Fill);
-var _dice1 = require("./icons/dice-1");
-var _dice1Default = parcelHelpers.interopDefault(_dice1);
-var _dice2Fill = require("./icons/dice-2-fill");
-var _dice2FillDefault = parcelHelpers.interopDefault(_dice2Fill);
-var _dice2 = require("./icons/dice-2");
-var _dice2Default = parcelHelpers.interopDefault(_dice2);
-var _dice3Fill = require("./icons/dice-3-fill");
-var _dice3FillDefault = parcelHelpers.interopDefault(_dice3Fill);
-var _dice3 = require("./icons/dice-3");
-var _dice3Default = parcelHelpers.interopDefault(_dice3);
-var _dice4Fill = require("./icons/dice-4-fill");
-var _dice4FillDefault = parcelHelpers.interopDefault(_dice4Fill);
-var _dice4 = require("./icons/dice-4");
-var _dice4Default = parcelHelpers.interopDefault(_dice4);
-var _dice5Fill = require("./icons/dice-5-fill");
-var _dice5FillDefault = parcelHelpers.interopDefault(_dice5Fill);
-var _dice5 = require("./icons/dice-5");
-var _dice5Default = parcelHelpers.interopDefault(_dice5);
-var _dice6Fill = require("./icons/dice-6-fill");
-var _dice6FillDefault = parcelHelpers.interopDefault(_dice6Fill);
-var _dice6 = require("./icons/dice-6");
-var _dice6Default = parcelHelpers.interopDefault(_dice6);
-var _discFill = require("./icons/disc-fill");
-var _discFillDefault = parcelHelpers.interopDefault(_discFill);
-var _disc = require("./icons/disc");
-var _discDefault = parcelHelpers.interopDefault(_disc);
-var _discord = require("./icons/discord");
-var _discordDefault = parcelHelpers.interopDefault(_discord);
-var _displayFill = require("./icons/display-fill");
-var _displayFillDefault = parcelHelpers.interopDefault(_displayFill);
-var _display = require("./icons/display");
-var _displayDefault = parcelHelpers.interopDefault(_display);
-var _displayportFill = require("./icons/displayport-fill");
-var _displayportFillDefault = parcelHelpers.interopDefault(_displayportFill);
-var _displayport = require("./icons/displayport");
-var _displayportDefault = parcelHelpers.interopDefault(_displayport);
-var _distributeHorizontal = require("./icons/distribute-horizontal");
-var _distributeHorizontalDefault = parcelHelpers.interopDefault(_distributeHorizontal);
-var _distributeVertical = require("./icons/distribute-vertical");
-var _distributeVerticalDefault = parcelHelpers.interopDefault(_distributeVertical);
-var _doorClosedFill = require("./icons/door-closed-fill");
-var _doorClosedFillDefault = parcelHelpers.interopDefault(_doorClosedFill);
-var _doorClosed = require("./icons/door-closed");
-var _doorClosedDefault = parcelHelpers.interopDefault(_doorClosed);
-var _doorOpenFill = require("./icons/door-open-fill");
-var _doorOpenFillDefault = parcelHelpers.interopDefault(_doorOpenFill);
-var _doorOpen = require("./icons/door-open");
-var _doorOpenDefault = parcelHelpers.interopDefault(_doorOpen);
-var _dot = require("./icons/dot");
-var _dotDefault = parcelHelpers.interopDefault(_dot);
-var _download = require("./icons/download");
-var _downloadDefault = parcelHelpers.interopDefault(_download);
-var _dpadFill = require("./icons/dpad-fill");
-var _dpadFillDefault = parcelHelpers.interopDefault(_dpadFill);
-var _dpad = require("./icons/dpad");
-var _dpadDefault = parcelHelpers.interopDefault(_dpad);
-var _dribbble = require("./icons/dribbble");
-var _dribbbleDefault = parcelHelpers.interopDefault(_dribbble);
-var _dropbox = require("./icons/dropbox");
-var _dropboxDefault = parcelHelpers.interopDefault(_dropbox);
-var _dropletFill = require("./icons/droplet-fill");
-var _dropletFillDefault = parcelHelpers.interopDefault(_dropletFill);
-var _dropletHalf = require("./icons/droplet-half");
-var _dropletHalfDefault = parcelHelpers.interopDefault(_dropletHalf);
-var _droplet = require("./icons/droplet");
-var _dropletDefault = parcelHelpers.interopDefault(_droplet);
-var _duffleFill = require("./icons/duffle-fill");
-var _duffleFillDefault = parcelHelpers.interopDefault(_duffleFill);
-var _duffle = require("./icons/duffle");
-var _duffleDefault = parcelHelpers.interopDefault(_duffle);
-var _earFill = require("./icons/ear-fill");
-var _earFillDefault = parcelHelpers.interopDefault(_earFill);
-var _ear = require("./icons/ear");
-var _earDefault = parcelHelpers.interopDefault(_ear);
-var _earbuds = require("./icons/earbuds");
-var _earbudsDefault = parcelHelpers.interopDefault(_earbuds);
-var _easelFill = require("./icons/easel-fill");
-var _easelFillDefault = parcelHelpers.interopDefault(_easelFill);
-var _easel = require("./icons/easel");
-var _easelDefault = parcelHelpers.interopDefault(_easel);
-var _easel2Fill = require("./icons/easel2-fill");
-var _easel2FillDefault = parcelHelpers.interopDefault(_easel2Fill);
-var _easel2 = require("./icons/easel2");
-var _easel2Default = parcelHelpers.interopDefault(_easel2);
-var _easel3Fill = require("./icons/easel3-fill");
-var _easel3FillDefault = parcelHelpers.interopDefault(_easel3Fill);
-var _easel3 = require("./icons/easel3");
-var _easel3Default = parcelHelpers.interopDefault(_easel3);
-var _eggFill = require("./icons/egg-fill");
-var _eggFillDefault = parcelHelpers.interopDefault(_eggFill);
-var _eggFried = require("./icons/egg-fried");
-var _eggFriedDefault = parcelHelpers.interopDefault(_eggFried);
-var _egg = require("./icons/egg");
-var _eggDefault = parcelHelpers.interopDefault(_egg);
-var _ejectFill = require("./icons/eject-fill");
-var _ejectFillDefault = parcelHelpers.interopDefault(_ejectFill);
-var _eject = require("./icons/eject");
-var _ejectDefault = parcelHelpers.interopDefault(_eject);
-var _emojiAngryFill = require("./icons/emoji-angry-fill");
-var _emojiAngryFillDefault = parcelHelpers.interopDefault(_emojiAngryFill);
-var _emojiAngry = require("./icons/emoji-angry");
-var _emojiAngryDefault = parcelHelpers.interopDefault(_emojiAngry);
-var _emojiAstonishedFill = require("./icons/emoji-astonished-fill");
-var _emojiAstonishedFillDefault = parcelHelpers.interopDefault(_emojiAstonishedFill);
-var _emojiAstonished = require("./icons/emoji-astonished");
-var _emojiAstonishedDefault = parcelHelpers.interopDefault(_emojiAstonished);
-var _emojiDizzyFill = require("./icons/emoji-dizzy-fill");
-var _emojiDizzyFillDefault = parcelHelpers.interopDefault(_emojiDizzyFill);
-var _emojiDizzy = require("./icons/emoji-dizzy");
-var _emojiDizzyDefault = parcelHelpers.interopDefault(_emojiDizzy);
-var _emojiExpressionlessFill = require("./icons/emoji-expressionless-fill");
-var _emojiExpressionlessFillDefault = parcelHelpers.interopDefault(_emojiExpressionlessFill);
-var _emojiExpressionless = require("./icons/emoji-expressionless");
-var _emojiExpressionlessDefault = parcelHelpers.interopDefault(_emojiExpressionless);
-var _emojiFrownFill = require("./icons/emoji-frown-fill");
-var _emojiFrownFillDefault = parcelHelpers.interopDefault(_emojiFrownFill);
-var _emojiFrown = require("./icons/emoji-frown");
-var _emojiFrownDefault = parcelHelpers.interopDefault(_emojiFrown);
-var _emojiGrimaceFill = require("./icons/emoji-grimace-fill");
-var _emojiGrimaceFillDefault = parcelHelpers.interopDefault(_emojiGrimaceFill);
-var _emojiGrimace = require("./icons/emoji-grimace");
-var _emojiGrimaceDefault = parcelHelpers.interopDefault(_emojiGrimace);
-var _emojiGrinFill = require("./icons/emoji-grin-fill");
-var _emojiGrinFillDefault = parcelHelpers.interopDefault(_emojiGrinFill);
-var _emojiGrin = require("./icons/emoji-grin");
-var _emojiGrinDefault = parcelHelpers.interopDefault(_emojiGrin);
-var _emojiHeartEyesFill = require("./icons/emoji-heart-eyes-fill");
-var _emojiHeartEyesFillDefault = parcelHelpers.interopDefault(_emojiHeartEyesFill);
-var _emojiHeartEyes = require("./icons/emoji-heart-eyes");
-var _emojiHeartEyesDefault = parcelHelpers.interopDefault(_emojiHeartEyes);
-var _emojiKissFill = require("./icons/emoji-kiss-fill");
-var _emojiKissFillDefault = parcelHelpers.interopDefault(_emojiKissFill);
-var _emojiKiss = require("./icons/emoji-kiss");
-var _emojiKissDefault = parcelHelpers.interopDefault(_emojiKiss);
-var _emojiLaughingFill = require("./icons/emoji-laughing-fill");
-var _emojiLaughingFillDefault = parcelHelpers.interopDefault(_emojiLaughingFill);
-var _emojiLaughing = require("./icons/emoji-laughing");
-var _emojiLaughingDefault = parcelHelpers.interopDefault(_emojiLaughing);
-var _emojiNeutralFill = require("./icons/emoji-neutral-fill");
-var _emojiNeutralFillDefault = parcelHelpers.interopDefault(_emojiNeutralFill);
-var _emojiNeutral = require("./icons/emoji-neutral");
-var _emojiNeutralDefault = parcelHelpers.interopDefault(_emojiNeutral);
-var _emojiSmileFill = require("./icons/emoji-smile-fill");
-var _emojiSmileFillDefault = parcelHelpers.interopDefault(_emojiSmileFill);
-var _emojiSmileUpsideDownFill = require("./icons/emoji-smile-upside-down-fill");
-var _emojiSmileUpsideDownFillDefault = parcelHelpers.interopDefault(_emojiSmileUpsideDownFill);
-var _emojiSmileUpsideDown = require("./icons/emoji-smile-upside-down");
-var _emojiSmileUpsideDownDefault = parcelHelpers.interopDefault(_emojiSmileUpsideDown);
-var _emojiSmile = require("./icons/emoji-smile");
-var _emojiSmileDefault = parcelHelpers.interopDefault(_emojiSmile);
-var _emojiSunglassesFill = require("./icons/emoji-sunglasses-fill");
-var _emojiSunglassesFillDefault = parcelHelpers.interopDefault(_emojiSunglassesFill);
-var _emojiSunglasses = require("./icons/emoji-sunglasses");
-var _emojiSunglassesDefault = parcelHelpers.interopDefault(_emojiSunglasses);
-var _emojiSurpriseFill = require("./icons/emoji-surprise-fill");
-var _emojiSurpriseFillDefault = parcelHelpers.interopDefault(_emojiSurpriseFill);
-var _emojiSurprise = require("./icons/emoji-surprise");
-var _emojiSurpriseDefault = parcelHelpers.interopDefault(_emojiSurprise);
-var _emojiTearFill = require("./icons/emoji-tear-fill");
-var _emojiTearFillDefault = parcelHelpers.interopDefault(_emojiTearFill);
-var _emojiTear = require("./icons/emoji-tear");
-var _emojiTearDefault = parcelHelpers.interopDefault(_emojiTear);
-var _emojiWinkFill = require("./icons/emoji-wink-fill");
-var _emojiWinkFillDefault = parcelHelpers.interopDefault(_emojiWinkFill);
-var _emojiWink = require("./icons/emoji-wink");
-var _emojiWinkDefault = parcelHelpers.interopDefault(_emojiWink);
-var _envelopeArrowDownFill = require("./icons/envelope-arrow-down-fill");
-var _envelopeArrowDownFillDefault = parcelHelpers.interopDefault(_envelopeArrowDownFill);
-var _envelopeArrowDown = require("./icons/envelope-arrow-down");
-var _envelopeArrowDownDefault = parcelHelpers.interopDefault(_envelopeArrowDown);
-var _envelopeArrowUpFill = require("./icons/envelope-arrow-up-fill");
-var _envelopeArrowUpFillDefault = parcelHelpers.interopDefault(_envelopeArrowUpFill);
-var _envelopeArrowUp = require("./icons/envelope-arrow-up");
-var _envelopeArrowUpDefault = parcelHelpers.interopDefault(_envelopeArrowUp);
-var _envelopeAtFill = require("./icons/envelope-at-fill");
-var _envelopeAtFillDefault = parcelHelpers.interopDefault(_envelopeAtFill);
-var _envelopeAt = require("./icons/envelope-at");
-var _envelopeAtDefault = parcelHelpers.interopDefault(_envelopeAt);
-var _envelopeCheckFill = require("./icons/envelope-check-fill");
-var _envelopeCheckFillDefault = parcelHelpers.interopDefault(_envelopeCheckFill);
-var _envelopeCheck = require("./icons/envelope-check");
-var _envelopeCheckDefault = parcelHelpers.interopDefault(_envelopeCheck);
-var _envelopeDashFill = require("./icons/envelope-dash-fill");
-var _envelopeDashFillDefault = parcelHelpers.interopDefault(_envelopeDashFill);
-var _envelopeDash = require("./icons/envelope-dash");
-var _envelopeDashDefault = parcelHelpers.interopDefault(_envelopeDash);
-var _envelopeExclamationFill = require("./icons/envelope-exclamation-fill");
-var _envelopeExclamationFillDefault = parcelHelpers.interopDefault(_envelopeExclamationFill);
-var _envelopeExclamation = require("./icons/envelope-exclamation");
-var _envelopeExclamationDefault = parcelHelpers.interopDefault(_envelopeExclamation);
-var _envelopeFill = require("./icons/envelope-fill");
-var _envelopeFillDefault = parcelHelpers.interopDefault(_envelopeFill);
-var _envelopeHeartFill = require("./icons/envelope-heart-fill");
-var _envelopeHeartFillDefault = parcelHelpers.interopDefault(_envelopeHeartFill);
-var _envelopeHeart = require("./icons/envelope-heart");
-var _envelopeHeartDefault = parcelHelpers.interopDefault(_envelopeHeart);
-var _envelopeOpenFill = require("./icons/envelope-open-fill");
-var _envelopeOpenFillDefault = parcelHelpers.interopDefault(_envelopeOpenFill);
-var _envelopeOpenHeartFill = require("./icons/envelope-open-heart-fill");
-var _envelopeOpenHeartFillDefault = parcelHelpers.interopDefault(_envelopeOpenHeartFill);
-var _envelopeOpenHeart = require("./icons/envelope-open-heart");
-var _envelopeOpenHeartDefault = parcelHelpers.interopDefault(_envelopeOpenHeart);
-var _envelopeOpen = require("./icons/envelope-open");
-var _envelopeOpenDefault = parcelHelpers.interopDefault(_envelopeOpen);
-var _envelopePaperFill = require("./icons/envelope-paper-fill");
-var _envelopePaperFillDefault = parcelHelpers.interopDefault(_envelopePaperFill);
-var _envelopePaperHeartFill = require("./icons/envelope-paper-heart-fill");
-var _envelopePaperHeartFillDefault = parcelHelpers.interopDefault(_envelopePaperHeartFill);
-var _envelopePaperHeart = require("./icons/envelope-paper-heart");
-var _envelopePaperHeartDefault = parcelHelpers.interopDefault(_envelopePaperHeart);
-var _envelopePaper = require("./icons/envelope-paper");
-var _envelopePaperDefault = parcelHelpers.interopDefault(_envelopePaper);
-var _envelopePlusFill = require("./icons/envelope-plus-fill");
-var _envelopePlusFillDefault = parcelHelpers.interopDefault(_envelopePlusFill);
-var _envelopePlus = require("./icons/envelope-plus");
-var _envelopePlusDefault = parcelHelpers.interopDefault(_envelopePlus);
-var _envelopeSlashFill = require("./icons/envelope-slash-fill");
-var _envelopeSlashFillDefault = parcelHelpers.interopDefault(_envelopeSlashFill);
-var _envelopeSlash = require("./icons/envelope-slash");
-var _envelopeSlashDefault = parcelHelpers.interopDefault(_envelopeSlash);
-var _envelopeXFill = require("./icons/envelope-x-fill");
-var _envelopeXFillDefault = parcelHelpers.interopDefault(_envelopeXFill);
-var _envelopeX = require("./icons/envelope-x");
-var _envelopeXDefault = parcelHelpers.interopDefault(_envelopeX);
-var _envelope = require("./icons/envelope");
-var _envelopeDefault = parcelHelpers.interopDefault(_envelope);
-var _eraserFill = require("./icons/eraser-fill");
-var _eraserFillDefault = parcelHelpers.interopDefault(_eraserFill);
-var _eraser = require("./icons/eraser");
-var _eraserDefault = parcelHelpers.interopDefault(_eraser);
-var _escape = require("./icons/escape");
-var _escapeDefault = parcelHelpers.interopDefault(_escape);
-var _ethernet = require("./icons/ethernet");
-var _ethernetDefault = parcelHelpers.interopDefault(_ethernet);
-var _evFrontFill = require("./icons/ev-front-fill");
-var _evFrontFillDefault = parcelHelpers.interopDefault(_evFrontFill);
-var _evFront = require("./icons/ev-front");
-var _evFrontDefault = parcelHelpers.interopDefault(_evFront);
-var _evStationFill = require("./icons/ev-station-fill");
-var _evStationFillDefault = parcelHelpers.interopDefault(_evStationFill);
-var _evStation = require("./icons/ev-station");
-var _evStationDefault = parcelHelpers.interopDefault(_evStation);
-var _exclamationCircleFill = require("./icons/exclamation-circle-fill");
-var _exclamationCircleFillDefault = parcelHelpers.interopDefault(_exclamationCircleFill);
-var _exclamationCircle = require("./icons/exclamation-circle");
-var _exclamationCircleDefault = parcelHelpers.interopDefault(_exclamationCircle);
-var _exclamationDiamondFill = require("./icons/exclamation-diamond-fill");
-var _exclamationDiamondFillDefault = parcelHelpers.interopDefault(_exclamationDiamondFill);
-var _exclamationDiamond = require("./icons/exclamation-diamond");
-var _exclamationDiamondDefault = parcelHelpers.interopDefault(_exclamationDiamond);
-var _exclamationLg = require("./icons/exclamation-lg");
-var _exclamationLgDefault = parcelHelpers.interopDefault(_exclamationLg);
-var _exclamationOctagonFill = require("./icons/exclamation-octagon-fill");
-var _exclamationOctagonFillDefault = parcelHelpers.interopDefault(_exclamationOctagonFill);
-var _exclamationOctagon = require("./icons/exclamation-octagon");
-var _exclamationOctagonDefault = parcelHelpers.interopDefault(_exclamationOctagon);
-var _exclamationSquareFill = require("./icons/exclamation-square-fill");
-var _exclamationSquareFillDefault = parcelHelpers.interopDefault(_exclamationSquareFill);
-var _exclamationSquare = require("./icons/exclamation-square");
-var _exclamationSquareDefault = parcelHelpers.interopDefault(_exclamationSquare);
-var _exclamationTriangleFill = require("./icons/exclamation-triangle-fill");
-var _exclamationTriangleFillDefault = parcelHelpers.interopDefault(_exclamationTriangleFill);
-var _exclamationTriangle = require("./icons/exclamation-triangle");
-var _exclamationTriangleDefault = parcelHelpers.interopDefault(_exclamationTriangle);
-var _exclamation = require("./icons/exclamation");
-var _exclamationDefault = parcelHelpers.interopDefault(_exclamation);
-var _exclude = require("./icons/exclude");
-var _excludeDefault = parcelHelpers.interopDefault(_exclude);
-var _explicitFill = require("./icons/explicit-fill");
-var _explicitFillDefault = parcelHelpers.interopDefault(_explicitFill);
-var _explicit = require("./icons/explicit");
-var _explicitDefault = parcelHelpers.interopDefault(_explicit);
-var _exposure = require("./icons/exposure");
-var _exposureDefault = parcelHelpers.interopDefault(_exposure);
-var _eyeFill = require("./icons/eye-fill");
-var _eyeFillDefault = parcelHelpers.interopDefault(_eyeFill);
-var _eyeSlashFill = require("./icons/eye-slash-fill");
-var _eyeSlashFillDefault = parcelHelpers.interopDefault(_eyeSlashFill);
-var _eyeSlash = require("./icons/eye-slash");
-var _eyeSlashDefault = parcelHelpers.interopDefault(_eyeSlash);
-var _eye = require("./icons/eye");
-var _eyeDefault = parcelHelpers.interopDefault(_eye);
-var _eyedropper = require("./icons/eyedropper");
-var _eyedropperDefault = parcelHelpers.interopDefault(_eyedropper);
-var _eyeglasses = require("./icons/eyeglasses");
-var _eyeglassesDefault = parcelHelpers.interopDefault(_eyeglasses);
-var _facebook = require("./icons/facebook");
-var _facebookDefault = parcelHelpers.interopDefault(_facebook);
-var _fan = require("./icons/fan");
-var _fanDefault = parcelHelpers.interopDefault(_fan);
-var _fastForwardBtnFill = require("./icons/fast-forward-btn-fill");
-var _fastForwardBtnFillDefault = parcelHelpers.interopDefault(_fastForwardBtnFill);
-var _fastForwardBtn = require("./icons/fast-forward-btn");
-var _fastForwardBtnDefault = parcelHelpers.interopDefault(_fastForwardBtn);
-var _fastForwardCircleFill = require("./icons/fast-forward-circle-fill");
-var _fastForwardCircleFillDefault = parcelHelpers.interopDefault(_fastForwardCircleFill);
-var _fastForwardCircle = require("./icons/fast-forward-circle");
-var _fastForwardCircleDefault = parcelHelpers.interopDefault(_fastForwardCircle);
-var _fastForwardFill = require("./icons/fast-forward-fill");
-var _fastForwardFillDefault = parcelHelpers.interopDefault(_fastForwardFill);
-var _fastForward = require("./icons/fast-forward");
-var _fastForwardDefault = parcelHelpers.interopDefault(_fastForward);
-var _feather = require("./icons/feather");
-var _featherDefault = parcelHelpers.interopDefault(_feather);
-var _feather2 = require("./icons/feather2");
-var _feather2Default = parcelHelpers.interopDefault(_feather2);
-var _fileArrowDownFill = require("./icons/file-arrow-down-fill");
-var _fileArrowDownFillDefault = parcelHelpers.interopDefault(_fileArrowDownFill);
-var _fileArrowDown = require("./icons/file-arrow-down");
-var _fileArrowDownDefault = parcelHelpers.interopDefault(_fileArrowDown);
-var _fileArrowUpFill = require("./icons/file-arrow-up-fill");
-var _fileArrowUpFillDefault = parcelHelpers.interopDefault(_fileArrowUpFill);
-var _fileArrowUp = require("./icons/file-arrow-up");
-var _fileArrowUpDefault = parcelHelpers.interopDefault(_fileArrowUp);
-var _fileBarGraphFill = require("./icons/file-bar-graph-fill");
-var _fileBarGraphFillDefault = parcelHelpers.interopDefault(_fileBarGraphFill);
-var _fileBarGraph = require("./icons/file-bar-graph");
-var _fileBarGraphDefault = parcelHelpers.interopDefault(_fileBarGraph);
-var _fileBinaryFill = require("./icons/file-binary-fill");
-var _fileBinaryFillDefault = parcelHelpers.interopDefault(_fileBinaryFill);
-var _fileBinary = require("./icons/file-binary");
-var _fileBinaryDefault = parcelHelpers.interopDefault(_fileBinary);
-var _fileBreakFill = require("./icons/file-break-fill");
-var _fileBreakFillDefault = parcelHelpers.interopDefault(_fileBreakFill);
-var _fileBreak = require("./icons/file-break");
-var _fileBreakDefault = parcelHelpers.interopDefault(_fileBreak);
-var _fileCheckFill = require("./icons/file-check-fill");
-var _fileCheckFillDefault = parcelHelpers.interopDefault(_fileCheckFill);
-var _fileCheck = require("./icons/file-check");
-var _fileCheckDefault = parcelHelpers.interopDefault(_fileCheck);
-var _fileCodeFill = require("./icons/file-code-fill");
-var _fileCodeFillDefault = parcelHelpers.interopDefault(_fileCodeFill);
-var _fileCode = require("./icons/file-code");
-var _fileCodeDefault = parcelHelpers.interopDefault(_fileCode);
-var _fileDiffFill = require("./icons/file-diff-fill");
-var _fileDiffFillDefault = parcelHelpers.interopDefault(_fileDiffFill);
-var _fileDiff = require("./icons/file-diff");
-var _fileDiffDefault = parcelHelpers.interopDefault(_fileDiff);
-var _fileEarmarkArrowDownFill = require("./icons/file-earmark-arrow-down-fill");
-var _fileEarmarkArrowDownFillDefault = parcelHelpers.interopDefault(_fileEarmarkArrowDownFill);
-var _fileEarmarkArrowDown = require("./icons/file-earmark-arrow-down");
-var _fileEarmarkArrowDownDefault = parcelHelpers.interopDefault(_fileEarmarkArrowDown);
-var _fileEarmarkArrowUpFill = require("./icons/file-earmark-arrow-up-fill");
-var _fileEarmarkArrowUpFillDefault = parcelHelpers.interopDefault(_fileEarmarkArrowUpFill);
-var _fileEarmarkArrowUp = require("./icons/file-earmark-arrow-up");
-var _fileEarmarkArrowUpDefault = parcelHelpers.interopDefault(_fileEarmarkArrowUp);
-var _fileEarmarkBarGraphFill = require("./icons/file-earmark-bar-graph-fill");
-var _fileEarmarkBarGraphFillDefault = parcelHelpers.interopDefault(_fileEarmarkBarGraphFill);
-var _fileEarmarkBarGraph = require("./icons/file-earmark-bar-graph");
-var _fileEarmarkBarGraphDefault = parcelHelpers.interopDefault(_fileEarmarkBarGraph);
-var _fileEarmarkBinaryFill = require("./icons/file-earmark-binary-fill");
-var _fileEarmarkBinaryFillDefault = parcelHelpers.interopDefault(_fileEarmarkBinaryFill);
-var _fileEarmarkBinary = require("./icons/file-earmark-binary");
-var _fileEarmarkBinaryDefault = parcelHelpers.interopDefault(_fileEarmarkBinary);
-var _fileEarmarkBreakFill = require("./icons/file-earmark-break-fill");
-var _fileEarmarkBreakFillDefault = parcelHelpers.interopDefault(_fileEarmarkBreakFill);
-var _fileEarmarkBreak = require("./icons/file-earmark-break");
-var _fileEarmarkBreakDefault = parcelHelpers.interopDefault(_fileEarmarkBreak);
-var _fileEarmarkCheckFill = require("./icons/file-earmark-check-fill");
-var _fileEarmarkCheckFillDefault = parcelHelpers.interopDefault(_fileEarmarkCheckFill);
-var _fileEarmarkCheck = require("./icons/file-earmark-check");
-var _fileEarmarkCheckDefault = parcelHelpers.interopDefault(_fileEarmarkCheck);
-var _fileEarmarkCodeFill = require("./icons/file-earmark-code-fill");
-var _fileEarmarkCodeFillDefault = parcelHelpers.interopDefault(_fileEarmarkCodeFill);
-var _fileEarmarkCode = require("./icons/file-earmark-code");
-var _fileEarmarkCodeDefault = parcelHelpers.interopDefault(_fileEarmarkCode);
-var _fileEarmarkDiffFill = require("./icons/file-earmark-diff-fill");
-var _fileEarmarkDiffFillDefault = parcelHelpers.interopDefault(_fileEarmarkDiffFill);
-var _fileEarmarkDiff = require("./icons/file-earmark-diff");
-var _fileEarmarkDiffDefault = parcelHelpers.interopDefault(_fileEarmarkDiff);
-var _fileEarmarkEaselFill = require("./icons/file-earmark-easel-fill");
-var _fileEarmarkEaselFillDefault = parcelHelpers.interopDefault(_fileEarmarkEaselFill);
-var _fileEarmarkEasel = require("./icons/file-earmark-easel");
-var _fileEarmarkEaselDefault = parcelHelpers.interopDefault(_fileEarmarkEasel);
-var _fileEarmarkExcelFill = require("./icons/file-earmark-excel-fill");
-var _fileEarmarkExcelFillDefault = parcelHelpers.interopDefault(_fileEarmarkExcelFill);
-var _fileEarmarkExcel = require("./icons/file-earmark-excel");
-var _fileEarmarkExcelDefault = parcelHelpers.interopDefault(_fileEarmarkExcel);
-var _fileEarmarkFill = require("./icons/file-earmark-fill");
-var _fileEarmarkFillDefault = parcelHelpers.interopDefault(_fileEarmarkFill);
-var _fileEarmarkFontFill = require("./icons/file-earmark-font-fill");
-var _fileEarmarkFontFillDefault = parcelHelpers.interopDefault(_fileEarmarkFontFill);
-var _fileEarmarkFont = require("./icons/file-earmark-font");
-var _fileEarmarkFontDefault = parcelHelpers.interopDefault(_fileEarmarkFont);
-var _fileEarmarkImageFill = require("./icons/file-earmark-image-fill");
-var _fileEarmarkImageFillDefault = parcelHelpers.interopDefault(_fileEarmarkImageFill);
-var _fileEarmarkImage = require("./icons/file-earmark-image");
-var _fileEarmarkImageDefault = parcelHelpers.interopDefault(_fileEarmarkImage);
-var _fileEarmarkLockFill = require("./icons/file-earmark-lock-fill");
-var _fileEarmarkLockFillDefault = parcelHelpers.interopDefault(_fileEarmarkLockFill);
-var _fileEarmarkLock = require("./icons/file-earmark-lock");
-var _fileEarmarkLockDefault = parcelHelpers.interopDefault(_fileEarmarkLock);
-var _fileEarmarkLock2Fill = require("./icons/file-earmark-lock2-fill");
-var _fileEarmarkLock2FillDefault = parcelHelpers.interopDefault(_fileEarmarkLock2Fill);
-var _fileEarmarkLock2 = require("./icons/file-earmark-lock2");
-var _fileEarmarkLock2Default = parcelHelpers.interopDefault(_fileEarmarkLock2);
-var _fileEarmarkMedicalFill = require("./icons/file-earmark-medical-fill");
-var _fileEarmarkMedicalFillDefault = parcelHelpers.interopDefault(_fileEarmarkMedicalFill);
-var _fileEarmarkMedical = require("./icons/file-earmark-medical");
-var _fileEarmarkMedicalDefault = parcelHelpers.interopDefault(_fileEarmarkMedical);
-var _fileEarmarkMinusFill = require("./icons/file-earmark-minus-fill");
-var _fileEarmarkMinusFillDefault = parcelHelpers.interopDefault(_fileEarmarkMinusFill);
-var _fileEarmarkMinus = require("./icons/file-earmark-minus");
-var _fileEarmarkMinusDefault = parcelHelpers.interopDefault(_fileEarmarkMinus);
-var _fileEarmarkMusicFill = require("./icons/file-earmark-music-fill");
-var _fileEarmarkMusicFillDefault = parcelHelpers.interopDefault(_fileEarmarkMusicFill);
-var _fileEarmarkMusic = require("./icons/file-earmark-music");
-var _fileEarmarkMusicDefault = parcelHelpers.interopDefault(_fileEarmarkMusic);
-var _fileEarmarkPdfFill = require("./icons/file-earmark-pdf-fill");
-var _fileEarmarkPdfFillDefault = parcelHelpers.interopDefault(_fileEarmarkPdfFill);
-var _fileEarmarkPdf = require("./icons/file-earmark-pdf");
-var _fileEarmarkPdfDefault = parcelHelpers.interopDefault(_fileEarmarkPdf);
-var _fileEarmarkPersonFill = require("./icons/file-earmark-person-fill");
-var _fileEarmarkPersonFillDefault = parcelHelpers.interopDefault(_fileEarmarkPersonFill);
-var _fileEarmarkPerson = require("./icons/file-earmark-person");
-var _fileEarmarkPersonDefault = parcelHelpers.interopDefault(_fileEarmarkPerson);
-var _fileEarmarkPlayFill = require("./icons/file-earmark-play-fill");
-var _fileEarmarkPlayFillDefault = parcelHelpers.interopDefault(_fileEarmarkPlayFill);
-var _fileEarmarkPlay = require("./icons/file-earmark-play");
-var _fileEarmarkPlayDefault = parcelHelpers.interopDefault(_fileEarmarkPlay);
-var _fileEarmarkPlusFill = require("./icons/file-earmark-plus-fill");
-var _fileEarmarkPlusFillDefault = parcelHelpers.interopDefault(_fileEarmarkPlusFill);
-var _fileEarmarkPlus = require("./icons/file-earmark-plus");
-var _fileEarmarkPlusDefault = parcelHelpers.interopDefault(_fileEarmarkPlus);
-var _fileEarmarkPostFill = require("./icons/file-earmark-post-fill");
-var _fileEarmarkPostFillDefault = parcelHelpers.interopDefault(_fileEarmarkPostFill);
-var _fileEarmarkPost = require("./icons/file-earmark-post");
-var _fileEarmarkPostDefault = parcelHelpers.interopDefault(_fileEarmarkPost);
-var _fileEarmarkPptFill = require("./icons/file-earmark-ppt-fill");
-var _fileEarmarkPptFillDefault = parcelHelpers.interopDefault(_fileEarmarkPptFill);
-var _fileEarmarkPpt = require("./icons/file-earmark-ppt");
-var _fileEarmarkPptDefault = parcelHelpers.interopDefault(_fileEarmarkPpt);
-var _fileEarmarkRichtextFill = require("./icons/file-earmark-richtext-fill");
-var _fileEarmarkRichtextFillDefault = parcelHelpers.interopDefault(_fileEarmarkRichtextFill);
-var _fileEarmarkRichtext = require("./icons/file-earmark-richtext");
-var _fileEarmarkRichtextDefault = parcelHelpers.interopDefault(_fileEarmarkRichtext);
-var _fileEarmarkRuledFill = require("./icons/file-earmark-ruled-fill");
-var _fileEarmarkRuledFillDefault = parcelHelpers.interopDefault(_fileEarmarkRuledFill);
-var _fileEarmarkRuled = require("./icons/file-earmark-ruled");
-var _fileEarmarkRuledDefault = parcelHelpers.interopDefault(_fileEarmarkRuled);
-var _fileEarmarkSlidesFill = require("./icons/file-earmark-slides-fill");
-var _fileEarmarkSlidesFillDefault = parcelHelpers.interopDefault(_fileEarmarkSlidesFill);
-var _fileEarmarkSlides = require("./icons/file-earmark-slides");
-var _fileEarmarkSlidesDefault = parcelHelpers.interopDefault(_fileEarmarkSlides);
-var _fileEarmarkSpreadsheetFill = require("./icons/file-earmark-spreadsheet-fill");
-var _fileEarmarkSpreadsheetFillDefault = parcelHelpers.interopDefault(_fileEarmarkSpreadsheetFill);
-var _fileEarmarkSpreadsheet = require("./icons/file-earmark-spreadsheet");
-var _fileEarmarkSpreadsheetDefault = parcelHelpers.interopDefault(_fileEarmarkSpreadsheet);
-var _fileEarmarkTextFill = require("./icons/file-earmark-text-fill");
-var _fileEarmarkTextFillDefault = parcelHelpers.interopDefault(_fileEarmarkTextFill);
-var _fileEarmarkText = require("./icons/file-earmark-text");
-var _fileEarmarkTextDefault = parcelHelpers.interopDefault(_fileEarmarkText);
-var _fileEarmarkWordFill = require("./icons/file-earmark-word-fill");
-var _fileEarmarkWordFillDefault = parcelHelpers.interopDefault(_fileEarmarkWordFill);
-var _fileEarmarkWord = require("./icons/file-earmark-word");
-var _fileEarmarkWordDefault = parcelHelpers.interopDefault(_fileEarmarkWord);
-var _fileEarmarkXFill = require("./icons/file-earmark-x-fill");
-var _fileEarmarkXFillDefault = parcelHelpers.interopDefault(_fileEarmarkXFill);
-var _fileEarmarkX = require("./icons/file-earmark-x");
-var _fileEarmarkXDefault = parcelHelpers.interopDefault(_fileEarmarkX);
-var _fileEarmarkZipFill = require("./icons/file-earmark-zip-fill");
-var _fileEarmarkZipFillDefault = parcelHelpers.interopDefault(_fileEarmarkZipFill);
-var _fileEarmarkZip = require("./icons/file-earmark-zip");
-var _fileEarmarkZipDefault = parcelHelpers.interopDefault(_fileEarmarkZip);
-var _fileEarmark = require("./icons/file-earmark");
-var _fileEarmarkDefault = parcelHelpers.interopDefault(_fileEarmark);
-var _fileEaselFill = require("./icons/file-easel-fill");
-var _fileEaselFillDefault = parcelHelpers.interopDefault(_fileEaselFill);
-var _fileEasel = require("./icons/file-easel");
-var _fileEaselDefault = parcelHelpers.interopDefault(_fileEasel);
-var _fileExcelFill = require("./icons/file-excel-fill");
-var _fileExcelFillDefault = parcelHelpers.interopDefault(_fileExcelFill);
-var _fileExcel = require("./icons/file-excel");
-var _fileExcelDefault = parcelHelpers.interopDefault(_fileExcel);
-var _fileFill = require("./icons/file-fill");
-var _fileFillDefault = parcelHelpers.interopDefault(_fileFill);
-var _fileFontFill = require("./icons/file-font-fill");
-var _fileFontFillDefault = parcelHelpers.interopDefault(_fileFontFill);
-var _fileFont = require("./icons/file-font");
-var _fileFontDefault = parcelHelpers.interopDefault(_fileFont);
-var _fileImageFill = require("./icons/file-image-fill");
-var _fileImageFillDefault = parcelHelpers.interopDefault(_fileImageFill);
-var _fileImage = require("./icons/file-image");
-var _fileImageDefault = parcelHelpers.interopDefault(_fileImage);
-var _fileLockFill = require("./icons/file-lock-fill");
-var _fileLockFillDefault = parcelHelpers.interopDefault(_fileLockFill);
-var _fileLock = require("./icons/file-lock");
-var _fileLockDefault = parcelHelpers.interopDefault(_fileLock);
-var _fileLock2Fill = require("./icons/file-lock2-fill");
-var _fileLock2FillDefault = parcelHelpers.interopDefault(_fileLock2Fill);
-var _fileLock2 = require("./icons/file-lock2");
-var _fileLock2Default = parcelHelpers.interopDefault(_fileLock2);
-var _fileMedicalFill = require("./icons/file-medical-fill");
-var _fileMedicalFillDefault = parcelHelpers.interopDefault(_fileMedicalFill);
-var _fileMedical = require("./icons/file-medical");
-var _fileMedicalDefault = parcelHelpers.interopDefault(_fileMedical);
-var _fileMinusFill = require("./icons/file-minus-fill");
-var _fileMinusFillDefault = parcelHelpers.interopDefault(_fileMinusFill);
-var _fileMinus = require("./icons/file-minus");
-var _fileMinusDefault = parcelHelpers.interopDefault(_fileMinus);
-var _fileMusicFill = require("./icons/file-music-fill");
-var _fileMusicFillDefault = parcelHelpers.interopDefault(_fileMusicFill);
-var _fileMusic = require("./icons/file-music");
-var _fileMusicDefault = parcelHelpers.interopDefault(_fileMusic);
-var _filePdfFill = require("./icons/file-pdf-fill");
-var _filePdfFillDefault = parcelHelpers.interopDefault(_filePdfFill);
-var _filePdf = require("./icons/file-pdf");
-var _filePdfDefault = parcelHelpers.interopDefault(_filePdf);
-var _filePersonFill = require("./icons/file-person-fill");
-var _filePersonFillDefault = parcelHelpers.interopDefault(_filePersonFill);
-var _filePerson = require("./icons/file-person");
-var _filePersonDefault = parcelHelpers.interopDefault(_filePerson);
-var _filePlayFill = require("./icons/file-play-fill");
-var _filePlayFillDefault = parcelHelpers.interopDefault(_filePlayFill);
-var _filePlay = require("./icons/file-play");
-var _filePlayDefault = parcelHelpers.interopDefault(_filePlay);
-var _filePlusFill = require("./icons/file-plus-fill");
-var _filePlusFillDefault = parcelHelpers.interopDefault(_filePlusFill);
-var _filePlus = require("./icons/file-plus");
-var _filePlusDefault = parcelHelpers.interopDefault(_filePlus);
-var _filePostFill = require("./icons/file-post-fill");
-var _filePostFillDefault = parcelHelpers.interopDefault(_filePostFill);
-var _filePost = require("./icons/file-post");
-var _filePostDefault = parcelHelpers.interopDefault(_filePost);
-var _filePptFill = require("./icons/file-ppt-fill");
-var _filePptFillDefault = parcelHelpers.interopDefault(_filePptFill);
-var _filePpt = require("./icons/file-ppt");
-var _filePptDefault = parcelHelpers.interopDefault(_filePpt);
-var _fileRichtextFill = require("./icons/file-richtext-fill");
-var _fileRichtextFillDefault = parcelHelpers.interopDefault(_fileRichtextFill);
-var _fileRichtext = require("./icons/file-richtext");
-var _fileRichtextDefault = parcelHelpers.interopDefault(_fileRichtext);
-var _fileRuledFill = require("./icons/file-ruled-fill");
-var _fileRuledFillDefault = parcelHelpers.interopDefault(_fileRuledFill);
-var _fileRuled = require("./icons/file-ruled");
-var _fileRuledDefault = parcelHelpers.interopDefault(_fileRuled);
-var _fileSlidesFill = require("./icons/file-slides-fill");
-var _fileSlidesFillDefault = parcelHelpers.interopDefault(_fileSlidesFill);
-var _fileSlides = require("./icons/file-slides");
-var _fileSlidesDefault = parcelHelpers.interopDefault(_fileSlides);
-var _fileSpreadsheetFill = require("./icons/file-spreadsheet-fill");
-var _fileSpreadsheetFillDefault = parcelHelpers.interopDefault(_fileSpreadsheetFill);
-var _fileSpreadsheet = require("./icons/file-spreadsheet");
-var _fileSpreadsheetDefault = parcelHelpers.interopDefault(_fileSpreadsheet);
-var _fileTextFill = require("./icons/file-text-fill");
-var _fileTextFillDefault = parcelHelpers.interopDefault(_fileTextFill);
-var _fileText = require("./icons/file-text");
-var _fileTextDefault = parcelHelpers.interopDefault(_fileText);
-var _fileWordFill = require("./icons/file-word-fill");
-var _fileWordFillDefault = parcelHelpers.interopDefault(_fileWordFill);
-var _fileWord = require("./icons/file-word");
-var _fileWordDefault = parcelHelpers.interopDefault(_fileWord);
-var _fileXFill = require("./icons/file-x-fill");
-var _fileXFillDefault = parcelHelpers.interopDefault(_fileXFill);
-var _fileX = require("./icons/file-x");
-var _fileXDefault = parcelHelpers.interopDefault(_fileX);
-var _fileZipFill = require("./icons/file-zip-fill");
-var _fileZipFillDefault = parcelHelpers.interopDefault(_fileZipFill);
-var _fileZip = require("./icons/file-zip");
-var _fileZipDefault = parcelHelpers.interopDefault(_fileZip);
-var _file = require("./icons/file");
-var _fileDefault = parcelHelpers.interopDefault(_file);
-var _filesAlt = require("./icons/files-alt");
-var _filesAltDefault = parcelHelpers.interopDefault(_filesAlt);
-var _files = require("./icons/files");
-var _filesDefault = parcelHelpers.interopDefault(_files);
-var _filetypeAac = require("./icons/filetype-aac");
-var _filetypeAacDefault = parcelHelpers.interopDefault(_filetypeAac);
-var _filetypeAi = require("./icons/filetype-ai");
-var _filetypeAiDefault = parcelHelpers.interopDefault(_filetypeAi);
-var _filetypeBmp = require("./icons/filetype-bmp");
-var _filetypeBmpDefault = parcelHelpers.interopDefault(_filetypeBmp);
-var _filetypeCs = require("./icons/filetype-cs");
-var _filetypeCsDefault = parcelHelpers.interopDefault(_filetypeCs);
-var _filetypeCss = require("./icons/filetype-css");
-var _filetypeCssDefault = parcelHelpers.interopDefault(_filetypeCss);
-var _filetypeCsv = require("./icons/filetype-csv");
-var _filetypeCsvDefault = parcelHelpers.interopDefault(_filetypeCsv);
-var _filetypeDoc = require("./icons/filetype-doc");
-var _filetypeDocDefault = parcelHelpers.interopDefault(_filetypeDoc);
-var _filetypeDocx = require("./icons/filetype-docx");
-var _filetypeDocxDefault = parcelHelpers.interopDefault(_filetypeDocx);
-var _filetypeExe = require("./icons/filetype-exe");
-var _filetypeExeDefault = parcelHelpers.interopDefault(_filetypeExe);
-var _filetypeGif = require("./icons/filetype-gif");
-var _filetypeGifDefault = parcelHelpers.interopDefault(_filetypeGif);
-var _filetypeHeic = require("./icons/filetype-heic");
-var _filetypeHeicDefault = parcelHelpers.interopDefault(_filetypeHeic);
-var _filetypeHtml = require("./icons/filetype-html");
-var _filetypeHtmlDefault = parcelHelpers.interopDefault(_filetypeHtml);
-var _filetypeJava = require("./icons/filetype-java");
-var _filetypeJavaDefault = parcelHelpers.interopDefault(_filetypeJava);
-var _filetypeJpg = require("./icons/filetype-jpg");
-var _filetypeJpgDefault = parcelHelpers.interopDefault(_filetypeJpg);
-var _filetypeJs = require("./icons/filetype-js");
-var _filetypeJsDefault = parcelHelpers.interopDefault(_filetypeJs);
-var _filetypeJson = require("./icons/filetype-json");
-var _filetypeJsonDefault = parcelHelpers.interopDefault(_filetypeJson);
-var _filetypeJsx = require("./icons/filetype-jsx");
-var _filetypeJsxDefault = parcelHelpers.interopDefault(_filetypeJsx);
-var _filetypeKey = require("./icons/filetype-key");
-var _filetypeKeyDefault = parcelHelpers.interopDefault(_filetypeKey);
-var _filetypeM4P = require("./icons/filetype-m4p");
-var _filetypeM4PDefault = parcelHelpers.interopDefault(_filetypeM4P);
-var _filetypeMd = require("./icons/filetype-md");
-var _filetypeMdDefault = parcelHelpers.interopDefault(_filetypeMd);
-var _filetypeMdx = require("./icons/filetype-mdx");
-var _filetypeMdxDefault = parcelHelpers.interopDefault(_filetypeMdx);
-var _filetypeMov = require("./icons/filetype-mov");
-var _filetypeMovDefault = parcelHelpers.interopDefault(_filetypeMov);
-var _filetypeMp3 = require("./icons/filetype-mp3");
-var _filetypeMp3Default = parcelHelpers.interopDefault(_filetypeMp3);
-var _filetypeMp4 = require("./icons/filetype-mp4");
-var _filetypeMp4Default = parcelHelpers.interopDefault(_filetypeMp4);
-var _filetypeOtf = require("./icons/filetype-otf");
-var _filetypeOtfDefault = parcelHelpers.interopDefault(_filetypeOtf);
-var _filetypePdf = require("./icons/filetype-pdf");
-var _filetypePdfDefault = parcelHelpers.interopDefault(_filetypePdf);
-var _filetypePhp = require("./icons/filetype-php");
-var _filetypePhpDefault = parcelHelpers.interopDefault(_filetypePhp);
-var _filetypePng = require("./icons/filetype-png");
-var _filetypePngDefault = parcelHelpers.interopDefault(_filetypePng);
-var _filetypePpt = require("./icons/filetype-ppt");
-var _filetypePptDefault = parcelHelpers.interopDefault(_filetypePpt);
-var _filetypePptx = require("./icons/filetype-pptx");
-var _filetypePptxDefault = parcelHelpers.interopDefault(_filetypePptx);
-var _filetypePsd = require("./icons/filetype-psd");
-var _filetypePsdDefault = parcelHelpers.interopDefault(_filetypePsd);
-var _filetypePy = require("./icons/filetype-py");
-var _filetypePyDefault = parcelHelpers.interopDefault(_filetypePy);
-var _filetypeRaw = require("./icons/filetype-raw");
-var _filetypeRawDefault = parcelHelpers.interopDefault(_filetypeRaw);
-var _filetypeRb = require("./icons/filetype-rb");
-var _filetypeRbDefault = parcelHelpers.interopDefault(_filetypeRb);
-var _filetypeSass = require("./icons/filetype-sass");
-var _filetypeSassDefault = parcelHelpers.interopDefault(_filetypeSass);
-var _filetypeScss = require("./icons/filetype-scss");
-var _filetypeScssDefault = parcelHelpers.interopDefault(_filetypeScss);
-var _filetypeSh = require("./icons/filetype-sh");
-var _filetypeShDefault = parcelHelpers.interopDefault(_filetypeSh);
-var _filetypeSql = require("./icons/filetype-sql");
-var _filetypeSqlDefault = parcelHelpers.interopDefault(_filetypeSql);
-var _filetypeSvg = require("./icons/filetype-svg");
-var _filetypeSvgDefault = parcelHelpers.interopDefault(_filetypeSvg);
-var _filetypeTiff = require("./icons/filetype-tiff");
-var _filetypeTiffDefault = parcelHelpers.interopDefault(_filetypeTiff);
-var _filetypeTsx = require("./icons/filetype-tsx");
-var _filetypeTsxDefault = parcelHelpers.interopDefault(_filetypeTsx);
-var _filetypeTtf = require("./icons/filetype-ttf");
-var _filetypeTtfDefault = parcelHelpers.interopDefault(_filetypeTtf);
-var _filetypeTxt = require("./icons/filetype-txt");
-var _filetypeTxtDefault = parcelHelpers.interopDefault(_filetypeTxt);
-var _filetypeWav = require("./icons/filetype-wav");
-var _filetypeWavDefault = parcelHelpers.interopDefault(_filetypeWav);
-var _filetypeWoff = require("./icons/filetype-woff");
-var _filetypeWoffDefault = parcelHelpers.interopDefault(_filetypeWoff);
-var _filetypeXls = require("./icons/filetype-xls");
-var _filetypeXlsDefault = parcelHelpers.interopDefault(_filetypeXls);
-var _filetypeXlsx = require("./icons/filetype-xlsx");
-var _filetypeXlsxDefault = parcelHelpers.interopDefault(_filetypeXlsx);
-var _filetypeXml = require("./icons/filetype-xml");
-var _filetypeXmlDefault = parcelHelpers.interopDefault(_filetypeXml);
-var _filetypeYml = require("./icons/filetype-yml");
-var _filetypeYmlDefault = parcelHelpers.interopDefault(_filetypeYml);
-var _film = require("./icons/film");
-var _filmDefault = parcelHelpers.interopDefault(_film);
-var _filterCircleFill = require("./icons/filter-circle-fill");
-var _filterCircleFillDefault = parcelHelpers.interopDefault(_filterCircleFill);
-var _filterCircle = require("./icons/filter-circle");
-var _filterCircleDefault = parcelHelpers.interopDefault(_filterCircle);
-var _filterLeft = require("./icons/filter-left");
-var _filterLeftDefault = parcelHelpers.interopDefault(_filterLeft);
-var _filterRight = require("./icons/filter-right");
-var _filterRightDefault = parcelHelpers.interopDefault(_filterRight);
-var _filterSquareFill = require("./icons/filter-square-fill");
-var _filterSquareFillDefault = parcelHelpers.interopDefault(_filterSquareFill);
-var _filterSquare = require("./icons/filter-square");
-var _filterSquareDefault = parcelHelpers.interopDefault(_filterSquare);
-var _filter = require("./icons/filter");
-var _filterDefault = parcelHelpers.interopDefault(_filter);
-var _fingerprint = require("./icons/fingerprint");
-var _fingerprintDefault = parcelHelpers.interopDefault(_fingerprint);
-var _fire = require("./icons/fire");
-var _fireDefault = parcelHelpers.interopDefault(_fire);
-var _flagFill = require("./icons/flag-fill");
-var _flagFillDefault = parcelHelpers.interopDefault(_flagFill);
-var _flag = require("./icons/flag");
-var _flagDefault = parcelHelpers.interopDefault(_flag);
-var _floppyFill = require("./icons/floppy-fill");
-var _floppyFillDefault = parcelHelpers.interopDefault(_floppyFill);
-var _floppy = require("./icons/floppy");
-var _floppyDefault = parcelHelpers.interopDefault(_floppy);
-var _floppy2Fill = require("./icons/floppy2-fill");
-var _floppy2FillDefault = parcelHelpers.interopDefault(_floppy2Fill);
-var _floppy2 = require("./icons/floppy2");
-var _floppy2Default = parcelHelpers.interopDefault(_floppy2);
-var _flower1 = require("./icons/flower1");
-var _flower1Default = parcelHelpers.interopDefault(_flower1);
-var _flower2 = require("./icons/flower2");
-var _flower2Default = parcelHelpers.interopDefault(_flower2);
-var _flower3 = require("./icons/flower3");
-var _flower3Default = parcelHelpers.interopDefault(_flower3);
-var _folderCheck = require("./icons/folder-check");
-var _folderCheckDefault = parcelHelpers.interopDefault(_folderCheck);
-var _folderFill = require("./icons/folder-fill");
-var _folderFillDefault = parcelHelpers.interopDefault(_folderFill);
-var _folderMinus = require("./icons/folder-minus");
-var _folderMinusDefault = parcelHelpers.interopDefault(_folderMinus);
-var _folderPlus = require("./icons/folder-plus");
-var _folderPlusDefault = parcelHelpers.interopDefault(_folderPlus);
-var _folderSymlinkFill = require("./icons/folder-symlink-fill");
-var _folderSymlinkFillDefault = parcelHelpers.interopDefault(_folderSymlinkFill);
-var _folderSymlink = require("./icons/folder-symlink");
-var _folderSymlinkDefault = parcelHelpers.interopDefault(_folderSymlink);
-var _folderX = require("./icons/folder-x");
-var _folderXDefault = parcelHelpers.interopDefault(_folderX);
-var _folder = require("./icons/folder");
-var _folderDefault = parcelHelpers.interopDefault(_folder);
-var _folder2Open = require("./icons/folder2-open");
-var _folder2OpenDefault = parcelHelpers.interopDefault(_folder2Open);
-var _folder2 = require("./icons/folder2");
-var _folder2Default = parcelHelpers.interopDefault(_folder2);
-var _fonts = require("./icons/fonts");
-var _fontsDefault = parcelHelpers.interopDefault(_fonts);
-var _forwardFill = require("./icons/forward-fill");
-var _forwardFillDefault = parcelHelpers.interopDefault(_forwardFill);
-var _forward = require("./icons/forward");
-var _forwardDefault = parcelHelpers.interopDefault(_forward);
-var _front = require("./icons/front");
-var _frontDefault = parcelHelpers.interopDefault(_front);
-var _fuelPumpDieselFill = require("./icons/fuel-pump-diesel-fill");
-var _fuelPumpDieselFillDefault = parcelHelpers.interopDefault(_fuelPumpDieselFill);
-var _fuelPumpDiesel = require("./icons/fuel-pump-diesel");
-var _fuelPumpDieselDefault = parcelHelpers.interopDefault(_fuelPumpDiesel);
-var _fuelPumpFill = require("./icons/fuel-pump-fill");
-var _fuelPumpFillDefault = parcelHelpers.interopDefault(_fuelPumpFill);
-var _fuelPump = require("./icons/fuel-pump");
-var _fuelPumpDefault = parcelHelpers.interopDefault(_fuelPump);
-var _fullscreenExit = require("./icons/fullscreen-exit");
-var _fullscreenExitDefault = parcelHelpers.interopDefault(_fullscreenExit);
-var _fullscreen = require("./icons/fullscreen");
-var _fullscreenDefault = parcelHelpers.interopDefault(_fullscreen);
-var _funnelFill = require("./icons/funnel-fill");
-var _funnelFillDefault = parcelHelpers.interopDefault(_funnelFill);
-var _funnel = require("./icons/funnel");
-var _funnelDefault = parcelHelpers.interopDefault(_funnel);
-var _gearFill = require("./icons/gear-fill");
-var _gearFillDefault = parcelHelpers.interopDefault(_gearFill);
-var _gearWideConnected = require("./icons/gear-wide-connected");
-var _gearWideConnectedDefault = parcelHelpers.interopDefault(_gearWideConnected);
-var _gearWide = require("./icons/gear-wide");
-var _gearWideDefault = parcelHelpers.interopDefault(_gearWide);
-var _gear = require("./icons/gear");
-var _gearDefault = parcelHelpers.interopDefault(_gear);
-var _gem = require("./icons/gem");
-var _gemDefault = parcelHelpers.interopDefault(_gem);
-var _genderAmbiguous = require("./icons/gender-ambiguous");
-var _genderAmbiguousDefault = parcelHelpers.interopDefault(_genderAmbiguous);
-var _genderFemale = require("./icons/gender-female");
-var _genderFemaleDefault = parcelHelpers.interopDefault(_genderFemale);
-var _genderMale = require("./icons/gender-male");
-var _genderMaleDefault = parcelHelpers.interopDefault(_genderMale);
-var _genderNeuter = require("./icons/gender-neuter");
-var _genderNeuterDefault = parcelHelpers.interopDefault(_genderNeuter);
-var _genderTrans = require("./icons/gender-trans");
-var _genderTransDefault = parcelHelpers.interopDefault(_genderTrans);
-var _geoAltFill = require("./icons/geo-alt-fill");
-var _geoAltFillDefault = parcelHelpers.interopDefault(_geoAltFill);
-var _geoAlt = require("./icons/geo-alt");
-var _geoAltDefault = parcelHelpers.interopDefault(_geoAlt);
-var _geoFill = require("./icons/geo-fill");
-var _geoFillDefault = parcelHelpers.interopDefault(_geoFill);
-var _geo = require("./icons/geo");
-var _geoDefault = parcelHelpers.interopDefault(_geo);
-var _giftFill = require("./icons/gift-fill");
-var _giftFillDefault = parcelHelpers.interopDefault(_giftFill);
-var _gift = require("./icons/gift");
-var _giftDefault = parcelHelpers.interopDefault(_gift);
-var _git = require("./icons/git");
-var _gitDefault = parcelHelpers.interopDefault(_git);
-var _github = require("./icons/github");
-var _githubDefault = parcelHelpers.interopDefault(_github);
-var _gitlab = require("./icons/gitlab");
-var _gitlabDefault = parcelHelpers.interopDefault(_gitlab);
-var _globeAmericas = require("./icons/globe-americas");
-var _globeAmericasDefault = parcelHelpers.interopDefault(_globeAmericas);
-var _globeAsiaAustralia = require("./icons/globe-asia-australia");
-var _globeAsiaAustraliaDefault = parcelHelpers.interopDefault(_globeAsiaAustralia);
-var _globeCentralSouthAsia = require("./icons/globe-central-south-asia");
-var _globeCentralSouthAsiaDefault = parcelHelpers.interopDefault(_globeCentralSouthAsia);
-var _globeEuropeAfrica = require("./icons/globe-europe-africa");
-var _globeEuropeAfricaDefault = parcelHelpers.interopDefault(_globeEuropeAfrica);
-var _globe = require("./icons/globe");
-var _globeDefault = parcelHelpers.interopDefault(_globe);
-var _globe2 = require("./icons/globe2");
-var _globe2Default = parcelHelpers.interopDefault(_globe2);
-var _googlePlay = require("./icons/google-play");
-var _googlePlayDefault = parcelHelpers.interopDefault(_googlePlay);
-var _google = require("./icons/google");
-var _googleDefault = parcelHelpers.interopDefault(_google);
-var _gpuCard = require("./icons/gpu-card");
-var _gpuCardDefault = parcelHelpers.interopDefault(_gpuCard);
-var _graphDownArrow = require("./icons/graph-down-arrow");
-var _graphDownArrowDefault = parcelHelpers.interopDefault(_graphDownArrow);
-var _graphDown = require("./icons/graph-down");
-var _graphDownDefault = parcelHelpers.interopDefault(_graphDown);
-var _graphUpArrow = require("./icons/graph-up-arrow");
-var _graphUpArrowDefault = parcelHelpers.interopDefault(_graphUpArrow);
-var _graphUp = require("./icons/graph-up");
-var _graphUpDefault = parcelHelpers.interopDefault(_graphUp);
-var _grid1X2Fill = require("./icons/grid-1x2-fill");
-var _grid1X2FillDefault = parcelHelpers.interopDefault(_grid1X2Fill);
-var _grid1X2 = require("./icons/grid-1x2");
-var _grid1X2Default = parcelHelpers.interopDefault(_grid1X2);
-var _grid3X2GapFill = require("./icons/grid-3x2-gap-fill");
-var _grid3X2GapFillDefault = parcelHelpers.interopDefault(_grid3X2GapFill);
-var _grid3X2Gap = require("./icons/grid-3x2-gap");
-var _grid3X2GapDefault = parcelHelpers.interopDefault(_grid3X2Gap);
-var _grid3X2 = require("./icons/grid-3x2");
-var _grid3X2Default = parcelHelpers.interopDefault(_grid3X2);
-var _grid3X3GapFill = require("./icons/grid-3x3-gap-fill");
-var _grid3X3GapFillDefault = parcelHelpers.interopDefault(_grid3X3GapFill);
-var _grid3X3Gap = require("./icons/grid-3x3-gap");
-var _grid3X3GapDefault = parcelHelpers.interopDefault(_grid3X3Gap);
-var _grid3X3 = require("./icons/grid-3x3");
-var _grid3X3Default = parcelHelpers.interopDefault(_grid3X3);
-var _gridFill = require("./icons/grid-fill");
-var _gridFillDefault = parcelHelpers.interopDefault(_gridFill);
-var _grid = require("./icons/grid");
-var _gridDefault = parcelHelpers.interopDefault(_grid);
-var _gripHorizontal = require("./icons/grip-horizontal");
-var _gripHorizontalDefault = parcelHelpers.interopDefault(_gripHorizontal);
-var _gripVertical = require("./icons/grip-vertical");
-var _gripVerticalDefault = parcelHelpers.interopDefault(_gripVertical);
-var _hCircleFill = require("./icons/h-circle-fill");
-var _hCircleFillDefault = parcelHelpers.interopDefault(_hCircleFill);
-var _hCircle = require("./icons/h-circle");
-var _hCircleDefault = parcelHelpers.interopDefault(_hCircle);
-var _hSquareFill = require("./icons/h-square-fill");
-var _hSquareFillDefault = parcelHelpers.interopDefault(_hSquareFill);
-var _hSquare = require("./icons/h-square");
-var _hSquareDefault = parcelHelpers.interopDefault(_hSquare);
-var _hammer = require("./icons/hammer");
-var _hammerDefault = parcelHelpers.interopDefault(_hammer);
-var _handIndexFill = require("./icons/hand-index-fill");
-var _handIndexFillDefault = parcelHelpers.interopDefault(_handIndexFill);
-var _handIndexThumbFill = require("./icons/hand-index-thumb-fill");
-var _handIndexThumbFillDefault = parcelHelpers.interopDefault(_handIndexThumbFill);
-var _handIndexThumb = require("./icons/hand-index-thumb");
-var _handIndexThumbDefault = parcelHelpers.interopDefault(_handIndexThumb);
-var _handIndex = require("./icons/hand-index");
-var _handIndexDefault = parcelHelpers.interopDefault(_handIndex);
-var _handThumbsDownFill = require("./icons/hand-thumbs-down-fill");
-var _handThumbsDownFillDefault = parcelHelpers.interopDefault(_handThumbsDownFill);
-var _handThumbsDown = require("./icons/hand-thumbs-down");
-var _handThumbsDownDefault = parcelHelpers.interopDefault(_handThumbsDown);
-var _handThumbsUpFill = require("./icons/hand-thumbs-up-fill");
-var _handThumbsUpFillDefault = parcelHelpers.interopDefault(_handThumbsUpFill);
-var _handThumbsUp = require("./icons/hand-thumbs-up");
-var _handThumbsUpDefault = parcelHelpers.interopDefault(_handThumbsUp);
-var _handbagFill = require("./icons/handbag-fill");
-var _handbagFillDefault = parcelHelpers.interopDefault(_handbagFill);
-var _handbag = require("./icons/handbag");
-var _handbagDefault = parcelHelpers.interopDefault(_handbag);
-var _hash = require("./icons/hash");
-var _hashDefault = parcelHelpers.interopDefault(_hash);
-var _hddFill = require("./icons/hdd-fill");
-var _hddFillDefault = parcelHelpers.interopDefault(_hddFill);
-var _hddNetworkFill = require("./icons/hdd-network-fill");
-var _hddNetworkFillDefault = parcelHelpers.interopDefault(_hddNetworkFill);
-var _hddNetwork = require("./icons/hdd-network");
-var _hddNetworkDefault = parcelHelpers.interopDefault(_hddNetwork);
-var _hddRackFill = require("./icons/hdd-rack-fill");
-var _hddRackFillDefault = parcelHelpers.interopDefault(_hddRackFill);
-var _hddRack = require("./icons/hdd-rack");
-var _hddRackDefault = parcelHelpers.interopDefault(_hddRack);
-var _hddStackFill = require("./icons/hdd-stack-fill");
-var _hddStackFillDefault = parcelHelpers.interopDefault(_hddStackFill);
-var _hddStack = require("./icons/hdd-stack");
-var _hddStackDefault = parcelHelpers.interopDefault(_hddStack);
-var _hdd = require("./icons/hdd");
-var _hddDefault = parcelHelpers.interopDefault(_hdd);
-var _hdmiFill = require("./icons/hdmi-fill");
-var _hdmiFillDefault = parcelHelpers.interopDefault(_hdmiFill);
-var _hdmi = require("./icons/hdmi");
-var _hdmiDefault = parcelHelpers.interopDefault(_hdmi);
-var _headphones = require("./icons/headphones");
-var _headphonesDefault = parcelHelpers.interopDefault(_headphones);
-var _headsetVr = require("./icons/headset-vr");
-var _headsetVrDefault = parcelHelpers.interopDefault(_headsetVr);
-var _headset = require("./icons/headset");
-var _headsetDefault = parcelHelpers.interopDefault(_headset);
-var _heartArrow = require("./icons/heart-arrow");
-var _heartArrowDefault = parcelHelpers.interopDefault(_heartArrow);
-var _heartFill = require("./icons/heart-fill");
-var _heartFillDefault = parcelHelpers.interopDefault(_heartFill);
-var _heartHalf = require("./icons/heart-half");
-var _heartHalfDefault = parcelHelpers.interopDefault(_heartHalf);
-var _heartPulseFill = require("./icons/heart-pulse-fill");
-var _heartPulseFillDefault = parcelHelpers.interopDefault(_heartPulseFill);
-var _heartPulse = require("./icons/heart-pulse");
-var _heartPulseDefault = parcelHelpers.interopDefault(_heartPulse);
-var _heart = require("./icons/heart");
-var _heartDefault = parcelHelpers.interopDefault(_heart);
-var _heartbreakFill = require("./icons/heartbreak-fill");
-var _heartbreakFillDefault = parcelHelpers.interopDefault(_heartbreakFill);
-var _heartbreak = require("./icons/heartbreak");
-var _heartbreakDefault = parcelHelpers.interopDefault(_heartbreak);
-var _hearts = require("./icons/hearts");
-var _heartsDefault = parcelHelpers.interopDefault(_hearts);
-var _heptagonFill = require("./icons/heptagon-fill");
-var _heptagonFillDefault = parcelHelpers.interopDefault(_heptagonFill);
-var _heptagonHalf = require("./icons/heptagon-half");
-var _heptagonHalfDefault = parcelHelpers.interopDefault(_heptagonHalf);
-var _heptagon = require("./icons/heptagon");
-var _heptagonDefault = parcelHelpers.interopDefault(_heptagon);
-var _hexagonFill = require("./icons/hexagon-fill");
-var _hexagonFillDefault = parcelHelpers.interopDefault(_hexagonFill);
-var _hexagonHalf = require("./icons/hexagon-half");
-var _hexagonHalfDefault = parcelHelpers.interopDefault(_hexagonHalf);
-var _hexagon = require("./icons/hexagon");
-var _hexagonDefault = parcelHelpers.interopDefault(_hexagon);
-var _highlighter = require("./icons/highlighter");
-var _highlighterDefault = parcelHelpers.interopDefault(_highlighter);
-var _highlights = require("./icons/highlights");
-var _highlightsDefault = parcelHelpers.interopDefault(_highlights);
-var _hospitalFill = require("./icons/hospital-fill");
-var _hospitalFillDefault = parcelHelpers.interopDefault(_hospitalFill);
-var _hospital = require("./icons/hospital");
-var _hospitalDefault = parcelHelpers.interopDefault(_hospital);
-var _hourglassBottom = require("./icons/hourglass-bottom");
-var _hourglassBottomDefault = parcelHelpers.interopDefault(_hourglassBottom);
-var _hourglassSplit = require("./icons/hourglass-split");
-var _hourglassSplitDefault = parcelHelpers.interopDefault(_hourglassSplit);
-var _hourglassTop = require("./icons/hourglass-top");
-var _hourglassTopDefault = parcelHelpers.interopDefault(_hourglassTop);
-var _hourglass = require("./icons/hourglass");
-var _hourglassDefault = parcelHelpers.interopDefault(_hourglass);
-var _houseAddFill = require("./icons/house-add-fill");
-var _houseAddFillDefault = parcelHelpers.interopDefault(_houseAddFill);
-var _houseAdd = require("./icons/house-add");
-var _houseAddDefault = parcelHelpers.interopDefault(_houseAdd);
-var _houseCheckFill = require("./icons/house-check-fill");
-var _houseCheckFillDefault = parcelHelpers.interopDefault(_houseCheckFill);
-var _houseCheck = require("./icons/house-check");
-var _houseCheckDefault = parcelHelpers.interopDefault(_houseCheck);
-var _houseDashFill = require("./icons/house-dash-fill");
-var _houseDashFillDefault = parcelHelpers.interopDefault(_houseDashFill);
-var _houseDash = require("./icons/house-dash");
-var _houseDashDefault = parcelHelpers.interopDefault(_houseDash);
-var _houseDoorFill = require("./icons/house-door-fill");
-var _houseDoorFillDefault = parcelHelpers.interopDefault(_houseDoorFill);
-var _houseDoor = require("./icons/house-door");
-var _houseDoorDefault = parcelHelpers.interopDefault(_houseDoor);
-var _houseDownFill = require("./icons/house-down-fill");
-var _houseDownFillDefault = parcelHelpers.interopDefault(_houseDownFill);
-var _houseDown = require("./icons/house-down");
-var _houseDownDefault = parcelHelpers.interopDefault(_houseDown);
-var _houseExclamationFill = require("./icons/house-exclamation-fill");
-var _houseExclamationFillDefault = parcelHelpers.interopDefault(_houseExclamationFill);
-var _houseExclamation = require("./icons/house-exclamation");
-var _houseExclamationDefault = parcelHelpers.interopDefault(_houseExclamation);
-var _houseFill = require("./icons/house-fill");
-var _houseFillDefault = parcelHelpers.interopDefault(_houseFill);
-var _houseGearFill = require("./icons/house-gear-fill");
-var _houseGearFillDefault = parcelHelpers.interopDefault(_houseGearFill);
-var _houseGear = require("./icons/house-gear");
-var _houseGearDefault = parcelHelpers.interopDefault(_houseGear);
-var _houseHeartFill = require("./icons/house-heart-fill");
-var _houseHeartFillDefault = parcelHelpers.interopDefault(_houseHeartFill);
-var _houseHeart = require("./icons/house-heart");
-var _houseHeartDefault = parcelHelpers.interopDefault(_houseHeart);
-var _houseLockFill = require("./icons/house-lock-fill");
-var _houseLockFillDefault = parcelHelpers.interopDefault(_houseLockFill);
-var _houseLock = require("./icons/house-lock");
-var _houseLockDefault = parcelHelpers.interopDefault(_houseLock);
-var _houseSlashFill = require("./icons/house-slash-fill");
-var _houseSlashFillDefault = parcelHelpers.interopDefault(_houseSlashFill);
-var _houseSlash = require("./icons/house-slash");
-var _houseSlashDefault = parcelHelpers.interopDefault(_houseSlash);
-var _houseUpFill = require("./icons/house-up-fill");
-var _houseUpFillDefault = parcelHelpers.interopDefault(_houseUpFill);
-var _houseUp = require("./icons/house-up");
-var _houseUpDefault = parcelHelpers.interopDefault(_houseUp);
-var _houseXFill = require("./icons/house-x-fill");
-var _houseXFillDefault = parcelHelpers.interopDefault(_houseXFill);
-var _houseX = require("./icons/house-x");
-var _houseXDefault = parcelHelpers.interopDefault(_houseX);
-var _house = require("./icons/house");
-var _houseDefault = parcelHelpers.interopDefault(_house);
-var _housesFill = require("./icons/houses-fill");
-var _housesFillDefault = parcelHelpers.interopDefault(_housesFill);
-var _houses = require("./icons/houses");
-var _housesDefault = parcelHelpers.interopDefault(_houses);
-var _hr = require("./icons/hr");
-var _hrDefault = parcelHelpers.interopDefault(_hr);
-var _hurricane = require("./icons/hurricane");
-var _hurricaneDefault = parcelHelpers.interopDefault(_hurricane);
-var _hypnotize = require("./icons/hypnotize");
-var _hypnotizeDefault = parcelHelpers.interopDefault(_hypnotize);
-var _imageAlt = require("./icons/image-alt");
-var _imageAltDefault = parcelHelpers.interopDefault(_imageAlt);
-var _imageFill = require("./icons/image-fill");
-var _imageFillDefault = parcelHelpers.interopDefault(_imageFill);
-var _image = require("./icons/image");
-var _imageDefault = parcelHelpers.interopDefault(_image);
-var _images = require("./icons/images");
-var _imagesDefault = parcelHelpers.interopDefault(_images);
-var _inboxFill = require("./icons/inbox-fill");
-var _inboxFillDefault = parcelHelpers.interopDefault(_inboxFill);
-var _inbox = require("./icons/inbox");
-var _inboxDefault = parcelHelpers.interopDefault(_inbox);
-var _inboxesFill = require("./icons/inboxes-fill");
-var _inboxesFillDefault = parcelHelpers.interopDefault(_inboxesFill);
-var _inboxes = require("./icons/inboxes");
-var _inboxesDefault = parcelHelpers.interopDefault(_inboxes);
-var _incognito = require("./icons/incognito");
-var _incognitoDefault = parcelHelpers.interopDefault(_incognito);
-var _indent = require("./icons/indent");
-var _indentDefault = parcelHelpers.interopDefault(_indent);
-var _infinity = require("./icons/infinity");
-var _infinityDefault = parcelHelpers.interopDefault(_infinity);
-var _infoCircleFill = require("./icons/info-circle-fill");
-var _infoCircleFillDefault = parcelHelpers.interopDefault(_infoCircleFill);
-var _infoCircle = require("./icons/info-circle");
-var _infoCircleDefault = parcelHelpers.interopDefault(_infoCircle);
-var _infoLg = require("./icons/info-lg");
-var _infoLgDefault = parcelHelpers.interopDefault(_infoLg);
-var _infoSquareFill = require("./icons/info-square-fill");
-var _infoSquareFillDefault = parcelHelpers.interopDefault(_infoSquareFill);
-var _infoSquare = require("./icons/info-square");
-var _infoSquareDefault = parcelHelpers.interopDefault(_infoSquare);
-var _info = require("./icons/info");
-var _infoDefault = parcelHelpers.interopDefault(_info);
-var _inputCursorText = require("./icons/input-cursor-text");
-var _inputCursorTextDefault = parcelHelpers.interopDefault(_inputCursorText);
-var _inputCursor = require("./icons/input-cursor");
-var _inputCursorDefault = parcelHelpers.interopDefault(_inputCursor);
-var _instagram = require("./icons/instagram");
-var _instagramDefault = parcelHelpers.interopDefault(_instagram);
-var _intersect = require("./icons/intersect");
-var _intersectDefault = parcelHelpers.interopDefault(_intersect);
-var _journalAlbum = require("./icons/journal-album");
-var _journalAlbumDefault = parcelHelpers.interopDefault(_journalAlbum);
-var _journalArrowDown = require("./icons/journal-arrow-down");
-var _journalArrowDownDefault = parcelHelpers.interopDefault(_journalArrowDown);
-var _journalArrowUp = require("./icons/journal-arrow-up");
-var _journalArrowUpDefault = parcelHelpers.interopDefault(_journalArrowUp);
-var _journalBookmarkFill = require("./icons/journal-bookmark-fill");
-var _journalBookmarkFillDefault = parcelHelpers.interopDefault(_journalBookmarkFill);
-var _journalBookmark = require("./icons/journal-bookmark");
-var _journalBookmarkDefault = parcelHelpers.interopDefault(_journalBookmark);
-var _journalCheck = require("./icons/journal-check");
-var _journalCheckDefault = parcelHelpers.interopDefault(_journalCheck);
-var _journalCode = require("./icons/journal-code");
-var _journalCodeDefault = parcelHelpers.interopDefault(_journalCode);
-var _journalMedical = require("./icons/journal-medical");
-var _journalMedicalDefault = parcelHelpers.interopDefault(_journalMedical);
-var _journalMinus = require("./icons/journal-minus");
-var _journalMinusDefault = parcelHelpers.interopDefault(_journalMinus);
-var _journalPlus = require("./icons/journal-plus");
-var _journalPlusDefault = parcelHelpers.interopDefault(_journalPlus);
-var _journalRichtext = require("./icons/journal-richtext");
-var _journalRichtextDefault = parcelHelpers.interopDefault(_journalRichtext);
-var _journalText = require("./icons/journal-text");
-var _journalTextDefault = parcelHelpers.interopDefault(_journalText);
-var _journalX = require("./icons/journal-x");
-var _journalXDefault = parcelHelpers.interopDefault(_journalX);
-var _journal = require("./icons/journal");
-var _journalDefault = parcelHelpers.interopDefault(_journal);
-var _journals = require("./icons/journals");
-var _journalsDefault = parcelHelpers.interopDefault(_journals);
-var _joystick = require("./icons/joystick");
-var _joystickDefault = parcelHelpers.interopDefault(_joystick);
-var _justifyLeft = require("./icons/justify-left");
-var _justifyLeftDefault = parcelHelpers.interopDefault(_justifyLeft);
-var _justifyRight = require("./icons/justify-right");
-var _justifyRightDefault = parcelHelpers.interopDefault(_justifyRight);
-var _justify = require("./icons/justify");
-var _justifyDefault = parcelHelpers.interopDefault(_justify);
-var _kanbanFill = require("./icons/kanban-fill");
-var _kanbanFillDefault = parcelHelpers.interopDefault(_kanbanFill);
-var _kanban = require("./icons/kanban");
-var _kanbanDefault = parcelHelpers.interopDefault(_kanban);
-var _keyFill = require("./icons/key-fill");
-var _keyFillDefault = parcelHelpers.interopDefault(_keyFill);
-var _key = require("./icons/key");
-var _keyDefault = parcelHelpers.interopDefault(_key);
-var _keyboardFill = require("./icons/keyboard-fill");
-var _keyboardFillDefault = parcelHelpers.interopDefault(_keyboardFill);
-var _keyboard = require("./icons/keyboard");
-var _keyboardDefault = parcelHelpers.interopDefault(_keyboard);
-var _ladder = require("./icons/ladder");
-var _ladderDefault = parcelHelpers.interopDefault(_ladder);
-var _lampFill = require("./icons/lamp-fill");
-var _lampFillDefault = parcelHelpers.interopDefault(_lampFill);
-var _lamp = require("./icons/lamp");
-var _lampDefault = parcelHelpers.interopDefault(_lamp);
-var _laptopFill = require("./icons/laptop-fill");
-var _laptopFillDefault = parcelHelpers.interopDefault(_laptopFill);
-var _laptop = require("./icons/laptop");
-var _laptopDefault = parcelHelpers.interopDefault(_laptop);
-var _layerBackward = require("./icons/layer-backward");
-var _layerBackwardDefault = parcelHelpers.interopDefault(_layerBackward);
-var _layerForward = require("./icons/layer-forward");
-var _layerForwardDefault = parcelHelpers.interopDefault(_layerForward);
-var _layersFill = require("./icons/layers-fill");
-var _layersFillDefault = parcelHelpers.interopDefault(_layersFill);
-var _layersHalf = require("./icons/layers-half");
-var _layersHalfDefault = parcelHelpers.interopDefault(_layersHalf);
-var _layers = require("./icons/layers");
-var _layersDefault = parcelHelpers.interopDefault(_layers);
-var _layoutSidebarInsetReverse = require("./icons/layout-sidebar-inset-reverse");
-var _layoutSidebarInsetReverseDefault = parcelHelpers.interopDefault(_layoutSidebarInsetReverse);
-var _layoutSidebarInset = require("./icons/layout-sidebar-inset");
-var _layoutSidebarInsetDefault = parcelHelpers.interopDefault(_layoutSidebarInset);
-var _layoutSidebarReverse = require("./icons/layout-sidebar-reverse");
-var _layoutSidebarReverseDefault = parcelHelpers.interopDefault(_layoutSidebarReverse);
-var _layoutSidebar = require("./icons/layout-sidebar");
-var _layoutSidebarDefault = parcelHelpers.interopDefault(_layoutSidebar);
-var _layoutSplit = require("./icons/layout-split");
-var _layoutSplitDefault = parcelHelpers.interopDefault(_layoutSplit);
-var _layoutTextSidebarReverse = require("./icons/layout-text-sidebar-reverse");
-var _layoutTextSidebarReverseDefault = parcelHelpers.interopDefault(_layoutTextSidebarReverse);
-var _layoutTextSidebar = require("./icons/layout-text-sidebar");
-var _layoutTextSidebarDefault = parcelHelpers.interopDefault(_layoutTextSidebar);
-var _layoutTextWindowReverse = require("./icons/layout-text-window-reverse");
-var _layoutTextWindowReverseDefault = parcelHelpers.interopDefault(_layoutTextWindowReverse);
-var _layoutTextWindow = require("./icons/layout-text-window");
-var _layoutTextWindowDefault = parcelHelpers.interopDefault(_layoutTextWindow);
-var _layoutThreeColumns = require("./icons/layout-three-columns");
-var _layoutThreeColumnsDefault = parcelHelpers.interopDefault(_layoutThreeColumns);
-var _layoutWtf = require("./icons/layout-wtf");
-var _layoutWtfDefault = parcelHelpers.interopDefault(_layoutWtf);
-var _lifePreserver = require("./icons/life-preserver");
-var _lifePreserverDefault = parcelHelpers.interopDefault(_lifePreserver);
-var _lightbulbFill = require("./icons/lightbulb-fill");
-var _lightbulbFillDefault = parcelHelpers.interopDefault(_lightbulbFill);
-var _lightbulbOffFill = require("./icons/lightbulb-off-fill");
-var _lightbulbOffFillDefault = parcelHelpers.interopDefault(_lightbulbOffFill);
-var _lightbulbOff = require("./icons/lightbulb-off");
-var _lightbulbOffDefault = parcelHelpers.interopDefault(_lightbulbOff);
-var _lightbulb = require("./icons/lightbulb");
-var _lightbulbDefault = parcelHelpers.interopDefault(_lightbulb);
-var _lightningChargeFill = require("./icons/lightning-charge-fill");
-var _lightningChargeFillDefault = parcelHelpers.interopDefault(_lightningChargeFill);
-var _lightningCharge = require("./icons/lightning-charge");
-var _lightningChargeDefault = parcelHelpers.interopDefault(_lightningCharge);
-var _lightningFill = require("./icons/lightning-fill");
-var _lightningFillDefault = parcelHelpers.interopDefault(_lightningFill);
-var _lightning = require("./icons/lightning");
-var _lightningDefault = parcelHelpers.interopDefault(_lightning);
-var _line = require("./icons/line");
-var _lineDefault = parcelHelpers.interopDefault(_line);
-var _link45Deg = require("./icons/link-45deg");
-var _link45DegDefault = parcelHelpers.interopDefault(_link45Deg);
-var _link = require("./icons/link");
-var _linkDefault = parcelHelpers.interopDefault(_link);
-var _linkedin = require("./icons/linkedin");
-var _linkedinDefault = parcelHelpers.interopDefault(_linkedin);
-var _listCheck = require("./icons/list-check");
-var _listCheckDefault = parcelHelpers.interopDefault(_listCheck);
-var _listColumnsReverse = require("./icons/list-columns-reverse");
-var _listColumnsReverseDefault = parcelHelpers.interopDefault(_listColumnsReverse);
-var _listColumns = require("./icons/list-columns");
-var _listColumnsDefault = parcelHelpers.interopDefault(_listColumns);
-var _listNested = require("./icons/list-nested");
-var _listNestedDefault = parcelHelpers.interopDefault(_listNested);
-var _listOl = require("./icons/list-ol");
-var _listOlDefault = parcelHelpers.interopDefault(_listOl);
-var _listStars = require("./icons/list-stars");
-var _listStarsDefault = parcelHelpers.interopDefault(_listStars);
-var _listTask = require("./icons/list-task");
-var _listTaskDefault = parcelHelpers.interopDefault(_listTask);
-var _listUl = require("./icons/list-ul");
-var _listUlDefault = parcelHelpers.interopDefault(_listUl);
-var _list = require("./icons/list");
-var _listDefault = parcelHelpers.interopDefault(_list);
-var _lockFill = require("./icons/lock-fill");
-var _lockFillDefault = parcelHelpers.interopDefault(_lockFill);
-var _lock = require("./icons/lock");
-var _lockDefault = parcelHelpers.interopDefault(_lock);
-var _luggageFill = require("./icons/luggage-fill");
-var _luggageFillDefault = parcelHelpers.interopDefault(_luggageFill);
-var _luggage = require("./icons/luggage");
-var _luggageDefault = parcelHelpers.interopDefault(_luggage);
-var _lungsFill = require("./icons/lungs-fill");
-var _lungsFillDefault = parcelHelpers.interopDefault(_lungsFill);
-var _lungs = require("./icons/lungs");
-var _lungsDefault = parcelHelpers.interopDefault(_lungs);
-var _magic = require("./icons/magic");
-var _magicDefault = parcelHelpers.interopDefault(_magic);
-var _magnetFill = require("./icons/magnet-fill");
-var _magnetFillDefault = parcelHelpers.interopDefault(_magnetFill);
-var _magnet = require("./icons/magnet");
-var _magnetDefault = parcelHelpers.interopDefault(_magnet);
-var _mailboxFlag = require("./icons/mailbox-flag");
-var _mailboxFlagDefault = parcelHelpers.interopDefault(_mailboxFlag);
-var _mailbox = require("./icons/mailbox");
-var _mailboxDefault = parcelHelpers.interopDefault(_mailbox);
-var _mailbox2Flag = require("./icons/mailbox2-flag");
-var _mailbox2FlagDefault = parcelHelpers.interopDefault(_mailbox2Flag);
-var _mailbox2 = require("./icons/mailbox2");
-var _mailbox2Default = parcelHelpers.interopDefault(_mailbox2);
-var _mapFill = require("./icons/map-fill");
-var _mapFillDefault = parcelHelpers.interopDefault(_mapFill);
-var _map = require("./icons/map");
-var _mapDefault = parcelHelpers.interopDefault(_map);
-var _markdownFill = require("./icons/markdown-fill");
-var _markdownFillDefault = parcelHelpers.interopDefault(_markdownFill);
-var _markdown = require("./icons/markdown");
-var _markdownDefault = parcelHelpers.interopDefault(_markdown);
-var _markerTip = require("./icons/marker-tip");
-var _markerTipDefault = parcelHelpers.interopDefault(_markerTip);
-var _mask = require("./icons/mask");
-var _maskDefault = parcelHelpers.interopDefault(_mask);
-var _mastodon = require("./icons/mastodon");
-var _mastodonDefault = parcelHelpers.interopDefault(_mastodon);
-var _medium = require("./icons/medium");
-var _mediumDefault = parcelHelpers.interopDefault(_medium);
-var _megaphoneFill = require("./icons/megaphone-fill");
-var _megaphoneFillDefault = parcelHelpers.interopDefault(_megaphoneFill);
-var _megaphone = require("./icons/megaphone");
-var _megaphoneDefault = parcelHelpers.interopDefault(_megaphone);
-var _memory = require("./icons/memory");
-var _memoryDefault = parcelHelpers.interopDefault(_memory);
-var _menuAppFill = require("./icons/menu-app-fill");
-var _menuAppFillDefault = parcelHelpers.interopDefault(_menuAppFill);
-var _menuApp = require("./icons/menu-app");
-var _menuAppDefault = parcelHelpers.interopDefault(_menuApp);
-var _menuButtonFill = require("./icons/menu-button-fill");
-var _menuButtonFillDefault = parcelHelpers.interopDefault(_menuButtonFill);
-var _menuButtonWideFill = require("./icons/menu-button-wide-fill");
-var _menuButtonWideFillDefault = parcelHelpers.interopDefault(_menuButtonWideFill);
-var _menuButtonWide = require("./icons/menu-button-wide");
-var _menuButtonWideDefault = parcelHelpers.interopDefault(_menuButtonWide);
-var _menuButton = require("./icons/menu-button");
-var _menuButtonDefault = parcelHelpers.interopDefault(_menuButton);
-var _menuDown = require("./icons/menu-down");
-var _menuDownDefault = parcelHelpers.interopDefault(_menuDown);
-var _menuUp = require("./icons/menu-up");
-var _menuUpDefault = parcelHelpers.interopDefault(_menuUp);
-var _messenger = require("./icons/messenger");
-var _messengerDefault = parcelHelpers.interopDefault(_messenger);
-var _meta = require("./icons/meta");
-var _metaDefault = parcelHelpers.interopDefault(_meta);
-var _micFill = require("./icons/mic-fill");
-var _micFillDefault = parcelHelpers.interopDefault(_micFill);
-var _micMuteFill = require("./icons/mic-mute-fill");
-var _micMuteFillDefault = parcelHelpers.interopDefault(_micMuteFill);
-var _micMute = require("./icons/mic-mute");
-var _micMuteDefault = parcelHelpers.interopDefault(_micMute);
-var _mic = require("./icons/mic");
-var _micDefault = parcelHelpers.interopDefault(_mic);
-var _microsoftTeams = require("./icons/microsoft-teams");
-var _microsoftTeamsDefault = parcelHelpers.interopDefault(_microsoftTeams);
-var _microsoft = require("./icons/microsoft");
-var _microsoftDefault = parcelHelpers.interopDefault(_microsoft);
-var _minecartLoaded = require("./icons/minecart-loaded");
-var _minecartLoadedDefault = parcelHelpers.interopDefault(_minecartLoaded);
-var _minecart = require("./icons/minecart");
-var _minecartDefault = parcelHelpers.interopDefault(_minecart);
-var _modemFill = require("./icons/modem-fill");
-var _modemFillDefault = parcelHelpers.interopDefault(_modemFill);
-var _modem = require("./icons/modem");
-var _modemDefault = parcelHelpers.interopDefault(_modem);
-var _moisture = require("./icons/moisture");
-var _moistureDefault = parcelHelpers.interopDefault(_moisture);
-var _moonFill = require("./icons/moon-fill");
-var _moonFillDefault = parcelHelpers.interopDefault(_moonFill);
-var _moonStarsFill = require("./icons/moon-stars-fill");
-var _moonStarsFillDefault = parcelHelpers.interopDefault(_moonStarsFill);
-var _moonStars = require("./icons/moon-stars");
-var _moonStarsDefault = parcelHelpers.interopDefault(_moonStars);
-var _moon = require("./icons/moon");
-var _moonDefault = parcelHelpers.interopDefault(_moon);
-var _mortarboardFill = require("./icons/mortarboard-fill");
-var _mortarboardFillDefault = parcelHelpers.interopDefault(_mortarboardFill);
-var _mortarboard = require("./icons/mortarboard");
-var _mortarboardDefault = parcelHelpers.interopDefault(_mortarboard);
-var _motherboardFill = require("./icons/motherboard-fill");
-var _motherboardFillDefault = parcelHelpers.interopDefault(_motherboardFill);
-var _motherboard = require("./icons/motherboard");
-var _motherboardDefault = parcelHelpers.interopDefault(_motherboard);
-var _mouseFill = require("./icons/mouse-fill");
-var _mouseFillDefault = parcelHelpers.interopDefault(_mouseFill);
-var _mouse = require("./icons/mouse");
-var _mouseDefault = parcelHelpers.interopDefault(_mouse);
-var _mouse2Fill = require("./icons/mouse2-fill");
-var _mouse2FillDefault = parcelHelpers.interopDefault(_mouse2Fill);
-var _mouse2 = require("./icons/mouse2");
-var _mouse2Default = parcelHelpers.interopDefault(_mouse2);
-var _mouse3Fill = require("./icons/mouse3-fill");
-var _mouse3FillDefault = parcelHelpers.interopDefault(_mouse3Fill);
-var _mouse3 = require("./icons/mouse3");
-var _mouse3Default = parcelHelpers.interopDefault(_mouse3);
-var _musicNoteBeamed = require("./icons/music-note-beamed");
-var _musicNoteBeamedDefault = parcelHelpers.interopDefault(_musicNoteBeamed);
-var _musicNoteList = require("./icons/music-note-list");
-var _musicNoteListDefault = parcelHelpers.interopDefault(_musicNoteList);
-var _musicNote = require("./icons/music-note");
-var _musicNoteDefault = parcelHelpers.interopDefault(_musicNote);
-var _musicPlayerFill = require("./icons/music-player-fill");
-var _musicPlayerFillDefault = parcelHelpers.interopDefault(_musicPlayerFill);
-var _musicPlayer = require("./icons/music-player");
-var _musicPlayerDefault = parcelHelpers.interopDefault(_musicPlayer);
-var _newspaper = require("./icons/newspaper");
-var _newspaperDefault = parcelHelpers.interopDefault(_newspaper);
-var _nintendoSwitch = require("./icons/nintendo-switch");
-var _nintendoSwitchDefault = parcelHelpers.interopDefault(_nintendoSwitch);
-var _nodeMinusFill = require("./icons/node-minus-fill");
-var _nodeMinusFillDefault = parcelHelpers.interopDefault(_nodeMinusFill);
-var _nodeMinus = require("./icons/node-minus");
-var _nodeMinusDefault = parcelHelpers.interopDefault(_nodeMinus);
-var _nodePlusFill = require("./icons/node-plus-fill");
-var _nodePlusFillDefault = parcelHelpers.interopDefault(_nodePlusFill);
-var _nodePlus = require("./icons/node-plus");
-var _nodePlusDefault = parcelHelpers.interopDefault(_nodePlus);
-var _noiseReduction = require("./icons/noise-reduction");
-var _noiseReductionDefault = parcelHelpers.interopDefault(_noiseReduction);
-var _nutFill = require("./icons/nut-fill");
-var _nutFillDefault = parcelHelpers.interopDefault(_nutFill);
-var _nut = require("./icons/nut");
-var _nutDefault = parcelHelpers.interopDefault(_nut);
-var _nvidia = require("./icons/nvidia");
-var _nvidiaDefault = parcelHelpers.interopDefault(_nvidia);
-var _nvmeFill = require("./icons/nvme-fill");
-var _nvmeFillDefault = parcelHelpers.interopDefault(_nvmeFill);
-var _nvme = require("./icons/nvme");
-var _nvmeDefault = parcelHelpers.interopDefault(_nvme);
-var _octagonFill = require("./icons/octagon-fill");
-var _octagonFillDefault = parcelHelpers.interopDefault(_octagonFill);
-var _octagonHalf = require("./icons/octagon-half");
-var _octagonHalfDefault = parcelHelpers.interopDefault(_octagonHalf);
-var _octagon = require("./icons/octagon");
-var _octagonDefault = parcelHelpers.interopDefault(_octagon);
-var _opencollective = require("./icons/opencollective");
-var _opencollectiveDefault = parcelHelpers.interopDefault(_opencollective);
-var _opticalAudioFill = require("./icons/optical-audio-fill");
-var _opticalAudioFillDefault = parcelHelpers.interopDefault(_opticalAudioFill);
-var _opticalAudio = require("./icons/optical-audio");
-var _opticalAudioDefault = parcelHelpers.interopDefault(_opticalAudio);
-var _option = require("./icons/option");
-var _optionDefault = parcelHelpers.interopDefault(_option);
-var _outlet = require("./icons/outlet");
-var _outletDefault = parcelHelpers.interopDefault(_outlet);
-var _pCircleFill = require("./icons/p-circle-fill");
-var _pCircleFillDefault = parcelHelpers.interopDefault(_pCircleFill);
-var _pCircle = require("./icons/p-circle");
-var _pCircleDefault = parcelHelpers.interopDefault(_pCircle);
-var _pSquareFill = require("./icons/p-square-fill");
-var _pSquareFillDefault = parcelHelpers.interopDefault(_pSquareFill);
-var _pSquare = require("./icons/p-square");
-var _pSquareDefault = parcelHelpers.interopDefault(_pSquare);
-var _paintBucket = require("./icons/paint-bucket");
-var _paintBucketDefault = parcelHelpers.interopDefault(_paintBucket);
-var _paletteFill = require("./icons/palette-fill");
-var _paletteFillDefault = parcelHelpers.interopDefault(_paletteFill);
-var _palette = require("./icons/palette");
-var _paletteDefault = parcelHelpers.interopDefault(_palette);
-var _palette2 = require("./icons/palette2");
-var _palette2Default = parcelHelpers.interopDefault(_palette2);
-var _paperclip = require("./icons/paperclip");
-var _paperclipDefault = parcelHelpers.interopDefault(_paperclip);
-var _paragraph = require("./icons/paragraph");
-var _paragraphDefault = parcelHelpers.interopDefault(_paragraph);
-var _passFill = require("./icons/pass-fill");
-var _passFillDefault = parcelHelpers.interopDefault(_passFill);
-var _pass = require("./icons/pass");
-var _passDefault = parcelHelpers.interopDefault(_pass);
-var _passportFill = require("./icons/passport-fill");
-var _passportFillDefault = parcelHelpers.interopDefault(_passportFill);
-var _passport = require("./icons/passport");
-var _passportDefault = parcelHelpers.interopDefault(_passport);
-var _patchCheckFill = require("./icons/patch-check-fill");
-var _patchCheckFillDefault = parcelHelpers.interopDefault(_patchCheckFill);
-var _patchCheck = require("./icons/patch-check");
-var _patchCheckDefault = parcelHelpers.interopDefault(_patchCheck);
-var _patchExclamationFill = require("./icons/patch-exclamation-fill");
-var _patchExclamationFillDefault = parcelHelpers.interopDefault(_patchExclamationFill);
-var _patchExclamation = require("./icons/patch-exclamation");
-var _patchExclamationDefault = parcelHelpers.interopDefault(_patchExclamation);
-var _patchMinusFill = require("./icons/patch-minus-fill");
-var _patchMinusFillDefault = parcelHelpers.interopDefault(_patchMinusFill);
-var _patchMinus = require("./icons/patch-minus");
-var _patchMinusDefault = parcelHelpers.interopDefault(_patchMinus);
-var _patchPlusFill = require("./icons/patch-plus-fill");
-var _patchPlusFillDefault = parcelHelpers.interopDefault(_patchPlusFill);
-var _patchPlus = require("./icons/patch-plus");
-var _patchPlusDefault = parcelHelpers.interopDefault(_patchPlus);
-var _patchQuestionFill = require("./icons/patch-question-fill");
-var _patchQuestionFillDefault = parcelHelpers.interopDefault(_patchQuestionFill);
-var _patchQuestion = require("./icons/patch-question");
-var _patchQuestionDefault = parcelHelpers.interopDefault(_patchQuestion);
-var _pauseBtnFill = require("./icons/pause-btn-fill");
-var _pauseBtnFillDefault = parcelHelpers.interopDefault(_pauseBtnFill);
-var _pauseBtn = require("./icons/pause-btn");
-var _pauseBtnDefault = parcelHelpers.interopDefault(_pauseBtn);
-var _pauseCircleFill = require("./icons/pause-circle-fill");
-var _pauseCircleFillDefault = parcelHelpers.interopDefault(_pauseCircleFill);
-var _pauseCircle = require("./icons/pause-circle");
-var _pauseCircleDefault = parcelHelpers.interopDefault(_pauseCircle);
-var _pauseFill = require("./icons/pause-fill");
-var _pauseFillDefault = parcelHelpers.interopDefault(_pauseFill);
-var _pause = require("./icons/pause");
-var _pauseDefault = parcelHelpers.interopDefault(_pause);
-var _paypal = require("./icons/paypal");
-var _paypalDefault = parcelHelpers.interopDefault(_paypal);
-var _pcDisplayHorizontal = require("./icons/pc-display-horizontal");
-var _pcDisplayHorizontalDefault = parcelHelpers.interopDefault(_pcDisplayHorizontal);
-var _pcDisplay = require("./icons/pc-display");
-var _pcDisplayDefault = parcelHelpers.interopDefault(_pcDisplay);
-var _pcHorizontal = require("./icons/pc-horizontal");
-var _pcHorizontalDefault = parcelHelpers.interopDefault(_pcHorizontal);
-var _pc = require("./icons/pc");
-var _pcDefault = parcelHelpers.interopDefault(_pc);
-var _pciCardNetwork = require("./icons/pci-card-network");
-var _pciCardNetworkDefault = parcelHelpers.interopDefault(_pciCardNetwork);
-var _pciCardSound = require("./icons/pci-card-sound");
-var _pciCardSoundDefault = parcelHelpers.interopDefault(_pciCardSound);
-var _pciCard = require("./icons/pci-card");
-var _pciCardDefault = parcelHelpers.interopDefault(_pciCard);
-var _peaceFill = require("./icons/peace-fill");
-var _peaceFillDefault = parcelHelpers.interopDefault(_peaceFill);
-var _peace = require("./icons/peace");
-var _peaceDefault = parcelHelpers.interopDefault(_peace);
-var _penFill = require("./icons/pen-fill");
-var _penFillDefault = parcelHelpers.interopDefault(_penFill);
-var _pen = require("./icons/pen");
-var _penDefault = parcelHelpers.interopDefault(_pen);
-var _pencilFill = require("./icons/pencil-fill");
-var _pencilFillDefault = parcelHelpers.interopDefault(_pencilFill);
-var _pencilSquare = require("./icons/pencil-square");
-var _pencilSquareDefault = parcelHelpers.interopDefault(_pencilSquare);
-var _pencil = require("./icons/pencil");
-var _pencilDefault = parcelHelpers.interopDefault(_pencil);
-var _pentagonFill = require("./icons/pentagon-fill");
-var _pentagonFillDefault = parcelHelpers.interopDefault(_pentagonFill);
-var _pentagonHalf = require("./icons/pentagon-half");
-var _pentagonHalfDefault = parcelHelpers.interopDefault(_pentagonHalf);
-var _pentagon = require("./icons/pentagon");
-var _pentagonDefault = parcelHelpers.interopDefault(_pentagon);
-var _peopleFill = require("./icons/people-fill");
-var _peopleFillDefault = parcelHelpers.interopDefault(_peopleFill);
-var _people = require("./icons/people");
-var _peopleDefault = parcelHelpers.interopDefault(_people);
-var _percent = require("./icons/percent");
-var _percentDefault = parcelHelpers.interopDefault(_percent);
-var _personAdd = require("./icons/person-add");
-var _personAddDefault = parcelHelpers.interopDefault(_personAdd);
-var _personArmsUp = require("./icons/person-arms-up");
-var _personArmsUpDefault = parcelHelpers.interopDefault(_personArmsUp);
-var _personBadgeFill = require("./icons/person-badge-fill");
-var _personBadgeFillDefault = parcelHelpers.interopDefault(_personBadgeFill);
-var _personBadge = require("./icons/person-badge");
-var _personBadgeDefault = parcelHelpers.interopDefault(_personBadge);
-var _personBoundingBox = require("./icons/person-bounding-box");
-var _personBoundingBoxDefault = parcelHelpers.interopDefault(_personBoundingBox);
-var _personCheckFill = require("./icons/person-check-fill");
-var _personCheckFillDefault = parcelHelpers.interopDefault(_personCheckFill);
-var _personCheck = require("./icons/person-check");
-var _personCheckDefault = parcelHelpers.interopDefault(_personCheck);
-var _personCircle = require("./icons/person-circle");
-var _personCircleDefault = parcelHelpers.interopDefault(_personCircle);
-var _personDashFill = require("./icons/person-dash-fill");
-var _personDashFillDefault = parcelHelpers.interopDefault(_personDashFill);
-var _personDash = require("./icons/person-dash");
-var _personDashDefault = parcelHelpers.interopDefault(_personDash);
-var _personDown = require("./icons/person-down");
-var _personDownDefault = parcelHelpers.interopDefault(_personDown);
-var _personExclamation = require("./icons/person-exclamation");
-var _personExclamationDefault = parcelHelpers.interopDefault(_personExclamation);
-var _personFillAdd = require("./icons/person-fill-add");
-var _personFillAddDefault = parcelHelpers.interopDefault(_personFillAdd);
-var _personFillCheck = require("./icons/person-fill-check");
-var _personFillCheckDefault = parcelHelpers.interopDefault(_personFillCheck);
-var _personFillDash = require("./icons/person-fill-dash");
-var _personFillDashDefault = parcelHelpers.interopDefault(_personFillDash);
-var _personFillDown = require("./icons/person-fill-down");
-var _personFillDownDefault = parcelHelpers.interopDefault(_personFillDown);
-var _personFillExclamation = require("./icons/person-fill-exclamation");
-var _personFillExclamationDefault = parcelHelpers.interopDefault(_personFillExclamation);
-var _personFillGear = require("./icons/person-fill-gear");
-var _personFillGearDefault = parcelHelpers.interopDefault(_personFillGear);
-var _personFillLock = require("./icons/person-fill-lock");
-var _personFillLockDefault = parcelHelpers.interopDefault(_personFillLock);
-var _personFillSlash = require("./icons/person-fill-slash");
-var _personFillSlashDefault = parcelHelpers.interopDefault(_personFillSlash);
-var _personFillUp = require("./icons/person-fill-up");
-var _personFillUpDefault = parcelHelpers.interopDefault(_personFillUp);
-var _personFillX = require("./icons/person-fill-x");
-var _personFillXDefault = parcelHelpers.interopDefault(_personFillX);
-var _personFill = require("./icons/person-fill");
-var _personFillDefault = parcelHelpers.interopDefault(_personFill);
-var _personGear = require("./icons/person-gear");
-var _personGearDefault = parcelHelpers.interopDefault(_personGear);
-var _personHeart = require("./icons/person-heart");
-var _personHeartDefault = parcelHelpers.interopDefault(_personHeart);
-var _personHearts = require("./icons/person-hearts");
-var _personHeartsDefault = parcelHelpers.interopDefault(_personHearts);
-var _personLinesFill = require("./icons/person-lines-fill");
-var _personLinesFillDefault = parcelHelpers.interopDefault(_personLinesFill);
-var _personLock = require("./icons/person-lock");
-var _personLockDefault = parcelHelpers.interopDefault(_personLock);
-var _personPlusFill = require("./icons/person-plus-fill");
-var _personPlusFillDefault = parcelHelpers.interopDefault(_personPlusFill);
-var _personPlus = require("./icons/person-plus");
-var _personPlusDefault = parcelHelpers.interopDefault(_personPlus);
-var _personRaisedHand = require("./icons/person-raised-hand");
-var _personRaisedHandDefault = parcelHelpers.interopDefault(_personRaisedHand);
-var _personRolodex = require("./icons/person-rolodex");
-var _personRolodexDefault = parcelHelpers.interopDefault(_personRolodex);
-var _personSlash = require("./icons/person-slash");
-var _personSlashDefault = parcelHelpers.interopDefault(_personSlash);
-var _personSquare = require("./icons/person-square");
-var _personSquareDefault = parcelHelpers.interopDefault(_personSquare);
-var _personStandingDress = require("./icons/person-standing-dress");
-var _personStandingDressDefault = parcelHelpers.interopDefault(_personStandingDress);
-var _personStanding = require("./icons/person-standing");
-var _personStandingDefault = parcelHelpers.interopDefault(_personStanding);
-var _personUp = require("./icons/person-up");
-var _personUpDefault = parcelHelpers.interopDefault(_personUp);
-var _personVcardFill = require("./icons/person-vcard-fill");
-var _personVcardFillDefault = parcelHelpers.interopDefault(_personVcardFill);
-var _personVcard = require("./icons/person-vcard");
-var _personVcardDefault = parcelHelpers.interopDefault(_personVcard);
-var _personVideo = require("./icons/person-video");
-var _personVideoDefault = parcelHelpers.interopDefault(_personVideo);
-var _personVideo2 = require("./icons/person-video2");
-var _personVideo2Default = parcelHelpers.interopDefault(_personVideo2);
-var _personVideo3 = require("./icons/person-video3");
-var _personVideo3Default = parcelHelpers.interopDefault(_personVideo3);
-var _personWalking = require("./icons/person-walking");
-var _personWalkingDefault = parcelHelpers.interopDefault(_personWalking);
-var _personWheelchair = require("./icons/person-wheelchair");
-var _personWheelchairDefault = parcelHelpers.interopDefault(_personWheelchair);
-var _personWorkspace = require("./icons/person-workspace");
-var _personWorkspaceDefault = parcelHelpers.interopDefault(_personWorkspace);
-var _personXFill = require("./icons/person-x-fill");
-var _personXFillDefault = parcelHelpers.interopDefault(_personXFill);
-var _personX = require("./icons/person-x");
-var _personXDefault = parcelHelpers.interopDefault(_personX);
-var _person = require("./icons/person");
-var _personDefault = parcelHelpers.interopDefault(_person);
-var _phoneFill = require("./icons/phone-fill");
-var _phoneFillDefault = parcelHelpers.interopDefault(_phoneFill);
-var _phoneFlip = require("./icons/phone-flip");
-var _phoneFlipDefault = parcelHelpers.interopDefault(_phoneFlip);
-var _phoneLandscapeFill = require("./icons/phone-landscape-fill");
-var _phoneLandscapeFillDefault = parcelHelpers.interopDefault(_phoneLandscapeFill);
-var _phoneLandscape = require("./icons/phone-landscape");
-var _phoneLandscapeDefault = parcelHelpers.interopDefault(_phoneLandscape);
-var _phoneVibrateFill = require("./icons/phone-vibrate-fill");
-var _phoneVibrateFillDefault = parcelHelpers.interopDefault(_phoneVibrateFill);
-var _phoneVibrate = require("./icons/phone-vibrate");
-var _phoneVibrateDefault = parcelHelpers.interopDefault(_phoneVibrate);
-var _phone = require("./icons/phone");
-var _phoneDefault = parcelHelpers.interopDefault(_phone);
-var _pieChartFill = require("./icons/pie-chart-fill");
-var _pieChartFillDefault = parcelHelpers.interopDefault(_pieChartFill);
-var _pieChart = require("./icons/pie-chart");
-var _pieChartDefault = parcelHelpers.interopDefault(_pieChart);
-var _piggyBankFill = require("./icons/piggy-bank-fill");
-var _piggyBankFillDefault = parcelHelpers.interopDefault(_piggyBankFill);
-var _piggyBank = require("./icons/piggy-bank");
-var _piggyBankDefault = parcelHelpers.interopDefault(_piggyBank);
-var _pinAngleFill = require("./icons/pin-angle-fill");
-var _pinAngleFillDefault = parcelHelpers.interopDefault(_pinAngleFill);
-var _pinAngle = require("./icons/pin-angle");
-var _pinAngleDefault = parcelHelpers.interopDefault(_pinAngle);
-var _pinFill = require("./icons/pin-fill");
-var _pinFillDefault = parcelHelpers.interopDefault(_pinFill);
-var _pinMapFill = require("./icons/pin-map-fill");
-var _pinMapFillDefault = parcelHelpers.interopDefault(_pinMapFill);
-var _pinMap = require("./icons/pin-map");
-var _pinMapDefault = parcelHelpers.interopDefault(_pinMap);
-var _pin = require("./icons/pin");
-var _pinDefault = parcelHelpers.interopDefault(_pin);
-var _pinterest = require("./icons/pinterest");
-var _pinterestDefault = parcelHelpers.interopDefault(_pinterest);
-var _pipFill = require("./icons/pip-fill");
-var _pipFillDefault = parcelHelpers.interopDefault(_pipFill);
-var _pip = require("./icons/pip");
-var _pipDefault = parcelHelpers.interopDefault(_pip);
-var _playBtnFill = require("./icons/play-btn-fill");
-var _playBtnFillDefault = parcelHelpers.interopDefault(_playBtnFill);
-var _playBtn = require("./icons/play-btn");
-var _playBtnDefault = parcelHelpers.interopDefault(_playBtn);
-var _playCircleFill = require("./icons/play-circle-fill");
-var _playCircleFillDefault = parcelHelpers.interopDefault(_playCircleFill);
-var _playCircle = require("./icons/play-circle");
-var _playCircleDefault = parcelHelpers.interopDefault(_playCircle);
-var _playFill = require("./icons/play-fill");
-var _playFillDefault = parcelHelpers.interopDefault(_playFill);
-var _play = require("./icons/play");
-var _playDefault = parcelHelpers.interopDefault(_play);
-var _playstation = require("./icons/playstation");
-var _playstationDefault = parcelHelpers.interopDefault(_playstation);
-var _plugFill = require("./icons/plug-fill");
-var _plugFillDefault = parcelHelpers.interopDefault(_plugFill);
-var _plug = require("./icons/plug");
-var _plugDefault = parcelHelpers.interopDefault(_plug);
-var _plugin = require("./icons/plugin");
-var _pluginDefault = parcelHelpers.interopDefault(_plugin);
-var _plusCircleDotted = require("./icons/plus-circle-dotted");
-var _plusCircleDottedDefault = parcelHelpers.interopDefault(_plusCircleDotted);
-var _plusCircleFill = require("./icons/plus-circle-fill");
-var _plusCircleFillDefault = parcelHelpers.interopDefault(_plusCircleFill);
-var _plusCircle = require("./icons/plus-circle");
-var _plusCircleDefault = parcelHelpers.interopDefault(_plusCircle);
-var _plusLg = require("./icons/plus-lg");
-var _plusLgDefault = parcelHelpers.interopDefault(_plusLg);
-var _plusSlashMinus = require("./icons/plus-slash-minus");
-var _plusSlashMinusDefault = parcelHelpers.interopDefault(_plusSlashMinus);
-var _plusSquareDotted = require("./icons/plus-square-dotted");
-var _plusSquareDottedDefault = parcelHelpers.interopDefault(_plusSquareDotted);
-var _plusSquareFill = require("./icons/plus-square-fill");
-var _plusSquareFillDefault = parcelHelpers.interopDefault(_plusSquareFill);
-var _plusSquare = require("./icons/plus-square");
-var _plusSquareDefault = parcelHelpers.interopDefault(_plusSquare);
-var _plus = require("./icons/plus");
-var _plusDefault = parcelHelpers.interopDefault(_plus);
-var _postageFill = require("./icons/postage-fill");
-var _postageFillDefault = parcelHelpers.interopDefault(_postageFill);
-var _postageHeartFill = require("./icons/postage-heart-fill");
-var _postageHeartFillDefault = parcelHelpers.interopDefault(_postageHeartFill);
-var _postageHeart = require("./icons/postage-heart");
-var _postageHeartDefault = parcelHelpers.interopDefault(_postageHeart);
-var _postage = require("./icons/postage");
-var _postageDefault = parcelHelpers.interopDefault(_postage);
-var _postcardFill = require("./icons/postcard-fill");
-var _postcardFillDefault = parcelHelpers.interopDefault(_postcardFill);
-var _postcardHeartFill = require("./icons/postcard-heart-fill");
-var _postcardHeartFillDefault = parcelHelpers.interopDefault(_postcardHeartFill);
-var _postcardHeart = require("./icons/postcard-heart");
-var _postcardHeartDefault = parcelHelpers.interopDefault(_postcardHeart);
-var _postcard = require("./icons/postcard");
-var _postcardDefault = parcelHelpers.interopDefault(_postcard);
-var _power = require("./icons/power");
-var _powerDefault = parcelHelpers.interopDefault(_power);
-var _prescription = require("./icons/prescription");
-var _prescriptionDefault = parcelHelpers.interopDefault(_prescription);
-var _prescription2 = require("./icons/prescription2");
-var _prescription2Default = parcelHelpers.interopDefault(_prescription2);
-var _printerFill = require("./icons/printer-fill");
-var _printerFillDefault = parcelHelpers.interopDefault(_printerFill);
-var _printer = require("./icons/printer");
-var _printerDefault = parcelHelpers.interopDefault(_printer);
-var _projectorFill = require("./icons/projector-fill");
-var _projectorFillDefault = parcelHelpers.interopDefault(_projectorFill);
-var _projector = require("./icons/projector");
-var _projectorDefault = parcelHelpers.interopDefault(_projector);
-var _puzzleFill = require("./icons/puzzle-fill");
-var _puzzleFillDefault = parcelHelpers.interopDefault(_puzzleFill);
-var _puzzle = require("./icons/puzzle");
-var _puzzleDefault = parcelHelpers.interopDefault(_puzzle);
-var _qrCodeScan = require("./icons/qr-code-scan");
-var _qrCodeScanDefault = parcelHelpers.interopDefault(_qrCodeScan);
-var _qrCode = require("./icons/qr-code");
-var _qrCodeDefault = parcelHelpers.interopDefault(_qrCode);
-var _questionCircleFill = require("./icons/question-circle-fill");
-var _questionCircleFillDefault = parcelHelpers.interopDefault(_questionCircleFill);
-var _questionCircle = require("./icons/question-circle");
-var _questionCircleDefault = parcelHelpers.interopDefault(_questionCircle);
-var _questionDiamondFill = require("./icons/question-diamond-fill");
-var _questionDiamondFillDefault = parcelHelpers.interopDefault(_questionDiamondFill);
-var _questionDiamond = require("./icons/question-diamond");
-var _questionDiamondDefault = parcelHelpers.interopDefault(_questionDiamond);
-var _questionLg = require("./icons/question-lg");
-var _questionLgDefault = parcelHelpers.interopDefault(_questionLg);
-var _questionOctagonFill = require("./icons/question-octagon-fill");
-var _questionOctagonFillDefault = parcelHelpers.interopDefault(_questionOctagonFill);
-var _questionOctagon = require("./icons/question-octagon");
-var _questionOctagonDefault = parcelHelpers.interopDefault(_questionOctagon);
-var _questionSquareFill = require("./icons/question-square-fill");
-var _questionSquareFillDefault = parcelHelpers.interopDefault(_questionSquareFill);
-var _questionSquare = require("./icons/question-square");
-var _questionSquareDefault = parcelHelpers.interopDefault(_questionSquare);
-var _question = require("./icons/question");
-var _questionDefault = parcelHelpers.interopDefault(_question);
-var _quora = require("./icons/quora");
-var _quoraDefault = parcelHelpers.interopDefault(_quora);
-var _quote = require("./icons/quote");
-var _quoteDefault = parcelHelpers.interopDefault(_quote);
-var _rCircleFill = require("./icons/r-circle-fill");
-var _rCircleFillDefault = parcelHelpers.interopDefault(_rCircleFill);
-var _rCircle = require("./icons/r-circle");
-var _rCircleDefault = parcelHelpers.interopDefault(_rCircle);
-var _rSquareFill = require("./icons/r-square-fill");
-var _rSquareFillDefault = parcelHelpers.interopDefault(_rSquareFill);
-var _rSquare = require("./icons/r-square");
-var _rSquareDefault = parcelHelpers.interopDefault(_rSquare);
-var _radar = require("./icons/radar");
-var _radarDefault = parcelHelpers.interopDefault(_radar);
-var _radioactive = require("./icons/radioactive");
-var _radioactiveDefault = parcelHelpers.interopDefault(_radioactive);
-var _rainbow = require("./icons/rainbow");
-var _rainbowDefault = parcelHelpers.interopDefault(_rainbow);
-var _receiptCutoff = require("./icons/receipt-cutoff");
-var _receiptCutoffDefault = parcelHelpers.interopDefault(_receiptCutoff);
-var _receipt = require("./icons/receipt");
-var _receiptDefault = parcelHelpers.interopDefault(_receipt);
-var _reception0 = require("./icons/reception-0");
-var _reception0Default = parcelHelpers.interopDefault(_reception0);
-var _reception1 = require("./icons/reception-1");
-var _reception1Default = parcelHelpers.interopDefault(_reception1);
-var _reception2 = require("./icons/reception-2");
-var _reception2Default = parcelHelpers.interopDefault(_reception2);
-var _reception3 = require("./icons/reception-3");
-var _reception3Default = parcelHelpers.interopDefault(_reception3);
-var _reception4 = require("./icons/reception-4");
-var _reception4Default = parcelHelpers.interopDefault(_reception4);
-var _recordBtnFill = require("./icons/record-btn-fill");
-var _recordBtnFillDefault = parcelHelpers.interopDefault(_recordBtnFill);
-var _recordBtn = require("./icons/record-btn");
-var _recordBtnDefault = parcelHelpers.interopDefault(_recordBtn);
-var _recordCircleFill = require("./icons/record-circle-fill");
-var _recordCircleFillDefault = parcelHelpers.interopDefault(_recordCircleFill);
-var _recordCircle = require("./icons/record-circle");
-var _recordCircleDefault = parcelHelpers.interopDefault(_recordCircle);
-var _recordFill = require("./icons/record-fill");
-var _recordFillDefault = parcelHelpers.interopDefault(_recordFill);
-var _record = require("./icons/record");
-var _recordDefault = parcelHelpers.interopDefault(_record);
-var _record2Fill = require("./icons/record2-fill");
-var _record2FillDefault = parcelHelpers.interopDefault(_record2Fill);
-var _record2 = require("./icons/record2");
-var _record2Default = parcelHelpers.interopDefault(_record2);
-var _recycle = require("./icons/recycle");
-var _recycleDefault = parcelHelpers.interopDefault(_recycle);
-var _reddit = require("./icons/reddit");
-var _redditDefault = parcelHelpers.interopDefault(_reddit);
-var _regex = require("./icons/regex");
-var _regexDefault = parcelHelpers.interopDefault(_regex);
-var _repeat1 = require("./icons/repeat-1");
-var _repeat1Default = parcelHelpers.interopDefault(_repeat1);
-var _repeat = require("./icons/repeat");
-var _repeatDefault = parcelHelpers.interopDefault(_repeat);
-var _replyAllFill = require("./icons/reply-all-fill");
-var _replyAllFillDefault = parcelHelpers.interopDefault(_replyAllFill);
-var _replyAll = require("./icons/reply-all");
-var _replyAllDefault = parcelHelpers.interopDefault(_replyAll);
-var _replyFill = require("./icons/reply-fill");
-var _replyFillDefault = parcelHelpers.interopDefault(_replyFill);
-var _reply = require("./icons/reply");
-var _replyDefault = parcelHelpers.interopDefault(_reply);
-var _rewindBtnFill = require("./icons/rewind-btn-fill");
-var _rewindBtnFillDefault = parcelHelpers.interopDefault(_rewindBtnFill);
-var _rewindBtn = require("./icons/rewind-btn");
-var _rewindBtnDefault = parcelHelpers.interopDefault(_rewindBtn);
-var _rewindCircleFill = require("./icons/rewind-circle-fill");
-var _rewindCircleFillDefault = parcelHelpers.interopDefault(_rewindCircleFill);
-var _rewindCircle = require("./icons/rewind-circle");
-var _rewindCircleDefault = parcelHelpers.interopDefault(_rewindCircle);
-var _rewindFill = require("./icons/rewind-fill");
-var _rewindFillDefault = parcelHelpers.interopDefault(_rewindFill);
-var _rewind = require("./icons/rewind");
-var _rewindDefault = parcelHelpers.interopDefault(_rewind);
-var _robot = require("./icons/robot");
-var _robotDefault = parcelHelpers.interopDefault(_robot);
-var _rocketFill = require("./icons/rocket-fill");
-var _rocketFillDefault = parcelHelpers.interopDefault(_rocketFill);
-var _rocketTakeoffFill = require("./icons/rocket-takeoff-fill");
-var _rocketTakeoffFillDefault = parcelHelpers.interopDefault(_rocketTakeoffFill);
-var _rocketTakeoff = require("./icons/rocket-takeoff");
-var _rocketTakeoffDefault = parcelHelpers.interopDefault(_rocketTakeoff);
-var _rocket = require("./icons/rocket");
-var _rocketDefault = parcelHelpers.interopDefault(_rocket);
-var _routerFill = require("./icons/router-fill");
-var _routerFillDefault = parcelHelpers.interopDefault(_routerFill);
-var _router = require("./icons/router");
-var _routerDefault = parcelHelpers.interopDefault(_router);
-var _rssFill = require("./icons/rss-fill");
-var _rssFillDefault = parcelHelpers.interopDefault(_rssFill);
-var _rss = require("./icons/rss");
-var _rssDefault = parcelHelpers.interopDefault(_rss);
-var _rulers = require("./icons/rulers");
-var _rulersDefault = parcelHelpers.interopDefault(_rulers);
-var _safeFill = require("./icons/safe-fill");
-var _safeFillDefault = parcelHelpers.interopDefault(_safeFill);
-var _safe = require("./icons/safe");
-var _safeDefault = parcelHelpers.interopDefault(_safe);
-var _safe2Fill = require("./icons/safe2-fill");
-var _safe2FillDefault = parcelHelpers.interopDefault(_safe2Fill);
-var _safe2 = require("./icons/safe2");
-var _safe2Default = parcelHelpers.interopDefault(_safe2);
-var _saveFill = require("./icons/save-fill");
-var _saveFillDefault = parcelHelpers.interopDefault(_saveFill);
-var _save = require("./icons/save");
-var _saveDefault = parcelHelpers.interopDefault(_save);
-var _save2Fill = require("./icons/save2-fill");
-var _save2FillDefault = parcelHelpers.interopDefault(_save2Fill);
-var _save2 = require("./icons/save2");
-var _save2Default = parcelHelpers.interopDefault(_save2);
-var _scissors = require("./icons/scissors");
-var _scissorsDefault = parcelHelpers.interopDefault(_scissors);
-var _scooter = require("./icons/scooter");
-var _scooterDefault = parcelHelpers.interopDefault(_scooter);
-var _screwdriver = require("./icons/screwdriver");
-var _screwdriverDefault = parcelHelpers.interopDefault(_screwdriver);
-var _sdCardFill = require("./icons/sd-card-fill");
-var _sdCardFillDefault = parcelHelpers.interopDefault(_sdCardFill);
-var _sdCard = require("./icons/sd-card");
-var _sdCardDefault = parcelHelpers.interopDefault(_sdCard);
-var _searchHeartFill = require("./icons/search-heart-fill");
-var _searchHeartFillDefault = parcelHelpers.interopDefault(_searchHeartFill);
-var _searchHeart = require("./icons/search-heart");
-var _searchHeartDefault = parcelHelpers.interopDefault(_searchHeart);
-var _search = require("./icons/search");
-var _searchDefault = parcelHelpers.interopDefault(_search);
-var _segmentedNav = require("./icons/segmented-nav");
-var _segmentedNavDefault = parcelHelpers.interopDefault(_segmentedNav);
-var _sendArrowDownFill = require("./icons/send-arrow-down-fill");
-var _sendArrowDownFillDefault = parcelHelpers.interopDefault(_sendArrowDownFill);
-var _sendArrowDown = require("./icons/send-arrow-down");
-var _sendArrowDownDefault = parcelHelpers.interopDefault(_sendArrowDown);
-var _sendArrowUpFill = require("./icons/send-arrow-up-fill");
-var _sendArrowUpFillDefault = parcelHelpers.interopDefault(_sendArrowUpFill);
-var _sendArrowUp = require("./icons/send-arrow-up");
-var _sendArrowUpDefault = parcelHelpers.interopDefault(_sendArrowUp);
-var _sendCheckFill = require("./icons/send-check-fill");
-var _sendCheckFillDefault = parcelHelpers.interopDefault(_sendCheckFill);
-var _sendCheck = require("./icons/send-check");
-var _sendCheckDefault = parcelHelpers.interopDefault(_sendCheck);
-var _sendDashFill = require("./icons/send-dash-fill");
-var _sendDashFillDefault = parcelHelpers.interopDefault(_sendDashFill);
-var _sendDash = require("./icons/send-dash");
-var _sendDashDefault = parcelHelpers.interopDefault(_sendDash);
-var _sendExclamationFill = require("./icons/send-exclamation-fill");
-var _sendExclamationFillDefault = parcelHelpers.interopDefault(_sendExclamationFill);
-var _sendExclamation = require("./icons/send-exclamation");
-var _sendExclamationDefault = parcelHelpers.interopDefault(_sendExclamation);
-var _sendFill = require("./icons/send-fill");
-var _sendFillDefault = parcelHelpers.interopDefault(_sendFill);
-var _sendPlusFill = require("./icons/send-plus-fill");
-var _sendPlusFillDefault = parcelHelpers.interopDefault(_sendPlusFill);
-var _sendPlus = require("./icons/send-plus");
-var _sendPlusDefault = parcelHelpers.interopDefault(_sendPlus);
-var _sendSlashFill = require("./icons/send-slash-fill");
-var _sendSlashFillDefault = parcelHelpers.interopDefault(_sendSlashFill);
-var _sendSlash = require("./icons/send-slash");
-var _sendSlashDefault = parcelHelpers.interopDefault(_sendSlash);
-var _sendXFill = require("./icons/send-x-fill");
-var _sendXFillDefault = parcelHelpers.interopDefault(_sendXFill);
-var _sendX = require("./icons/send-x");
-var _sendXDefault = parcelHelpers.interopDefault(_sendX);
-var _send = require("./icons/send");
-var _sendDefault = parcelHelpers.interopDefault(_send);
-var _server = require("./icons/server");
-var _serverDefault = parcelHelpers.interopDefault(_server);
-var _shadows = require("./icons/shadows");
-var _shadowsDefault = parcelHelpers.interopDefault(_shadows);
-var _shareFill = require("./icons/share-fill");
-var _shareFillDefault = parcelHelpers.interopDefault(_shareFill);
-var _share = require("./icons/share");
-var _shareDefault = parcelHelpers.interopDefault(_share);
-var _shieldCheck = require("./icons/shield-check");
-var _shieldCheckDefault = parcelHelpers.interopDefault(_shieldCheck);
-var _shieldExclamation = require("./icons/shield-exclamation");
-var _shieldExclamationDefault = parcelHelpers.interopDefault(_shieldExclamation);
-var _shieldFillCheck = require("./icons/shield-fill-check");
-var _shieldFillCheckDefault = parcelHelpers.interopDefault(_shieldFillCheck);
-var _shieldFillExclamation = require("./icons/shield-fill-exclamation");
-var _shieldFillExclamationDefault = parcelHelpers.interopDefault(_shieldFillExclamation);
-var _shieldFillMinus = require("./icons/shield-fill-minus");
-var _shieldFillMinusDefault = parcelHelpers.interopDefault(_shieldFillMinus);
-var _shieldFillPlus = require("./icons/shield-fill-plus");
-var _shieldFillPlusDefault = parcelHelpers.interopDefault(_shieldFillPlus);
-var _shieldFillX = require("./icons/shield-fill-x");
-var _shieldFillXDefault = parcelHelpers.interopDefault(_shieldFillX);
-var _shieldFill = require("./icons/shield-fill");
-var _shieldFillDefault = parcelHelpers.interopDefault(_shieldFill);
-var _shieldLockFill = require("./icons/shield-lock-fill");
-var _shieldLockFillDefault = parcelHelpers.interopDefault(_shieldLockFill);
-var _shieldLock = require("./icons/shield-lock");
-var _shieldLockDefault = parcelHelpers.interopDefault(_shieldLock);
-var _shieldMinus = require("./icons/shield-minus");
-var _shieldMinusDefault = parcelHelpers.interopDefault(_shieldMinus);
-var _shieldPlus = require("./icons/shield-plus");
-var _shieldPlusDefault = parcelHelpers.interopDefault(_shieldPlus);
-var _shieldShaded = require("./icons/shield-shaded");
-var _shieldShadedDefault = parcelHelpers.interopDefault(_shieldShaded);
-var _shieldSlashFill = require("./icons/shield-slash-fill");
-var _shieldSlashFillDefault = parcelHelpers.interopDefault(_shieldSlashFill);
-var _shieldSlash = require("./icons/shield-slash");
-var _shieldSlashDefault = parcelHelpers.interopDefault(_shieldSlash);
-var _shieldX = require("./icons/shield-x");
-var _shieldXDefault = parcelHelpers.interopDefault(_shieldX);
-var _shield = require("./icons/shield");
-var _shieldDefault = parcelHelpers.interopDefault(_shield);
-var _shiftFill = require("./icons/shift-fill");
-var _shiftFillDefault = parcelHelpers.interopDefault(_shiftFill);
-var _shift = require("./icons/shift");
-var _shiftDefault = parcelHelpers.interopDefault(_shift);
-var _shopWindow = require("./icons/shop-window");
-var _shopWindowDefault = parcelHelpers.interopDefault(_shopWindow);
-var _shop = require("./icons/shop");
-var _shopDefault = parcelHelpers.interopDefault(_shop);
-var _shuffle = require("./icons/shuffle");
-var _shuffleDefault = parcelHelpers.interopDefault(_shuffle);
-var _signDeadEndFill = require("./icons/sign-dead-end-fill");
-var _signDeadEndFillDefault = parcelHelpers.interopDefault(_signDeadEndFill);
-var _signDeadEnd = require("./icons/sign-dead-end");
-var _signDeadEndDefault = parcelHelpers.interopDefault(_signDeadEnd);
-var _signDoNotEnterFill = require("./icons/sign-do-not-enter-fill");
-var _signDoNotEnterFillDefault = parcelHelpers.interopDefault(_signDoNotEnterFill);
-var _signDoNotEnter = require("./icons/sign-do-not-enter");
-var _signDoNotEnterDefault = parcelHelpers.interopDefault(_signDoNotEnter);
-var _signIntersectionFill = require("./icons/sign-intersection-fill");
-var _signIntersectionFillDefault = parcelHelpers.interopDefault(_signIntersectionFill);
-var _signIntersectionSideFill = require("./icons/sign-intersection-side-fill");
-var _signIntersectionSideFillDefault = parcelHelpers.interopDefault(_signIntersectionSideFill);
-var _signIntersectionSide = require("./icons/sign-intersection-side");
-var _signIntersectionSideDefault = parcelHelpers.interopDefault(_signIntersectionSide);
-var _signIntersectionTFill = require("./icons/sign-intersection-t-fill");
-var _signIntersectionTFillDefault = parcelHelpers.interopDefault(_signIntersectionTFill);
-var _signIntersectionT = require("./icons/sign-intersection-t");
-var _signIntersectionTDefault = parcelHelpers.interopDefault(_signIntersectionT);
-var _signIntersectionYFill = require("./icons/sign-intersection-y-fill");
-var _signIntersectionYFillDefault = parcelHelpers.interopDefault(_signIntersectionYFill);
-var _signIntersectionY = require("./icons/sign-intersection-y");
-var _signIntersectionYDefault = parcelHelpers.interopDefault(_signIntersectionY);
-var _signIntersection = require("./icons/sign-intersection");
-var _signIntersectionDefault = parcelHelpers.interopDefault(_signIntersection);
-var _signMergeLeftFill = require("./icons/sign-merge-left-fill");
-var _signMergeLeftFillDefault = parcelHelpers.interopDefault(_signMergeLeftFill);
-var _signMergeLeft = require("./icons/sign-merge-left");
-var _signMergeLeftDefault = parcelHelpers.interopDefault(_signMergeLeft);
-var _signMergeRightFill = require("./icons/sign-merge-right-fill");
-var _signMergeRightFillDefault = parcelHelpers.interopDefault(_signMergeRightFill);
-var _signMergeRight = require("./icons/sign-merge-right");
-var _signMergeRightDefault = parcelHelpers.interopDefault(_signMergeRight);
-var _signNoLeftTurnFill = require("./icons/sign-no-left-turn-fill");
-var _signNoLeftTurnFillDefault = parcelHelpers.interopDefault(_signNoLeftTurnFill);
-var _signNoLeftTurn = require("./icons/sign-no-left-turn");
-var _signNoLeftTurnDefault = parcelHelpers.interopDefault(_signNoLeftTurn);
-var _signNoParkingFill = require("./icons/sign-no-parking-fill");
-var _signNoParkingFillDefault = parcelHelpers.interopDefault(_signNoParkingFill);
-var _signNoParking = require("./icons/sign-no-parking");
-var _signNoParkingDefault = parcelHelpers.interopDefault(_signNoParking);
-var _signNoRightTurnFill = require("./icons/sign-no-right-turn-fill");
-var _signNoRightTurnFillDefault = parcelHelpers.interopDefault(_signNoRightTurnFill);
-var _signNoRightTurn = require("./icons/sign-no-right-turn");
-var _signNoRightTurnDefault = parcelHelpers.interopDefault(_signNoRightTurn);
-var _signRailroadFill = require("./icons/sign-railroad-fill");
-var _signRailroadFillDefault = parcelHelpers.interopDefault(_signRailroadFill);
-var _signRailroad = require("./icons/sign-railroad");
-var _signRailroadDefault = parcelHelpers.interopDefault(_signRailroad);
-var _signStopFill = require("./icons/sign-stop-fill");
-var _signStopFillDefault = parcelHelpers.interopDefault(_signStopFill);
-var _signStopLightsFill = require("./icons/sign-stop-lights-fill");
-var _signStopLightsFillDefault = parcelHelpers.interopDefault(_signStopLightsFill);
-var _signStopLights = require("./icons/sign-stop-lights");
-var _signStopLightsDefault = parcelHelpers.interopDefault(_signStopLights);
-var _signStop = require("./icons/sign-stop");
-var _signStopDefault = parcelHelpers.interopDefault(_signStop);
-var _signTurnLeftFill = require("./icons/sign-turn-left-fill");
-var _signTurnLeftFillDefault = parcelHelpers.interopDefault(_signTurnLeftFill);
-var _signTurnLeft = require("./icons/sign-turn-left");
-var _signTurnLeftDefault = parcelHelpers.interopDefault(_signTurnLeft);
-var _signTurnRightFill = require("./icons/sign-turn-right-fill");
-var _signTurnRightFillDefault = parcelHelpers.interopDefault(_signTurnRightFill);
-var _signTurnRight = require("./icons/sign-turn-right");
-var _signTurnRightDefault = parcelHelpers.interopDefault(_signTurnRight);
-var _signTurnSlightLeftFill = require("./icons/sign-turn-slight-left-fill");
-var _signTurnSlightLeftFillDefault = parcelHelpers.interopDefault(_signTurnSlightLeftFill);
-var _signTurnSlightLeft = require("./icons/sign-turn-slight-left");
-var _signTurnSlightLeftDefault = parcelHelpers.interopDefault(_signTurnSlightLeft);
-var _signTurnSlightRightFill = require("./icons/sign-turn-slight-right-fill");
-var _signTurnSlightRightFillDefault = parcelHelpers.interopDefault(_signTurnSlightRightFill);
-var _signTurnSlightRight = require("./icons/sign-turn-slight-right");
-var _signTurnSlightRightDefault = parcelHelpers.interopDefault(_signTurnSlightRight);
-var _signYieldFill = require("./icons/sign-yield-fill");
-var _signYieldFillDefault = parcelHelpers.interopDefault(_signYieldFill);
-var _signYield = require("./icons/sign-yield");
-var _signYieldDefault = parcelHelpers.interopDefault(_signYield);
-var _signal = require("./icons/signal");
-var _signalDefault = parcelHelpers.interopDefault(_signal);
-var _signpost2Fill = require("./icons/signpost-2-fill");
-var _signpost2FillDefault = parcelHelpers.interopDefault(_signpost2Fill);
-var _signpost2 = require("./icons/signpost-2");
-var _signpost2Default = parcelHelpers.interopDefault(_signpost2);
-var _signpostFill = require("./icons/signpost-fill");
-var _signpostFillDefault = parcelHelpers.interopDefault(_signpostFill);
-var _signpostSplitFill = require("./icons/signpost-split-fill");
-var _signpostSplitFillDefault = parcelHelpers.interopDefault(_signpostSplitFill);
-var _signpostSplit = require("./icons/signpost-split");
-var _signpostSplitDefault = parcelHelpers.interopDefault(_signpostSplit);
-var _signpost = require("./icons/signpost");
-var _signpostDefault = parcelHelpers.interopDefault(_signpost);
-var _simFill = require("./icons/sim-fill");
-var _simFillDefault = parcelHelpers.interopDefault(_simFill);
-var _simSlashFill = require("./icons/sim-slash-fill");
-var _simSlashFillDefault = parcelHelpers.interopDefault(_simSlashFill);
-var _simSlash = require("./icons/sim-slash");
-var _simSlashDefault = parcelHelpers.interopDefault(_simSlash);
-var _sim = require("./icons/sim");
-var _simDefault = parcelHelpers.interopDefault(_sim);
-var _sinaWeibo = require("./icons/sina-weibo");
-var _sinaWeiboDefault = parcelHelpers.interopDefault(_sinaWeibo);
-var _skipBackwardBtnFill = require("./icons/skip-backward-btn-fill");
-var _skipBackwardBtnFillDefault = parcelHelpers.interopDefault(_skipBackwardBtnFill);
-var _skipBackwardBtn = require("./icons/skip-backward-btn");
-var _skipBackwardBtnDefault = parcelHelpers.interopDefault(_skipBackwardBtn);
-var _skipBackwardCircleFill = require("./icons/skip-backward-circle-fill");
-var _skipBackwardCircleFillDefault = parcelHelpers.interopDefault(_skipBackwardCircleFill);
-var _skipBackwardCircle = require("./icons/skip-backward-circle");
-var _skipBackwardCircleDefault = parcelHelpers.interopDefault(_skipBackwardCircle);
-var _skipBackwardFill = require("./icons/skip-backward-fill");
-var _skipBackwardFillDefault = parcelHelpers.interopDefault(_skipBackwardFill);
-var _skipBackward = require("./icons/skip-backward");
-var _skipBackwardDefault = parcelHelpers.interopDefault(_skipBackward);
-var _skipEndBtnFill = require("./icons/skip-end-btn-fill");
-var _skipEndBtnFillDefault = parcelHelpers.interopDefault(_skipEndBtnFill);
-var _skipEndBtn = require("./icons/skip-end-btn");
-var _skipEndBtnDefault = parcelHelpers.interopDefault(_skipEndBtn);
-var _skipEndCircleFill = require("./icons/skip-end-circle-fill");
-var _skipEndCircleFillDefault = parcelHelpers.interopDefault(_skipEndCircleFill);
-var _skipEndCircle = require("./icons/skip-end-circle");
-var _skipEndCircleDefault = parcelHelpers.interopDefault(_skipEndCircle);
-var _skipEndFill = require("./icons/skip-end-fill");
-var _skipEndFillDefault = parcelHelpers.interopDefault(_skipEndFill);
-var _skipEnd = require("./icons/skip-end");
-var _skipEndDefault = parcelHelpers.interopDefault(_skipEnd);
-var _skipForwardBtnFill = require("./icons/skip-forward-btn-fill");
-var _skipForwardBtnFillDefault = parcelHelpers.interopDefault(_skipForwardBtnFill);
-var _skipForwardBtn = require("./icons/skip-forward-btn");
-var _skipForwardBtnDefault = parcelHelpers.interopDefault(_skipForwardBtn);
-var _skipForwardCircleFill = require("./icons/skip-forward-circle-fill");
-var _skipForwardCircleFillDefault = parcelHelpers.interopDefault(_skipForwardCircleFill);
-var _skipForwardCircle = require("./icons/skip-forward-circle");
-var _skipForwardCircleDefault = parcelHelpers.interopDefault(_skipForwardCircle);
-var _skipForwardFill = require("./icons/skip-forward-fill");
-var _skipForwardFillDefault = parcelHelpers.interopDefault(_skipForwardFill);
-var _skipForward = require("./icons/skip-forward");
-var _skipForwardDefault = parcelHelpers.interopDefault(_skipForward);
-var _skipStartBtnFill = require("./icons/skip-start-btn-fill");
-var _skipStartBtnFillDefault = parcelHelpers.interopDefault(_skipStartBtnFill);
-var _skipStartBtn = require("./icons/skip-start-btn");
-var _skipStartBtnDefault = parcelHelpers.interopDefault(_skipStartBtn);
-var _skipStartCircleFill = require("./icons/skip-start-circle-fill");
-var _skipStartCircleFillDefault = parcelHelpers.interopDefault(_skipStartCircleFill);
-var _skipStartCircle = require("./icons/skip-start-circle");
-var _skipStartCircleDefault = parcelHelpers.interopDefault(_skipStartCircle);
-var _skipStartFill = require("./icons/skip-start-fill");
-var _skipStartFillDefault = parcelHelpers.interopDefault(_skipStartFill);
-var _skipStart = require("./icons/skip-start");
-var _skipStartDefault = parcelHelpers.interopDefault(_skipStart);
-var _skype = require("./icons/skype");
-var _skypeDefault = parcelHelpers.interopDefault(_skype);
-var _slack = require("./icons/slack");
-var _slackDefault = parcelHelpers.interopDefault(_slack);
-var _slashCircleFill = require("./icons/slash-circle-fill");
-var _slashCircleFillDefault = parcelHelpers.interopDefault(_slashCircleFill);
-var _slashCircle = require("./icons/slash-circle");
-var _slashCircleDefault = parcelHelpers.interopDefault(_slashCircle);
-var _slashLg = require("./icons/slash-lg");
-var _slashLgDefault = parcelHelpers.interopDefault(_slashLg);
-var _slashSquareFill = require("./icons/slash-square-fill");
-var _slashSquareFillDefault = parcelHelpers.interopDefault(_slashSquareFill);
-var _slashSquare = require("./icons/slash-square");
-var _slashSquareDefault = parcelHelpers.interopDefault(_slashSquare);
-var _slash = require("./icons/slash");
-var _slashDefault = parcelHelpers.interopDefault(_slash);
-var _sliders = require("./icons/sliders");
-var _slidersDefault = parcelHelpers.interopDefault(_sliders);
-var _sliders2Vertical = require("./icons/sliders2-vertical");
-var _sliders2VerticalDefault = parcelHelpers.interopDefault(_sliders2Vertical);
-var _sliders2 = require("./icons/sliders2");
-var _sliders2Default = parcelHelpers.interopDefault(_sliders2);
-var _smartwatch = require("./icons/smartwatch");
-var _smartwatchDefault = parcelHelpers.interopDefault(_smartwatch);
-var _snapchat = require("./icons/snapchat");
-var _snapchatDefault = parcelHelpers.interopDefault(_snapchat);
-var _snow = require("./icons/snow");
-var _snowDefault = parcelHelpers.interopDefault(_snow);
-var _snow2 = require("./icons/snow2");
-var _snow2Default = parcelHelpers.interopDefault(_snow2);
-var _snow3 = require("./icons/snow3");
-var _snow3Default = parcelHelpers.interopDefault(_snow3);
-var _sortAlphaDownAlt = require("./icons/sort-alpha-down-alt");
-var _sortAlphaDownAltDefault = parcelHelpers.interopDefault(_sortAlphaDownAlt);
-var _sortAlphaDown = require("./icons/sort-alpha-down");
-var _sortAlphaDownDefault = parcelHelpers.interopDefault(_sortAlphaDown);
-var _sortAlphaUpAlt = require("./icons/sort-alpha-up-alt");
-var _sortAlphaUpAltDefault = parcelHelpers.interopDefault(_sortAlphaUpAlt);
-var _sortAlphaUp = require("./icons/sort-alpha-up");
-var _sortAlphaUpDefault = parcelHelpers.interopDefault(_sortAlphaUp);
-var _sortDownAlt = require("./icons/sort-down-alt");
-var _sortDownAltDefault = parcelHelpers.interopDefault(_sortDownAlt);
-var _sortDown = require("./icons/sort-down");
-var _sortDownDefault = parcelHelpers.interopDefault(_sortDown);
-var _sortNumericDownAlt = require("./icons/sort-numeric-down-alt");
-var _sortNumericDownAltDefault = parcelHelpers.interopDefault(_sortNumericDownAlt);
-var _sortNumericDown = require("./icons/sort-numeric-down");
-var _sortNumericDownDefault = parcelHelpers.interopDefault(_sortNumericDown);
-var _sortNumericUpAlt = require("./icons/sort-numeric-up-alt");
-var _sortNumericUpAltDefault = parcelHelpers.interopDefault(_sortNumericUpAlt);
-var _sortNumericUp = require("./icons/sort-numeric-up");
-var _sortNumericUpDefault = parcelHelpers.interopDefault(_sortNumericUp);
-var _sortUpAlt = require("./icons/sort-up-alt");
-var _sortUpAltDefault = parcelHelpers.interopDefault(_sortUpAlt);
-var _sortUp = require("./icons/sort-up");
-var _sortUpDefault = parcelHelpers.interopDefault(_sortUp);
-var _soundwave = require("./icons/soundwave");
-var _soundwaveDefault = parcelHelpers.interopDefault(_soundwave);
-var _sourceforge = require("./icons/sourceforge");
-var _sourceforgeDefault = parcelHelpers.interopDefault(_sourceforge);
-var _speakerFill = require("./icons/speaker-fill");
-var _speakerFillDefault = parcelHelpers.interopDefault(_speakerFill);
-var _speaker = require("./icons/speaker");
-var _speakerDefault = parcelHelpers.interopDefault(_speaker);
-var _speedometer = require("./icons/speedometer");
-var _speedometerDefault = parcelHelpers.interopDefault(_speedometer);
-var _speedometer2 = require("./icons/speedometer2");
-var _speedometer2Default = parcelHelpers.interopDefault(_speedometer2);
-var _spellcheck = require("./icons/spellcheck");
-var _spellcheckDefault = parcelHelpers.interopDefault(_spellcheck);
-var _spotify = require("./icons/spotify");
-var _spotifyDefault = parcelHelpers.interopDefault(_spotify);
-var _squareFill = require("./icons/square-fill");
-var _squareFillDefault = parcelHelpers.interopDefault(_squareFill);
-var _squareHalf = require("./icons/square-half");
-var _squareHalfDefault = parcelHelpers.interopDefault(_squareHalf);
-var _square = require("./icons/square");
-var _squareDefault = parcelHelpers.interopDefault(_square);
-var _stackOverflow = require("./icons/stack-overflow");
-var _stackOverflowDefault = parcelHelpers.interopDefault(_stackOverflow);
-var _stack = require("./icons/stack");
-var _stackDefault = parcelHelpers.interopDefault(_stack);
-var _starFill = require("./icons/star-fill");
-var _starFillDefault = parcelHelpers.interopDefault(_starFill);
-var _starHalf = require("./icons/star-half");
-var _starHalfDefault = parcelHelpers.interopDefault(_starHalf);
-var _star = require("./icons/star");
-var _starDefault = parcelHelpers.interopDefault(_star);
-var _stars = require("./icons/stars");
-var _starsDefault = parcelHelpers.interopDefault(_stars);
-var _steam = require("./icons/steam");
-var _steamDefault = parcelHelpers.interopDefault(_steam);
-var _stickiesFill = require("./icons/stickies-fill");
-var _stickiesFillDefault = parcelHelpers.interopDefault(_stickiesFill);
-var _stickies = require("./icons/stickies");
-var _stickiesDefault = parcelHelpers.interopDefault(_stickies);
-var _stickyFill = require("./icons/sticky-fill");
-var _stickyFillDefault = parcelHelpers.interopDefault(_stickyFill);
-var _sticky = require("./icons/sticky");
-var _stickyDefault = parcelHelpers.interopDefault(_sticky);
-var _stopBtnFill = require("./icons/stop-btn-fill");
-var _stopBtnFillDefault = parcelHelpers.interopDefault(_stopBtnFill);
-var _stopBtn = require("./icons/stop-btn");
-var _stopBtnDefault = parcelHelpers.interopDefault(_stopBtn);
-var _stopCircleFill = require("./icons/stop-circle-fill");
-var _stopCircleFillDefault = parcelHelpers.interopDefault(_stopCircleFill);
-var _stopCircle = require("./icons/stop-circle");
-var _stopCircleDefault = parcelHelpers.interopDefault(_stopCircle);
-var _stopFill = require("./icons/stop-fill");
-var _stopFillDefault = parcelHelpers.interopDefault(_stopFill);
-var _stop = require("./icons/stop");
-var _stopDefault = parcelHelpers.interopDefault(_stop);
-var _stoplightsFill = require("./icons/stoplights-fill");
-var _stoplightsFillDefault = parcelHelpers.interopDefault(_stoplightsFill);
-var _stoplights = require("./icons/stoplights");
-var _stoplightsDefault = parcelHelpers.interopDefault(_stoplights);
-var _stopwatchFill = require("./icons/stopwatch-fill");
-var _stopwatchFillDefault = parcelHelpers.interopDefault(_stopwatchFill);
-var _stopwatch = require("./icons/stopwatch");
-var _stopwatchDefault = parcelHelpers.interopDefault(_stopwatch);
-var _strava = require("./icons/strava");
-var _stravaDefault = parcelHelpers.interopDefault(_strava);
-var _stripe = require("./icons/stripe");
-var _stripeDefault = parcelHelpers.interopDefault(_stripe);
-var _subscript = require("./icons/subscript");
-var _subscriptDefault = parcelHelpers.interopDefault(_subscript);
-var _substack = require("./icons/substack");
-var _substackDefault = parcelHelpers.interopDefault(_substack);
-var _subtract = require("./icons/subtract");
-var _subtractDefault = parcelHelpers.interopDefault(_subtract);
-var _suitClubFill = require("./icons/suit-club-fill");
-var _suitClubFillDefault = parcelHelpers.interopDefault(_suitClubFill);
-var _suitClub = require("./icons/suit-club");
-var _suitClubDefault = parcelHelpers.interopDefault(_suitClub);
-var _suitDiamondFill = require("./icons/suit-diamond-fill");
-var _suitDiamondFillDefault = parcelHelpers.interopDefault(_suitDiamondFill);
-var _suitDiamond = require("./icons/suit-diamond");
-var _suitDiamondDefault = parcelHelpers.interopDefault(_suitDiamond);
-var _suitHeartFill = require("./icons/suit-heart-fill");
-var _suitHeartFillDefault = parcelHelpers.interopDefault(_suitHeartFill);
-var _suitHeart = require("./icons/suit-heart");
-var _suitHeartDefault = parcelHelpers.interopDefault(_suitHeart);
-var _suitSpadeFill = require("./icons/suit-spade-fill");
-var _suitSpadeFillDefault = parcelHelpers.interopDefault(_suitSpadeFill);
-var _suitSpade = require("./icons/suit-spade");
-var _suitSpadeDefault = parcelHelpers.interopDefault(_suitSpade);
-var _suitcaseFill = require("./icons/suitcase-fill");
-var _suitcaseFillDefault = parcelHelpers.interopDefault(_suitcaseFill);
-var _suitcaseLgFill = require("./icons/suitcase-lg-fill");
-var _suitcaseLgFillDefault = parcelHelpers.interopDefault(_suitcaseLgFill);
-var _suitcaseLg = require("./icons/suitcase-lg");
-var _suitcaseLgDefault = parcelHelpers.interopDefault(_suitcaseLg);
-var _suitcase = require("./icons/suitcase");
-var _suitcaseDefault = parcelHelpers.interopDefault(_suitcase);
-var _suitcase2Fill = require("./icons/suitcase2-fill");
-var _suitcase2FillDefault = parcelHelpers.interopDefault(_suitcase2Fill);
-var _suitcase2 = require("./icons/suitcase2");
-var _suitcase2Default = parcelHelpers.interopDefault(_suitcase2);
-var _sunFill = require("./icons/sun-fill");
-var _sunFillDefault = parcelHelpers.interopDefault(_sunFill);
-var _sun = require("./icons/sun");
-var _sunDefault = parcelHelpers.interopDefault(_sun);
-var _sunglasses = require("./icons/sunglasses");
-var _sunglassesDefault = parcelHelpers.interopDefault(_sunglasses);
-var _sunriseFill = require("./icons/sunrise-fill");
-var _sunriseFillDefault = parcelHelpers.interopDefault(_sunriseFill);
-var _sunrise = require("./icons/sunrise");
-var _sunriseDefault = parcelHelpers.interopDefault(_sunrise);
-var _sunsetFill = require("./icons/sunset-fill");
-var _sunsetFillDefault = parcelHelpers.interopDefault(_sunsetFill);
-var _sunset = require("./icons/sunset");
-var _sunsetDefault = parcelHelpers.interopDefault(_sunset);
-var _superscript = require("./icons/superscript");
-var _superscriptDefault = parcelHelpers.interopDefault(_superscript);
-var _symmetryHorizontal = require("./icons/symmetry-horizontal");
-var _symmetryHorizontalDefault = parcelHelpers.interopDefault(_symmetryHorizontal);
-var _symmetryVertical = require("./icons/symmetry-vertical");
-var _symmetryVerticalDefault = parcelHelpers.interopDefault(_symmetryVertical);
-var _table = require("./icons/table");
-var _tableDefault = parcelHelpers.interopDefault(_table);
-var _tabletFill = require("./icons/tablet-fill");
-var _tabletFillDefault = parcelHelpers.interopDefault(_tabletFill);
-var _tabletLandscapeFill = require("./icons/tablet-landscape-fill");
-var _tabletLandscapeFillDefault = parcelHelpers.interopDefault(_tabletLandscapeFill);
-var _tabletLandscape = require("./icons/tablet-landscape");
-var _tabletLandscapeDefault = parcelHelpers.interopDefault(_tabletLandscape);
-var _tablet = require("./icons/tablet");
-var _tabletDefault = parcelHelpers.interopDefault(_tablet);
-var _tagFill = require("./icons/tag-fill");
-var _tagFillDefault = parcelHelpers.interopDefault(_tagFill);
-var _tag = require("./icons/tag");
-var _tagDefault = parcelHelpers.interopDefault(_tag);
-var _tagsFill = require("./icons/tags-fill");
-var _tagsFillDefault = parcelHelpers.interopDefault(_tagsFill);
-var _tags = require("./icons/tags");
-var _tagsDefault = parcelHelpers.interopDefault(_tags);
-var _taxiFrontFill = require("./icons/taxi-front-fill");
-var _taxiFrontFillDefault = parcelHelpers.interopDefault(_taxiFrontFill);
-var _taxiFront = require("./icons/taxi-front");
-var _taxiFrontDefault = parcelHelpers.interopDefault(_taxiFront);
-var _telegram = require("./icons/telegram");
-var _telegramDefault = parcelHelpers.interopDefault(_telegram);
-var _telephoneFill = require("./icons/telephone-fill");
-var _telephoneFillDefault = parcelHelpers.interopDefault(_telephoneFill);
-var _telephoneForwardFill = require("./icons/telephone-forward-fill");
-var _telephoneForwardFillDefault = parcelHelpers.interopDefault(_telephoneForwardFill);
-var _telephoneForward = require("./icons/telephone-forward");
-var _telephoneForwardDefault = parcelHelpers.interopDefault(_telephoneForward);
-var _telephoneInboundFill = require("./icons/telephone-inbound-fill");
-var _telephoneInboundFillDefault = parcelHelpers.interopDefault(_telephoneInboundFill);
-var _telephoneInbound = require("./icons/telephone-inbound");
-var _telephoneInboundDefault = parcelHelpers.interopDefault(_telephoneInbound);
-var _telephoneMinusFill = require("./icons/telephone-minus-fill");
-var _telephoneMinusFillDefault = parcelHelpers.interopDefault(_telephoneMinusFill);
-var _telephoneMinus = require("./icons/telephone-minus");
-var _telephoneMinusDefault = parcelHelpers.interopDefault(_telephoneMinus);
-var _telephoneOutboundFill = require("./icons/telephone-outbound-fill");
-var _telephoneOutboundFillDefault = parcelHelpers.interopDefault(_telephoneOutboundFill);
-var _telephoneOutbound = require("./icons/telephone-outbound");
-var _telephoneOutboundDefault = parcelHelpers.interopDefault(_telephoneOutbound);
-var _telephonePlusFill = require("./icons/telephone-plus-fill");
-var _telephonePlusFillDefault = parcelHelpers.interopDefault(_telephonePlusFill);
-var _telephonePlus = require("./icons/telephone-plus");
-var _telephonePlusDefault = parcelHelpers.interopDefault(_telephonePlus);
-var _telephoneXFill = require("./icons/telephone-x-fill");
-var _telephoneXFillDefault = parcelHelpers.interopDefault(_telephoneXFill);
-var _telephoneX = require("./icons/telephone-x");
-var _telephoneXDefault = parcelHelpers.interopDefault(_telephoneX);
-var _telephone = require("./icons/telephone");
-var _telephoneDefault = parcelHelpers.interopDefault(_telephone);
-var _tencentQq = require("./icons/tencent-qq");
-var _tencentQqDefault = parcelHelpers.interopDefault(_tencentQq);
-var _terminalDash = require("./icons/terminal-dash");
-var _terminalDashDefault = parcelHelpers.interopDefault(_terminalDash);
-var _terminalFill = require("./icons/terminal-fill");
-var _terminalFillDefault = parcelHelpers.interopDefault(_terminalFill);
-var _terminalPlus = require("./icons/terminal-plus");
-var _terminalPlusDefault = parcelHelpers.interopDefault(_terminalPlus);
-var _terminalSplit = require("./icons/terminal-split");
-var _terminalSplitDefault = parcelHelpers.interopDefault(_terminalSplit);
-var _terminalX = require("./icons/terminal-x");
-var _terminalXDefault = parcelHelpers.interopDefault(_terminalX);
-var _terminal = require("./icons/terminal");
-var _terminalDefault = parcelHelpers.interopDefault(_terminal);
-var _textCenter = require("./icons/text-center");
-var _textCenterDefault = parcelHelpers.interopDefault(_textCenter);
-var _textIndentLeft = require("./icons/text-indent-left");
-var _textIndentLeftDefault = parcelHelpers.interopDefault(_textIndentLeft);
-var _textIndentRight = require("./icons/text-indent-right");
-var _textIndentRightDefault = parcelHelpers.interopDefault(_textIndentRight);
-var _textLeft = require("./icons/text-left");
-var _textLeftDefault = parcelHelpers.interopDefault(_textLeft);
-var _textParagraph = require("./icons/text-paragraph");
-var _textParagraphDefault = parcelHelpers.interopDefault(_textParagraph);
-var _textRight = require("./icons/text-right");
-var _textRightDefault = parcelHelpers.interopDefault(_textRight);
-var _textWrap = require("./icons/text-wrap");
-var _textWrapDefault = parcelHelpers.interopDefault(_textWrap);
-var _textareaResize = require("./icons/textarea-resize");
-var _textareaResizeDefault = parcelHelpers.interopDefault(_textareaResize);
-var _textareaT = require("./icons/textarea-t");
-var _textareaTDefault = parcelHelpers.interopDefault(_textareaT);
-var _textarea = require("./icons/textarea");
-var _textareaDefault = parcelHelpers.interopDefault(_textarea);
-var _thermometerHalf = require("./icons/thermometer-half");
-var _thermometerHalfDefault = parcelHelpers.interopDefault(_thermometerHalf);
-var _thermometerHigh = require("./icons/thermometer-high");
-var _thermometerHighDefault = parcelHelpers.interopDefault(_thermometerHigh);
-var _thermometerLow = require("./icons/thermometer-low");
-var _thermometerLowDefault = parcelHelpers.interopDefault(_thermometerLow);
-var _thermometerSnow = require("./icons/thermometer-snow");
-var _thermometerSnowDefault = parcelHelpers.interopDefault(_thermometerSnow);
-var _thermometerSun = require("./icons/thermometer-sun");
-var _thermometerSunDefault = parcelHelpers.interopDefault(_thermometerSun);
-var _thermometer = require("./icons/thermometer");
-var _thermometerDefault = parcelHelpers.interopDefault(_thermometer);
-var _threadsFill = require("./icons/threads-fill");
-var _threadsFillDefault = parcelHelpers.interopDefault(_threadsFill);
-var _threads = require("./icons/threads");
-var _threadsDefault = parcelHelpers.interopDefault(_threads);
-var _threeDotsVertical = require("./icons/three-dots-vertical");
-var _threeDotsVerticalDefault = parcelHelpers.interopDefault(_threeDotsVertical);
-var _threeDots = require("./icons/three-dots");
-var _threeDotsDefault = parcelHelpers.interopDefault(_threeDots);
-var _thunderboltFill = require("./icons/thunderbolt-fill");
-var _thunderboltFillDefault = parcelHelpers.interopDefault(_thunderboltFill);
-var _thunderbolt = require("./icons/thunderbolt");
-var _thunderboltDefault = parcelHelpers.interopDefault(_thunderbolt);
-var _ticketDetailedFill = require("./icons/ticket-detailed-fill");
-var _ticketDetailedFillDefault = parcelHelpers.interopDefault(_ticketDetailedFill);
-var _ticketDetailed = require("./icons/ticket-detailed");
-var _ticketDetailedDefault = parcelHelpers.interopDefault(_ticketDetailed);
-var _ticketFill = require("./icons/ticket-fill");
-var _ticketFillDefault = parcelHelpers.interopDefault(_ticketFill);
-var _ticketPerforatedFill = require("./icons/ticket-perforated-fill");
-var _ticketPerforatedFillDefault = parcelHelpers.interopDefault(_ticketPerforatedFill);
-var _ticketPerforated = require("./icons/ticket-perforated");
-var _ticketPerforatedDefault = parcelHelpers.interopDefault(_ticketPerforated);
-var _ticket = require("./icons/ticket");
-var _ticketDefault = parcelHelpers.interopDefault(_ticket);
-var _tiktok = require("./icons/tiktok");
-var _tiktokDefault = parcelHelpers.interopDefault(_tiktok);
-var _toggleOff = require("./icons/toggle-off");
-var _toggleOffDefault = parcelHelpers.interopDefault(_toggleOff);
-var _toggleOn = require("./icons/toggle-on");
-var _toggleOnDefault = parcelHelpers.interopDefault(_toggleOn);
-var _toggle2Off = require("./icons/toggle2-off");
-var _toggle2OffDefault = parcelHelpers.interopDefault(_toggle2Off);
-var _toggle2On = require("./icons/toggle2-on");
-var _toggle2OnDefault = parcelHelpers.interopDefault(_toggle2On);
-var _toggles = require("./icons/toggles");
-var _togglesDefault = parcelHelpers.interopDefault(_toggles);
-var _toggles2 = require("./icons/toggles2");
-var _toggles2Default = parcelHelpers.interopDefault(_toggles2);
-var _tools = require("./icons/tools");
-var _toolsDefault = parcelHelpers.interopDefault(_tools);
-var _tornado = require("./icons/tornado");
-var _tornadoDefault = parcelHelpers.interopDefault(_tornado);
-var _trainFreightFrontFill = require("./icons/train-freight-front-fill");
-var _trainFreightFrontFillDefault = parcelHelpers.interopDefault(_trainFreightFrontFill);
-var _trainFreightFront = require("./icons/train-freight-front");
-var _trainFreightFrontDefault = parcelHelpers.interopDefault(_trainFreightFront);
-var _trainFrontFill = require("./icons/train-front-fill");
-var _trainFrontFillDefault = parcelHelpers.interopDefault(_trainFrontFill);
-var _trainFront = require("./icons/train-front");
-var _trainFrontDefault = parcelHelpers.interopDefault(_trainFront);
-var _trainLightrailFrontFill = require("./icons/train-lightrail-front-fill");
-var _trainLightrailFrontFillDefault = parcelHelpers.interopDefault(_trainLightrailFrontFill);
-var _trainLightrailFront = require("./icons/train-lightrail-front");
-var _trainLightrailFrontDefault = parcelHelpers.interopDefault(_trainLightrailFront);
-var _translate = require("./icons/translate");
-var _translateDefault = parcelHelpers.interopDefault(_translate);
-var _transparency = require("./icons/transparency");
-var _transparencyDefault = parcelHelpers.interopDefault(_transparency);
-var _trashFill = require("./icons/trash-fill");
-var _trashFillDefault = parcelHelpers.interopDefault(_trashFill);
-var _trash = require("./icons/trash");
-var _trashDefault = parcelHelpers.interopDefault(_trash);
-var _trash2Fill = require("./icons/trash2-fill");
-var _trash2FillDefault = parcelHelpers.interopDefault(_trash2Fill);
-var _trash2 = require("./icons/trash2");
-var _trash2Default = parcelHelpers.interopDefault(_trash2);
-var _trash3Fill = require("./icons/trash3-fill");
-var _trash3FillDefault = parcelHelpers.interopDefault(_trash3Fill);
-var _trash3 = require("./icons/trash3");
-var _trash3Default = parcelHelpers.interopDefault(_trash3);
-var _treeFill = require("./icons/tree-fill");
-var _treeFillDefault = parcelHelpers.interopDefault(_treeFill);
-var _tree = require("./icons/tree");
-var _treeDefault = parcelHelpers.interopDefault(_tree);
-var _trello = require("./icons/trello");
-var _trelloDefault = parcelHelpers.interopDefault(_trello);
-var _triangleFill = require("./icons/triangle-fill");
-var _triangleFillDefault = parcelHelpers.interopDefault(_triangleFill);
-var _triangleHalf = require("./icons/triangle-half");
-var _triangleHalfDefault = parcelHelpers.interopDefault(_triangleHalf);
-var _triangle = require("./icons/triangle");
-var _triangleDefault = parcelHelpers.interopDefault(_triangle);
-var _trophyFill = require("./icons/trophy-fill");
-var _trophyFillDefault = parcelHelpers.interopDefault(_trophyFill);
-var _trophy = require("./icons/trophy");
-var _trophyDefault = parcelHelpers.interopDefault(_trophy);
-var _tropicalStorm = require("./icons/tropical-storm");
-var _tropicalStormDefault = parcelHelpers.interopDefault(_tropicalStorm);
-var _truckFlatbed = require("./icons/truck-flatbed");
-var _truckFlatbedDefault = parcelHelpers.interopDefault(_truckFlatbed);
-var _truckFrontFill = require("./icons/truck-front-fill");
-var _truckFrontFillDefault = parcelHelpers.interopDefault(_truckFrontFill);
-var _truckFront = require("./icons/truck-front");
-var _truckFrontDefault = parcelHelpers.interopDefault(_truckFront);
-var _truck = require("./icons/truck");
-var _truckDefault = parcelHelpers.interopDefault(_truck);
-var _tsunami = require("./icons/tsunami");
-var _tsunamiDefault = parcelHelpers.interopDefault(_tsunami);
-var _tvFill = require("./icons/tv-fill");
-var _tvFillDefault = parcelHelpers.interopDefault(_tvFill);
-var _tv = require("./icons/tv");
-var _tvDefault = parcelHelpers.interopDefault(_tv);
-var _twitch = require("./icons/twitch");
-var _twitchDefault = parcelHelpers.interopDefault(_twitch);
-var _twitterX = require("./icons/twitter-x");
-var _twitterXDefault = parcelHelpers.interopDefault(_twitterX);
-var _twitter = require("./icons/twitter");
-var _twitterDefault = parcelHelpers.interopDefault(_twitter);
-var _typeBold = require("./icons/type-bold");
-var _typeBoldDefault = parcelHelpers.interopDefault(_typeBold);
-var _typeH1 = require("./icons/type-h1");
-var _typeH1Default = parcelHelpers.interopDefault(_typeH1);
-var _typeH2 = require("./icons/type-h2");
-var _typeH2Default = parcelHelpers.interopDefault(_typeH2);
-var _typeH3 = require("./icons/type-h3");
-var _typeH3Default = parcelHelpers.interopDefault(_typeH3);
-var _typeH4 = require("./icons/type-h4");
-var _typeH4Default = parcelHelpers.interopDefault(_typeH4);
-var _typeH5 = require("./icons/type-h5");
-var _typeH5Default = parcelHelpers.interopDefault(_typeH5);
-var _typeH6 = require("./icons/type-h6");
-var _typeH6Default = parcelHelpers.interopDefault(_typeH6);
-var _typeItalic = require("./icons/type-italic");
-var _typeItalicDefault = parcelHelpers.interopDefault(_typeItalic);
-var _typeStrikethrough = require("./icons/type-strikethrough");
-var _typeStrikethroughDefault = parcelHelpers.interopDefault(_typeStrikethrough);
-var _typeUnderline = require("./icons/type-underline");
-var _typeUnderlineDefault = parcelHelpers.interopDefault(_typeUnderline);
-var _type = require("./icons/type");
-var _typeDefault = parcelHelpers.interopDefault(_type);
-var _ubuntu = require("./icons/ubuntu");
-var _ubuntuDefault = parcelHelpers.interopDefault(_ubuntu);
-var _uiChecksGrid = require("./icons/ui-checks-grid");
-var _uiChecksGridDefault = parcelHelpers.interopDefault(_uiChecksGrid);
-var _uiChecks = require("./icons/ui-checks");
-var _uiChecksDefault = parcelHelpers.interopDefault(_uiChecks);
-var _uiRadiosGrid = require("./icons/ui-radios-grid");
-var _uiRadiosGridDefault = parcelHelpers.interopDefault(_uiRadiosGrid);
-var _uiRadios = require("./icons/ui-radios");
-var _uiRadiosDefault = parcelHelpers.interopDefault(_uiRadios);
-var _umbrellaFill = require("./icons/umbrella-fill");
-var _umbrellaFillDefault = parcelHelpers.interopDefault(_umbrellaFill);
-var _umbrella = require("./icons/umbrella");
-var _umbrellaDefault = parcelHelpers.interopDefault(_umbrella);
-var _unindent = require("./icons/unindent");
-var _unindentDefault = parcelHelpers.interopDefault(_unindent);
-var _union = require("./icons/union");
-var _unionDefault = parcelHelpers.interopDefault(_union);
-var _unity = require("./icons/unity");
-var _unityDefault = parcelHelpers.interopDefault(_unity);
-var _universalAccessCircle = require("./icons/universal-access-circle");
-var _universalAccessCircleDefault = parcelHelpers.interopDefault(_universalAccessCircle);
-var _universalAccess = require("./icons/universal-access");
-var _universalAccessDefault = parcelHelpers.interopDefault(_universalAccess);
-var _unlockFill = require("./icons/unlock-fill");
-var _unlockFillDefault = parcelHelpers.interopDefault(_unlockFill);
-var _unlock = require("./icons/unlock");
-var _unlockDefault = parcelHelpers.interopDefault(_unlock);
-var _upcScan = require("./icons/upc-scan");
-var _upcScanDefault = parcelHelpers.interopDefault(_upcScan);
-var _upc = require("./icons/upc");
-var _upcDefault = parcelHelpers.interopDefault(_upc);
-var _upload = require("./icons/upload");
-var _uploadDefault = parcelHelpers.interopDefault(_upload);
-var _usbCFill = require("./icons/usb-c-fill");
-var _usbCFillDefault = parcelHelpers.interopDefault(_usbCFill);
-var _usbC = require("./icons/usb-c");
-var _usbCDefault = parcelHelpers.interopDefault(_usbC);
-var _usbDriveFill = require("./icons/usb-drive-fill");
-var _usbDriveFillDefault = parcelHelpers.interopDefault(_usbDriveFill);
-var _usbDrive = require("./icons/usb-drive");
-var _usbDriveDefault = parcelHelpers.interopDefault(_usbDrive);
-var _usbFill = require("./icons/usb-fill");
-var _usbFillDefault = parcelHelpers.interopDefault(_usbFill);
-var _usbMicroFill = require("./icons/usb-micro-fill");
-var _usbMicroFillDefault = parcelHelpers.interopDefault(_usbMicroFill);
-var _usbMicro = require("./icons/usb-micro");
-var _usbMicroDefault = parcelHelpers.interopDefault(_usbMicro);
-var _usbMiniFill = require("./icons/usb-mini-fill");
-var _usbMiniFillDefault = parcelHelpers.interopDefault(_usbMiniFill);
-var _usbMini = require("./icons/usb-mini");
-var _usbMiniDefault = parcelHelpers.interopDefault(_usbMini);
-var _usbPlugFill = require("./icons/usb-plug-fill");
-var _usbPlugFillDefault = parcelHelpers.interopDefault(_usbPlugFill);
-var _usbPlug = require("./icons/usb-plug");
-var _usbPlugDefault = parcelHelpers.interopDefault(_usbPlug);
-var _usbSymbol = require("./icons/usb-symbol");
-var _usbSymbolDefault = parcelHelpers.interopDefault(_usbSymbol);
-var _usb = require("./icons/usb");
-var _usbDefault = parcelHelpers.interopDefault(_usb);
-var _valentine = require("./icons/valentine");
-var _valentineDefault = parcelHelpers.interopDefault(_valentine);
-var _valentine2 = require("./icons/valentine2");
-var _valentine2Default = parcelHelpers.interopDefault(_valentine2);
-var _vectorPen = require("./icons/vector-pen");
-var _vectorPenDefault = parcelHelpers.interopDefault(_vectorPen);
-var _viewList = require("./icons/view-list");
-var _viewListDefault = parcelHelpers.interopDefault(_viewList);
-var _viewStacked = require("./icons/view-stacked");
-var _viewStackedDefault = parcelHelpers.interopDefault(_viewStacked);
-var _vignette = require("./icons/vignette");
-var _vignetteDefault = parcelHelpers.interopDefault(_vignette);
-var _vimeo = require("./icons/vimeo");
-var _vimeoDefault = parcelHelpers.interopDefault(_vimeo);
-var _vinylFill = require("./icons/vinyl-fill");
-var _vinylFillDefault = parcelHelpers.interopDefault(_vinylFill);
-var _vinyl = require("./icons/vinyl");
-var _vinylDefault = parcelHelpers.interopDefault(_vinyl);
-var _virus = require("./icons/virus");
-var _virusDefault = parcelHelpers.interopDefault(_virus);
-var _virus2 = require("./icons/virus2");
-var _virus2Default = parcelHelpers.interopDefault(_virus2);
-var _voicemail = require("./icons/voicemail");
-var _voicemailDefault = parcelHelpers.interopDefault(_voicemail);
-var _volumeDownFill = require("./icons/volume-down-fill");
-var _volumeDownFillDefault = parcelHelpers.interopDefault(_volumeDownFill);
-var _volumeDown = require("./icons/volume-down");
-var _volumeDownDefault = parcelHelpers.interopDefault(_volumeDown);
-var _volumeMuteFill = require("./icons/volume-mute-fill");
-var _volumeMuteFillDefault = parcelHelpers.interopDefault(_volumeMuteFill);
-var _volumeMute = require("./icons/volume-mute");
-var _volumeMuteDefault = parcelHelpers.interopDefault(_volumeMute);
-var _volumeOffFill = require("./icons/volume-off-fill");
-var _volumeOffFillDefault = parcelHelpers.interopDefault(_volumeOffFill);
-var _volumeOff = require("./icons/volume-off");
-var _volumeOffDefault = parcelHelpers.interopDefault(_volumeOff);
-var _volumeUpFill = require("./icons/volume-up-fill");
-var _volumeUpFillDefault = parcelHelpers.interopDefault(_volumeUpFill);
-var _volumeUp = require("./icons/volume-up");
-var _volumeUpDefault = parcelHelpers.interopDefault(_volumeUp);
-var _vr = require("./icons/vr");
-var _vrDefault = parcelHelpers.interopDefault(_vr);
-var _walletFill = require("./icons/wallet-fill");
-var _walletFillDefault = parcelHelpers.interopDefault(_walletFill);
-var _wallet = require("./icons/wallet");
-var _walletDefault = parcelHelpers.interopDefault(_wallet);
-var _wallet2 = require("./icons/wallet2");
-var _wallet2Default = parcelHelpers.interopDefault(_wallet2);
-var _watch = require("./icons/watch");
-var _watchDefault = parcelHelpers.interopDefault(_watch);
-var _water = require("./icons/water");
-var _waterDefault = parcelHelpers.interopDefault(_water);
-var _webcamFill = require("./icons/webcam-fill");
-var _webcamFillDefault = parcelHelpers.interopDefault(_webcamFill);
-var _webcam = require("./icons/webcam");
-var _webcamDefault = parcelHelpers.interopDefault(_webcam);
-var _wechat = require("./icons/wechat");
-var _wechatDefault = parcelHelpers.interopDefault(_wechat);
-var _whatsapp = require("./icons/whatsapp");
-var _whatsappDefault = parcelHelpers.interopDefault(_whatsapp);
-var _wifi1 = require("./icons/wifi-1");
-var _wifi1Default = parcelHelpers.interopDefault(_wifi1);
-var _wifi2 = require("./icons/wifi-2");
-var _wifi2Default = parcelHelpers.interopDefault(_wifi2);
-var _wifiOff = require("./icons/wifi-off");
-var _wifiOffDefault = parcelHelpers.interopDefault(_wifiOff);
-var _wifi = require("./icons/wifi");
-var _wifiDefault = parcelHelpers.interopDefault(_wifi);
-var _wikipedia = require("./icons/wikipedia");
-var _wikipediaDefault = parcelHelpers.interopDefault(_wikipedia);
-var _wind = require("./icons/wind");
-var _windDefault = parcelHelpers.interopDefault(_wind);
-var _windowDash = require("./icons/window-dash");
-var _windowDashDefault = parcelHelpers.interopDefault(_windowDash);
-var _windowDesktop = require("./icons/window-desktop");
-var _windowDesktopDefault = parcelHelpers.interopDefault(_windowDesktop);
-var _windowDock = require("./icons/window-dock");
-var _windowDockDefault = parcelHelpers.interopDefault(_windowDock);
-var _windowFullscreen = require("./icons/window-fullscreen");
-var _windowFullscreenDefault = parcelHelpers.interopDefault(_windowFullscreen);
-var _windowPlus = require("./icons/window-plus");
-var _windowPlusDefault = parcelHelpers.interopDefault(_windowPlus);
-var _windowSidebar = require("./icons/window-sidebar");
-var _windowSidebarDefault = parcelHelpers.interopDefault(_windowSidebar);
-var _windowSplit = require("./icons/window-split");
-var _windowSplitDefault = parcelHelpers.interopDefault(_windowSplit);
-var _windowStack = require("./icons/window-stack");
-var _windowStackDefault = parcelHelpers.interopDefault(_windowStack);
-var _windowX = require("./icons/window-x");
-var _windowXDefault = parcelHelpers.interopDefault(_windowX);
-var _window = require("./icons/window");
-var _windowDefault = parcelHelpers.interopDefault(_window);
-var _windows = require("./icons/windows");
-var _windowsDefault = parcelHelpers.interopDefault(_windows);
-var _wordpress = require("./icons/wordpress");
-var _wordpressDefault = parcelHelpers.interopDefault(_wordpress);
-var _wrenchAdjustableCircleFill = require("./icons/wrench-adjustable-circle-fill");
-var _wrenchAdjustableCircleFillDefault = parcelHelpers.interopDefault(_wrenchAdjustableCircleFill);
-var _wrenchAdjustableCircle = require("./icons/wrench-adjustable-circle");
-var _wrenchAdjustableCircleDefault = parcelHelpers.interopDefault(_wrenchAdjustableCircle);
-var _wrenchAdjustable = require("./icons/wrench-adjustable");
-var _wrenchAdjustableDefault = parcelHelpers.interopDefault(_wrenchAdjustable);
-var _wrench = require("./icons/wrench");
-var _wrenchDefault = parcelHelpers.interopDefault(_wrench);
-var _xCircleFill = require("./icons/x-circle-fill");
-var _xCircleFillDefault = parcelHelpers.interopDefault(_xCircleFill);
-var _xCircle = require("./icons/x-circle");
-var _xCircleDefault = parcelHelpers.interopDefault(_xCircle);
-var _xDiamondFill = require("./icons/x-diamond-fill");
-var _xDiamondFillDefault = parcelHelpers.interopDefault(_xDiamondFill);
-var _xDiamond = require("./icons/x-diamond");
-var _xDiamondDefault = parcelHelpers.interopDefault(_xDiamond);
-var _xLg = require("./icons/x-lg");
-var _xLgDefault = parcelHelpers.interopDefault(_xLg);
-var _xOctagonFill = require("./icons/x-octagon-fill");
-var _xOctagonFillDefault = parcelHelpers.interopDefault(_xOctagonFill);
-var _xOctagon = require("./icons/x-octagon");
-var _xOctagonDefault = parcelHelpers.interopDefault(_xOctagon);
-var _xSquareFill = require("./icons/x-square-fill");
-var _xSquareFillDefault = parcelHelpers.interopDefault(_xSquareFill);
-var _xSquare = require("./icons/x-square");
-var _xSquareDefault = parcelHelpers.interopDefault(_xSquare);
-var _x = require("./icons/x");
-var _xDefault = parcelHelpers.interopDefault(_x);
-var _xbox = require("./icons/xbox");
-var _xboxDefault = parcelHelpers.interopDefault(_xbox);
-var _yelp = require("./icons/yelp");
-var _yelpDefault = parcelHelpers.interopDefault(_yelp);
-var _yinYang = require("./icons/yin-yang");
-var _yinYangDefault = parcelHelpers.interopDefault(_yinYang);
-var _youtube = require("./icons/youtube");
-var _youtubeDefault = parcelHelpers.interopDefault(_youtube);
-var _zoomIn = require("./icons/zoom-in");
-var _zoomInDefault = parcelHelpers.interopDefault(_zoomIn);
-var _zoomOut = require("./icons/zoom-out");
-var _zoomOutDefault = parcelHelpers.interopDefault(_zoomOut);
-
-},{"./icons/0-circle-fill":false,"./icons/0-circle":false,"./icons/0-square-fill":false,"./icons/0-square":false,"./icons/1-circle-fill":false,"./icons/1-circle":false,"./icons/1-square-fill":false,"./icons/1-square":false,"./icons/123":false,"./icons/2-circle-fill":false,"./icons/2-circle":false,"./icons/2-square-fill":false,"./icons/2-square":false,"./icons/3-circle-fill":false,"./icons/3-circle":false,"./icons/3-square-fill":false,"./icons/3-square":false,"./icons/4-circle-fill":false,"./icons/4-circle":false,"./icons/4-square-fill":false,"./icons/4-square":false,"./icons/5-circle-fill":false,"./icons/5-circle":false,"./icons/5-square-fill":false,"./icons/5-square":false,"./icons/6-circle-fill":false,"./icons/6-circle":false,"./icons/6-square-fill":false,"./icons/6-square":false,"./icons/7-circle-fill":false,"./icons/7-circle":false,"./icons/7-square-fill":false,"./icons/7-square":false,"./icons/8-circle-fill":false,"./icons/8-circle":false,"./icons/8-square-fill":false,"./icons/8-square":false,"./icons/9-circle-fill":false,"./icons/9-circle":false,"./icons/9-square-fill":false,"./icons/9-square":false,"./icons/activity":false,"./icons/airplane-engines-fill":false,"./icons/airplane-engines":false,"./icons/airplane-fill":false,"./icons/airplane":false,"./icons/alarm-fill":false,"./icons/alarm":false,"./icons/alexa":false,"./icons/align-bottom":false,"./icons/align-center":false,"./icons/align-end":false,"./icons/align-middle":false,"./icons/align-start":false,"./icons/align-top":false,"./icons/alipay":false,"./icons/alphabet-uppercase":false,"./icons/alphabet":false,"./icons/alt":false,"./icons/amazon":false,"./icons/amd":false,"./icons/android":false,"./icons/android2":false,"./icons/app-indicator":false,"./icons/app":false,"./icons/apple":false,"./icons/archive-fill":false,"./icons/archive":false,"./icons/arrow-90deg-down":false,"./icons/arrow-90deg-left":false,"./icons/arrow-90deg-right":false,"./icons/arrow-90deg-up":false,"./icons/arrow-bar-down":false,"./icons/arrow-bar-left":false,"./icons/arrow-bar-right":false,"./icons/arrow-bar-up":false,"./icons/arrow-clockwise":false,"./icons/arrow-counterclockwise":false,"./icons/arrow-down-circle-fill":false,"./icons/arrow-down-circle":false,"./icons/arrow-down-left-circle-fill":false,"./icons/arrow-down-left-circle":false,"./icons/arrow-down-left-square-fill":false,"./icons/arrow-down-left-square":false,"./icons/arrow-down-left":false,"./icons/arrow-down-right-circle-fill":false,"./icons/arrow-down-right-circle":false,"./icons/arrow-down-right-square-fill":false,"./icons/arrow-down-right-square":false,"./icons/arrow-down-right":false,"./icons/arrow-down-short":false,"./icons/arrow-down-square-fill":false,"./icons/arrow-down-square":false,"./icons/arrow-down-up":false,"./icons/arrow-down":false,"./icons/arrow-left-circle-fill":false,"./icons/arrow-left-circle":false,"./icons/arrow-left-right":false,"./icons/arrow-left-short":false,"./icons/arrow-left-square-fill":false,"./icons/arrow-left-square":false,"./icons/arrow-left":false,"./icons/arrow-repeat":false,"./icons/arrow-return-left":false,"./icons/arrow-return-right":false,"./icons/arrow-right-circle-fill":false,"./icons/arrow-right-circle":false,"./icons/arrow-right-short":false,"./icons/arrow-right-square-fill":false,"./icons/arrow-right-square":false,"./icons/arrow-right":false,"./icons/arrow-through-heart-fill":false,"./icons/arrow-through-heart":false,"./icons/arrow-up-circle-fill":false,"./icons/arrow-up-circle":false,"./icons/arrow-up-left-circle-fill":false,"./icons/arrow-up-left-circle":false,"./icons/arrow-up-left-square-fill":false,"./icons/arrow-up-left-square":false,"./icons/arrow-up-left":false,"./icons/arrow-up-right-circle-fill":false,"./icons/arrow-up-right-circle":false,"./icons/arrow-up-right-square-fill":false,"./icons/arrow-up-right-square":false,"./icons/arrow-up-right":false,"./icons/arrow-up-short":false,"./icons/arrow-up-square-fill":false,"./icons/arrow-up-square":false,"./icons/arrow-up":false,"./icons/arrows-angle-contract":false,"./icons/arrows-angle-expand":false,"./icons/arrows-collapse-vertical":false,"./icons/arrows-collapse":false,"./icons/arrows-expand-vertical":false,"./icons/arrows-expand":false,"./icons/arrows-fullscreen":false,"./icons/arrows-move":false,"./icons/arrows-vertical":false,"./icons/arrows":false,"./icons/aspect-ratio-fill":false,"./icons/aspect-ratio":false,"./icons/asterisk":false,"./icons/at":false,"./icons/award-fill":false,"./icons/award":false,"./icons/back":false,"./icons/backpack-fill":false,"./icons/backpack":false,"./icons/backpack2-fill":false,"./icons/backpack2":false,"./icons/backpack3-fill":false,"./icons/backpack3":false,"./icons/backpack4-fill":false,"./icons/backpack4":false,"./icons/backspace-fill":false,"./icons/backspace-reverse-fill":false,"./icons/backspace-reverse":false,"./icons/backspace":false,"./icons/badge-3d-fill":false,"./icons/badge-3d":false,"./icons/badge-4k-fill":false,"./icons/badge-4k":false,"./icons/badge-8k-fill":false,"./icons/badge-8k":false,"./icons/badge-ad-fill":false,"./icons/badge-ad":false,"./icons/badge-ar-fill":false,"./icons/badge-ar":false,"./icons/badge-cc-fill":false,"./icons/badge-cc":false,"./icons/badge-hd-fill":false,"./icons/badge-hd":false,"./icons/badge-sd-fill":false,"./icons/badge-sd":false,"./icons/badge-tm-fill":false,"./icons/badge-tm":false,"./icons/badge-vo-fill":false,"./icons/badge-vo":false,"./icons/badge-vr-fill":false,"./icons/badge-vr":false,"./icons/badge-wc-fill":false,"./icons/badge-wc":false,"./icons/bag-check-fill":false,"./icons/bag-check":false,"./icons/bag-dash-fill":false,"./icons/bag-dash":false,"./icons/bag-fill":false,"./icons/bag-heart-fill":false,"./icons/bag-heart":false,"./icons/bag-plus-fill":false,"./icons/bag-plus":false,"./icons/bag-x-fill":false,"./icons/bag-x":false,"./icons/bag":false,"./icons/balloon-fill":false,"./icons/balloon-heart-fill":false,"./icons/balloon-heart":false,"./icons/balloon":false,"./icons/ban-fill":false,"./icons/ban":false,"./icons/bandaid-fill":false,"./icons/bandaid":false,"./icons/bank":false,"./icons/bank2":false,"./icons/bar-chart-fill":false,"./icons/bar-chart-line-fill":false,"./icons/bar-chart-line":false,"./icons/bar-chart-steps":false,"./icons/bar-chart":false,"./icons/basket-fill":false,"./icons/basket":false,"./icons/basket2-fill":false,"./icons/basket2":false,"./icons/basket3-fill":false,"./icons/basket3":false,"./icons/battery-charging":false,"./icons/battery-full":false,"./icons/battery-half":false,"./icons/battery":false,"./icons/behance":false,"./icons/bell-fill":false,"./icons/bell-slash-fill":false,"./icons/bell-slash":false,"./icons/bell":false,"./icons/bezier":false,"./icons/bezier2":false,"./icons/bicycle":false,"./icons/bing":false,"./icons/binoculars-fill":false,"./icons/binoculars":false,"./icons/blockquote-left":false,"./icons/blockquote-right":false,"./icons/bluetooth":false,"./icons/body-text":false,"./icons/book-fill":false,"./icons/book-half":false,"./icons/book":false,"./icons/bookmark-check-fill":false,"./icons/bookmark-check":false,"./icons/bookmark-dash-fill":false,"./icons/bookmark-dash":false,"./icons/bookmark-fill":false,"./icons/bookmark-heart-fill":false,"./icons/bookmark-heart":false,"./icons/bookmark-plus-fill":false,"./icons/bookmark-plus":false,"./icons/bookmark-star-fill":false,"./icons/bookmark-star":false,"./icons/bookmark-x-fill":false,"./icons/bookmark-x":false,"./icons/bookmark":false,"./icons/bookmarks-fill":false,"./icons/bookmarks":false,"./icons/bookshelf":false,"./icons/boombox-fill":false,"./icons/boombox":false,"./icons/bootstrap-fill":false,"./icons/bootstrap-reboot":false,"./icons/bootstrap":false,"./icons/border-all":false,"./icons/border-bottom":false,"./icons/border-center":false,"./icons/border-inner":false,"./icons/border-left":false,"./icons/border-middle":false,"./icons/border-outer":false,"./icons/border-right":false,"./icons/border-style":false,"./icons/border-top":false,"./icons/border-width":false,"./icons/border":false,"./icons/bounding-box-circles":false,"./icons/bounding-box":false,"./icons/box-arrow-down-left":false,"./icons/box-arrow-down-right":false,"./icons/box-arrow-down":false,"./icons/box-arrow-in-down-left":false,"./icons/box-arrow-in-down-right":false,"./icons/box-arrow-in-down":false,"./icons/box-arrow-in-left":false,"./icons/box-arrow-in-right":false,"./icons/box-arrow-in-up-left":false,"./icons/box-arrow-in-up-right":false,"./icons/box-arrow-in-up":false,"./icons/box-arrow-left":false,"./icons/box-arrow-right":false,"./icons/box-arrow-up-left":false,"./icons/box-arrow-up-right":false,"./icons/box-arrow-up":false,"./icons/box-fill":false,"./icons/box-seam-fill":false,"./icons/box-seam":false,"./icons/box":false,"./icons/box2-fill":false,"./icons/box2-heart-fill":false,"./icons/box2-heart":false,"./icons/box2":false,"./icons/boxes":false,"./icons/braces-asterisk":false,"./icons/braces":false,"./icons/bricks":false,"./icons/briefcase-fill":false,"./icons/briefcase":false,"./icons/brightness-alt-high-fill":false,"./icons/brightness-alt-high":false,"./icons/brightness-alt-low-fill":false,"./icons/brightness-alt-low":false,"./icons/brightness-high-fill":false,"./icons/brightness-high":false,"./icons/brightness-low-fill":false,"./icons/brightness-low":false,"./icons/brilliance":false,"./icons/broadcast-pin":false,"./icons/broadcast":false,"./icons/browser-chrome":false,"./icons/browser-edge":false,"./icons/browser-firefox":false,"./icons/browser-safari":false,"./icons/brush-fill":false,"./icons/brush":false,"./icons/bucket-fill":false,"./icons/bucket":false,"./icons/bug-fill":false,"./icons/bug":false,"./icons/building-add":false,"./icons/building-check":false,"./icons/building-dash":false,"./icons/building-down":false,"./icons/building-exclamation":false,"./icons/building-fill-add":false,"./icons/building-fill-check":false,"./icons/building-fill-dash":false,"./icons/building-fill-down":false,"./icons/building-fill-exclamation":false,"./icons/building-fill-gear":false,"./icons/building-fill-lock":false,"./icons/building-fill-slash":false,"./icons/building-fill-up":false,"./icons/building-fill-x":false,"./icons/building-fill":false,"./icons/building-gear":false,"./icons/building-lock":false,"./icons/building-slash":false,"./icons/building-up":false,"./icons/building-x":false,"./icons/building":false,"./icons/buildings-fill":false,"./icons/buildings":false,"./icons/bullseye":false,"./icons/bus-front-fill":false,"./icons/bus-front":false,"./icons/c-circle-fill":false,"./icons/c-circle":false,"./icons/c-square-fill":false,"./icons/c-square":false,"./icons/cake-fill":false,"./icons/cake":false,"./icons/cake2-fill":false,"./icons/cake2":false,"./icons/calculator-fill":false,"./icons/calculator":false,"./icons/calendar-check-fill":false,"./icons/calendar-check":false,"./icons/calendar-date-fill":false,"./icons/calendar-date":false,"./icons/calendar-day-fill":false,"./icons/calendar-day":false,"./icons/calendar-event-fill":false,"./icons/calendar-event":false,"./icons/calendar-fill":false,"./icons/calendar-heart-fill":false,"./icons/calendar-heart":false,"./icons/calendar-minus-fill":false,"./icons/calendar-minus":false,"./icons/calendar-month-fill":false,"./icons/calendar-month":false,"./icons/calendar-plus-fill":false,"./icons/calendar-plus":false,"./icons/calendar-range-fill":false,"./icons/calendar-range":false,"./icons/calendar-week-fill":false,"./icons/calendar-week":false,"./icons/calendar-x-fill":false,"./icons/calendar-x":false,"./icons/calendar":false,"./icons/calendar2-check-fill":false,"./icons/calendar2-check":false,"./icons/calendar2-date-fill":false,"./icons/calendar2-date":false,"./icons/calendar2-day-fill":false,"./icons/calendar2-day":false,"./icons/calendar2-event-fill":false,"./icons/calendar2-event":false,"./icons/calendar2-fill":false,"./icons/calendar2-heart-fill":false,"./icons/calendar2-heart":false,"./icons/calendar2-minus-fill":false,"./icons/calendar2-minus":false,"./icons/calendar2-month-fill":false,"./icons/calendar2-month":false,"./icons/calendar2-plus-fill":false,"./icons/calendar2-plus":false,"./icons/calendar2-range-fill":false,"./icons/calendar2-range":false,"./icons/calendar2-week-fill":false,"./icons/calendar2-week":false,"./icons/calendar2-x-fill":false,"./icons/calendar2-x":false,"./icons/calendar2":false,"./icons/calendar3-event-fill":false,"./icons/calendar3-event":false,"./icons/calendar3-fill":false,"./icons/calendar3-range-fill":false,"./icons/calendar3-range":false,"./icons/calendar3-week-fill":false,"./icons/calendar3-week":false,"./icons/calendar3":false,"./icons/calendar4-event":false,"./icons/calendar4-range":false,"./icons/calendar4-week":false,"./icons/calendar4":false,"./icons/camera-fill":false,"./icons/camera-reels-fill":false,"./icons/camera-reels":false,"./icons/camera-video-fill":false,"./icons/camera-video-off-fill":false,"./icons/camera-video-off":false,"./icons/camera-video":false,"./icons/camera":false,"./icons/camera2":false,"./icons/capslock-fill":false,"./icons/capslock":false,"./icons/capsule-pill":false,"./icons/capsule":false,"./icons/car-front-fill":false,"./icons/car-front":false,"./icons/card-checklist":false,"./icons/card-heading":false,"./icons/card-image":false,"./icons/card-list":false,"./icons/card-text":false,"./icons/caret-down-fill":false,"./icons/caret-down-square-fill":false,"./icons/caret-down-square":false,"./icons/caret-down":false,"./icons/caret-left-fill":false,"./icons/caret-left-square-fill":false,"./icons/caret-left-square":false,"./icons/caret-left":false,"./icons/caret-right-fill":false,"./icons/caret-right-square-fill":false,"./icons/caret-right-square":false,"./icons/caret-right":false,"./icons/caret-up-fill":false,"./icons/caret-up-square-fill":false,"./icons/caret-up-square":false,"./icons/caret-up":false,"./icons/cart-check-fill":false,"./icons/cart-check":false,"./icons/cart-dash-fill":false,"./icons/cart-dash":false,"./icons/cart-fill":false,"./icons/cart-plus-fill":false,"./icons/cart-plus":false,"./icons/cart-x-fill":false,"./icons/cart-x":false,"./icons/cart":false,"./icons/cart2":false,"./icons/cart3":false,"./icons/cart4":false,"./icons/cash-coin":false,"./icons/cash-stack":false,"./icons/cash":false,"./icons/cassette-fill":false,"./icons/cassette":false,"./icons/cast":false,"./icons/cc-circle-fill":false,"./icons/cc-circle":false,"./icons/cc-square-fill":false,"./icons/cc-square":false,"./icons/chat-dots-fill":false,"./icons/chat-dots":false,"./icons/chat-fill":false,"./icons/chat-heart-fill":false,"./icons/chat-heart":false,"./icons/chat-left-dots-fill":false,"./icons/chat-left-dots":false,"./icons/chat-left-fill":false,"./icons/chat-left-heart-fill":false,"./icons/chat-left-heart":false,"./icons/chat-left-quote-fill":false,"./icons/chat-left-quote":false,"./icons/chat-left-text-fill":false,"./icons/chat-left-text":false,"./icons/chat-left":false,"./icons/chat-quote-fill":false,"./icons/chat-quote":false,"./icons/chat-right-dots-fill":false,"./icons/chat-right-dots":false,"./icons/chat-right-fill":false,"./icons/chat-right-heart-fill":false,"./icons/chat-right-heart":false,"./icons/chat-right-quote-fill":false,"./icons/chat-right-quote":false,"./icons/chat-right-text-fill":false,"./icons/chat-right-text":false,"./icons/chat-right":false,"./icons/chat-square-dots-fill":false,"./icons/chat-square-dots":false,"./icons/chat-square-fill":false,"./icons/chat-square-heart-fill":false,"./icons/chat-square-heart":false,"./icons/chat-square-quote-fill":false,"./icons/chat-square-quote":false,"./icons/chat-square-text-fill":false,"./icons/chat-square-text":false,"./icons/chat-square":false,"./icons/chat-text-fill":false,"./icons/chat-text":false,"./icons/chat":false,"./icons/check-all":false,"./icons/check-circle-fill":false,"./icons/check-circle":false,"./icons/check-lg":false,"./icons/check-square-fill":false,"./icons/check-square":false,"./icons/check":false,"./icons/check2-all":false,"./icons/check2-circle":false,"./icons/check2-square":false,"./icons/check2":false,"./icons/chevron-bar-contract":false,"./icons/chevron-bar-down":false,"./icons/chevron-bar-expand":false,"./icons/chevron-bar-left":false,"./icons/chevron-bar-right":false,"./icons/chevron-bar-up":false,"./icons/chevron-compact-down":false,"./icons/chevron-compact-left":false,"./icons/chevron-compact-right":false,"./icons/chevron-compact-up":false,"./icons/chevron-contract":false,"./icons/chevron-double-down":false,"./icons/chevron-double-left":false,"./icons/chevron-double-right":false,"./icons/chevron-double-up":false,"./icons/chevron-down":false,"./icons/chevron-expand":false,"./icons/chevron-left":false,"./icons/chevron-right":false,"./icons/chevron-up":false,"./icons/circle-fill":false,"./icons/circle-half":false,"./icons/circle-square":false,"./icons/circle":false,"./icons/clipboard-check-fill":false,"./icons/clipboard-check":false,"./icons/clipboard-data-fill":false,"./icons/clipboard-data":false,"./icons/clipboard-fill":false,"./icons/clipboard-heart-fill":false,"./icons/clipboard-heart":false,"./icons/clipboard-minus-fill":false,"./icons/clipboard-minus":false,"./icons/clipboard-plus-fill":false,"./icons/clipboard-plus":false,"./icons/clipboard-pulse":false,"./icons/clipboard-x-fill":false,"./icons/clipboard-x":false,"./icons/clipboard":false,"./icons/clipboard2-check-fill":false,"./icons/clipboard2-check":false,"./icons/clipboard2-data-fill":false,"./icons/clipboard2-data":false,"./icons/clipboard2-fill":false,"./icons/clipboard2-heart-fill":false,"./icons/clipboard2-heart":false,"./icons/clipboard2-minus-fill":false,"./icons/clipboard2-minus":false,"./icons/clipboard2-plus-fill":false,"./icons/clipboard2-plus":false,"./icons/clipboard2-pulse-fill":false,"./icons/clipboard2-pulse":false,"./icons/clipboard2-x-fill":false,"./icons/clipboard2-x":false,"./icons/clipboard2":false,"./icons/clock-fill":false,"./icons/clock-history":false,"./icons/clock":false,"./icons/cloud-arrow-down-fill":false,"./icons/cloud-arrow-down":false,"./icons/cloud-arrow-up-fill":false,"./icons/cloud-arrow-up":false,"./icons/cloud-check-fill":false,"./icons/cloud-check":false,"./icons/cloud-download-fill":false,"./icons/cloud-download":false,"./icons/cloud-drizzle-fill":false,"./icons/cloud-drizzle":false,"./icons/cloud-fill":false,"./icons/cloud-fog-fill":false,"./icons/cloud-fog":false,"./icons/cloud-fog2-fill":false,"./icons/cloud-fog2":false,"./icons/cloud-hail-fill":false,"./icons/cloud-hail":false,"./icons/cloud-haze-fill":false,"./icons/cloud-haze":false,"./icons/cloud-haze2-fill":false,"./icons/cloud-haze2":false,"./icons/cloud-lightning-fill":false,"./icons/cloud-lightning-rain-fill":false,"./icons/cloud-lightning-rain":false,"./icons/cloud-lightning":false,"./icons/cloud-minus-fill":false,"./icons/cloud-minus":false,"./icons/cloud-moon-fill":false,"./icons/cloud-moon":false,"./icons/cloud-plus-fill":false,"./icons/cloud-plus":false,"./icons/cloud-rain-fill":false,"./icons/cloud-rain-heavy-fill":false,"./icons/cloud-rain-heavy":false,"./icons/cloud-rain":false,"./icons/cloud-slash-fill":false,"./icons/cloud-slash":false,"./icons/cloud-sleet-fill":false,"./icons/cloud-sleet":false,"./icons/cloud-snow-fill":false,"./icons/cloud-snow":false,"./icons/cloud-sun-fill":false,"./icons/cloud-sun":false,"./icons/cloud-upload-fill":false,"./icons/cloud-upload":false,"./icons/cloud":false,"./icons/clouds-fill":false,"./icons/clouds":false,"./icons/cloudy-fill":false,"./icons/cloudy":false,"./icons/code-slash":false,"./icons/code-square":false,"./icons/code":false,"./icons/coin":false,"./icons/collection-fill":false,"./icons/collection-play-fill":false,"./icons/collection-play":false,"./icons/collection":false,"./icons/columns-gap":false,"./icons/columns":false,"./icons/command":false,"./icons/compass-fill":false,"./icons/compass":false,"./icons/cone-striped":false,"./icons/cone":false,"./icons/controller":false,"./icons/cookie":false,"./icons/copy":false,"./icons/cpu-fill":false,"./icons/cpu":false,"./icons/credit-card-2-back-fill":false,"./icons/credit-card-2-back":false,"./icons/credit-card-2-front-fill":false,"./icons/credit-card-2-front":false,"./icons/credit-card-fill":false,"./icons/credit-card":false,"./icons/crop":false,"./icons/crosshair":false,"./icons/crosshair2":false,"./icons/cup-fill":false,"./icons/cup-hot-fill":false,"./icons/cup-hot":false,"./icons/cup-straw":false,"./icons/cup":false,"./icons/currency-bitcoin":false,"./icons/currency-dollar":false,"./icons/currency-euro":false,"./icons/currency-exchange":false,"./icons/currency-pound":false,"./icons/currency-rupee":false,"./icons/currency-yen":false,"./icons/cursor-fill":false,"./icons/cursor-text":false,"./icons/cursor":false,"./icons/dash-circle-dotted":false,"./icons/dash-circle-fill":false,"./icons/dash-circle":false,"./icons/dash-lg":false,"./icons/dash-square-dotted":false,"./icons/dash-square-fill":false,"./icons/dash-square":false,"./icons/dash":false,"./icons/database-add":false,"./icons/database-check":false,"./icons/database-dash":false,"./icons/database-down":false,"./icons/database-exclamation":false,"./icons/database-fill-add":false,"./icons/database-fill-check":false,"./icons/database-fill-dash":false,"./icons/database-fill-down":false,"./icons/database-fill-exclamation":false,"./icons/database-fill-gear":false,"./icons/database-fill-lock":false,"./icons/database-fill-slash":false,"./icons/database-fill-up":false,"./icons/database-fill-x":false,"./icons/database-fill":false,"./icons/database-gear":false,"./icons/database-lock":false,"./icons/database-slash":false,"./icons/database-up":false,"./icons/database-x":false,"./icons/database":false,"./icons/device-hdd-fill":false,"./icons/device-hdd":false,"./icons/device-ssd-fill":false,"./icons/device-ssd":false,"./icons/diagram-2-fill":false,"./icons/diagram-2":false,"./icons/diagram-3-fill":false,"./icons/diagram-3":false,"./icons/diamond-fill":false,"./icons/diamond-half":false,"./icons/diamond":false,"./icons/dice-1-fill":false,"./icons/dice-1":false,"./icons/dice-2-fill":false,"./icons/dice-2":false,"./icons/dice-3-fill":false,"./icons/dice-3":false,"./icons/dice-4-fill":false,"./icons/dice-4":false,"./icons/dice-5-fill":false,"./icons/dice-5":false,"./icons/dice-6-fill":false,"./icons/dice-6":false,"./icons/disc-fill":false,"./icons/disc":false,"./icons/discord":false,"./icons/display-fill":false,"./icons/display":false,"./icons/displayport-fill":false,"./icons/displayport":false,"./icons/distribute-horizontal":false,"./icons/distribute-vertical":false,"./icons/door-closed-fill":false,"./icons/door-closed":false,"./icons/door-open-fill":false,"./icons/door-open":false,"./icons/dot":false,"./icons/download":false,"./icons/dpad-fill":false,"./icons/dpad":false,"./icons/dribbble":false,"./icons/dropbox":false,"./icons/droplet-fill":false,"./icons/droplet-half":false,"./icons/droplet":false,"./icons/duffle-fill":false,"./icons/duffle":false,"./icons/ear-fill":false,"./icons/ear":false,"./icons/earbuds":false,"./icons/easel-fill":false,"./icons/easel":false,"./icons/easel2-fill":false,"./icons/easel2":false,"./icons/easel3-fill":false,"./icons/easel3":false,"./icons/egg-fill":false,"./icons/egg-fried":false,"./icons/egg":false,"./icons/eject-fill":false,"./icons/eject":false,"./icons/emoji-angry-fill":false,"./icons/emoji-angry":false,"./icons/emoji-astonished-fill":false,"./icons/emoji-astonished":false,"./icons/emoji-dizzy-fill":false,"./icons/emoji-dizzy":false,"./icons/emoji-expressionless-fill":false,"./icons/emoji-expressionless":false,"./icons/emoji-frown-fill":false,"./icons/emoji-frown":false,"./icons/emoji-grimace-fill":false,"./icons/emoji-grimace":false,"./icons/emoji-grin-fill":false,"./icons/emoji-grin":false,"./icons/emoji-heart-eyes-fill":false,"./icons/emoji-heart-eyes":false,"./icons/emoji-kiss-fill":false,"./icons/emoji-kiss":false,"./icons/emoji-laughing-fill":false,"./icons/emoji-laughing":false,"./icons/emoji-neutral-fill":false,"./icons/emoji-neutral":false,"./icons/emoji-smile-fill":false,"./icons/emoji-smile-upside-down-fill":false,"./icons/emoji-smile-upside-down":false,"./icons/emoji-smile":false,"./icons/emoji-sunglasses-fill":false,"./icons/emoji-sunglasses":false,"./icons/emoji-surprise-fill":false,"./icons/emoji-surprise":false,"./icons/emoji-tear-fill":false,"./icons/emoji-tear":false,"./icons/emoji-wink-fill":false,"./icons/emoji-wink":false,"./icons/envelope-arrow-down-fill":false,"./icons/envelope-arrow-down":false,"./icons/envelope-arrow-up-fill":false,"./icons/envelope-arrow-up":false,"./icons/envelope-at-fill":false,"./icons/envelope-at":false,"./icons/envelope-check-fill":false,"./icons/envelope-check":false,"./icons/envelope-dash-fill":false,"./icons/envelope-dash":false,"./icons/envelope-exclamation-fill":false,"./icons/envelope-exclamation":false,"./icons/envelope-fill":false,"./icons/envelope-heart-fill":false,"./icons/envelope-heart":false,"./icons/envelope-open-fill":false,"./icons/envelope-open-heart-fill":false,"./icons/envelope-open-heart":false,"./icons/envelope-open":false,"./icons/envelope-paper-fill":false,"./icons/envelope-paper-heart-fill":false,"./icons/envelope-paper-heart":false,"./icons/envelope-paper":false,"./icons/envelope-plus-fill":false,"./icons/envelope-plus":false,"./icons/envelope-slash-fill":false,"./icons/envelope-slash":false,"./icons/envelope-x-fill":false,"./icons/envelope-x":false,"./icons/envelope":false,"./icons/eraser-fill":false,"./icons/eraser":false,"./icons/escape":false,"./icons/ethernet":false,"./icons/ev-front-fill":false,"./icons/ev-front":false,"./icons/ev-station-fill":false,"./icons/ev-station":false,"./icons/exclamation-circle-fill":false,"./icons/exclamation-circle":false,"./icons/exclamation-diamond-fill":false,"./icons/exclamation-diamond":false,"./icons/exclamation-lg":false,"./icons/exclamation-octagon-fill":false,"./icons/exclamation-octagon":false,"./icons/exclamation-square-fill":false,"./icons/exclamation-square":false,"./icons/exclamation-triangle-fill":false,"./icons/exclamation-triangle":false,"./icons/exclamation":false,"./icons/exclude":false,"./icons/explicit-fill":false,"./icons/explicit":false,"./icons/exposure":false,"./icons/eye-fill":false,"./icons/eye-slash-fill":false,"./icons/eye-slash":false,"./icons/eye":false,"./icons/eyedropper":false,"./icons/eyeglasses":false,"./icons/facebook":false,"./icons/fan":false,"./icons/fast-forward-btn-fill":false,"./icons/fast-forward-btn":false,"./icons/fast-forward-circle-fill":false,"./icons/fast-forward-circle":false,"./icons/fast-forward-fill":false,"./icons/fast-forward":false,"./icons/feather":false,"./icons/feather2":false,"./icons/file-arrow-down-fill":false,"./icons/file-arrow-down":false,"./icons/file-arrow-up-fill":false,"./icons/file-arrow-up":false,"./icons/file-bar-graph-fill":false,"./icons/file-bar-graph":false,"./icons/file-binary-fill":false,"./icons/file-binary":false,"./icons/file-break-fill":false,"./icons/file-break":false,"./icons/file-check-fill":false,"./icons/file-check":false,"./icons/file-code-fill":false,"./icons/file-code":false,"./icons/file-diff-fill":false,"./icons/file-diff":false,"./icons/file-earmark-arrow-down-fill":false,"./icons/file-earmark-arrow-down":false,"./icons/file-earmark-arrow-up-fill":false,"./icons/file-earmark-arrow-up":false,"./icons/file-earmark-bar-graph-fill":false,"./icons/file-earmark-bar-graph":false,"./icons/file-earmark-binary-fill":false,"./icons/file-earmark-binary":false,"./icons/file-earmark-break-fill":false,"./icons/file-earmark-break":false,"./icons/file-earmark-check-fill":false,"./icons/file-earmark-check":false,"./icons/file-earmark-code-fill":false,"./icons/file-earmark-code":false,"./icons/file-earmark-diff-fill":false,"./icons/file-earmark-diff":false,"./icons/file-earmark-easel-fill":false,"./icons/file-earmark-easel":false,"./icons/file-earmark-excel-fill":false,"./icons/file-earmark-excel":false,"./icons/file-earmark-fill":false,"./icons/file-earmark-font-fill":false,"./icons/file-earmark-font":false,"./icons/file-earmark-image-fill":false,"./icons/file-earmark-image":false,"./icons/file-earmark-lock-fill":false,"./icons/file-earmark-lock":false,"./icons/file-earmark-lock2-fill":false,"./icons/file-earmark-lock2":false,"./icons/file-earmark-medical-fill":false,"./icons/file-earmark-medical":false,"./icons/file-earmark-minus-fill":false,"./icons/file-earmark-minus":false,"./icons/file-earmark-music-fill":false,"./icons/file-earmark-music":false,"./icons/file-earmark-pdf-fill":false,"./icons/file-earmark-pdf":false,"./icons/file-earmark-person-fill":false,"./icons/file-earmark-person":false,"./icons/file-earmark-play-fill":false,"./icons/file-earmark-play":false,"./icons/file-earmark-plus-fill":false,"./icons/file-earmark-plus":false,"./icons/file-earmark-post-fill":false,"./icons/file-earmark-post":false,"./icons/file-earmark-ppt-fill":false,"./icons/file-earmark-ppt":false,"./icons/file-earmark-richtext-fill":false,"./icons/file-earmark-richtext":false,"./icons/file-earmark-ruled-fill":false,"./icons/file-earmark-ruled":false,"./icons/file-earmark-slides-fill":false,"./icons/file-earmark-slides":false,"./icons/file-earmark-spreadsheet-fill":false,"./icons/file-earmark-spreadsheet":false,"./icons/file-earmark-text-fill":false,"./icons/file-earmark-text":false,"./icons/file-earmark-word-fill":false,"./icons/file-earmark-word":false,"./icons/file-earmark-x-fill":false,"./icons/file-earmark-x":false,"./icons/file-earmark-zip-fill":false,"./icons/file-earmark-zip":false,"./icons/file-earmark":false,"./icons/file-easel-fill":false,"./icons/file-easel":false,"./icons/file-excel-fill":false,"./icons/file-excel":false,"./icons/file-fill":false,"./icons/file-font-fill":false,"./icons/file-font":false,"./icons/file-image-fill":false,"./icons/file-image":false,"./icons/file-lock-fill":false,"./icons/file-lock":false,"./icons/file-lock2-fill":false,"./icons/file-lock2":false,"./icons/file-medical-fill":false,"./icons/file-medical":false,"./icons/file-minus-fill":false,"./icons/file-minus":false,"./icons/file-music-fill":false,"./icons/file-music":false,"./icons/file-pdf-fill":false,"./icons/file-pdf":false,"./icons/file-person-fill":false,"./icons/file-person":false,"./icons/file-play-fill":false,"./icons/file-play":false,"./icons/file-plus-fill":false,"./icons/file-plus":false,"./icons/file-post-fill":false,"./icons/file-post":false,"./icons/file-ppt-fill":false,"./icons/file-ppt":false,"./icons/file-richtext-fill":false,"./icons/file-richtext":false,"./icons/file-ruled-fill":false,"./icons/file-ruled":false,"./icons/file-slides-fill":false,"./icons/file-slides":false,"./icons/file-spreadsheet-fill":false,"./icons/file-spreadsheet":false,"./icons/file-text-fill":false,"./icons/file-text":false,"./icons/file-word-fill":false,"./icons/file-word":false,"./icons/file-x-fill":false,"./icons/file-x":false,"./icons/file-zip-fill":false,"./icons/file-zip":false,"./icons/file":false,"./icons/files-alt":false,"./icons/files":false,"./icons/filetype-aac":false,"./icons/filetype-ai":false,"./icons/filetype-bmp":false,"./icons/filetype-cs":false,"./icons/filetype-css":false,"./icons/filetype-csv":false,"./icons/filetype-doc":false,"./icons/filetype-docx":false,"./icons/filetype-exe":false,"./icons/filetype-gif":false,"./icons/filetype-heic":false,"./icons/filetype-html":false,"./icons/filetype-java":false,"./icons/filetype-jpg":false,"./icons/filetype-js":false,"./icons/filetype-json":false,"./icons/filetype-jsx":false,"./icons/filetype-key":false,"./icons/filetype-m4p":false,"./icons/filetype-md":false,"./icons/filetype-mdx":false,"./icons/filetype-mov":false,"./icons/filetype-mp3":false,"./icons/filetype-mp4":false,"./icons/filetype-otf":false,"./icons/filetype-pdf":false,"./icons/filetype-php":false,"./icons/filetype-png":false,"./icons/filetype-ppt":false,"./icons/filetype-pptx":false,"./icons/filetype-psd":false,"./icons/filetype-py":false,"./icons/filetype-raw":false,"./icons/filetype-rb":false,"./icons/filetype-sass":false,"./icons/filetype-scss":false,"./icons/filetype-sh":false,"./icons/filetype-sql":false,"./icons/filetype-svg":false,"./icons/filetype-tiff":false,"./icons/filetype-tsx":false,"./icons/filetype-ttf":false,"./icons/filetype-txt":false,"./icons/filetype-wav":false,"./icons/filetype-woff":false,"./icons/filetype-xls":false,"./icons/filetype-xlsx":false,"./icons/filetype-xml":false,"./icons/filetype-yml":false,"./icons/film":false,"./icons/filter-circle-fill":false,"./icons/filter-circle":false,"./icons/filter-left":false,"./icons/filter-right":false,"./icons/filter-square-fill":false,"./icons/filter-square":false,"./icons/filter":false,"./icons/fingerprint":false,"./icons/fire":false,"./icons/flag-fill":false,"./icons/flag":false,"./icons/floppy-fill":false,"./icons/floppy":false,"./icons/floppy2-fill":false,"./icons/floppy2":false,"./icons/flower1":false,"./icons/flower2":false,"./icons/flower3":false,"./icons/folder-check":false,"./icons/folder-fill":false,"./icons/folder-minus":false,"./icons/folder-plus":false,"./icons/folder-symlink-fill":false,"./icons/folder-symlink":false,"./icons/folder-x":false,"./icons/folder":false,"./icons/folder2-open":false,"./icons/folder2":false,"./icons/fonts":false,"./icons/forward-fill":false,"./icons/forward":false,"./icons/front":false,"./icons/fuel-pump-diesel-fill":false,"./icons/fuel-pump-diesel":false,"./icons/fuel-pump-fill":false,"./icons/fuel-pump":false,"./icons/fullscreen-exit":false,"./icons/fullscreen":false,"./icons/funnel-fill":false,"./icons/funnel":false,"./icons/gear-fill":false,"./icons/gear-wide-connected":false,"./icons/gear-wide":false,"./icons/gear":false,"./icons/gem":false,"./icons/gender-ambiguous":false,"./icons/gender-female":false,"./icons/gender-male":false,"./icons/gender-neuter":false,"./icons/gender-trans":false,"./icons/geo-alt-fill":false,"./icons/geo-alt":false,"./icons/geo-fill":false,"./icons/geo":false,"./icons/gift-fill":false,"./icons/gift":false,"./icons/git":false,"./icons/github":false,"./icons/gitlab":false,"./icons/globe-americas":false,"./icons/globe-asia-australia":false,"./icons/globe-central-south-asia":false,"./icons/globe-europe-africa":false,"./icons/globe":false,"./icons/globe2":false,"./icons/google-play":false,"./icons/google":false,"./icons/gpu-card":false,"./icons/graph-down-arrow":false,"./icons/graph-down":false,"./icons/graph-up-arrow":false,"./icons/graph-up":false,"./icons/grid-1x2-fill":false,"./icons/grid-1x2":false,"./icons/grid-3x2-gap-fill":false,"./icons/grid-3x2-gap":false,"./icons/grid-3x2":false,"./icons/grid-3x3-gap-fill":false,"./icons/grid-3x3-gap":false,"./icons/grid-3x3":false,"./icons/grid-fill":false,"./icons/grid":false,"./icons/grip-horizontal":false,"./icons/grip-vertical":false,"./icons/h-circle-fill":false,"./icons/h-circle":false,"./icons/h-square-fill":false,"./icons/h-square":false,"./icons/hammer":false,"./icons/hand-index-fill":false,"./icons/hand-index-thumb-fill":false,"./icons/hand-index-thumb":false,"./icons/hand-index":false,"./icons/hand-thumbs-down-fill":false,"./icons/hand-thumbs-down":false,"./icons/hand-thumbs-up-fill":false,"./icons/hand-thumbs-up":false,"./icons/handbag-fill":false,"./icons/handbag":false,"./icons/hash":false,"./icons/hdd-fill":false,"./icons/hdd-network-fill":false,"./icons/hdd-network":false,"./icons/hdd-rack-fill":false,"./icons/hdd-rack":false,"./icons/hdd-stack-fill":false,"./icons/hdd-stack":false,"./icons/hdd":false,"./icons/hdmi-fill":false,"./icons/hdmi":false,"./icons/headphones":false,"./icons/headset-vr":false,"./icons/headset":false,"./icons/heart-arrow":false,"./icons/heart-fill":false,"./icons/heart-half":false,"./icons/heart-pulse-fill":false,"./icons/heart-pulse":false,"./icons/heart":false,"./icons/heartbreak-fill":false,"./icons/heartbreak":false,"./icons/hearts":false,"./icons/heptagon-fill":false,"./icons/heptagon-half":false,"./icons/heptagon":false,"./icons/hexagon-fill":false,"./icons/hexagon-half":false,"./icons/hexagon":false,"./icons/highlighter":false,"./icons/highlights":false,"./icons/hospital-fill":false,"./icons/hospital":false,"./icons/hourglass-bottom":false,"./icons/hourglass-split":false,"./icons/hourglass-top":false,"./icons/hourglass":false,"./icons/house-add-fill":false,"./icons/house-add":false,"./icons/house-check-fill":false,"./icons/house-check":false,"./icons/house-dash-fill":false,"./icons/house-dash":false,"./icons/house-door-fill":false,"./icons/house-door":false,"./icons/house-down-fill":false,"./icons/house-down":false,"./icons/house-exclamation-fill":false,"./icons/house-exclamation":false,"./icons/house-fill":false,"./icons/house-gear-fill":false,"./icons/house-gear":false,"./icons/house-heart-fill":false,"./icons/house-heart":false,"./icons/house-lock-fill":false,"./icons/house-lock":false,"./icons/house-slash-fill":false,"./icons/house-slash":false,"./icons/house-up-fill":false,"./icons/house-up":false,"./icons/house-x-fill":false,"./icons/house-x":false,"./icons/house":false,"./icons/houses-fill":false,"./icons/houses":false,"./icons/hr":false,"./icons/hurricane":false,"./icons/hypnotize":false,"./icons/image-alt":false,"./icons/image-fill":false,"./icons/image":false,"./icons/images":false,"./icons/inbox-fill":false,"./icons/inbox":false,"./icons/inboxes-fill":false,"./icons/inboxes":false,"./icons/incognito":false,"./icons/indent":false,"./icons/infinity":false,"./icons/info-circle-fill":false,"./icons/info-circle":false,"./icons/info-lg":false,"./icons/info-square-fill":false,"./icons/info-square":false,"./icons/info":false,"./icons/input-cursor-text":false,"./icons/input-cursor":false,"./icons/instagram":false,"./icons/intersect":false,"./icons/journal-album":false,"./icons/journal-arrow-down":false,"./icons/journal-arrow-up":false,"./icons/journal-bookmark-fill":false,"./icons/journal-bookmark":false,"./icons/journal-check":false,"./icons/journal-code":false,"./icons/journal-medical":false,"./icons/journal-minus":false,"./icons/journal-plus":false,"./icons/journal-richtext":false,"./icons/journal-text":false,"./icons/journal-x":false,"./icons/journal":false,"./icons/journals":false,"./icons/joystick":false,"./icons/justify-left":false,"./icons/justify-right":false,"./icons/justify":false,"./icons/kanban-fill":false,"./icons/kanban":false,"./icons/key-fill":false,"./icons/key":false,"./icons/keyboard-fill":false,"./icons/keyboard":false,"./icons/ladder":false,"./icons/lamp-fill":false,"./icons/lamp":false,"./icons/laptop-fill":false,"./icons/laptop":false,"./icons/layer-backward":false,"./icons/layer-forward":false,"./icons/layers-fill":false,"./icons/layers-half":false,"./icons/layers":false,"./icons/layout-sidebar-inset-reverse":false,"./icons/layout-sidebar-inset":false,"./icons/layout-sidebar-reverse":false,"./icons/layout-sidebar":false,"./icons/layout-split":false,"./icons/layout-text-sidebar-reverse":false,"./icons/layout-text-sidebar":false,"./icons/layout-text-window-reverse":false,"./icons/layout-text-window":false,"./icons/layout-three-columns":false,"./icons/layout-wtf":false,"./icons/life-preserver":false,"./icons/lightbulb-fill":false,"./icons/lightbulb-off-fill":false,"./icons/lightbulb-off":false,"./icons/lightbulb":false,"./icons/lightning-charge-fill":false,"./icons/lightning-charge":false,"./icons/lightning-fill":false,"./icons/lightning":false,"./icons/line":false,"./icons/link-45deg":false,"./icons/link":false,"./icons/linkedin":false,"./icons/list-check":false,"./icons/list-columns-reverse":false,"./icons/list-columns":false,"./icons/list-nested":false,"./icons/list-ol":false,"./icons/list-stars":false,"./icons/list-task":false,"./icons/list-ul":false,"./icons/list":false,"./icons/lock-fill":false,"./icons/lock":false,"./icons/luggage-fill":false,"./icons/luggage":false,"./icons/lungs-fill":false,"./icons/lungs":false,"./icons/magic":false,"./icons/magnet-fill":false,"./icons/magnet":false,"./icons/mailbox-flag":false,"./icons/mailbox":false,"./icons/mailbox2-flag":false,"./icons/mailbox2":false,"./icons/map-fill":false,"./icons/map":false,"./icons/markdown-fill":false,"./icons/markdown":false,"./icons/marker-tip":false,"./icons/mask":false,"./icons/mastodon":false,"./icons/medium":false,"./icons/megaphone-fill":false,"./icons/megaphone":false,"./icons/memory":false,"./icons/menu-app-fill":false,"./icons/menu-app":false,"./icons/menu-button-fill":false,"./icons/menu-button-wide-fill":false,"./icons/menu-button-wide":false,"./icons/menu-button":false,"./icons/menu-down":false,"./icons/menu-up":false,"./icons/messenger":false,"./icons/meta":false,"./icons/mic-fill":false,"./icons/mic-mute-fill":false,"./icons/mic-mute":false,"./icons/mic":false,"./icons/microsoft-teams":false,"./icons/microsoft":false,"./icons/minecart-loaded":false,"./icons/minecart":false,"./icons/modem-fill":false,"./icons/modem":false,"./icons/moisture":false,"./icons/moon-fill":false,"./icons/moon-stars-fill":false,"./icons/moon-stars":false,"./icons/moon":false,"./icons/mortarboard-fill":false,"./icons/mortarboard":false,"./icons/motherboard-fill":false,"./icons/motherboard":false,"./icons/mouse-fill":false,"./icons/mouse":false,"./icons/mouse2-fill":false,"./icons/mouse2":false,"./icons/mouse3-fill":false,"./icons/mouse3":false,"./icons/music-note-beamed":false,"./icons/music-note-list":false,"./icons/music-note":false,"./icons/music-player-fill":false,"./icons/music-player":false,"./icons/newspaper":false,"./icons/nintendo-switch":false,"./icons/node-minus-fill":false,"./icons/node-minus":false,"./icons/node-plus-fill":false,"./icons/node-plus":false,"./icons/noise-reduction":false,"./icons/nut-fill":false,"./icons/nut":false,"./icons/nvidia":false,"./icons/nvme-fill":false,"./icons/nvme":false,"./icons/octagon-fill":false,"./icons/octagon-half":false,"./icons/octagon":false,"./icons/opencollective":false,"./icons/optical-audio-fill":false,"./icons/optical-audio":false,"./icons/option":false,"./icons/outlet":false,"./icons/p-circle-fill":false,"./icons/p-circle":false,"./icons/p-square-fill":false,"./icons/p-square":false,"./icons/paint-bucket":false,"./icons/palette-fill":false,"./icons/palette":false,"./icons/palette2":false,"./icons/paperclip":false,"./icons/paragraph":false,"./icons/pass-fill":false,"./icons/pass":false,"./icons/passport-fill":false,"./icons/passport":false,"./icons/patch-check-fill":false,"./icons/patch-check":false,"./icons/patch-exclamation-fill":false,"./icons/patch-exclamation":false,"./icons/patch-minus-fill":false,"./icons/patch-minus":false,"./icons/patch-plus-fill":false,"./icons/patch-plus":false,"./icons/patch-question-fill":false,"./icons/patch-question":false,"./icons/pause-btn-fill":false,"./icons/pause-btn":false,"./icons/pause-circle-fill":false,"./icons/pause-circle":false,"./icons/pause-fill":false,"./icons/pause":false,"./icons/paypal":false,"./icons/pc-display-horizontal":false,"./icons/pc-display":false,"./icons/pc-horizontal":false,"./icons/pc":false,"./icons/pci-card-network":false,"./icons/pci-card-sound":false,"./icons/pci-card":false,"./icons/peace-fill":false,"./icons/peace":false,"./icons/pen-fill":false,"./icons/pen":false,"./icons/pencil-fill":false,"./icons/pencil-square":false,"./icons/pencil":false,"./icons/pentagon-fill":false,"./icons/pentagon-half":false,"./icons/pentagon":false,"./icons/people-fill":false,"./icons/people":false,"./icons/percent":false,"./icons/person-add":false,"./icons/person-arms-up":false,"./icons/person-badge-fill":false,"./icons/person-badge":false,"./icons/person-bounding-box":false,"./icons/person-check-fill":false,"./icons/person-check":false,"./icons/person-circle":false,"./icons/person-dash-fill":false,"./icons/person-dash":false,"./icons/person-down":false,"./icons/person-exclamation":false,"./icons/person-fill-add":false,"./icons/person-fill-check":false,"./icons/person-fill-dash":false,"./icons/person-fill-down":false,"./icons/person-fill-exclamation":false,"./icons/person-fill-gear":false,"./icons/person-fill-lock":false,"./icons/person-fill-slash":false,"./icons/person-fill-up":false,"./icons/person-fill-x":false,"./icons/person-fill":false,"./icons/person-gear":false,"./icons/person-heart":false,"./icons/person-hearts":false,"./icons/person-lines-fill":false,"./icons/person-lock":false,"./icons/person-plus-fill":false,"./icons/person-plus":false,"./icons/person-raised-hand":false,"./icons/person-rolodex":false,"./icons/person-slash":false,"./icons/person-square":"eTgsZ","./icons/person-standing-dress":false,"./icons/person-standing":false,"./icons/person-up":false,"./icons/person-vcard-fill":false,"./icons/person-vcard":false,"./icons/person-video":false,"./icons/person-video2":false,"./icons/person-video3":false,"./icons/person-walking":false,"./icons/person-wheelchair":false,"./icons/person-workspace":false,"./icons/person-x-fill":false,"./icons/person-x":false,"./icons/person":false,"./icons/phone-fill":false,"./icons/phone-flip":false,"./icons/phone-landscape-fill":false,"./icons/phone-landscape":false,"./icons/phone-vibrate-fill":false,"./icons/phone-vibrate":false,"./icons/phone":false,"./icons/pie-chart-fill":false,"./icons/pie-chart":false,"./icons/piggy-bank-fill":false,"./icons/piggy-bank":false,"./icons/pin-angle-fill":false,"./icons/pin-angle":false,"./icons/pin-fill":false,"./icons/pin-map-fill":false,"./icons/pin-map":false,"./icons/pin":false,"./icons/pinterest":false,"./icons/pip-fill":false,"./icons/pip":false,"./icons/play-btn-fill":false,"./icons/play-btn":false,"./icons/play-circle-fill":false,"./icons/play-circle":false,"./icons/play-fill":false,"./icons/play":false,"./icons/playstation":false,"./icons/plug-fill":false,"./icons/plug":false,"./icons/plugin":false,"./icons/plus-circle-dotted":false,"./icons/plus-circle-fill":false,"./icons/plus-circle":false,"./icons/plus-lg":false,"./icons/plus-slash-minus":false,"./icons/plus-square-dotted":false,"./icons/plus-square-fill":false,"./icons/plus-square":false,"./icons/plus":false,"./icons/postage-fill":false,"./icons/postage-heart-fill":false,"./icons/postage-heart":false,"./icons/postage":false,"./icons/postcard-fill":false,"./icons/postcard-heart-fill":false,"./icons/postcard-heart":false,"./icons/postcard":false,"./icons/power":false,"./icons/prescription":false,"./icons/prescription2":false,"./icons/printer-fill":false,"./icons/printer":false,"./icons/projector-fill":false,"./icons/projector":false,"./icons/puzzle-fill":false,"./icons/puzzle":false,"./icons/qr-code-scan":false,"./icons/qr-code":false,"./icons/question-circle-fill":false,"./icons/question-circle":false,"./icons/question-diamond-fill":false,"./icons/question-diamond":false,"./icons/question-lg":false,"./icons/question-octagon-fill":false,"./icons/question-octagon":false,"./icons/question-square-fill":false,"./icons/question-square":false,"./icons/question":false,"./icons/quora":false,"./icons/quote":false,"./icons/r-circle-fill":false,"./icons/r-circle":false,"./icons/r-square-fill":false,"./icons/r-square":false,"./icons/radar":false,"./icons/radioactive":false,"./icons/rainbow":false,"./icons/receipt-cutoff":false,"./icons/receipt":false,"./icons/reception-0":false,"./icons/reception-1":false,"./icons/reception-2":false,"./icons/reception-3":false,"./icons/reception-4":false,"./icons/record-btn-fill":false,"./icons/record-btn":false,"./icons/record-circle-fill":false,"./icons/record-circle":false,"./icons/record-fill":false,"./icons/record":false,"./icons/record2-fill":false,"./icons/record2":false,"./icons/recycle":false,"./icons/reddit":false,"./icons/regex":false,"./icons/repeat-1":false,"./icons/repeat":false,"./icons/reply-all-fill":false,"./icons/reply-all":false,"./icons/reply-fill":false,"./icons/reply":false,"./icons/rewind-btn-fill":false,"./icons/rewind-btn":false,"./icons/rewind-circle-fill":false,"./icons/rewind-circle":false,"./icons/rewind-fill":false,"./icons/rewind":false,"./icons/robot":false,"./icons/rocket-fill":false,"./icons/rocket-takeoff-fill":false,"./icons/rocket-takeoff":false,"./icons/rocket":false,"./icons/router-fill":false,"./icons/router":false,"./icons/rss-fill":false,"./icons/rss":false,"./icons/rulers":false,"./icons/safe-fill":false,"./icons/safe":false,"./icons/safe2-fill":false,"./icons/safe2":false,"./icons/save-fill":false,"./icons/save":false,"./icons/save2-fill":false,"./icons/save2":false,"./icons/scissors":false,"./icons/scooter":false,"./icons/screwdriver":false,"./icons/sd-card-fill":false,"./icons/sd-card":false,"./icons/search-heart-fill":false,"./icons/search-heart":false,"./icons/search":false,"./icons/segmented-nav":false,"./icons/send-arrow-down-fill":false,"./icons/send-arrow-down":false,"./icons/send-arrow-up-fill":false,"./icons/send-arrow-up":false,"./icons/send-check-fill":false,"./icons/send-check":false,"./icons/send-dash-fill":false,"./icons/send-dash":false,"./icons/send-exclamation-fill":false,"./icons/send-exclamation":false,"./icons/send-fill":false,"./icons/send-plus-fill":false,"./icons/send-plus":false,"./icons/send-slash-fill":false,"./icons/send-slash":false,"./icons/send-x-fill":false,"./icons/send-x":false,"./icons/send":false,"./icons/server":false,"./icons/shadows":false,"./icons/share-fill":false,"./icons/share":false,"./icons/shield-check":false,"./icons/shield-exclamation":false,"./icons/shield-fill-check":false,"./icons/shield-fill-exclamation":false,"./icons/shield-fill-minus":false,"./icons/shield-fill-plus":false,"./icons/shield-fill-x":false,"./icons/shield-fill":false,"./icons/shield-lock-fill":false,"./icons/shield-lock":false,"./icons/shield-minus":false,"./icons/shield-plus":false,"./icons/shield-shaded":false,"./icons/shield-slash-fill":false,"./icons/shield-slash":false,"./icons/shield-x":false,"./icons/shield":false,"./icons/shift-fill":false,"./icons/shift":false,"./icons/shop-window":false,"./icons/shop":false,"./icons/shuffle":false,"./icons/sign-dead-end-fill":false,"./icons/sign-dead-end":false,"./icons/sign-do-not-enter-fill":false,"./icons/sign-do-not-enter":false,"./icons/sign-intersection-fill":false,"./icons/sign-intersection-side-fill":false,"./icons/sign-intersection-side":false,"./icons/sign-intersection-t-fill":false,"./icons/sign-intersection-t":false,"./icons/sign-intersection-y-fill":false,"./icons/sign-intersection-y":false,"./icons/sign-intersection":false,"./icons/sign-merge-left-fill":false,"./icons/sign-merge-left":false,"./icons/sign-merge-right-fill":false,"./icons/sign-merge-right":false,"./icons/sign-no-left-turn-fill":false,"./icons/sign-no-left-turn":false,"./icons/sign-no-parking-fill":false,"./icons/sign-no-parking":false,"./icons/sign-no-right-turn-fill":false,"./icons/sign-no-right-turn":false,"./icons/sign-railroad-fill":false,"./icons/sign-railroad":false,"./icons/sign-stop-fill":false,"./icons/sign-stop-lights-fill":false,"./icons/sign-stop-lights":false,"./icons/sign-stop":false,"./icons/sign-turn-left-fill":false,"./icons/sign-turn-left":false,"./icons/sign-turn-right-fill":false,"./icons/sign-turn-right":false,"./icons/sign-turn-slight-left-fill":false,"./icons/sign-turn-slight-left":false,"./icons/sign-turn-slight-right-fill":false,"./icons/sign-turn-slight-right":false,"./icons/sign-yield-fill":false,"./icons/sign-yield":false,"./icons/signal":false,"./icons/signpost-2-fill":false,"./icons/signpost-2":false,"./icons/signpost-fill":false,"./icons/signpost-split-fill":false,"./icons/signpost-split":false,"./icons/signpost":false,"./icons/sim-fill":false,"./icons/sim-slash-fill":false,"./icons/sim-slash":false,"./icons/sim":false,"./icons/sina-weibo":false,"./icons/skip-backward-btn-fill":false,"./icons/skip-backward-btn":false,"./icons/skip-backward-circle-fill":false,"./icons/skip-backward-circle":false,"./icons/skip-backward-fill":false,"./icons/skip-backward":false,"./icons/skip-end-btn-fill":false,"./icons/skip-end-btn":false,"./icons/skip-end-circle-fill":false,"./icons/skip-end-circle":false,"./icons/skip-end-fill":false,"./icons/skip-end":false,"./icons/skip-forward-btn-fill":false,"./icons/skip-forward-btn":false,"./icons/skip-forward-circle-fill":false,"./icons/skip-forward-circle":false,"./icons/skip-forward-fill":false,"./icons/skip-forward":false,"./icons/skip-start-btn-fill":false,"./icons/skip-start-btn":false,"./icons/skip-start-circle-fill":false,"./icons/skip-start-circle":false,"./icons/skip-start-fill":false,"./icons/skip-start":false,"./icons/skype":false,"./icons/slack":false,"./icons/slash-circle-fill":false,"./icons/slash-circle":false,"./icons/slash-lg":false,"./icons/slash-square-fill":false,"./icons/slash-square":false,"./icons/slash":false,"./icons/sliders":false,"./icons/sliders2-vertical":false,"./icons/sliders2":false,"./icons/smartwatch":false,"./icons/snapchat":false,"./icons/snow":false,"./icons/snow2":false,"./icons/snow3":false,"./icons/sort-alpha-down-alt":false,"./icons/sort-alpha-down":false,"./icons/sort-alpha-up-alt":false,"./icons/sort-alpha-up":false,"./icons/sort-down-alt":false,"./icons/sort-down":false,"./icons/sort-numeric-down-alt":false,"./icons/sort-numeric-down":false,"./icons/sort-numeric-up-alt":false,"./icons/sort-numeric-up":false,"./icons/sort-up-alt":false,"./icons/sort-up":false,"./icons/soundwave":false,"./icons/sourceforge":false,"./icons/speaker-fill":false,"./icons/speaker":false,"./icons/speedometer":false,"./icons/speedometer2":false,"./icons/spellcheck":false,"./icons/spotify":false,"./icons/square-fill":false,"./icons/square-half":false,"./icons/square":false,"./icons/stack-overflow":false,"./icons/stack":false,"./icons/star-fill":false,"./icons/star-half":false,"./icons/star":false,"./icons/stars":false,"./icons/steam":false,"./icons/stickies-fill":false,"./icons/stickies":false,"./icons/sticky-fill":false,"./icons/sticky":false,"./icons/stop-btn-fill":false,"./icons/stop-btn":false,"./icons/stop-circle-fill":false,"./icons/stop-circle":false,"./icons/stop-fill":false,"./icons/stop":false,"./icons/stoplights-fill":false,"./icons/stoplights":false,"./icons/stopwatch-fill":false,"./icons/stopwatch":false,"./icons/strava":false,"./icons/stripe":false,"./icons/subscript":false,"./icons/substack":false,"./icons/subtract":false,"./icons/suit-club-fill":false,"./icons/suit-club":false,"./icons/suit-diamond-fill":false,"./icons/suit-diamond":false,"./icons/suit-heart-fill":false,"./icons/suit-heart":false,"./icons/suit-spade-fill":false,"./icons/suit-spade":false,"./icons/suitcase-fill":false,"./icons/suitcase-lg-fill":false,"./icons/suitcase-lg":false,"./icons/suitcase":false,"./icons/suitcase2-fill":false,"./icons/suitcase2":false,"./icons/sun-fill":false,"./icons/sun":false,"./icons/sunglasses":false,"./icons/sunrise-fill":false,"./icons/sunrise":false,"./icons/sunset-fill":false,"./icons/sunset":false,"./icons/superscript":false,"./icons/symmetry-horizontal":false,"./icons/symmetry-vertical":false,"./icons/table":false,"./icons/tablet-fill":false,"./icons/tablet-landscape-fill":false,"./icons/tablet-landscape":false,"./icons/tablet":false,"./icons/tag-fill":false,"./icons/tag":false,"./icons/tags-fill":false,"./icons/tags":false,"./icons/taxi-front-fill":false,"./icons/taxi-front":false,"./icons/telegram":false,"./icons/telephone-fill":false,"./icons/telephone-forward-fill":false,"./icons/telephone-forward":false,"./icons/telephone-inbound-fill":false,"./icons/telephone-inbound":false,"./icons/telephone-minus-fill":false,"./icons/telephone-minus":false,"./icons/telephone-outbound-fill":false,"./icons/telephone-outbound":false,"./icons/telephone-plus-fill":false,"./icons/telephone-plus":false,"./icons/telephone-x-fill":false,"./icons/telephone-x":false,"./icons/telephone":false,"./icons/tencent-qq":false,"./icons/terminal-dash":false,"./icons/terminal-fill":false,"./icons/terminal-plus":false,"./icons/terminal-split":false,"./icons/terminal-x":false,"./icons/terminal":false,"./icons/text-center":false,"./icons/text-indent-left":false,"./icons/text-indent-right":false,"./icons/text-left":false,"./icons/text-paragraph":false,"./icons/text-right":false,"./icons/text-wrap":false,"./icons/textarea-resize":false,"./icons/textarea-t":false,"./icons/textarea":false,"./icons/thermometer-half":false,"./icons/thermometer-high":false,"./icons/thermometer-low":false,"./icons/thermometer-snow":false,"./icons/thermometer-sun":false,"./icons/thermometer":false,"./icons/threads-fill":false,"./icons/threads":false,"./icons/three-dots-vertical":false,"./icons/three-dots":false,"./icons/thunderbolt-fill":false,"./icons/thunderbolt":false,"./icons/ticket-detailed-fill":false,"./icons/ticket-detailed":false,"./icons/ticket-fill":false,"./icons/ticket-perforated-fill":false,"./icons/ticket-perforated":false,"./icons/ticket":false,"./icons/tiktok":false,"./icons/toggle-off":false,"./icons/toggle-on":false,"./icons/toggle2-off":false,"./icons/toggle2-on":false,"./icons/toggles":false,"./icons/toggles2":false,"./icons/tools":false,"./icons/tornado":false,"./icons/train-freight-front-fill":false,"./icons/train-freight-front":false,"./icons/train-front-fill":false,"./icons/train-front":false,"./icons/train-lightrail-front-fill":false,"./icons/train-lightrail-front":false,"./icons/translate":false,"./icons/transparency":false,"./icons/trash-fill":false,"./icons/trash":false,"./icons/trash2-fill":false,"./icons/trash2":false,"./icons/trash3-fill":false,"./icons/trash3":false,"./icons/tree-fill":false,"./icons/tree":false,"./icons/trello":false,"./icons/triangle-fill":false,"./icons/triangle-half":false,"./icons/triangle":false,"./icons/trophy-fill":false,"./icons/trophy":false,"./icons/tropical-storm":false,"./icons/truck-flatbed":false,"./icons/truck-front-fill":false,"./icons/truck-front":false,"./icons/truck":false,"./icons/tsunami":false,"./icons/tv-fill":false,"./icons/tv":false,"./icons/twitch":false,"./icons/twitter-x":false,"./icons/twitter":false,"./icons/type-bold":false,"./icons/type-h1":false,"./icons/type-h2":false,"./icons/type-h3":false,"./icons/type-h4":false,"./icons/type-h5":false,"./icons/type-h6":false,"./icons/type-italic":false,"./icons/type-strikethrough":false,"./icons/type-underline":false,"./icons/type":false,"./icons/ubuntu":false,"./icons/ui-checks-grid":false,"./icons/ui-checks":false,"./icons/ui-radios-grid":false,"./icons/ui-radios":false,"./icons/umbrella-fill":false,"./icons/umbrella":false,"./icons/unindent":false,"./icons/union":false,"./icons/unity":false,"./icons/universal-access-circle":false,"./icons/universal-access":false,"./icons/unlock-fill":false,"./icons/unlock":false,"./icons/upc-scan":false,"./icons/upc":false,"./icons/upload":false,"./icons/usb-c-fill":false,"./icons/usb-c":false,"./icons/usb-drive-fill":false,"./icons/usb-drive":false,"./icons/usb-fill":false,"./icons/usb-micro-fill":false,"./icons/usb-micro":false,"./icons/usb-mini-fill":false,"./icons/usb-mini":false,"./icons/usb-plug-fill":false,"./icons/usb-plug":false,"./icons/usb-symbol":false,"./icons/usb":false,"./icons/valentine":false,"./icons/valentine2":false,"./icons/vector-pen":false,"./icons/view-list":false,"./icons/view-stacked":false,"./icons/vignette":false,"./icons/vimeo":false,"./icons/vinyl-fill":false,"./icons/vinyl":false,"./icons/virus":false,"./icons/virus2":false,"./icons/voicemail":false,"./icons/volume-down-fill":false,"./icons/volume-down":false,"./icons/volume-mute-fill":false,"./icons/volume-mute":false,"./icons/volume-off-fill":false,"./icons/volume-off":false,"./icons/volume-up-fill":false,"./icons/volume-up":false,"./icons/vr":false,"./icons/wallet-fill":false,"./icons/wallet":false,"./icons/wallet2":false,"./icons/watch":false,"./icons/water":false,"./icons/webcam-fill":false,"./icons/webcam":false,"./icons/wechat":false,"./icons/whatsapp":false,"./icons/wifi-1":false,"./icons/wifi-2":false,"./icons/wifi-off":false,"./icons/wifi":false,"./icons/wikipedia":false,"./icons/wind":false,"./icons/window-dash":false,"./icons/window-desktop":false,"./icons/window-dock":false,"./icons/window-fullscreen":false,"./icons/window-plus":false,"./icons/window-sidebar":false,"./icons/window-split":false,"./icons/window-stack":false,"./icons/window-x":false,"./icons/window":false,"./icons/windows":false,"./icons/wordpress":false,"./icons/wrench-adjustable-circle-fill":false,"./icons/wrench-adjustable-circle":false,"./icons/wrench-adjustable":false,"./icons/wrench":false,"./icons/x-circle-fill":false,"./icons/x-circle":false,"./icons/x-diamond-fill":false,"./icons/x-diamond":false,"./icons/x-lg":false,"./icons/x-octagon-fill":false,"./icons/x-octagon":false,"./icons/x-square-fill":false,"./icons/x-square":false,"./icons/x":false,"./icons/xbox":false,"./icons/yelp":false,"./icons/yin-yang":false,"./icons/youtube":false,"./icons/zoom-in":false,"./icons/zoom-out":false,"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"eTgsZ":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _react = require("react");
-var _reactDefault = parcelHelpers.interopDefault(_react);
-var _propTypes = require("prop-types");
-var _propTypesDefault = parcelHelpers.interopDefault(_propTypes);
-var _excluded = [
-    "color",
-    "size",
-    "title",
-    "className"
-];
-function _extends() {
-    _extends = Object.assign || function(target) {
-        for(var i = 1; i < arguments.length; i++){
-            var source = arguments[i];
-            for(var key in source)if (Object.prototype.hasOwnProperty.call(source, key)) target[key] = source[key];
-        }
-        return target;
-    };
-    return _extends.apply(this, arguments);
-}
-function _objectWithoutProperties(source, excluded) {
-    if (source == null) return {};
-    var target = _objectWithoutPropertiesLoose(source, excluded);
-    var key, i;
-    if (Object.getOwnPropertySymbols) {
-        var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
-        for(i = 0; i < sourceSymbolKeys.length; i++){
-            key = sourceSymbolKeys[i];
-            if (excluded.indexOf(key) >= 0) continue;
-            if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
-            target[key] = source[key];
-        }
-    }
-    return target;
-}
-function _objectWithoutPropertiesLoose(source, excluded) {
-    if (source == null) return {};
-    var target = {};
-    var sourceKeys = Object.keys(source);
-    var key, i;
-    for(i = 0; i < sourceKeys.length; i++){
-        key = sourceKeys[i];
-        if (excluded.indexOf(key) >= 0) continue;
-        target[key] = source[key];
-    }
-    return target;
-}
-var PersonSquare = /*#__PURE__*/ (0, _react.forwardRef)(function(_ref, ref) {
-    var color = _ref.color, size = _ref.size, title = _ref.title, className = _ref.className, rest = _objectWithoutProperties(_ref, _excluded);
-    return /*#__PURE__*/ (0, _reactDefault.default).createElement("svg", _extends({
-        ref: ref,
-        xmlns: "http://www.w3.org/2000/svg",
-        viewBox: "0 0 16 16",
-        width: size,
-        height: size,
-        fill: color,
-        className: [
-            "bi",
-            "bi-person-square",
-            className
-        ].filter(Boolean).join(" ")
-    }, rest), title ? /*#__PURE__*/ (0, _reactDefault.default).createElement("title", null, title) : null, /*#__PURE__*/ (0, _reactDefault.default).createElement("path", {
-        d: "M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"
-    }), /*#__PURE__*/ (0, _reactDefault.default).createElement("path", {
-        d: "M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1v-1c0-1-1-4-6-4s-6 3-6 4v1a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"
-    }));
-});
-PersonSquare.propTypes = {
-    color: (0, _propTypesDefault.default).string,
-    size: (0, _propTypesDefault.default).oneOfType([
-        (0, _propTypesDefault.default).string,
-        (0, _propTypesDefault.default).number
-    ]),
-    title: (0, _propTypesDefault.default).string,
-    className: (0, _propTypesDefault.default).string
-};
-PersonSquare.defaultProps = {
-    color: "currentColor",
-    size: "1em",
-    title: null,
-    className: ""
-};
-exports.default = PersonSquare;
-
-},{"react":"21dqq","prop-types":"7wKI2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bsPVM":[function(require,module,exports) {
-var $parcel$ReactRefreshHelpers$abf5 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","prop-types":"7wKI2","react-bootstrap":"3AD9A","../movie-card/movie-card":"bwuIu","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"bwuIu":[function(require,module,exports) {
+var $parcel$ReactRefreshHelpers$67b2 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
-$parcel$ReactRefreshHelpers$abf5.prelude(module);
+$parcel$ReactRefreshHelpers$67b2.prelude(module);
 
 try {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "NavigationBar", ()=>NavigationBar);
+parcelHelpers.export(exports, "MovieCard", ()=>MovieCard);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
+var _react = require("react");
+var _reactDefault = parcelHelpers.interopDefault(_react);
+var _propTypes = require("prop-types");
+var _propTypesDefault = parcelHelpers.interopDefault(_propTypes);
 var _reactBootstrap = require("react-bootstrap");
 var _reactRouterDom = require("react-router-dom");
-const NavigationBar = ({ user, onLoggedOut })=>{
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Navbar), {
-        bg: "primary",
-        expand: "lg",
-        fixed: "top",
-        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Container), {
-            children: [
-                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Navbar).Brand, {
-                    as: (0, _reactRouterDom.Link),
-                    to: "/",
-                    children: "MyMovies"
-                }, void 0, false, {
-                    fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                    lineNumber: 8,
-                    columnNumber: 17
-                }, undefined),
-                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Navbar).Toggle, {
-                    "aria-controls": "basic-navbar-nav"
-                }, void 0, false, {
-                    fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                    lineNumber: 11,
-                    columnNumber: 17
-                }, undefined),
-                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Navbar).Collapse, {
-                    id: "-basic-navbar-nav",
-                    children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav), {
-                        className: "me-auto",
-                        children: [
-                            !user && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
-                                children: [
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
-                                        as: (0, _reactRouterDom.Link),
-                                        to: "/login",
-                                        children: "Login"
-                                    }, void 0, false, {
-                                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                                        lineNumber: 16,
-                                        columnNumber: 33
-                                    }, undefined),
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
-                                        as: (0, _reactRouterDom.Link),
-                                        to: "/signup",
-                                        children: "Signup"
-                                    }, void 0, false, {
-                                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                                        lineNumber: 19,
-                                        columnNumber: 33
-                                    }, undefined)
-                                ]
-                            }, void 0, true),
-                            user && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
-                                children: [
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
-                                        as: (0, _reactRouterDom.Link),
-                                        to: "/",
-                                        children: "Home"
-                                    }, void 0, false, {
-                                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                                        lineNumber: 26,
-                                        columnNumber: 33
-                                    }, undefined),
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
-                                        as: (0, _reactRouterDom.Link),
-                                        to: "/profile",
-                                        children: "Profile"
-                                    }, void 0, false, {
-                                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                                        lineNumber: 29,
-                                        columnNumber: 33
-                                    }, undefined),
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
-                                        onClick: onLoggedOut,
-                                        children: "Logout"
-                                    }, void 0, false, {
-                                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                                        lineNumber: 32,
-                                        columnNumber: 33
-                                    }, undefined)
-                                ]
-                            }, void 0, true)
-                        ]
-                    }, void 0, true, {
-                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                        lineNumber: 13,
-                        columnNumber: 21
+const MovieCard = ({ movie, onAddToFavorites, onMovieClick })=>{
+    const { _id, Title, Description, ImagePath } = movie;
+    const handleAddToFavoritesClick = ()=>{
+        if (typeof onAddToFavorites === "function") onAddToFavorites(_id);
+    };
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card), {
+        style: {
+            width: "18rem"
+        },
+        children: [
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Img, {
+                variant: "top",
+                src: ImagePath
+            }, void 0, false, {
+                fileName: "src/components/movie-card/movie-card.jsx",
+                lineNumber: 17,
+                columnNumber: 13
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Body, {
+                children: [
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Title, {
+                        children: Title
+                    }, void 0, false, {
+                        fileName: "src/components/movie-card/movie-card.jsx",
+                        lineNumber: 19,
+                        columnNumber: 17
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Text, {
+                        children: Description
+                    }, void 0, false, {
+                        fileName: "src/components/movie-card/movie-card.jsx",
+                        lineNumber: 20,
+                        columnNumber: 17
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
+                        variant: "primary",
+                        onClick: handleAddToFavoritesClick,
+                        children: "Add to Favorites"
+                    }, void 0, false, {
+                        fileName: "src/components/movie-card/movie-card.jsx",
+                        lineNumber: 21,
+                        columnNumber: 17
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Link), {
+                        to: `/movies/${_id}`,
+                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
+                            variant: "secondary",
+                            className: "mt-2",
+                            onClick: onMovieClick,
+                            children: "Open Movie"
+                        }, void 0, false, {
+                            fileName: "src/components/movie-card/movie-card.jsx",
+                            lineNumber: 25,
+                            columnNumber: 21
+                        }, undefined)
+                    }, void 0, false, {
+                        fileName: "src/components/movie-card/movie-card.jsx",
+                        lineNumber: 24,
+                        columnNumber: 17
                     }, undefined)
-                }, void 0, false, {
-                    fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                    lineNumber: 12,
-                    columnNumber: 17
-                }, undefined)
-            ]
-        }, void 0, true, {
-            fileName: "src/components/navigation-bar/navigation-bar.jsx",
-            lineNumber: 7,
-            columnNumber: 13
-        }, undefined)
-    }, void 0, false, {
-        fileName: "src/components/navigation-bar/navigation-bar.jsx",
-        lineNumber: 6,
+                ]
+            }, void 0, true, {
+                fileName: "src/components/movie-card/movie-card.jsx",
+                lineNumber: 18,
+                columnNumber: 13
+            }, undefined)
+        ]
+    }, void 0, true, {
+        fileName: "src/components/movie-card/movie-card.jsx",
+        lineNumber: 16,
         columnNumber: 9
     }, undefined);
 };
-_c = NavigationBar;
+_c = MovieCard;
+MovieCard.propTypes = {
+    movie: (0, _propTypesDefault.default).shape({
+        _id: (0, _propTypesDefault.default).string.isRequired,
+        Title: (0, _propTypesDefault.default).string.isRequired,
+        Description: (0, _propTypesDefault.default).string.isRequired,
+        ImagePath: (0, _propTypesDefault.default).string.isRequired
+    }).isRequired,
+    onAddToFavorites: (0, _propTypesDefault.default).func.isRequired,
+    onMovieClick: (0, _propTypesDefault.default).func.isRequired
+};
+exports.default = MovieCard;
 var _c;
-$RefreshReg$(_c, "NavigationBar");
+$RefreshReg$(_c, "MovieCard");
 
-  $parcel$ReactRefreshHelpers$abf5.postlude(module);
+  $parcel$ReactRefreshHelpers$67b2.postlude(module);
 } finally {
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react-bootstrap":"3AD9A","react-router-dom":"9xmpe","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"eBaMl":[function() {},{}],"i5LP7":[function() {},{}],"lJZlQ":[function() {},{}]},["gjUm6","1xC6H","d8Dch"], "d8Dch", "parcelRequireaec4")
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","prop-types":"7wKI2","react-bootstrap":"3AD9A","react-router-dom":"9xmpe","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"i5LP7":[function() {},{}],"lJZlQ":[function() {},{}]},["gjUm6","1xC6H","d8Dch"], "d8Dch", "parcelRequireaec4")
 
 //# sourceMappingURL=index.b4b6dfad.js.map
