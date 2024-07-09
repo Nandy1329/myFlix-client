@@ -4,7 +4,7 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 
 export const MovieView = ({ movie, onBackClick }) => {
-  // Check if movie is null or undefined
+  
   if (!movie) {
     return <div>Loading...</div>;
   }

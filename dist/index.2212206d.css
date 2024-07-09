@@ -1,3 +1,46 @@
+.movie-card .card-header {
+  background-color: #f7be16d9;
+  width: 100%;
+  position: absolute;
+}
+
+.card-img {
+  object-fit: cover;
+  width: auto;
+  height: 100%;
+}
+
+.card-title, .card-text {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-link-unstyled {
+  text-decoration: none;
+}
+
+.navbar {
+  background-color: #a5a4a4;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+a.logo, a.logo:visited {
+  color: #000;
+  font-weight: bold;
+}
+
+a.logo:hover, a.logo:active {
+  color: #1d2d37;
+}
+
+a.logout-link {
+  color: #000;
+}
+
 *, :after, :before {
   box-sizing: border-box;
 }
