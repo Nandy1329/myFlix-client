@@ -6,19 +6,11 @@ import { SignupView } from "../signup-view/signup-view";
 import { NavigationBar } from "../navigation-bar/navigation-bar";
 import { ProfileView } from "../profile-view/profile-view";
 import Spinner from "react-bootstrap/Spinner";
-
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import {
-    BrowserRouter,
-    Routes,
-    Route,
-    Navigate,
-    Container,
-    Form,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
-/** function creates main screen of app*/
+
 export const MainView = () => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     const storedToken = localStorage.getItem("token");
@@ -28,18 +20,16 @@ export const MainView = () => {
     const [loading, setLoading] = useState(false);
     const [filteredMovies, setFilteredMovies] = useState([]);
     const [userQuery, setUserQuery] = useState("");
-    const showSpinner = function () {
-        return (
-            <Col className="spinner-wrapper">
-                <Spinner animation="border" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </Spinner>
-            </Col>
-        );
-    };
 
-    // Logic to manage FavoriteMovies list (needed in both ProfileView and MovieCard)
-    const addMovie = function (movieId) {
+    const showSpinner = () => (
+        <Col className="spinner-wrapper">
+            <Spinner animation="border" role="status">
+                <span className="visually-hidden">Loading...</span>
+            </Spinner>
+        </Col>
+    );
+
+    const addMovie = (movieId) => {
         fetch(
             `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}/movies/${movieId}`,
             {
@@ -49,38 +39,28 @@ export const MainView = () => {
                 },
             }
         )
-            .then(function (response) {
+            .then((response) => {
                 if (response.status === 401) {
-                    throw new Error(
-                        "Sorry, you're not authorized to access this resource. "
-                    );
+                    throw new Error("Sorry, you're not authorized to access this resource.");
                 } else if (response.status === 409) {
                     throw new Error("You already added this movie to the list.");
                 } else if (response.ok) {
                     return response.json();
                 }
             })
-            .then(function (updatedUser) {
+            .then((updatedUser) => {
                 toast.success("Movie has been added to your Favorite Movies.");
                 setUser(updatedUser);
             })
-            .catch(function (error) {
-                if (error.message) {
-                    toast.error(error.message);
-                } else {
-                    toast.error(
-                        "An error occurred while trying to add movie. Please try again later."
-                    );
-                }
-                console.error("An error occurred:" + error);
+            .catch((error) => {
+                toast.error(error.message || "An error occurred while trying to add movie. Please try again later.");
+                console.error("An error occurred:", error);
             });
     };
-    // Removes movie from favorite list
-    const removeMovie = function (movieId) {
-        console.log(movieId);
+
+    const removeMovie = (movieId) => {
         fetch(
             `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}/movies/${movieId}`,
-
             {
                 method: "DELETE",
                 headers: {
@@ -88,32 +68,24 @@ export const MainView = () => {
                 },
             }
         )
-            .then(function (response) {
+            .then((response) => {
                 if (response.status === 401) {
-                    throw new Error(
-                        "Sorry, you're not authorized to access this resource. "
-                    );
+                    throw new Error("Sorry, you're not authorized to access this resource.");
                 } else if (response.ok) {
                     return response.json();
                 }
             })
-            .then(function (updatedUser) {
+            .then((updatedUser) => {
                 toast.success("Movie has been removed from your Favorite Movies.");
                 setUser(updatedUser);
             })
-            .catch(function (error) {
-                if (error.message) {
-                    toast.error(error.message);
-                } else {
-                    toast.error(
-                        "An error occurred while trying to delete. Please try again later."
-                    );
-                }
-                console.error("An error occurred:" + error);
+            .catch((error) => {
+                toast.error(error.message || "An error occurred while trying to delete. Please try again later.");
+                console.error("An error occurred:", error);
             });
     };
-    // To be run whenever user logs out (or is logged out)
-    const onLoggedOut = function () {
+
+    const onLoggedOut = () => {
         setUser(null);
         setToken(null);
         localStorage.clear();
@@ -129,9 +101,13 @@ export const MainView = () => {
             headers: { Authorization: `Bearer ${token}` },
         })
             .then((response) => response.json())
-
             .then((data) => {
                 setMovies(data);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error("An error occurred:", error);
+                setLoading(false);
             });
     }, [token]);
 
@@ -139,10 +115,9 @@ export const MainView = () => {
         setFilteredMovies(movies);
     }, [movies]);
 
-    // Handle changes in the search input field
     const handleSearchInput = (e) => {
         const searchWord = e.target.value.toLowerCase();
-        let tempArray = movies.filter((m) =>
+        const tempArray = movies.filter((m) =>
             m.Title.toLowerCase().includes(searchWord)
         );
         setFilteredMovies(tempArray);
@@ -152,11 +127,7 @@ export const MainView = () => {
         <BrowserRouter>
             <NavigationBar
                 user={user}
-                onLoggedOut={() => {
-                    setUser(null);
-                    setToken(null);
-                    localStorage.clear();
-                }}
+                onLoggedOut={onLoggedOut}
                 handleSearchInput={handleSearchInput}
             />
             <Row className="justify-content-md-center mt-5 main-body-container">
@@ -164,92 +135,83 @@ export const MainView = () => {
                     <Route
                         path="/signup"
                         element={
-                            <>
-                                {user ? (
-                                    <Navigate to="/" />
-                                ) : (
-                                    <Col md={5}>
-                                        <SignupView />
-                                    </Col>
-                                )}
-                            </>
+                            user ? (
+                                <Navigate to="/" />
+                            ) : (
+                                <Col md={5}>
+                                    <SignupView />
+                                </Col>
+                            )
                         }
                     />
                     <Route
                         path="/login"
                         element={
-                            <>
-                                {user ? (
-                                    <Navigate to="/" />
-                                ) : (
-                                    <Col md={5}>
-                                        <LoginView onLoggedIn={(user) => setUser(user)} />
-                                    </Col>
-                                )}
-                            </>
+                            user ? (
+                                <Navigate to="/" />
+                            ) : (
+                                <Col md={5}>
+                                    <LoginView onLoggedIn={(user) => setUser(user)} />
+                                </Col>
+                            )
                         }
                     />
                     <Route
                         path="/movies/:movieId"
                         element={
-                            <>
-                                {!user ? (
-                                    <Navigate to="/login" replace />
-                                ) : movies.length === 0 ? (
-                                    <>{showSpinner()}</>
-                                ) : (
-                                    <Col md={8}>
-                                        <MovieView
-                                            addMovie={addMovie}
-                                            movies={movies}
-                                            removeMovie={removeMovie}
-                                            username={user.Username}
-                                            FavoriteMovies={user.FavoriteMovies}
-                                        />
-                                    </Col>
-                                )}
-                            </>
+                            !user ? (
+                                <Navigate to="/login" replace />
+                            ) : movies.length === 0 ? (
+                                showSpinner()
+                            ) : (
+                                <Col md={8}>
+                                    <MovieView
+                                        addMovie={addMovie}
+                                        movies={movies}
+                                        removeMovie={removeMovie}
+                                        username={user.Username}
+                                        FavoriteMovies={user.FavoriteMovies}
+                                        onBackClick={() => window.history.back()}
+                                    />
+                                </Col>
+                            )
                         }
                     />
                     <Route
                         path="/profile"
                         element={
-                            <>
-                                {!user ? (
-                                    <Navigate to="/login" replace />
-                                ) : (
-                                    <Col>
-                                        <ProfileView
-                                            user={user}
-                                            movies={movies}
-                                            onLoggedOut={onLoggedOut}
-                                            removeMovie={removeMovie}
-                                            setUser={setUser}
-                                            token={token}
-                                        />
-                                    </Col>
-                                )}
-                            </>
+                            !user ? (
+                                <Navigate to="/login" replace />
+                            ) : (
+                                <Col>
+                                    <ProfileView
+                                        user={user}
+                                        movies={movies}
+                                        onLoggedOut={onLoggedOut}
+                                        removeMovie={removeMovie}
+                                        setUser={setUser}
+                                        token={token}
+                                    />
+                                </Col>
+                            )
                         }
                     />
                     <Route
                         path="/"
                         element={
-                            <>
-                                {!user ? (
-                                    <Navigate to="/login" replace />
-                                ) : movies.length === 0 ? (
-                                    <div>The list is empty!</div>
-                                ) : (
-                                    <>
-                                        {filteredMovies.map((movie) => (
-                                            <Col className="mb-5" key={movie.id} md={3}>
-                                                <MovieCard movie={movie} />
-                                            </Col>
-                                        ))}
-                                    </>
-                                )}
-                            </>
+                            !user ? (
+                                <Navigate to="/login" replace />
+                            ) : movies.length === 0 ? (
+                                <div>The list is empty!</div>
+                            ) : (
+                                <>
+                                    {filteredMovies.map((movie) => (
+                                        <Col className="mb-5" key={movie._id} md={3}>
+                                            <MovieCard movie={movie} />
+                                        </Col>
+                                    ))}
+                                </>
+                            )
                         }
                     />
                 </Routes>
