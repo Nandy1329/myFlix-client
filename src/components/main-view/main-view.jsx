@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { MovieCard } from "../movie-card/movie-card";
 import { MovieView } from "../movie-view/movie-view";
 import { LoginView } from "../login-view/login-view";
@@ -14,8 +14,8 @@ import { toast } from "react-toastify";
 export const MainView = () => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     const storedToken = localStorage.getItem("token");
-    const [user, setUser] = useState(storedUser ? storedUser : null);
-    const [token, setToken] = useState(storedToken ? storedToken : null);
+    const [user, setUser] = useState(storedUser || null);
+    const [token, setToken] = useState(storedToken || null);
     const [movies, setMovies] = useState([]);
     const [loading, setLoading] = useState(false);
     const [filteredMovies, setFilteredMovies] = useState([]);
@@ -166,8 +166,10 @@ export const MainView = () => {
                             ) : (
                                 <Col md={8}>
                                     <MovieView
+                                        movie={movies.find(
+                                            (m) => m._id === window.location.pathname.split("/")[2]
+                                        )}
                                         addMovie={addMovie}
-                                        movies={movies}
                                         removeMovie={removeMovie}
                                         username={user.Username}
                                         FavoriteMovies={user.FavoriteMovies}
@@ -219,3 +221,6 @@ export const MainView = () => {
         </BrowserRouter>
     );
 };
+
+export default MainView;
+
