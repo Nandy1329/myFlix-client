@@ -1,35 +1,51 @@
 import React from "react";
-import { Card, ListGroup } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { Row, Col, Figure, Button, Card } from "react-bootstrap";
 
-//Favorite movie logic
-export const FavoriteMovie = ({
-  movies,
-  user,
-  favoriteMoviesList,
-  removeMovie,
-}) => {
-  const favoriteMovies = movies.filter((m) =>
-    favoriteMoviesList.includes(m._id)
-  );
-
+function FavoriteMovies({ favoriteMovieList }) {
+  const removeFav = (id) => {
+    let token = localStorage.getItem("token");
+    let url = 'https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/' + localStorage.getItem('user') + '/movies/' + id;
+    axios.delete(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+  }
   return (
-    <ListGroup>
-      {favoriteMovies.map((m) => (
-        <ListGroup.Item
-          key={m._id}
-          className="d-flex justify-content-between align-items-center"
-        >
-          <div>
-            <img src={m.ImagePath} />
-          </div>
-          <div>
-            <button onClick={() => removeMovie(m._id)}>Remove</button>
-          </div>
-        </ListGroup.Item>
-      ))}
-      {favoriteMovies.length === 0 && (
-        <Card.Text>No favorite movies selected yet.</Card.Text>
-      )}
-    </ListGroup>
+    <Card>
+    <Card.Body>
+    <Row>
+        {favoriteMovieList.map((ImagePath, Title, _id) => {
+          return (
+            <Col xs={12} md={6} lg={3} key={_id}>
+              <Figure>
+                <Link to={`/movies/${movies._id}`}>
+                  <Figure.Image
+                    src={ImagePath}
+                    alt={Title}
+                  />
+
+                  <Figure.Caption>
+                    {Title}
+                  </Figure.Caption>
+                </Link>
+              </Figure>
+              <button variant="secondary" onClick={() => removeFav(_id)}>
+                Remove from Favorites
+              </button>
+            </Col>
+          );
+        }
+        )}
+      </Row>
+    </Card.Body>
+      <Row>
+        <Col xs={12}>
+          <h4>Favorite Movies</h4>
+        </Col>
+      </Row>
+    </Card>
   );
-};
+}
+
+
+

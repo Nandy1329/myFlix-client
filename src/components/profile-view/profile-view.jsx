@@ -1,56 +1,68 @@
-import React, { useState, useEffect } from "react";
-import { Container, Col, Row, Card } from "react-bootstrap";
-import { UpdateUser } from "./update-user";
-import { FavoriteMovie } from "./favorite-movies";
-import UserInfo from "./user-info";
+import React, { useState, useEffect } from 'react';
+import { Container, Col, Row, Card } from 'react-bootstrap';
+import axios from 'axios';
+import  UpdateUser  from './update-user';
+import  FavoriteMovies  from './favorite-movies';
+import UserInfo from './user-info';
+import './profile-view.scss';
 
-export const ProfileView = ({ user, movies, removeMovie }) => {
-  const [favoriteMovies, setFavoriteMovies] = useState(
-    user.FavoriteMovies || []
-  );
+const ProfileView = ({ user, setUser, movies, token }) => {
+  const [favoriteMovies, setFavoriteMovies] = useState([]);
 
   useEffect(() => {
-    localStorage.setItem(
-      "user",
-      JSON.stringify({ ...user, FavoriteMovies: favoriteMovies })
-    );
-  }, [favoriteMovies, user]);
+    if (!user || !movies.length) return;
+    setFavoriteMovies(movies.filter((movie) => user.FavoriteMovies.includes(movie._id)));
+  }, [user, movies]);
 
-  const handleFavoriteMovieChange = (newFavorites) => {
-    setFavoriteMovies(newFavorites);
+  const handleUpdate = (updatedUser) => {
+    setUser(updatedUser);
   };
 
-  movies = movies || [];
-  console.log("userPV: ", user);
+  const removeFav = (id) => {
+    const accessToken = localStorage.getItem('token');
+    const userId = user.Username;
+
+    axios.delete(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${userId}/movies/${id}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+      .then(response => {
+        setUser(response.data);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
+
   return (
     <Container>
-      <Row className="mb-4">
+      <Row>
+        <Col xs={12} md={6}>
+          <Card>
+            <Card.Body>
+              <UserInfo email={user.Email} name={user.Username} />
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col xs={12} md={8}>
+          <Card>
+            <Card.Body>
+              <UpdateUser user={user} setUser={handleUpdate} />
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+      <Row>
         <Col>
-          <Card>
-            <Card.Body>
-              <UserInfo username={user.Username} email={user.Email} />
-              <div className="align-center mt-auto"></div>
-            </Card.Body>
-          </Card>
-          <Card>
-            <Card.Body>
-              <UpdateUser user={user.Username} />
-              <div className="align-right mt-auto"></div>
-            </Card.Body>
-          </Card>
-          <Card>
-            <Card.Body>
-              <h3>Favorite Movies:</h3>
-              <FavoriteMovie
-                movies={movies}
-                user={user}
-                favoriteMoviesList={favoriteMovies}
-                removeMovie={removeMovie}
-              />
-            </Card.Body>
-          </Card>
+          <FavoriteMovie
+            movies={movies}
+            user={user}
+            favoriteMoviesList={user.FavoriteMovies}
+            removeMovie={removeFav}
+          />
         </Col>
       </Row>
     </Container>
   );
 };
+
+export default ProfileView;
