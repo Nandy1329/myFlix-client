@@ -1,61 +1,50 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
+import { useParams } from 'react-router';
+import { Link } from 'react-router-dom';
+import { Button, Col, Row } from 'react-bootstrap';
 
-export const MovieView = ({ movie, onBackClick, addMovie, removeMovie, username, FavoriteMovies }) => {
+export const MovieView = ({ movies }) => {
+    const { movieId } = useParams();
+    const movie = movies.find((movie) => movie._id === movieId);
+
     if (!movie) {
-        return <div>Loading...</div>;
+        return <div>Loading...</div>; // Handle case where movie with movieId is not found
     }
 
+    const { Title, Description, Genre, Director, Year, ImagePath } = movie;
+
     return (
-        <Row className="my-5 justify-content-center">
-            <Col md={5}>
-                <img src={movie.ImagePath} alt="movie cover" className="img-fluid" />
+        <Row className="my-5 justify-content-md-center">
+            <Col md={7} className="col-12">
+                <img src={ImagePath} alt="movie cover" className="mx-auto w-100" />
             </Col>
-            <Col md={3}>
+            <Col md={5} className="col-12">
                 <div className="my-1">
-                    <span className="h1">{movie.Title}</span>
+                    <span className="h1">{Title}</span>
                 </div>
                 <div className="my-1">
                     <span className="h6">Description: </span>
-                    <span>{movie.Description}</span>
+                    <span>{Description}</span>
                 </div>
                 <div className="my-1">
                     <span className="h6">Director: </span>
-                    <span>{movie.Director.Name}</span>
+                    {/* Check if Director exists before accessing Name */}
+                    <span>{Director ? Director.Name : 'N/A'}</span>
                 </div>
                 <div className="my-1">
                     <span className="h6">Genre: </span>
-                    <span>{movie.Genre.Name}</span>
+                    {/* Check if Genre exists before accessing Name */}
+                    <span>{Genre ? Genre.Name : 'N/A'}</span>
                 </div>
                 <div className="my-1">
                     <span className="h6">Year: </span>
-                    <span>{movie.Year}</span>
+                    <span>{Year}</span>
                 </div>
-                <Button onClick={onBackClick} variant="link">Back</Button>
+                <Button className="my-2 me-2">Add to Favorite</Button>
+                <Link to={`/`}>
+                    <Button className="my-2">Back</Button>
+                </Link>
             </Col>
         </Row>
     );
-};
-
-MovieView.propTypes = {
-    movie: PropTypes.shape({
-        Title: PropTypes.string.isRequired,
-        ImagePath: PropTypes.string.isRequired,
-        Description: PropTypes.string.isRequired,
-        Director: PropTypes.shape({
-            Name: PropTypes.string.isRequired
-        }).isRequired,
-        Genre: PropTypes.shape({
-            Name: PropTypes.string.isRequired
-        }).isRequired,
-        Year: PropTypes.string.isRequired
-    }).isRequired,
-    onBackClick: PropTypes.func.isRequired,
-    addMovie: PropTypes.func.isRequired,
-    removeMovie: PropTypes.func.isRequired,
-    username: PropTypes.string.isRequired,
-    FavoriteMovies: PropTypes.arrayOf(PropTypes.string).isRequired
 };

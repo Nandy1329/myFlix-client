@@ -1,37 +1,23 @@
-import react from "react";
-import { Container, Col, Row, Card } from "react-bootstrap";
-import Button from "react-bootstrap/Button";
+import React from "react";
+import PropTypes from "prop-types";
 
-function UserInfo({ username, email }) {
+export const UserInfo = ({ email, name, birthday }) => {
   return (
-    <Container>
-      <Row className="mb-4">
-        <Col>
-          <Card>
-            <Card.Body>
-              <div>
-                <h4>Your Information</h4>
-                <p>
-                  Name: <span className="fw-bolder"> {username}</span>
-                </p>
-                <p>
-                  Email: <span className="fw-bolder">{email}</span>
-                </p>
-                <Button
-                  onClick={() => handleDeregister(user._id)}
-                  className="button-delete mt-3"
-                  type="submit"
-                  variant="danger"
-                >
-                  Delete Account
-                </Button>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+    <div className="user-info card">
+      <div className="card-body">
+        <h3 className="card-title">User Information</h3>
+        <ul className="list-group list-group-flush">
+          <li className="list-group-item">Username:{name}</li>
+          <li className="list-group-item">Email:{email}</li>
+          <li className="list-group-item">Birthday:{birthday}</li>
+        </ul>
+      </div>
+    </div>
   );
-}
+};
 
-export default UserInfo;
+UserInfo.propTypes = {
+  email: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  birthday: PropTypes.string.isRequired,
+};

@@ -1,44 +1,33 @@
-.movie-card .card-header {
-  background-color: #f7be16d9;
-  width: 100%;
-  position: absolute;
+.fav-movie {
+  margin-bottom: 15px;
 }
 
-.card-img {
-  object-fit: cover;
-  width: auto;
-  height: 100%;
-}
-
-.card-title, .card-text {
+.fav-movie figure {
   text-overflow: ellipsis;
   white-space: nowrap;
+  width: 100%;
+  margin: auto;
   position: relative;
   overflow: hidden;
 }
 
-.card-link-unstyled {
-  text-decoration: none;
+.fav-movie figure img {
+  height: 400px;
+  margin: auto;
+  display: block;
 }
 
-.navbar {
-  background-color: #a5a4a4;
-  width: 100%;
-  margin: 0;
-  padding: 0;
+.fav-movie figure figcaption {
+  text-align: center;
 }
 
-a.logo, a.logo:visited {
-  color: #000;
-  font-weight: bold;
+.fav-movie button.btn {
+  margin: auto;
+  display: block;
 }
 
-a.logo:hover, a.logo:active {
-  color: #1d2d37;
-}
-
-a.logout-link {
-  color: #000;
+.card {
+  margin-bottom: 15px;
 }
 
 *, :after, :before {
