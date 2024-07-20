@@ -16,6 +16,14 @@ export const FavoriteMovies = ({ movies, user }) => {
     user.FavoriteMovies.includes(movie.id)
   );
 
+function FavoriteMovies({ favoriteMovieList }) {
+  const removeFav = (id) => {
+    let token = localStorage.getItem("token");
+    let url = 'https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/' + localStorage.getItem('user') + '/movies/' + id;
+    axios.delete(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+  }
   return (
     <div>
       <h2>Favorite Movies</h2>
@@ -28,4 +36,7 @@ export const FavoriteMovies = ({ movies, user }) => {
       </Row>
     </div>
   );
-};
+}
+
+
+
