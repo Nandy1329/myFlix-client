@@ -37,6 +37,4 @@ function FavoriteMovies({ favoriteMovieList }) {
     </div>
   );
 }
-
-
-
+}

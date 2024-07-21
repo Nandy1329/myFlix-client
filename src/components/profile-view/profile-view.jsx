@@ -1,9 +1,10 @@
+// profile-view.jsx
 import React, { useState, useEffect } from 'react';
 import { Container, Col, Row, Card } from 'react-bootstrap';
 import axios from 'axios';
-import  UpdateUser  from './update-user';
-import  { FavoriteMovies } from './favorite-movies';
-import {UserInfo} from './user-info';
+import UpdateUser from './update-user';
+import { FavoriteMovies } from './favorite-movies';
+import { UserInfo } from './user-info';
 import './profile-view.scss';
 
 const ProfileView = ({ user, setUser, movies, token }) => {
@@ -39,25 +40,25 @@ const ProfileView = ({ user, setUser, movies, token }) => {
         <Col xs={12} md={6}>
           <Card>
             <Card.Body>
-              <UserInfo email={user.Email} name={user.Username} />
+              <UserInfo email={user.Email} name={user.Username} birthday={user.Birthday} />
             </Card.Body>
           </Card>
         </Col>
         <Col xs={12} md={8}>
           <Card>
             <Card.Body>
-              <UpdateUser user={user} setUser={handleUpdate} />
+              <UpdateUser user={user} handleUpdate={handleUpdate} />
             </Card.Body>
           </Card>
         </Col>
       </Row>
       <Row>
         <Col>
-        <FavoriteMovies
-  movies={movies}
-  user={user}
-  favoriteMoviesList={user.FavoriteMovies}
-/>
+          <FavoriteMovies
+            movies={movies}
+            user={user}
+            favoriteMoviesList={user.FavoriteMovies}
+          />
         </Col>
       </Row>
     </Container>
