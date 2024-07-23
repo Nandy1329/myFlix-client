@@ -1,20 +1,26 @@
-.card-shadow {
-    box-shadow: 5px 5px 15px 5px rgba(255, 165, 0, 0.4);
-}
-
-.card-img {
+.fav-movie{
+  margin-bottom: 15px;
+  figure {
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin: auto;
+    width: 100%;
+    img{
+      display:block;
+      height: 400px;
+      margin: auto;
+    }
+  }
+  figcaption {
+    text-align: center;
+  }
+  button.btn {
     display: block;
-    width: 150px; 
-    height: 400px; 
-    object-fit: fill;
+    margin: auto;
+  }
 }
-
-.fav-button {
-    cursor: pointer;
-    transition: 0.2s linear;
-    position: absolute;
-}
-
-.fav-button:hover {
-    transform: scale(1.2);
+.card {
+  margin-bottom: 15px;
 }

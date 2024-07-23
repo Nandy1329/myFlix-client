@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import "./user-deregister.scss";
 
@@ -11,15 +10,17 @@ export const DeleteUser = () => {
   const [storedToken, setStoredToken] = useState(
     localStorage.getItem("token") || ""
   );
+
   const handleDelete = async () => {
     if (!storedToken) {
       console.log("Token not found in local storage");
+      setMessage("Token not found.");
       return;
     }
 
     try {
       const response = await fetch(
-        `https://top-movies-flix-0061641eb1b3.herokuapp.com/User/${storedUser.Username}`,
+        `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${storedUser.Username}`, // Ensure this is the correct endpoint
         {
           method: "DELETE",
           headers: {
@@ -49,3 +50,5 @@ export const DeleteUser = () => {
     </div>
   );
 };
+
+export default DeleteUser;

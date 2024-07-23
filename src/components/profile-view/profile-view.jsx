@@ -1,102 +1,117 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { Row, Col, Button, Form } from 'react-bootstrap';
-import { MovieCard } from '../movie-card/movie-card';
+import React, { useState } from "react";
+import PropTypes from "prop-types";
+import { Col, Row, Card, Form, Button } from "react-bootstrap";
+import { UserInfo } from "./user-info";
+import { FavoriteMovies } from "./favorite-movies";
+import axios from "axios";
+import { toast } from "react-toastify";
 
-export const ProfileView = ({ movies, user, setUser, addFav, removeFav }) => {
-    const localUser = JSON.parse(localStorage.getItem("user")) || user;
-    const [username, setUsername] = useState(localUser.Username || "");
-    const [password, setPassword] = useState(localUser.Password || "");
-    const [email, setEmail] = useState(localUser.Email || "");
+const ProfileView = ({ user, movies, removeFav, setUser }) => {
+  const [username, setUsername] = useState(user.Username);
+  const [email, setEmail] = useState(user.Email);
+  const [birthday, setBirthday] = useState(user.Birthday);
+  const [password, setPassword] = useState("");
 
-    useEffect(() => {
-        // Update localUser state whenever localStorage changes (e.g., on login or update)
-        const updatedUser = JSON.parse(localStorage.getItem("user")) || user;
-        if (updatedUser) {
-            setUsername(updatedUser.Username || "");
-            setPassword(updatedUser.Password || "");
-            setEmail(updatedUser.Email || "");
+  const handleUpdate = (event) => {
+    event.preventDefault();
+
+    let token = localStorage.getItem("token");
+    const url = `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}`;
+
+    axios
+      .put(
+        url,
+        {
+          Username: username,
+          Password: password,
+          Email: email,
+          Birthday: birthday,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
-    }, [user]);
+      )
+      .then((response) => {
+        const updatedUser = response.data;
+        setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        toast.success("Profile updated successfully");
+      })
+      .catch((error) => {
+        console.error("Error updating profile:", error);
+        toast.error("Failed to update profile");
+      });
+  };
 
-    const handleUpdateProfile = (e) => {
-        e.preventDefault();
-        // Implement update logic here
-        // Example: Call an API to update user profile
-    };
+  return (
+    <Row>
+      <Col xs={12} md={6}>
+        <Card>
+          <Card.Body>
+            <UserInfo email={user.Email} name={user.Username} birthday={user.Birthday} />
+          </Card.Body>
+        </Card>
+      </Col>
+      <Col xs={12} md={6}>
+        <FavoriteMovies user={user} movies={movies} removeFav={removeFav} />
+      </Col>
+      <Col xs={12} md={6}>
+        <Card>
+          <Card.Body>
+            <h3>Update Profile</h3>
+            <Form onSubmit={handleUpdate}>
+              <Form.Group controlId="formUsername">
+                <Form.Label>Username</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </Form.Group>
 
-    const fav = movies.filter((movie) => localUser.FavoriteMovies && localUser.FavoriteMovies.includes(movie._id));
+              <Form.Group controlId="formEmail">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </Form.Group>
 
-    return (
-        <div>
-            <h1>Profile</h1>
-            <Row>
-                <Col>
-                    <Form onSubmit={handleUpdateProfile}>
-                        <Form.Group controlId="formUsername">
-                            <Form.Label>Username</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formPassword">
-                            <Form.Label>Password</Form.Label>
-                            <Form.Control
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formEmail">
-                            <Form.Label>Email</Form.Label>
-                            <Form.Control
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </Form.Group>
-                        <Button variant="primary" type="submit">
-                            Update
-                        </Button>
-                    </Form>
-                </Col>
-            </Row>
-            <h2>Favorite Movies</h2>
-            <Row>
-                {fav.map((movie) => (
-                    <Col key={movie._id} md={3}>
-                        <MovieCard 
-                            movie={movie} 
-                            onAddToFavorites={addFav} 
-                            onMovieClick={() => console.log(`Open movie ${movie._id}`)}
-                        />
-                    </Col>
-                ))}
-            </Row>
-        </div>
-    );
+              <Form.Group controlId="formBirthday">
+                <Form.Label>Birthday</Form.Label>
+                <Form.Control
+                  type="date"
+                  value={birthday}
+                  onChange={(e) => setBirthday(e.target.value)}
+                />
+              </Form.Group>
+
+              <Form.Group controlId="formPassword">
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </Form.Group>
+
+              <Button variant="primary" type="submit">
+                Update Profile
+              </Button>
+            </Form>
+          </Card.Body>
+        </Card>
+      </Col>
+    </Row>
+  );
 };
 
 ProfileView.propTypes = {
-    movies: PropTypes.arrayOf(
-        PropTypes.shape({
-            _id: PropTypes.string.isRequired,
-            Title: PropTypes.string.isRequired,
-            Description: PropTypes.string.isRequired,
-            ImagePath: PropTypes.string.isRequired,
-        })
-    ).isRequired,
-    user: PropTypes.shape({
-        Username: PropTypes.string,
-        Password: PropTypes.string,
-        Email: PropTypes.string,
-        FavoriteMovies: PropTypes.arrayOf(PropTypes.string),
-    }).isRequired,
-    setUser: PropTypes.func.isRequired,
-    addFav: PropTypes.func.isRequired,
-    removeFav: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
+  movies: PropTypes.array.isRequired,
+  removeFav: PropTypes.func.isRequired,
+  setUser: PropTypes.func.isRequired,
 };
 
 export default ProfileView;

@@ -1,45 +1,50 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Button, Card, Image } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
-export const MovieCard = ({ movie, onAddToFavorites, onMovieClick }) => {
-    const { _id, Title, Description, ImagePath } = movie;
+export const MovieCard = ({ movie, onAddToFavorites, onRemoveFromFavorites, isFavorite }) => {
+  const navigate = useNavigate();
 
-    const handleAddToFavoritesClick = () => {
-        if (typeof onAddToFavorites === 'function') {
-            onAddToFavorites(_id);
-        }
-    };
-
-    return (
-        <Card style={{ width: '18rem' }}>
-            <Card.Img variant="top" src={ImagePath} />
-            <Card.Body>
-                <Card.Title>{Title}</Card.Title>
-                <Card.Text>{Description}</Card.Text>
-                <Button variant="primary" onClick={handleAddToFavoritesClick}>
-                    Add to Favorites
-                </Button>
-                <Link to={`/movies/${_id}`}>
-                    <Button variant="secondary" className="mt-2" onClick={onMovieClick}>
-                        Open Movie
-                    </Button>
-                </Link>
-            </Card.Body>
-        </Card>
-    );
+  return (
+    <Card className="movie-card">
+      <Image src={movie.ImagePath} alt={movie.Title} fluid />
+      <Card.Body>
+        <Card.Title>{movie.Title}</Card.Title>
+        <Card.Text>{movie.Description}</Card.Text>
+        <Card.Text><strong>Genre:</strong> {movie.Genre?.Name}</Card.Text>
+        <Card.Text><strong>Director:</strong> {movie.Director?.Name}</Card.Text>
+        <Button variant="info" onClick={() => navigate(`/movies/${movie._id}`)}>
+          View Movie
+        </Button>
+        {isFavorite ? (
+          <Button variant="danger" onClick={() => onRemoveFromFavorites(movie._id)}>
+            Remove from Favorites
+          </Button>
+        ) : (
+          <Button variant="primary" onClick={() => onAddToFavorites(movie._id)}>
+            Add to Favorites
+          </Button>
+        )}
+      </Card.Body>
+    </Card>
+  );
 };
 
 MovieCard.propTypes = {
-    movie: PropTypes.shape({
-        _id: PropTypes.string.isRequired,
-        Title: PropTypes.string.isRequired,
-        Description: PropTypes.string.isRequired,
-        ImagePath: PropTypes.string.isRequired,
-    }).isRequired,
-    onAddToFavorites: PropTypes.func.isRequired,
-    onMovieClick: PropTypes.func.isRequired,
+  movie: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    Title: PropTypes.string.isRequired,
+    Description: PropTypes.string.isRequired,
+    ImagePath: PropTypes.string.isRequired,
+    Genre: PropTypes.shape({
+      Name: PropTypes.string
+    }),
+    Director: PropTypes.shape({
+      Name: PropTypes.string
+    }),
+  }).isRequired,
+  onAddToFavorites: PropTypes.func.isRequired,
+  onRemoveFromFavorites: PropTypes.func.isRequired,
+  isFavorite: PropTypes.bool.isRequired,
 };
-
-export default MovieCard;
