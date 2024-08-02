@@ -115,8 +115,8 @@
   max-height: var(--toastify-toast-max-height);
   font-family: var(--toastify-font-family);
   cursor: default;
-  direction: ltr;
   z-index: 0;
+  direction: ltr;
   justify-content: space-between;
   margin-bottom: 1rem;
   padding: 8px;
@@ -935,8 +935,6 @@
 }
 
 [data-bs-theme="dark"] {
-  --lightningcss-light: ;
-  --lightningcss-dark: initial;
   color-scheme: dark;
   --bs-body-color: #dee2e6;
   --bs-body-color-rgb: 222, 226, 230;

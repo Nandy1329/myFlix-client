@@ -1,18 +1,45 @@
-// update-user.jsx
-import React, { useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
-import PropTypes from 'prop-types';
+// src/components/update-user/update-user.jsx
+import React, { useState, useEffect } from "react";
+import { Form, Button } from "react-bootstrap";
+import PropTypes from "prop-types";
 
 const UpdateUser = ({ user, handleUpdate }) => {
-  const [username, setUsername] = useState(user.Username);
-  const [email, setEmail] = useState(user.Email);
-  const [birthday, setBirthday] = useState(user.Birthday);
+  const [username, setUsername] = useState(user.Username || "");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(user.Email || "");
+  const [birthday, setBirthday] = useState(user.Birthday ? user.Birthday.split('T')[0] : "");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const updatedUser = { ...user, Username: username, Email: email, Birthday: birthday };
-    handleUpdate(updatedUser);
-  };
+  useEffect(() => {
+    setUsername(user.Username || "");
+    setEmail(user.Email || "");
+    setBirthday(user.Birthday ? user.Birthday.split('T')[0] : "");
+  }, [user]);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const userData = {
+        username: username,
+        email: email,
+        password: password,
+        birthday: birthday
+    };
+
+    console.log('User data being sent:', userData); // Log the payload
+
+    try {
+        const response = await axios.put(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.username}`, userData, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (response.status === 200) {
+            toast.success("Profile updated successfully!");
+            setUser(response.data);
+        }
+    } catch (error) {
+        console.error("Error updating profile:", error);
+        toast.error("Failed to update profile. Please check your input.");
+    }
+};
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -23,7 +50,15 @@ const UpdateUser = ({ user, handleUpdate }) => {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
-          placeholder="Enter Username"
+        />
+      </Form.Group>
+      <Form.Group controlId="formPassword">
+        <Form.Label>Password</Form.Label>
+        <Form.Control
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
         />
       </Form.Group>
       <Form.Group controlId="formEmail">
@@ -33,7 +68,6 @@ const UpdateUser = ({ user, handleUpdate }) => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          placeholder="Enter Email"
         />
       </Form.Group>
       <Form.Group controlId="formBirthday">
@@ -42,7 +76,6 @@ const UpdateUser = ({ user, handleUpdate }) => {
           type="date"
           value={birthday}
           onChange={(e) => setBirthday(e.target.value)}
-          required
         />
       </Form.Group>
       <Button variant="primary" type="submit">
@@ -56,9 +89,9 @@ UpdateUser.propTypes = {
   user: PropTypes.shape({
     Username: PropTypes.string.isRequired,
     Email: PropTypes.string.isRequired,
-    Birthday: PropTypes.string.isRequired
+    Birthday: PropTypes.string,
   }).isRequired,
-  handleUpdate: PropTypes.func.isRequired
+  handleUpdate: PropTypes.func.isRequired,
 };
 
 export default UpdateUser;

@@ -1,9 +1,14 @@
 import React from "react";
+import PropTypes from "prop-types";
 import axios from "axios";
 import { Row, Col } from "react-bootstrap";
-import { MovieCard } from "../movie-card/movie-card";
+import MovieCard from "../movie-card/movie-card";
 
 export const FavoriteMovies = ({ movies, user, removeFav }) => {
+  // Log the state of movies and user for debugging
+  console.log('Movies:', movies);
+  console.log('User:', user);
+
   if (!movies || !user || !user.FavoriteMovies) {
     return <div>No favorite movies available</div>;
   }
@@ -37,10 +42,20 @@ export const FavoriteMovies = ({ movies, user, removeFav }) => {
       <Row>
         {favoriteMovies.map((movie) => (
           <Col key={movie._id} xs={12} sm={6} md={4} lg={3}>
-            <MovieCard movie={movie} removeFav={() => removeFavHandler(movie._id)} />
+            <MovieCard
+              movie={movie}
+              onRemoveFromFavorites={() => removeFavHandler(movie._id)}
+              isFavorite={true}
+            />
           </Col>
         ))}
       </Row>
     </div>
   );
+};
+
+FavoriteMovies.propTypes = {
+  movies: PropTypes.array.isRequired,
+  user: PropTypes.object.isRequired,
+  removeFav: PropTypes.func.isRequired,
 };

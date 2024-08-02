@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Col, Row, Card, Form, Button } from "react-bootstrap";
+import { Col, Row, Card } from "react-bootstrap";
 import { UserInfo } from "./user-info";
 import { FavoriteMovies } from "./favorite-movies";
 import axios from "axios";
 import { toast } from "react-toastify";
+import UpdateUser from "./update-user"; // Import the UpdateUser component
 
 const ProfileView = ({ user, movies, removeFav, setUser }) => {
   const [username, setUsername] = useState(user.Username);
@@ -12,9 +13,7 @@ const ProfileView = ({ user, movies, removeFav, setUser }) => {
   const [birthday, setBirthday] = useState(user.Birthday);
   const [password, setPassword] = useState("");
 
-  const handleUpdate = (event) => {
-    event.preventDefault();
-
+  const handleUpdate = async (updatedUser) => {
     let token = localStorage.getItem("token");
     const url = `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}`;
 
@@ -22,10 +21,10 @@ const ProfileView = ({ user, movies, removeFav, setUser }) => {
       .put(
         url,
         {
-          Username: username,
+          Username: updatedUser.Username,
           Password: password,
-          Email: email,
-          Birthday: birthday,
+          Email: updatedUser.Email,
+          Birthday: updatedUser.Birthday,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -59,47 +58,7 @@ const ProfileView = ({ user, movies, removeFav, setUser }) => {
         <Card>
           <Card.Body>
             <h3>Update Profile</h3>
-            <Form onSubmit={handleUpdate}>
-              <Form.Group controlId="formUsername">
-                <Form.Label>Username</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formEmail">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formBirthday">
-                <Form.Label>Birthday</Form.Label>
-                <Form.Control
-                  type="date"
-                  value={birthday}
-                  onChange={(e) => setBirthday(e.target.value)}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formPassword">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </Form.Group>
-
-              <Button variant="primary" type="submit">
-                Update Profile
-              </Button>
-            </Form>
+            <UpdateUser user={user} handleUpdate={handleUpdate} /> {/* Use UpdateUser component */}
           </Card.Body>
         </Card>
       </Col>

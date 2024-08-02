@@ -1,5 +1,6 @@
-.fav-movie{
+.fav-movie {
   margin-bottom: 15px;
+
   figure {
     position: relative;
     overflow: hidden;
@@ -7,20 +8,84 @@
     white-space: nowrap;
     margin: auto;
     width: 100%;
-    img{
-      display:block;
-      height: 400px;
-      margin: auto;
+
+    img {
+      display: block;
+      height: auto;
+      max-height: 400px;
+      width: 100%;
+      object-fit: cover;
     }
   }
+
   figcaption {
     text-align: center;
   }
+
   button.btn {
     display: block;
     margin: auto;
   }
 }
-.card {
-  margin-bottom: 15px;
+
+.movie-card {
+  max-width: 300px;
+  margin: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .movie-card-img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .movie-card-body {
+    text-align: center;
+  }
+
+  .movie-card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .movie-card-text {
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .movie-card {
+    max-width: 100%;
+    margin: 5px;
+  }
+
+  .fav-movie figure img {
+    height: auto;
+    max-height: 300px;
+    width: 100%;
+    object-fit: cover;
+  }
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+}
+
+.data-mismatch {
+  color: red;
+  font-weight: bold;
 }
