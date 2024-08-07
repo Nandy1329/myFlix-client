@@ -1,60 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Button, Image } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+// src/components/movie-card/movie-card.jsx
+import React from "react";
+import PropTypes from "prop-types";
+import { Card, Button } from "react-bootstrap";
 
-const MovieCard = ({ movie, isFavorite, onAddToFavorites, onRemoveFromFavorites }) => {
-  const [apiMovie, setApiMovie] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchMovieData = async () => {
-      try {
-        const response = await axios.get(`/api/movies/${movie._id}`);
-        setApiMovie(response.data);
-      } catch (error) {
-        console.error('Error fetching movie data:', error);
-      }
-    };
-
-    fetchMovieData();
-  }, [movie._id]);
-
-  if (!apiMovie) {
-    return <div>Loading...</div>;
-  }
-
-  const isDataMatching = (
-    movie.Title === apiMovie.Title &&
-    movie.Description === apiMovie.Description &&
-    movie.Genre?.Name === apiMovie.Genre?.Name &&
-    movie.Director?.Name === apiMovie.Director?.Name
-  );
-
+const MovieCard = ({ movie, onAddToFavorites, onRemoveFromFavorites, isFavorite, onMovieClick }) => {
   return (
-    <Card className="movie-card">
-      <Image src={movie.ImagePath} alt={movie.Title} fluid />
+    <Card className="mb-4">
+      <Card.Img variant="top" src={movie.ImagePath} alt={`${movie.Title} image`} />
       <Card.Body>
         <Card.Title>{movie.Title}</Card.Title>
-        <Card.Text>{movie.Description}</Card.Text>
-        <Card.Text><strong>Genre:</strong> {movie.Genre?.Name}</Card.Text>
-        <Card.Text><strong>Director:</strong> {movie.Director?.Name}</Card.Text>
-        <Button variant="info" onClick={() => navigate(`/movies/${movie._id}`)}>
-          View Movie
+        <Button variant="primary" onClick={onMovieClick}>View Movie</Button>
+        <Button variant="secondary" onClick={isFavorite ? onRemoveFromFavorites : onAddToFavorites}>
+          {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
         </Button>
-        {isFavorite ? (
-          <Button variant="danger" onClick={() => onRemoveFromFavorites(movie._id)}>
-            Remove from Favorites
-          </Button>
-        ) : (
-          <Button variant="primary" onClick={() => onAddToFavorites(movie._id)}>
-            Add to Favorites
-          </Button>
-        )}
-        {!isDataMatching && <div>Data mismatch detected!</div>}
       </Card.Body>
     </Card>
   );
+};
+
+MovieCard.propTypes = {
+  movie: PropTypes.shape({
+    Title: PropTypes.string.isRequired,
+    ImagePath: PropTypes.string.isRequired,
+  }).isRequired,
+  onAddToFavorites: PropTypes.func.isRequired,
+  onRemoveFromFavorites: PropTypes.func.isRequired,
+  isFavorite: PropTypes.bool.isRequired,
+  onMovieClick: PropTypes.func.isRequired,
 };
 
 export default MovieCard;

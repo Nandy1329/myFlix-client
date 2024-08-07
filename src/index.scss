@@ -4,4 +4,5 @@ $body-bg: #f8f9fa;
 
 
 
-@import '~bootstrap/scss/bootstrap.scss';
+$deprecation-warnings: false;
+@import "~bootstrap/scss/bootstrap";

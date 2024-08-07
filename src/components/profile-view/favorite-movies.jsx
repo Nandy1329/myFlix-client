@@ -1,20 +1,13 @@
+// src/components/favorite-movies/favorite-movies.jsx
 import React from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, Card, Button } from "react-bootstrap";
 import MovieCard from "../movie-card/movie-card";
 
 export const FavoriteMovies = ({ movies, user, removeFav }) => {
-  // Log the state of movies and user for debugging
-  console.log('Movies:', movies);
-  console.log('User:', user);
-
   if (!movies || !user || !user.FavoriteMovies) {
     return <div>No favorite movies available</div>;
-  }
-
-  if (!Array.isArray(movies)) {
-    return <div>Invalid movies data</div>;
   }
 
   let favoriteMovies = movies.filter((movie) =>

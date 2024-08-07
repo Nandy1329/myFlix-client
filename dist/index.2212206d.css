@@ -1,3 +1,28 @@
+.back-button {
+  color: #f5f5f5;
+  cursor: pointer;
+  text-align: center;
+  background-color: #1e90ff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 12px;
+}
+
+.movie-view-card {
+  max-width: 800px;
+  margin: auto;
+  overflow: hidden;
+}
+
+.movie-view-img {
+  object-fit: cover;
+  box-sizing: border-box;
+  width: 100%;
+  height: auto;
+  max-height: 500px;
+  padding: 10px;
+}
+
 :root {
   --toastify-color-light: #fff;
   --toastify-color-dark: #121212;

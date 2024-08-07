@@ -1,11 +1,10 @@
-// src/components/main-view/main-view.jsx
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import { Row, Col, Spinner, Form } from "react-bootstrap";
 import { NavigationBar } from "../navigation-bar/navigation-bar";
-import  MovieCard  from "../movie-card/movie-card";
-import { MovieView } from "../movie-view/movie-view";
+import MovieCard from "../movie-card/movie-card";
+import MovieView from "../movie-view/movie-view";
 import { LoginView } from "../login-view/login-view";
 import { SignupView } from "../signup-view/signup-view";
 import ProfileView from "../profile-view/profile-view";
@@ -29,76 +28,83 @@ export const MainView = () => {
     const [search, setSearch] = useState("");
     const [selectedGenre, setSelectedGenre] = useState("");
     const [loading, setLoading] = useState(true);
-    
+
     const navigate = useNavigate();
-    
+
     useEffect(() => {
+        if (!token) {
+            console.error("Token is missing");
+            return;
+        }
+
         const fetchMovies = async () => {
             try {
-                console.log('Token used for fetch:', token); // Log token value
+                console.log('Token used for fetch:', token);
+
                 const response = await fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
-    
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-    
+
                 const data = await response.json();
-    
+
                 if (!Array.isArray(data)) {
                     throw new Error("Expected an array of movies");
                 }
-    
+
                 const fetchDirectorDetails = async (directorId) => {
                     const directorResponse = await fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/directors/${directorId}`, {
                         headers: {
                             'Authorization': `Bearer ${token}`,
                         },
                     });
-    
+
                     if (!directorResponse.ok) {
                         throw new Error(`HTTP error! status: ${directorResponse.status}`);
                     }
-    
+
                     return await directorResponse.json();
                 };
-    
-                const moviesFromApi = await Promise.all(data.map(async ({ _id, Title, ImagePath, Description, Year, Genre, Director }) => {
+
+                const moviesFromApi = await Promise.all(data.map(async (movie) => {
                     let directorDetails = { Name: "Unknown" };
-                    if (Director && typeof Director === 'string') {
-                        directorDetails = await fetchDirectorDetails(Director);
+                    if (movie.Director && typeof movie.Director === 'string') {
+                        directorDetails = await fetchDirectorDetails(movie.Director);
+                    } else if (movie.Director && typeof movie.Director === 'object') {
+                        directorDetails = movie.Director;
                     }
-    
+
                     return {
-                        _id,
-                        Title,
-                        ImagePath,
-                        Description,
-                        Year,
-                        Genre: {
-                            Name: Genre?.Name,
-                        },
+                        ...movie,
                         Director: {
                             Name: directorDetails.Name,
                         },
                     };
                 }));
-    
+
                 setMovies(moviesFromApi);
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching movies:', error.message);
                 toast.error('Failed to fetch movies');
+                setLoading(false);
             }
         };
-    
+
         fetchMovies();
     }, [token]);
 
     const addFav = (id) => {
+        if (!token) {
+            console.error("Token is missing");
+            return;
+        }
+
         fetch(
             `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}/Movies/${id}`,
             {
@@ -109,11 +115,10 @@ export const MainView = () => {
             }
         )
             .then((response) => {
-                if (response.ok) {
-                    return response.json();
-                } else {
+                if (!response.ok) {
                     throw new Error("Failed to add movie to favorites");
                 }
+                return response.json();
             })
             .then((user) => {
                 if (user) {
@@ -129,6 +134,11 @@ export const MainView = () => {
     };
 
     const removeFav = (id) => {
+        if (!token) {
+            console.error("Token is missing");
+            return;
+        }
+
         fetch(
             `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}/Movies/${id}`,
             {
@@ -139,11 +149,10 @@ export const MainView = () => {
             }
         )
             .then((response) => {
-                if (response.ok) {
-                    return response.json();
-                } else {
+                if (!response.ok) {
                     throw new Error("Failed to remove movie from favorites");
                 }
+                return response.json();
             })
             .then((user) => {
                 if (user) {
@@ -159,7 +168,11 @@ export const MainView = () => {
     };
 
     if (loading) {
-        return <Spinner animation="border" role="status"><span className="visually-hidden">Loading...</span></Spinner>;
+        return (
+            <Spinner animation="border" role="status">
+                <span className="visually-hidden">Loading...</span>
+            </Spinner>
+        );
     }
 
     return (
@@ -266,8 +279,7 @@ export const MainView = () => {
                                                         movie.Title.toLowerCase().includes(
                                                             search.toLowerCase()
                                                         )) &&
-                                                    (!selectedGenre ||
-                                                        movie.Genre.Name === selectedGenre)
+                                                    (!selectedGenre || movie.Genre.Name === selectedGenre)
                                             )
                                             .map((movie) => (
                                                 <Col
@@ -317,3 +329,4 @@ export const MainView = () => {
         </div>
     );
 };
+
