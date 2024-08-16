@@ -39,8 +39,6 @@ export const MainView = () => {
 
         const fetchMovies = async () => {
             try {
-                console.log('Token used for fetch:', token);
-
                 const response = await fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -167,6 +165,15 @@ export const MainView = () => {
             });
     };
 
+    const handleLogout = () => {
+        setUser(null);
+        setToken(null);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        toast.info("Logged out");
+        navigate("/login");
+    };
+
     if (loading) {
         return (
             <Spinner animation="border" role="status">
@@ -179,12 +186,7 @@ export const MainView = () => {
         <div className="main-view">
             <NavigationBar
                 user={user}
-                onLoggedOut={() => {
-                    setUser(null);
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("user");
-                    toast.info("Logged out");
-                }}
+                onLoggedOut={handleLogout}
             />
             <Row className="justify-content-center my-5">
                 <Routes>
@@ -209,6 +211,8 @@ export const MainView = () => {
                                 <Col md={5}>
                                     <LoginView
                                         onLoggedIn={(user, token) => {
+                                            localStorage.setItem("token", token);
+                                            localStorage.setItem("user", JSON.stringify(user));
                                             setUser(user);
                                             setToken(token);
                                             toast.success("Logged in successfully");
@@ -329,4 +333,3 @@ export const MainView = () => {
         </div>
     );
 };
-
