@@ -9,7 +9,6 @@ import { LoginView } from "../login-view/login-view";
 import { SignupView } from "../signup-view/signup-view";
 import ProfileView from "../profile-view/profile-view";
 import "react-toastify/dist/ReactToastify.css";
-import "./main-view.scss";
 
 export const MainView = () => {
     const storedUser = localStorage.getItem("user");
