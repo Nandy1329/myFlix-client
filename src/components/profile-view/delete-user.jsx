@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
-import "./user-deregister.scss";
 
 export const DeleteUser = () => {
   const [message, setMessage] = useState("");

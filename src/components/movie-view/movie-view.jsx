@@ -3,7 +3,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Card, Button } from "react-bootstrap";
 import { useParams } from "react-router-dom";
-import './movie-view.scss'; // Import your SCSS file with styles
+
 
 const MovieView = ({ movies, onAddToFavorites, onRemoveFromFavorites, isFavorite }) => {
     const { movieId } = useParams();
