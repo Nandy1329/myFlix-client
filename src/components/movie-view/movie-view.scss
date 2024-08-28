@@ -21,7 +21,7 @@
     width: 100%;
     height: auto;
     max-height: 500px; /* Set a max-height to ensure the image doesn’t get too large */
-    object-fit: contain; /* Maintain aspect ratio */
+    object-fit: cover; /* Use cover if you want to fill the container */
     padding: 10px; /* Add padding for better spacing */
     box-sizing: border-box; /* Include padding in the width and height */
 }

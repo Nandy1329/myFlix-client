@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import { Row, Col, Spinner, Form } from "react-bootstrap";
 import { NavigationBar } from "../navigation-bar/navigation-bar";
@@ -9,9 +9,10 @@ import { LoginView } from "../login-view/login-view";
 import { SignupView } from "../signup-view/signup-view";
 import ProfileView from "../profile-view/profile-view";
 import "react-toastify/dist/ReactToastify.css";
-import "./main-view.scss";
 
 export const MainView = () => {
+    const navigate = useNavigate(); // Call useNavigate at the top level of your component
+
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
 
@@ -23,13 +24,11 @@ export const MainView = () => {
     }
 
     const [user, setUser] = useState(parsedUser);
-    const [token, setToken] = useState(storedToken ? storedToken : null);
+    const [token, setToken] = useState(storedToken || null);
     const [movies, setMovies] = useState([]);
     const [search, setSearch] = useState("");
     const [selectedGenre, setSelectedGenre] = useState("");
     const [loading, setLoading] = useState(true);
-
-    const navigate = useNavigate();
 
     useEffect(() => {
         if (!token) {
@@ -39,8 +38,6 @@ export const MainView = () => {
 
         const fetchMovies = async () => {
             try {
-                console.log('Token used for fetch:', token);
-
                 const response = await fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -88,10 +85,10 @@ export const MainView = () => {
                 }));
 
                 setMovies(moviesFromApi);
-                setLoading(false);
             } catch (error) {
                 console.error('Error fetching movies:', error.message);
                 toast.error('Failed to fetch movies');
+            } finally {
                 setLoading(false);
             }
         };
@@ -167,6 +164,15 @@ export const MainView = () => {
             });
     };
 
+    const handleLogout = () => {
+        setUser(null);
+        setToken(null);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        toast.info("Logged out");
+        navigate("/login"); // Use navigate here
+    };
+
     if (loading) {
         return (
             <Spinner animation="border" role="status">
@@ -179,12 +185,7 @@ export const MainView = () => {
         <div className="main-view">
             <NavigationBar
                 user={user}
-                onLoggedOut={() => {
-                    setUser(null);
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("user");
-                    toast.info("Logged out");
-                }}
+                onLoggedOut={handleLogout}
             />
             <Row className="justify-content-center my-5">
                 <Routes>
@@ -209,6 +210,8 @@ export const MainView = () => {
                                 <Col md={5}>
                                     <LoginView
                                         onLoggedIn={(user, token) => {
+                                            localStorage.setItem("token", token);
+                                            localStorage.setItem("user", JSON.stringify(user));
                                             setUser(user);
                                             setToken(token);
                                             toast.success("Logged in successfully");
@@ -292,14 +295,9 @@ export const MainView = () => {
                                                 >
                                                     <MovieCard
                                                         movie={movie}
-                                                        onAddToFavorites={() => addFav(movie._id)}
-                                                        onRemoveFromFavorites={() => removeFav(movie._id)}
-                                                        isFavorite={
-                                                            user && user.FavoriteMovies
-                                                                ? user.FavoriteMovies.includes(movie._id)
-                                                                : false
-                                                        }
-                                                        onMovieClick={() => navigate(`/movies/${movie._id}`)}
+                                                        addFav={addFav}
+                                                        removeFav={removeFav}
+                                                        user={user}
                                                     />
                                                 </Col>
                                             ))}
@@ -314,19 +312,15 @@ export const MainView = () => {
                             !user ? (
                                 <Navigate to="/login" replace />
                             ) : (
-                                <ProfileView
-                                    user={user}
-                                    movies={movies}
-                                    removeFav={removeFav}
-                                    setUser={setUser}
-                                />
+                                <Col md={12}>
+                                    <ProfileView user={user} />
+                                </Col>
                             )
                         }
                     />
                 </Routes>
             </Row>
-            <ToastContainer position="top-center" />
+            <ToastContainer />
         </div>
     );
 };
-
