@@ -170,7 +170,7 @@ export const MainView = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         toast.info("Logged out");
-        navigate("/login"); // Use navigate here
+        navigate("/login");
     };
 
     if (loading) {
