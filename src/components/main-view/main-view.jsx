@@ -11,7 +11,7 @@ import ProfileView from "../profile-view/profile-view";
 import "react-toastify/dist/ReactToastify.css";
 
 export const MainView = () => {
-    const navigate = useNavigate(); // Call useNavigate at the top level of your component
+    const navigate = useNavigate();
 
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
@@ -33,6 +33,7 @@ export const MainView = () => {
     useEffect(() => {
         if (!token) {
             console.error("Token is missing");
+            navigate("/login"); // Redirect to login if token is missing
             return;
         }
 
@@ -94,7 +95,7 @@ export const MainView = () => {
         };
 
         fetchMovies();
-    }, [token]);
+    }, [token, navigate]);
 
     const addFav = (id) => {
         if (!token) {
@@ -160,167 +161,65 @@ export const MainView = () => {
             })
             .catch((error) => {
                 console.error("Error: ", error);
-                toast.error("Failed to remove from favorites");
+                toast.error("Failed to remove movie from favorites");
             });
     };
 
-    const handleLogout = () => {
-        setUser(null);
-        setToken(null);
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        toast.info("Logged out");
-        navigate("/login");
-    };
-
-    if (loading) {
-        return (
-            <Spinner animation="border" role="status">
-                <span className="visually-hidden">Loading...</span>
-            </Spinner>
-        );
-    }
-
     return (
-        <div className="main-view">
-            <NavigationBar
-                user={user}
-                onLoggedOut={handleLogout}
-            />
-            <Row className="justify-content-center my-5">
+        <Router>
+            <NavigationBar user={user} onLoggedOut={() => {
+                setUser(null);
+                setToken(null);
+                localStorage.clear();
+                navigate("/login");
+            }} />
+            <Row className="justify-content-md-center">
                 <Routes>
-                    <Route
-                        path="/signup"
-                        element={
-                            user ? (
-                                <Navigate to="/" />
-                            ) : (
-                                <Col md={5}>
-                                    <SignupView />
-                                </Col>
-                            )
-                        }
-                    />
-                    <Route
-                        path="/login"
-                        element={
-                            user ? (
-                                <Navigate to="/" />
-                            ) : (
-                                <Col md={5}>
-                                    <LoginView
-                                        onLoggedIn={(user, token) => {
-                                            localStorage.setItem("token", token);
-                                            localStorage.setItem("user", JSON.stringify(user));
-                                            setUser(user);
-                                            setToken(token);
-                                            toast.success("Logged in successfully");
-                                        }}
-                                    />
-                                </Col>
-                            )
-                        }
-                    />
-                    <Route
-                        path="/movies/:movieId"
-                        element={
-                            !user ? (
-                                <Navigate to="/login" replace />
-                            ) : movies.length === 0 ? (
-                                <Col>There are no movies</Col>
-                            ) : (
-                                <Col md={12}>
-                                    <MovieView
-                                        movies={movies}
-                                        addFav={addFav}
-                                        removeFav={removeFav}
-                                        user={user}
-                                    />
-                                </Col>
-                            )
-                        }
-                    />
-                    <Route
-                        path="/"
-                        element={
-                            !user ? (
-                                <Navigate to="/login" replace />
-                            ) : movies.length === 0 ? (
-                                <Col>There are no movies</Col>
-                            ) : (
-                                <>
-                                    <Row className="justify-content-center mb-5">
-                                        <Col md={6}>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Search movies"
-                                                value={search}
-                                                onChange={(e) => setSearch(e.target.value)}
-                                            />
+                    <Route path="/login" element={<LoginView onLoggedIn={(user, token) => {
+                        setUser(user);
+                        setToken(token);
+                        localStorage.setItem("user", JSON.stringify(user));
+                        localStorage.setItem("token", token);
+                        navigate("/");
+                    }} />} />
+                    <Route path="/signup" element={<SignupView />} />
+                    <Route path="/movies/:movieId" element={<MovieView movies={movies} />} />
+                    <Route path="/profile" element={<ProfileView user={user} token={token} setUser={setUser} />} />
+                    <Route path="/" element={
+                        loading ? (
+                            <Spinner animation="border" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </Spinner>
+                        ) : (
+                            <>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Search for a movie..."
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                />
+                                <Form.Select
+                                    value={selectedGenre}
+                                    onChange={(e) => setSelectedGenre(e.target.value)}
+                                >
+                                    <option value="">All Genres</option>
+                                    {/* Add options for genres here */}
+                                </Form.Select>
+                                {movies
+                                    .filter((movie) => movie.Title.toLowerCase().includes(search.toLowerCase()))
+                                    .filter((movie) => !selectedGenre || movie.Genre.Name === selectedGenre)
+                                    .map((movie) => (
+                                        <Col md={3} key={movie._id}>
+                                            <MovieCard movie={movie} addFav={addFav} removeFav={removeFav} />
                                         </Col>
-                                        <Col md={6}>
-                                            <Form.Select
-                                                value={selectedGenre}
-                                                onChange={(e) => setSelectedGenre(e.target.value)}
-                                            >
-                                                <option value="">All genres</option>
-                                                {[...new Set(movies.map((m) => m.Genre.Name))]
-                                                    .sort()
-                                                    .map((genre) => (
-                                                        <option key={genre} value={genre}>
-                                                            {genre}
-                                                        </option>
-                                                    ))}
-                                            </Form.Select>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        {movies
-                                            .filter(
-                                                (movie) =>
-                                                    (!search ||
-                                                        movie.Title.toLowerCase().includes(
-                                                            search.toLowerCase()
-                                                        )) &&
-                                                    (!selectedGenre || movie.Genre.Name === selectedGenre)
-                                            )
-                                            .map((movie) => (
-                                                <Col
-                                                    className="mb-4"
-                                                    key={movie._id}
-                                                    xs={12}
-                                                    sm={6}
-                                                    md={4}
-                                                    lg={3}
-                                                >
-                                                    <MovieCard
-                                                        movie={movie}
-                                                        addFav={addFav}
-                                                        removeFav={removeFav}
-                                                        user={user}
-                                                    />
-                                                </Col>
-                                            ))}
-                                    </Row>
-                                </>
-                            )
-                        }
-                    />
-                    <Route
-                        path="/profile"
-                        element={
-                            !user ? (
-                                <Navigate to="/login" replace />
-                            ) : (
-                                <Col md={12}>
-                                    <ProfileView user={user} />
-                                </Col>
-                            )
-                        }
-                    />
+                                    ))}
+                            </>
+                        )
+                    } />
+                    <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
             </Row>
             <ToastContainer />
-        </div>
+        </Router>
     );
 };

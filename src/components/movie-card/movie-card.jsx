@@ -1,16 +1,26 @@
-// src/components/movie-card/movie-card.jsx
 import React from "react";
 import PropTypes from "prop-types";
 import { Card, Button } from "react-bootstrap";
 
-const MovieCard = ({ movie, onAddToFavorites, onRemoveFromFavorites, isFavorite, onMovieClick }) => {
+const MovieCard = ({ movie: { Title, ImagePath }, onAddToFavorites, onRemoveFromFavorites, isFavorite, onMovieClick }) => {
   return (
     <Card className="mb-4">
-      <Card.Img variant="top" src={movie.ImagePath} alt={`${movie.Title} image`} />
+      <Card.Img variant="top" src={ImagePath} alt={`${Title} image`} />
       <Card.Body>
-        <Card.Title>{movie.Title}</Card.Title>
-        <Button variant="primary" onClick={onMovieClick}>View Movie</Button>
-        <Button variant="secondary" onClick={isFavorite ? onRemoveFromFavorites : onAddToFavorites}>
+        <Card.Title>{Title}</Card.Title>
+        <Button
+          variant="primary"
+          onClick={onMovieClick}
+          aria-label={`View details for ${Title}`}
+          className="me-2"
+        >
+          View Movie
+        </Button>
+        <Button
+          variant={isFavorite ? "danger" : "secondary"}
+          onClick={isFavorite ? onRemoveFromFavorites : onAddToFavorites}
+          aria-label={isFavorite ? `Remove ${Title} from favorites` : `Add ${Title} to favorites`}
+        >
           {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
         </Button>
       </Card.Body>

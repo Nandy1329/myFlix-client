@@ -1,19 +1,21 @@
+import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { MainView } from './components/main-view/main-view';
+import { Container } from 'react-bootstrap';
+import './index.scss'; 
 
-import { MainView } from './components/main-view/main-view.jsx';
-import Container from 'react-bootstrap/Container';
+const MyMovies = () => {
+    return (
+        <Container>
+            <BrowserRouter>
+                <MainView />
+            </BrowserRouter>
+        </Container>
+    );
+}
 
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./index.scss";
-
-const MyFlixApp = () => {
-  return (
-    <Container>
-      <MainView />
-    </Container>
-  )
-};
-
-const container = document.querySelector("#root");
+const container = document.querySelector('#root');
 const root = createRoot(container);
-root.render(<MyFlixApp />);
+
+root.render(<MyMovies />);

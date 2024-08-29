@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 export const LoginView = ({ onLoggedIn }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+
     const handleSubmit = (event) => {
         event.preventDefault();
 
@@ -14,24 +15,25 @@ export const LoginView = ({ onLoggedIn }) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ Username: username, Password: password })
         })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log("User logged in as:", data);
-                if (data.user) {
-                    localStorage.setItem("user", JSON.stringify(data.user));
-                    localStorage.setItem("token", data.token);
-                    onLoggedIn(data.user, data.token);
-                } else {
-                    toast.error("No Such User");
-                }
-            })
-            .catch((e) => {
-                toast.error("Something went wrong");
-            });
-    }
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.user && data.token) {
+                localStorage.setItem("user", JSON.stringify(data.user));
+                localStorage.setItem("token", data.token);
+                onLoggedIn(data.user, data.token);
+                toast.success("Logged in successfully");
+            } else {
+                toast.error("Invalid username or password");
+            }
+        })
+        .catch((e) => {
+            console.error("Error: ", e);
+            toast.error("Something went wrong");
+        });
+    };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit}>
             <h1>Login</h1>
             <Form.Group controlId='formUsername'>
                 <Form.Label>Username:</Form.Label>
@@ -55,6 +57,6 @@ export const LoginView = ({ onLoggedIn }) => {
             <Button variant="primary" type="submit">
                 Submit
             </Button>
-        </form>
+        </Form>
     );
 };
