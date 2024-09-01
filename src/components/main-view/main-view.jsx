@@ -1,22 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { MovieCard } from "../movie-card/movie-card";
-import { MovieView } from "../movie-view/movie-view";
-import { LoginView } from "../login-view/login-view";
-import { SignupView } from "../signup-view/signup-view";
-import { NavigationBar } from "../navigation-bar/navigation-bar";
-import ProfileView from "../profile-view/profile-view";
-import { Spinner, Row, Col, Form } from "react-bootstrap";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
-import axios from "axios";
+import { Row, Col, Spinner, Form } from "react-bootstrap";
+import { NavigationBar } from "../navigation-bar/navigation-bar";
+import MovieCard from "../movie-card/movie-card";
+import MovieView from "../movie-view/movie-view";
+import { LoginView } from "../login-view/login-view";
+import { SignupView } from "../signup-view/signup-view";
+import ProfileView from "../profile-view/profile-view";
 import "react-toastify/dist/ReactToastify.css";
 import "./main-view.scss";
-import { FavoriteMovies } from "../profile-view/favorite-movies";
 
 export const MainView = () => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
-    const [user, setUser] = useState(storedUser ? storedUser : null);
+
+    let parsedUser = null;
+    try {
+        parsedUser = storedUser ? JSON.parse(storedUser) : null;
+    } catch (error) {
+        console.error("Error parsing stored user:", error);
+    }
+
+    const [user, setUser] = useState(parsedUser);
     const [token, setToken] = useState(storedToken ? storedToken : null);
     const [movies, setMovies] = useState([]);
     const [search, setSearch] = useState("");
@@ -25,7 +31,14 @@ export const MainView = () => {
 
     const navigate = useNavigate();
 
+
     useEffect(() => {
+        if (!token) {
+            console.error("Token is missing");
+            navigate("/login");
+            return;
+        }
+
         const fetchMovies = async () => {
             try {
                 const response = await fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies', {
@@ -33,60 +46,48 @@ export const MainView = () => {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
-    
+
+                if (response.status === 401) {
+                    // Token might be invalid or expired
+                    toast.error('Session expired. Please log in again.');
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    setUser(null);
+                    setToken(null);
+                    navigate('/login');
+                    return;
+                }
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-    
+
                 const data = await response.json();
-                setMovies(data.movies);
-            } catch (error) {
-                console.error('Error fetching movies:', error.message);
-            }
-        };
-    
-        if (token) {
-            fetchMovies();
-        }
-        fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies", {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                return response.json();
-            })
-            .then((data) => {
+
                 if (!Array.isArray(data)) {
                     throw new Error("Expected an array of movies");
                 }
-                const moviesFromApi = data.map(
-                    ({ _id, Title, ImagePath, Description, Year, Genre, Director }) => ({
-                        _id,
-                        Title,
-                        ImagePath,
-                        Description,
-                        Year,
-                        Genre: {
-                            Name: Genre?.Name,
-                        },
-                        Director: {
-                            Name: Director?.Name,
-                        },
-                    })
-                );
-                setMovies(moviesFromApi);
+
+                // ... rest of the code
+            } catch (error) {
+                console.error('Error fetching movies:', error.message);
+                toast.error('Failed to fetch movies');
                 setLoading(false);
-            })
-            .catch((error) => {
-                console.error("Error fetching movies:", error);
-                toast.error("Failed to fetch movies");
-                setLoading(false);
-            });
+            }
+        };
+
+        fetchMovies();
     }, [token]);
 
+
+
+
     const addFav = (id) => {
+        if (!token) {
+            console.error("Token is missing");
+            return;
+        }
+
         fetch(
             `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}/Movies/${id}`,
             {
@@ -97,11 +98,10 @@ export const MainView = () => {
             }
         )
             .then((response) => {
-                if (response.ok) {
-                    return response.json();
-                } else {
+                if (!response.ok) {
                     throw new Error("Failed to add movie to favorites");
                 }
+                return response.json();
             })
             .then((user) => {
                 if (user) {
@@ -117,6 +117,11 @@ export const MainView = () => {
     };
 
     const removeFav = (id) => {
+        if (!token) {
+            console.error("Token is missing");
+            return;
+        }
+
         fetch(
             `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}/Movies/${id}`,
             {
@@ -127,11 +132,10 @@ export const MainView = () => {
             }
         )
             .then((response) => {
-                if (response.ok) {
-                    return response.json();
-                } else {
+                if (!response.ok) {
                     throw new Error("Failed to remove movie from favorites");
                 }
+                return response.json();
             })
             .then((user) => {
                 if (user) {
@@ -146,15 +150,25 @@ export const MainView = () => {
             });
     };
 
+    if (loading) {
+        return (
+            <Spinner animation="border" role="status">
+                <span className="visually-hidden">Loading...</span>
+            </Spinner>
+        );
+    }
+
     return (
         <div className="main-view">
             <NavigationBar
                 user={user}
                 onLoggedOut={() => {
                     setUser(null);
+                    setToken(null);
                     localStorage.removeItem("token");
                     localStorage.removeItem("user");
                     toast.info("Logged out");
+                    navigate("/login");
                 }}
             />
             <Row className="justify-content-center my-5">
@@ -214,59 +228,67 @@ export const MainView = () => {
                             !user ? (
                                 <Navigate to="/login" replace />
                             ) : movies.length === 0 ? (
-                                <Col>The list is empty</Col>
+                                <Col>There are no movies</Col>
                             ) : (
                                 <>
-                                    <Form className="form-inline mt-5 d-flex justify-content-center">
-                                        <Form.Control
-                                            className="mx-5 mx-md-0"
-                                            type="search"
-                                            id="searchForm"
-                                            onChange={(e) => setSearch(e.target.value)}
-                                            placeholder="Search for ..."
-                                            aria-label="Search"
-                                        />
-                                        <Form.Select
-                                            className="ms-3 w-25"
-                                            aria-label="Default select genre"
-                                            onChange={(e) => setSelectedGenre(e.target.value)}
-                                        >
-                                            <option value="">Search by genre</option>
-                                            <option value="Science Fiction">Science Fiction</option>
-                                            <option value="Horror">Horror</option>
-                                            <option value="Action">Action</option>
-                                            <option value="Fantasy">Fantasy</option>
-                                            <option value="Thriller">Thriller</option>
-                                        </Form.Select>
-                                    </Form>
-                                    {movies
-                                        .filter((movie) =>
-                                            selectedGenre === ""
-                                                ? movie
-                                                : movie.Genre.Name === selectedGenre
-                                        )
-                                        .filter((movie) =>
-                                            search === ""
-                                                ? movie
-                                                : movie.Title.toLowerCase().includes(search.toLowerCase())
-                                        )
-                                        .map((movie) => (
-                                            <Col
-                                                md={6}
-                                                lg={4}
-                                                xl={3}
-                                                className="mb-5 col-8"
-                                                key={movie._id}
+                                    <Row className="justify-content-center mb-5">
+                                        <Col md={6}>
+                                            <Form.Control
+                                                type="text"
+                                                placeholder="Search movies"
+                                                value={search}
+                                                onChange={(e) => setSearch(e.target.value)}
+                                            />
+                                        </Col>
+                                        <Col md={6}>
+                                            <Form.Select
+                                                value={selectedGenre}
+                                                onChange={(e) => setSelectedGenre(e.target.value)}
                                             >
-                                                <MovieCard
-                                                    movie={movie}
-                                                    onAddToFavorites={addFav}
-                                                    onRemoveFromFavorites={removeFav}
-                                                    isFavorite={user.FavoriteMovies ? user.FavoriteMovies.includes(movie._id) : false}
-                                                    onMovieClick={(movieId) => navigate(`/movies/${movieId}`)}
-                                                />
-                                            </Col>
-                                        ))}
+                                                <option value="">All genres</option>
+                                                {[...new Set(movies.map((m) => m.Genre.Name))]
+                                                    .sort()
+                                                    .map((genre) => (
+                                                        <option key={genre} value={genre}>
+                                                            {genre}
+                                                        </option>
+                                                    ))}
+                                            </Form.Select>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        {movies
+                                            .filter(
+                                                (movie) =>
+                                                    (!search ||
+                                                        movie.Title.toLowerCase().includes(
+                                                            search.toLowerCase()
+                                                        )) &&
+                                                    (!selectedGenre || movie.Genre.Name === selectedGenre)
+                                            )
+                                            .map((movie) => (
+                                                <Col
+                                                    className="mb-4"
+                                                    key={movie._id}
+                                                    xs={12}
+                                                    sm={6}
+                                                    md={4}
+                                                    lg={3}
+                                                >
+                                                    <MovieCard
+                                                        movie={movie}
+                                                        onAddToFavorites={() => addFav(movie._id)}
+                                                        onRemoveFromFavorites={() => removeFav(movie._id)}
+                                                        isFavorite={
+                                                            user && user.FavoriteMovies
+                                                                ? user.FavoriteMovies.includes(movie._id)
+                                                                : false
+                                                        }
+                                                        onMovieClick={() => navigate(`/movies/${movie._id}`)}
+                                                    />
+                                                </Col>
+                                            ))}
+                                    </Row>
                                 </>
                             )
                         }
@@ -277,21 +299,18 @@ export const MainView = () => {
                             !user ? (
                                 <Navigate to="/login" replace />
                             ) : (
-                                <Col>
-                                    <ProfileView
-                                        user={user}
-                                        movies={movies}
-                                        removeFav={removeFav}
-                                        addFav={addFav}
-                                        setUser={setUser}
-                                    />
-                                </Col>
+                                <ProfileView
+                                    user={user}
+                                    movies={movies}
+                                    removeFav={removeFav}
+                                    setUser={setUser}
+                                />
                             )
                         }
                     />
                 </Routes>
             </Row>
-            <ToastContainer />
+            <ToastContainer position="top-center" />
         </div>
     );
 };

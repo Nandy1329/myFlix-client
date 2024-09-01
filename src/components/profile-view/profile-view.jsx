@@ -1,20 +1,15 @@
-import React, { useState } from "react";
+// src/components/profile-view/profile-view.jsx
+import React from "react";
 import PropTypes from "prop-types";
-import { Col, Row, Card, Form, Button } from "react-bootstrap";
-import { UserInfo } from "./user-info";
-import { FavoriteMovies } from "./favorite-movies";
-import axios from "axios";
+import { Col, Row, Card, Container } from "react-bootstrap";
 import { toast } from "react-toastify";
+import UserInfo from "./user-info";
+import { FavoriteMovies } from "./favorite-movies"; // Assuming you have a default export
+import UpdateUser from "./update-user";
+import axios from "axios";
 
 const ProfileView = ({ user, movies, removeFav, setUser }) => {
-  const [username, setUsername] = useState(user.Username);
-  const [email, setEmail] = useState(user.Email);
-  const [birthday, setBirthday] = useState(user.Birthday);
-  const [password, setPassword] = useState("");
-
-  const handleUpdate = (event) => {
-    event.preventDefault();
-
+  const handleUpdate = async (updatedUser) => {
     let token = localStorage.getItem("token");
     const url = `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}`;
 
@@ -22,10 +17,10 @@ const ProfileView = ({ user, movies, removeFav, setUser }) => {
       .put(
         url,
         {
-          Username: username,
-          Password: password,
-          Email: email,
-          Birthday: birthday,
+          Username: updatedUser.Username,
+          Password: updatedUser.Password,
+          Email: updatedUser.Email,
+          Birthday: updatedUser.Birthday,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -44,66 +39,34 @@ const ProfileView = ({ user, movies, removeFav, setUser }) => {
   };
 
   return (
-    <Row>
-      <Col xs={12} md={6}>
-        <Card>
-          <Card.Body>
-            <UserInfo email={user.Email} name={user.Username} birthday={user.Birthday} />
-          </Card.Body>
-        </Card>
-      </Col>
-      <Col xs={12} md={6}>
-        <FavoriteMovies user={user} movies={movies} removeFav={removeFav} />
-      </Col>
-      <Col xs={12} md={6}>
-        <Card>
-          <Card.Body>
-            <h3>Update Profile</h3>
-            <Form onSubmit={handleUpdate}>
-              <Form.Group controlId="formUsername">
-                <Form.Label>Username</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formEmail">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formBirthday">
-                <Form.Label>Birthday</Form.Label>
-                <Form.Control
-                  type="date"
-                  value={birthday}
-                  onChange={(e) => setBirthday(e.target.value)}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formPassword">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </Form.Group>
-
-              <Button variant="primary" type="submit">
-                Update Profile
-              </Button>
-            </Form>
-          </Card.Body>
-        </Card>
-      </Col>
-    </Row>
+    <Container>
+      <Row className="justify-content-md-center">
+        <Col xs={12} md={6} className="mb-4">
+          <Card>
+            <Card.Body>
+              <UserInfo email={user.Email} name={user.Username} birthday={user.Birthday} />
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col xs={12} md={6} className="mb-4">
+          <Card>
+            <Card.Body>
+              <h3>Update Profile</h3>
+              <UpdateUser user={user} handleUpdate={handleUpdate} />
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+      <Row className="justify-content-md-center">
+        <Col xs={12}>
+          <Card>
+            <Card.Body>
+              <FavoriteMovies user={user} movies={movies} removeFav={removeFav} />
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

@@ -1,0 +1,9 @@
+[build]
+  node_version = "18.x"  # Specify the Node.js version
+  publish = "dist"       # Directory to publish after build
+  command = "node -v && parcel build src/index.html --public-url /"
+
+[[redirects]]
+  from = "/*"
+  to = "/"
+  status = 200

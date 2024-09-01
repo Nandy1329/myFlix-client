@@ -1,64 +1,99 @@
-// update-user.jsx
+// src/components/update-user/update-user.jsx
 import React, { useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const UpdateUser = ({ user, handleUpdate }) => {
   const [username, setUsername] = useState(user.Username);
   const [email, setEmail] = useState(user.Email);
   const [birthday, setBirthday] = useState(user.Birthday);
+  const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const updatedUser = { ...user, Username: username, Email: email, Birthday: birthday };
-    handleUpdate(updatedUser);
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast.error('You are not authorized');
+      return;
+    }
+
+    const updatedUser = {
+      Username: username,
+      Email: email,
+      Birthday: birthday,
+      Password: password,
+    };
+
+    const url = `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}`;
+
+    axios
+      .put(url, updatedUser, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        const updatedUser = response.data;
+        handleUpdate(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        toast.success('Profile updated successfully');
+      })
+      .catch((error) => {
+        console.error('Error updating profile:', error);
+        toast.error('Failed to update profile');
+      });
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <Form.Group controlId="formUsername">
-        <Form.Label>Username</Form.Label>
-        <Form.Control
+    <form onSubmit={handleSubmit}>
+      <div className="form-group">
+        <label htmlFor="username">Username</label>
+        <input
           type="text"
+          className="form-control"
+          id="username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          required
-          placeholder="Enter Username"
         />
-      </Form.Group>
-      <Form.Group controlId="formEmail">
-        <Form.Label>Email</Form.Label>
-        <Form.Control
+      </div>
+      <div className="form-group">
+        <label htmlFor="email">Email</label>
+        <input
           type="email"
+          className="form-control"
+          id="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
-          placeholder="Enter Email"
         />
-      </Form.Group>
-      <Form.Group controlId="formBirthday">
-        <Form.Label>Birthday</Form.Label>
-        <Form.Control
+      </div>
+      <div className="form-group">
+        <label htmlFor="birthday">Birthday</label>
+        <input
           type="date"
+          className="form-control"
+          id="birthday"
           value={birthday}
           onChange={(e) => setBirthday(e.target.value)}
-          required
         />
-      </Form.Group>
-      <Button variant="primary" type="submit">
-        Update
-      </Button>
-    </Form>
+      </div>
+      <div className="form-group">
+        <label htmlFor="password">Password</label>
+        <input
+          type="password"
+          className="form-control"
+          id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+      <button type="submit" className="btn btn-primary">Update Profile</button>
+    </form>
   );
 };
 
 UpdateUser.propTypes = {
-  user: PropTypes.shape({
-    Username: PropTypes.string.isRequired,
-    Email: PropTypes.string.isRequired,
-    Birthday: PropTypes.string.isRequired
-  }).isRequired,
-  handleUpdate: PropTypes.func.isRequired
+  user: PropTypes.object.isRequired,
+  handleUpdate: PropTypes.func.isRequired,
 };
 
 export default UpdateUser;

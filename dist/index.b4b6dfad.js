@@ -2995,7 +2995,7 @@ $RefreshReg$(_c, "MyMovies");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-dom/client":"lOjBx","react-router-dom":"9xmpe","./components/main-view/main-view":"4gflv","react-bootstrap":"3AD9A","./index.scss":"lJZlQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"iTorj":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-dom/client":"lOjBx","react-router-dom":"9xmpe","react-bootstrap":"3AD9A","./components/main-view/main-view":"4gflv","./index.scss":"lJZlQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"iTorj":[function(require,module,exports) {
 "use strict";
 module.exports = require("ee51401569654d91");
 
@@ -27240,7 +27240,7 @@ module.exports = require("ef03b89c8fe2794e");
 
 },{}],"9xmpe":[function(require,module,exports) {
 /**
- * React Router DOM v6.25.1
+ * React Router DOM v6.26.1
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -27279,6 +27279,7 @@ parcelHelpers.export(exports, "parsePath", ()=>(0, _reactRouter.parsePath));
 parcelHelpers.export(exports, "redirect", ()=>(0, _reactRouter.redirect));
 parcelHelpers.export(exports, "redirectDocument", ()=>(0, _reactRouter.redirectDocument));
 parcelHelpers.export(exports, "renderMatches", ()=>(0, _reactRouter.renderMatches));
+parcelHelpers.export(exports, "replace", ()=>(0, _reactRouter.replace));
 parcelHelpers.export(exports, "resolvePath", ()=>(0, _reactRouter.resolvePath));
 parcelHelpers.export(exports, "useActionData", ()=>(0, _reactRouter.useActionData));
 parcelHelpers.export(exports, "useAsyncError", ()=>(0, _reactRouter.useAsyncError));
@@ -27568,7 +27569,7 @@ function createBrowserRouter(routes, opts) {
         routes,
         mapRouteProperties: (0, _reactRouter.UNSAFE_mapRouteProperties),
         unstable_dataStrategy: opts == null ? void 0 : opts.unstable_dataStrategy,
-        unstable_patchRoutesOnMiss: opts == null ? void 0 : opts.unstable_patchRoutesOnMiss,
+        unstable_patchRoutesOnNavigation: opts == null ? void 0 : opts.unstable_patchRoutesOnNavigation,
         window: opts == null ? void 0 : opts.window
     }).initialize();
 }
@@ -27585,7 +27586,7 @@ function createHashRouter(routes, opts) {
         routes,
         mapRouteProperties: (0, _reactRouter.UNSAFE_mapRouteProperties),
         unstable_dataStrategy: opts == null ? void 0 : opts.unstable_dataStrategy,
-        unstable_patchRoutesOnMiss: opts == null ? void 0 : opts.unstable_patchRoutesOnMiss,
+        unstable_patchRoutesOnNavigation: opts == null ? void 0 : opts.unstable_patchRoutesOnNavigation,
         window: opts == null ? void 0 : opts.window
     }).initialize();
 }
@@ -28674,7 +28675,7 @@ let savedScrollPositions = {};
 
 },{"react":"21dqq","react-dom":"j6uA9","react-router":"dbWyW","@remix-run/router":"5ncDG","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dbWyW":[function(require,module,exports) {
 /**
- * React Router v6.25.1
+ * React Router v6.26.1
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -28696,6 +28697,7 @@ parcelHelpers.export(exports, "matchRoutes", ()=>(0, _router.matchRoutes));
 parcelHelpers.export(exports, "parsePath", ()=>(0, _router.parsePath));
 parcelHelpers.export(exports, "redirect", ()=>(0, _router.redirect));
 parcelHelpers.export(exports, "redirectDocument", ()=>(0, _router.redirectDocument));
+parcelHelpers.export(exports, "replace", ()=>(0, _router.replace));
 parcelHelpers.export(exports, "resolvePath", ()=>(0, _router.resolvePath));
 parcelHelpers.export(exports, "Await", ()=>Await);
 parcelHelpers.export(exports, "MemoryRouter", ()=>MemoryRouter);
@@ -29161,20 +29163,28 @@ function RenderedRoute(_ref) {
     }, children);
 }
 function _renderMatches(matches, parentMatches, dataRouterState, future) {
-    var _dataRouterState2;
+    var _dataRouterState;
     if (parentMatches === void 0) parentMatches = [];
     if (dataRouterState === void 0) dataRouterState = null;
     if (future === void 0) future = null;
     if (matches == null) {
-        var _dataRouterState;
-        if ((_dataRouterState = dataRouterState) != null && _dataRouterState.errors) // Don't bail if we have data router errors so we can render them in the
+        var _future;
+        if (!dataRouterState) return null;
+        if (dataRouterState.errors) // Don't bail if we have data router errors so we can render them in the
         // boundary.  Use the pre-matched (or shimmed) matches
+        matches = dataRouterState.matches;
+        else if ((_future = future) != null && _future.v7_partialHydration && parentMatches.length === 0 && !dataRouterState.initialized && dataRouterState.matches.length > 0) // Don't bail if we're initializing with partial hydration and we have
+        // router matches.  That means we're actively running `patchRoutesOnNavigation`
+        // so we should render down the partial matches to the appropriate
+        // `HydrateFallback`.  We only do this if `parentMatches` is empty so it
+        // only impacts the root matches for `RouterProvider` and no descendant
+        // `<Routes>`
         matches = dataRouterState.matches;
         else return null;
     }
     let renderedMatches = matches;
     // If we have data errors, trim matches to the highest error boundary
-    let errors = (_dataRouterState2 = dataRouterState) == null ? void 0 : _dataRouterState2.errors;
+    let errors = (_dataRouterState = dataRouterState) == null ? void 0 : _dataRouterState.errors;
     if (errors != null) {
         let errorIndex = renderedMatches.findIndex((m)=>m.route.id && (errors == null ? void 0 : errors[m.route.id]) !== undefined);
         !(errorIndex >= 0) && (0, _router.UNSAFE_invariant)(false, "Could not find a matching route for errors on route IDs: " + Object.keys(errors).join(","));
@@ -29936,13 +29946,13 @@ function createMemoryRouter(routes, opts) {
         routes,
         mapRouteProperties,
         unstable_dataStrategy: opts == null ? void 0 : opts.unstable_dataStrategy,
-        unstable_patchRoutesOnMiss: opts == null ? void 0 : opts.unstable_patchRoutesOnMiss
+        unstable_patchRoutesOnNavigation: opts == null ? void 0 : opts.unstable_patchRoutesOnNavigation
     }).initialize();
 }
 
 },{"react":"21dqq","@remix-run/router":"5ncDG","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5ncDG":[function(require,module,exports) {
 /**
- * @remix-run/router v1.18.0
+ * @remix-run/router v1.19.1
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -29977,6 +29987,7 @@ parcelHelpers.export(exports, "defer", ()=>defer);
 parcelHelpers.export(exports, "generatePath", ()=>generatePath);
 parcelHelpers.export(exports, "getStaticContextFromError", ()=>getStaticContextFromError);
 parcelHelpers.export(exports, "getToPathname", ()=>getToPathname);
+parcelHelpers.export(exports, "isDataWithResponseInit", ()=>isDataWithResponseInit);
 parcelHelpers.export(exports, "isDeferredData", ()=>isDeferredData);
 parcelHelpers.export(exports, "isRouteErrorResponse", ()=>isRouteErrorResponse);
 parcelHelpers.export(exports, "joinPaths", ()=>joinPaths);
@@ -29987,9 +29998,11 @@ parcelHelpers.export(exports, "normalizePathname", ()=>normalizePathname);
 parcelHelpers.export(exports, "parsePath", ()=>parsePath);
 parcelHelpers.export(exports, "redirect", ()=>redirect);
 parcelHelpers.export(exports, "redirectDocument", ()=>redirectDocument);
+parcelHelpers.export(exports, "replace", ()=>replace);
 parcelHelpers.export(exports, "resolvePath", ()=>resolvePath);
 parcelHelpers.export(exports, "resolveTo", ()=>resolveTo);
 parcelHelpers.export(exports, "stripBasename", ()=>stripBasename);
+parcelHelpers.export(exports, "unstable_data", ()=>data);
 function _extends() {
     _extends = Object.assign ? Object.assign.bind() : function(target) {
         for(var i = 1; i < arguments.length; i++){
@@ -30900,6 +30913,21 @@ function getResolveToMatches(matches, v7_relativeSplatPath) {
         headers
     }));
 };
+class DataWithResponseInit {
+    constructor(data, init){
+        this.type = "DataWithResponseInit";
+        this.data = data;
+        this.init = init || null;
+    }
+}
+/**
+ * Create "responses" that contain `status`/`headers` without forcing
+ * serialization into an actual `Response` - used by Remix single fetch
+ */ function data(data, init) {
+    return new DataWithResponseInit(data, typeof init === "number" ? {
+        status: init
+    } : init);
+}
 class AbortedDeferredError extends Error {
 }
 class DeferredData {
@@ -31061,6 +31089,16 @@ const defer = function defer(data, init) {
     return response;
 };
 /**
+ * A redirect response that will perform a `history.replaceState` instead of a
+ * `history.pushState` for client-side navigation redirects.
+ * Sets the status code and the `Location` header.
+ * Defaults to "302 Found".
+ */ const replace = (url, init)=>{
+    let response = redirect(url, init);
+    response.headers.set("X-Remix-Replace", "true");
+    return response;
+};
+/**
  * @private
  * Utility class we use to hold auto-unwrapped 4xx/5xx Response bodies
  *
@@ -31166,7 +31204,7 @@ const TRANSITIONS_STORAGE_KEY = "remix-router-transitions";
     let inFlightDataRoutes;
     let basename = init.basename || "/";
     let dataStrategyImpl = init.unstable_dataStrategy || defaultDataStrategy;
-    let patchRoutesOnMissImpl = init.unstable_patchRoutesOnMiss;
+    let patchRoutesOnNavigationImpl = init.unstable_patchRoutesOnNavigation;
     // Config driven behavior flags
     let future = _extends({
         v7_fetcherPersist: false,
@@ -31180,6 +31218,10 @@ const TRANSITIONS_STORAGE_KEY = "remix-router-transitions";
     let unlistenHistory = null;
     // Externally-provided functions to call on all state changes
     let subscribers = new Set();
+    // FIFO queue of previously discovered routes to prevent re-calling on
+    // subsequent navigations to the same path
+    let discoveredRoutesMaxSize = 1000;
+    let discoveredRoutes = new Set();
     // Externally-provided object to hold scroll restoration locations during routing
     let savedScrollPositions = null;
     // Externally-provided function to get scroll restoration keys
@@ -31195,7 +31237,7 @@ const TRANSITIONS_STORAGE_KEY = "remix-router-transitions";
     let initialScrollRestored = init.hydrationData != null;
     let initialMatches = matchRoutes(dataRoutes, init.history.location, basename);
     let initialErrors = null;
-    if (initialMatches == null && !patchRoutesOnMissImpl) {
+    if (initialMatches == null && !patchRoutesOnNavigationImpl) {
         // If we do not match a user-provided-route, fall back to the root
         // to allow the error boundary to take over
         let error = getInternalRouterError(404, {
@@ -31207,21 +31249,27 @@ const TRANSITIONS_STORAGE_KEY = "remix-router-transitions";
             [route.id]: error
         };
     }
-    // In SPA apps, if the user provided a patchRoutesOnMiss implementation and
+    // In SPA apps, if the user provided a patchRoutesOnNavigation implementation and
     // our initial match is a splat route, clear them out so we run through lazy
     // discovery on hydration in case there's a more accurate lazy route match.
     // In SSR apps (with `hydrationData`), we expect that the server will send
     // up the proper matched routes so we don't want to run lazy discovery on
     // initial hydration and want to hydrate into the splat route.
-    if (initialMatches && patchRoutesOnMissImpl && !init.hydrationData) {
+    if (initialMatches && !init.hydrationData) {
         let fogOfWar = checkFogOfWar(initialMatches, dataRoutes, init.history.location.pathname);
         if (fogOfWar.active) initialMatches = null;
     }
     let initialized;
     if (!initialMatches) {
-        // We need to run patchRoutesOnMiss in initialize()
         initialized = false;
         initialMatches = [];
+        // If partial hydration and fog of war is enabled, we will be running
+        // `patchRoutesOnNavigation` during hydration so include any partial matches as
+        // the initial matches so we can properly render `HydrateFallback`'s
+        if (future.v7_partialHydration) {
+            let fogOfWar = checkFogOfWar(null, dataRoutes, init.history.location.pathname);
+            if (fogOfWar.active && fogOfWar.matches) initialMatches = fogOfWar.matches;
+        }
     } else if (initialMatches.some((m)=>m.route.lazy)) // All initialMatches need to be loaded before we're ready.  If we have lazy
     // functions around still then we'll need to run them in initialize()
     initialized = false;
@@ -31293,7 +31341,7 @@ const TRANSITIONS_STORAGE_KEY = "remix-router-transitions";
     let cancelledDeferredRoutes = [];
     // Use this internal array to capture fetcher loads that were cancelled by an
     // action navigation and require revalidation
-    let cancelledFetcherLoads = [];
+    let cancelledFetcherLoads = new Set();
     // AbortControllers for any in-flight fetchers
     let fetchControllers = new Map();
     // Track loads based on the order in which they started
@@ -31321,7 +31369,7 @@ const TRANSITIONS_STORAGE_KEY = "remix-router-transitions";
     // Store blocker functions in a separate Map outside of router state since
     // we don't need to update UI state if they change
     let blockerFunctions = new Map();
-    // Map of pending patchRoutesOnMiss() promises (keyed by path/matches) so
+    // Map of pending patchRoutesOnNavigation() promises (keyed by path/matches) so
     // that we only kick them off once for a given combo
     let pendingPatchRoutes = new Map();
     // Flag to ignore the next history update, so we can revert the URL change on
@@ -31538,7 +31586,6 @@ const TRANSITIONS_STORAGE_KEY = "remix-router-transitions";
         isUninterruptedRevalidation = false;
         isRevalidationRequired = false;
         cancelledDeferredRoutes = [];
-        cancelledFetcherLoads = [];
     }
     // Trigger a navigation event, which can either be a numerical POP or a PUSH
     // replace with an optional submission
@@ -32381,7 +32428,7 @@ const TRANSITIONS_STORAGE_KEY = "remix-router-transitions";
         // There's no need to abort on redirects, since we don't detect the
         // redirect until the action/loaders have settled
         pendingNavigationController = null;
-        let redirectHistoryAction = replace === true ? Action.Replace : Action.Push;
+        let redirectHistoryAction = replace === true || redirect.response.headers.has("X-Remix-Replace") ? Action.Replace : Action.Push;
         // Use the incoming submission if provided, fallback on the active one in
         // state.navigation
         let { formMethod, formAction, formEncType } = state.navigation;
@@ -32469,7 +32516,7 @@ const TRANSITIONS_STORAGE_KEY = "remix-router-transitions";
         // Abort in-flight fetcher loads
         fetchLoadMatches.forEach((_, key)=>{
             if (fetchControllers.has(key)) {
-                cancelledFetcherLoads.push(key);
+                cancelledFetcherLoads.add(key);
                 abortFetcher(key);
             }
         });
@@ -32515,6 +32562,7 @@ const TRANSITIONS_STORAGE_KEY = "remix-router-transitions";
         fetchReloadIds.delete(key);
         fetchRedirectIds.delete(key);
         deletedFetchers.delete(key);
+        cancelledFetcherLoads.delete(key);
         state.fetchers.delete(key);
     }
     function deleteFetcherAndUpdateState(key) {
@@ -32694,25 +32742,29 @@ const TRANSITIONS_STORAGE_KEY = "remix-router-transitions";
         return null;
     }
     function checkFogOfWar(matches, routesToUse, pathname) {
-        if (patchRoutesOnMissImpl) {
+        if (patchRoutesOnNavigationImpl) {
+            // Don't bother re-calling patchRouteOnMiss for a path we've already
+            // processed.  the last execution would have patched the route tree
+            // accordingly so `matches` here are already accurate.
+            if (discoveredRoutes.has(pathname)) return {
+                active: false,
+                matches
+            };
             if (!matches) {
                 let fogMatches = matchRoutesImpl(routesToUse, pathname, basename, true);
                 return {
                     active: true,
                     matches: fogMatches || []
                 };
-            } else {
-                let leafRoute = matches[matches.length - 1].route;
-                if (leafRoute.path && (leafRoute.path === "*" || leafRoute.path.endsWith("/*"))) {
-                    // If we matched a splat, it might only be because we haven't yet fetched
-                    // the children that would match with a higher score, so let's fetch
-                    // around and find out
-                    let partialMatches = matchRoutesImpl(routesToUse, pathname, basename, true);
-                    return {
-                        active: true,
-                        matches: partialMatches
-                    };
-                }
+            } else if (Object.keys(matches[0].params).length > 0) {
+                // If we matched a dynamic param or a splat, it might only be because
+                // we haven't yet discovered other routes that would match with a
+                // higher score.  Call patchRoutesOnNavigation just to be sure
+                let partialMatches = matchRoutesImpl(routesToUse, pathname, basename, true);
+                return {
+                    active: true,
+                    matches: partialMatches
+                };
             }
         }
         return {
@@ -32722,12 +32774,11 @@ const TRANSITIONS_STORAGE_KEY = "remix-router-transitions";
     }
     async function discoverRoutes(matches, pathname, signal) {
         let partialMatches = matches;
-        let route = partialMatches.length > 0 ? partialMatches[partialMatches.length - 1].route : null;
         while(true){
             let isNonHMR = inFlightDataRoutes == null;
             let routesToUse = inFlightDataRoutes || dataRoutes;
             try {
-                await loadLazyRouteChildren(patchRoutesOnMissImpl, pathname, partialMatches, routesToUse, manifest, mapRouteProperties, pendingPatchRoutes, signal);
+                await loadLazyRouteChildren(patchRoutesOnNavigationImpl, pathname, partialMatches, routesToUse, manifest, mapRouteProperties, pendingPatchRoutes, signal);
             } catch (e) {
                 return {
                     type: "error",
@@ -32749,42 +32800,31 @@ const TRANSITIONS_STORAGE_KEY = "remix-router-transitions";
                 type: "aborted"
             };
             let newMatches = matchRoutes(routesToUse, pathname, basename);
-            let matchedSplat = false;
             if (newMatches) {
-                let leafRoute = newMatches[newMatches.length - 1].route;
-                if (leafRoute.index) // If we found an index route, we can stop
+                addToFifoQueue(pathname, discoveredRoutes);
                 return {
                     type: "success",
                     matches: newMatches
                 };
-                if (leafRoute.path && leafRoute.path.length > 0) {
-                    if (leafRoute.path === "*") // If we found a splat route, we can't be sure there's not a
-                    // higher-scoring route down some partial matches trail so we need
-                    // to check that out
-                    matchedSplat = true;
-                    else // If we found a non-splat route, we can stop
-                    return {
-                        type: "success",
-                        matches: newMatches
-                    };
-                }
             }
             let newPartialMatches = matchRoutesImpl(routesToUse, pathname, basename, true);
-            // If we are no longer partially matching anything, this was either a
-            // legit splat match above, or it's a 404.  Also avoid loops if the
-            // second pass results in the same partial matches
-            if (!newPartialMatches || partialMatches.map((m)=>m.route.id).join("-") === newPartialMatches.map((m)=>m.route.id).join("-")) return {
-                type: "success",
-                matches: matchedSplat ? newMatches : null
-            };
+            // Avoid loops if the second pass results in the same partial matches
+            if (!newPartialMatches || partialMatches.length === newPartialMatches.length && partialMatches.every((m, i)=>m.route.id === newPartialMatches[i].route.id)) {
+                addToFifoQueue(pathname, discoveredRoutes);
+                return {
+                    type: "success",
+                    matches: null
+                };
+            }
             partialMatches = newPartialMatches;
-            route = partialMatches[partialMatches.length - 1].route;
-            if (route.path === "*") // The splat is still our most accurate partial, so run with it
-            return {
-                type: "success",
-                matches: partialMatches
-            };
         }
+    }
+    function addToFifoQueue(path, queue) {
+        if (queue.size >= discoveredRoutesMaxSize) {
+            let first = queue.values().next().value;
+            queue.delete(first);
+        }
+        queue.add(path);
     }
     function _internalSetRoutes(newRoutes) {
         manifest = {};
@@ -33460,9 +33500,11 @@ function getMatchesToLoad(history, state, matches, submission, location, isIniti
         let shouldRevalidate = false;
         if (fetchRedirectIds.has(key)) // Never trigger a revalidation of an actively redirecting fetcher
         shouldRevalidate = false;
-        else if (cancelledFetcherLoads.includes(key)) // Always revalidate if the fetcher was cancelled
-        shouldRevalidate = true;
-        else if (fetcher && fetcher.state !== "idle" && fetcher.data === undefined) // If the fetcher hasn't ever completed loading yet, then this isn't a
+        else if (cancelledFetcherLoads.has(key)) {
+            // Always mark for revalidation if the fetcher was cancelled
+            cancelledFetcherLoads.delete(key);
+            shouldRevalidate = true;
+        } else if (fetcher && fetcher.state !== "idle" && fetcher.data === undefined) // If the fetcher hasn't ever completed loading yet, then this isn't a
         // revalidation, it would just be a brand new load if an explicit
         // revalidation is required
         shouldRevalidate = isRevalidationRequired;
@@ -33517,9 +33559,9 @@ function shouldRevalidateLoader(loaderMatch, arg) {
     return arg.defaultShouldRevalidate;
 }
 /**
- * Idempotent utility to execute patchRoutesOnMiss() to lazily load route
+ * Idempotent utility to execute patchRoutesOnNavigation() to lazily load route
  * definitions and update the routes/routeManifest
- */ async function loadLazyRouteChildren(patchRoutesOnMissImpl, path, matches, routes, manifest, mapRouteProperties, pendingRouteChildren, signal) {
+ */ async function loadLazyRouteChildren(patchRoutesOnNavigationImpl, path, matches, routes, manifest, mapRouteProperties, pendingRouteChildren, signal) {
     let key = [
         path,
         ...matches.map((m)=>m.route.id)
@@ -33527,7 +33569,7 @@ function shouldRevalidateLoader(loaderMatch, arg) {
     try {
         let pending = pendingRouteChildren.get(key);
         if (!pending) {
-            pending = patchRoutesOnMissImpl({
+            pending = patchRoutesOnNavigationImpl({
                 path,
                 matches,
                 patch: (routeId, children)=>{
@@ -33745,7 +33787,7 @@ async function callLoaderOrAction(type, request, match, manifest, mapRouteProper
     return result;
 }
 async function convertHandlerResultToDataResult(handlerResult) {
-    let { result, type, status } = handlerResult;
+    let { result, type } = handlerResult;
     if (isResponse(result)) {
         let data;
         try {
@@ -33775,24 +33817,47 @@ async function convertHandlerResultToDataResult(handlerResult) {
             headers: result.headers
         };
     }
-    if (type === ResultType.error) return {
-        type: ResultType.error,
-        error: result,
-        statusCode: isRouteErrorResponse(result) ? result.status : status
-    };
+    if (type === ResultType.error) {
+        if (isDataWithResponseInit(result)) {
+            var _result$init2;
+            if (result.data instanceof Error) {
+                var _result$init;
+                return {
+                    type: ResultType.error,
+                    error: result.data,
+                    statusCode: (_result$init = result.init) == null ? void 0 : _result$init.status
+                };
+            }
+            // Convert thrown unstable_data() to ErrorResponse instances
+            result = new ErrorResponseImpl(((_result$init2 = result.init) == null ? void 0 : _result$init2.status) || 500, undefined, result.data);
+        }
+        return {
+            type: ResultType.error,
+            error: result,
+            statusCode: isRouteErrorResponse(result) ? result.status : undefined
+        };
+    }
     if (isDeferredData(result)) {
-        var _result$init, _result$init2;
+        var _result$init3, _result$init4;
         return {
             type: ResultType.deferred,
             deferredData: result,
-            statusCode: (_result$init = result.init) == null ? void 0 : _result$init.status,
-            headers: ((_result$init2 = result.init) == null ? void 0 : _result$init2.headers) && new Headers(result.init.headers)
+            statusCode: (_result$init3 = result.init) == null ? void 0 : _result$init3.status,
+            headers: ((_result$init4 = result.init) == null ? void 0 : _result$init4.headers) && new Headers(result.init.headers)
+        };
+    }
+    if (isDataWithResponseInit(result)) {
+        var _result$init5, _result$init6;
+        return {
+            type: ResultType.data,
+            data: result.data,
+            statusCode: (_result$init5 = result.init) == null ? void 0 : _result$init5.status,
+            headers: (_result$init6 = result.init) != null && _result$init6.headers ? new Headers(result.init.headers) : undefined
         };
     }
     return {
         type: ResultType.data,
-        data: result,
-        statusCode: status
+        data: result
     };
 }
 // Support relative routing in internal redirects
@@ -34013,7 +34078,7 @@ function getInternalRouterError(status, _temp5) {
     let errorMessage = "Unknown @remix-run/router error";
     if (status === 400) {
         statusText = "Bad Request";
-        if (type === "route-discovery") errorMessage = 'Unable to match URL "' + pathname + '" - the `unstable_patchRoutesOnMiss()` ' + ("function threw the following error:\n" + message);
+        if (type === "route-discovery") errorMessage = 'Unable to match URL "' + pathname + '" - the `unstable_patchRoutesOnNavigation()` ' + ("function threw the following error:\n" + message);
         else if (method && pathname && routeId) errorMessage = "You made a " + method + ' request to "' + pathname + '" but ' + ('did not provide a `loader` for route "' + routeId + '", ') + "so there is no way to handle the request.";
         else if (type === "defer-action") errorMessage = "defer() is not supported in actions";
         else if (type === "invalid-body") errorMessage = "Unable to encode submission body";
@@ -34075,6 +34140,9 @@ function isErrorResult(result) {
 }
 function isRedirectResult(result) {
     return (result && result.type) === ResultType.redirect;
+}
+function isDataWithResponseInit(value) {
+    return typeof value === "object" && value != null && "type" in value && "data" in value && "init" in value && value.type === "DataWithResponseInit";
 }
 function isDeferredData(value) {
     let deferred = value;
@@ -34326,1327 +34394,7 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}],"4gflv":[function(require,module,exports) {
-var $parcel$ReactRefreshHelpers$f7a6 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
-var prevRefreshReg = window.$RefreshReg$;
-var prevRefreshSig = window.$RefreshSig$;
-$parcel$ReactRefreshHelpers$f7a6.prelude(module);
-
-try {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "MainView", ()=>MainView);
-var _jsxDevRuntime = require("react/jsx-dev-runtime");
-var _react = require("react");
-var _reactDefault = parcelHelpers.interopDefault(_react);
-var _movieCard = require("../movie-card/movie-card");
-var _movieView = require("../movie-view/movie-view");
-var _loginView = require("../login-view/login-view");
-var _signupView = require("../signup-view/signup-view");
-var _navigationBar = require("../navigation-bar/navigation-bar");
-var _profileView = require("../profile-view/profile-view");
-var _profileViewDefault = parcelHelpers.interopDefault(_profileView);
-var _reactBootstrap = require("react-bootstrap");
-var _reactRouterDom = require("react-router-dom");
-var _reactToastify = require("react-toastify");
-var _axios = require("axios");
-var _axiosDefault = parcelHelpers.interopDefault(_axios);
-var _reactToastifyCss = require("react-toastify/dist/ReactToastify.css");
-var _mainViewScss = require("./main-view.scss");
-var _favoriteMovies = require("../profile-view/favorite-movies");
-var _s = $RefreshSig$();
-const MainView = ()=>{
-    _s();
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    const storedToken = localStorage.getItem("token");
-    const [user, setUser] = (0, _react.useState)(storedUser ? storedUser : null);
-    const [token, setToken] = (0, _react.useState)(storedToken ? storedToken : null);
-    const [movies, setMovies] = (0, _react.useState)([]);
-    const [search, setSearch] = (0, _react.useState)("");
-    const [selectedGenre, setSelectedGenre] = (0, _react.useState)("");
-    const [loading, setLoading] = (0, _react.useState)(true);
-    const navigate = (0, _reactRouterDom.useNavigate)();
-    (0, _react.useEffect)(()=>{
-        if (!token) return;
-        fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies", {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }).then((response)=>{
-            if (!response.ok) throw new Error("Network response was not ok");
-            return response.json();
-        }).then((data)=>{
-            if (!Array.isArray(data)) throw new Error("Expected an array of movies");
-            const moviesFromApi = data.map(({ _id, Title, ImagePath, Description, Year, Genre, Director })=>({
-                    _id,
-                    Title,
-                    ImagePath,
-                    Description,
-                    Year,
-                    Genre: {
-                        Name: Genre?.Name
-                    },
-                    Director: {
-                        Name: Director?.Name
-                    }
-                }));
-            setMovies(moviesFromApi);
-            setLoading(false);
-        }).catch((error)=>{
-            console.error("Error fetching movies:", error);
-            (0, _reactToastify.toast).error("Failed to fetch movies");
-            setLoading(false);
-        });
-    }, [
-        token
-    ]);
-    const addFav = (id)=>{
-        fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}/Movies/${id}`, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }).then((response)=>{
-            if (response.ok) return response.json();
-            else throw new Error("Failed to add movie to favorites");
-        }).then((user)=>{
-            if (user) {
-                localStorage.setItem("user", JSON.stringify(user));
-                setUser(user);
-                (0, _reactToastify.toast).success("Added to favorites");
-            }
-        }).catch((error)=>{
-            console.error("Error: ", error);
-            (0, _reactToastify.toast).error("Failed to add to favorites");
-        });
-    };
-    const removeFav = (id)=>{
-        fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}/Movies/${id}`, {
-            method: "DELETE",
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }).then((response)=>{
-            if (response.ok) return response.json();
-            else throw new Error("Failed to remove movie from favorites");
-        }).then((user)=>{
-            if (user) {
-                localStorage.setItem("user", JSON.stringify(user));
-                setUser(user);
-                (0, _reactToastify.toast).success("Removed from favorites");
-            }
-        }).catch((error)=>{
-            console.error("Error: ", error);
-            (0, _reactToastify.toast).error("Failed to remove from favorites");
-        });
-    };
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-        className: "main-view",
-        children: [
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _navigationBar.NavigationBar), {
-                user: user,
-                onLoggedOut: ()=>{
-                    setUser(null);
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("user");
-                    (0, _reactToastify.toast).info("Logged out");
-                }
-            }, void 0, false, {
-                fileName: "src/components/main-view/main-view.jsx",
-                lineNumber: 132,
-                columnNumber: 13
-            }, undefined),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Row), {
-                className: "justify-content-center my-5",
-                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Routes), {
-                    children: [
-                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
-                            path: "/signup",
-                            element: user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
-                                to: "/"
-                            }, void 0, false, {
-                                fileName: "src/components/main-view/main-view.jsx",
-                                lineNumber: 147,
-                                columnNumber: 33
-                            }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                                md: 5,
-                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _signupView.SignupView), {}, void 0, false, {
-                                    fileName: "src/components/main-view/main-view.jsx",
-                                    lineNumber: 150,
-                                    columnNumber: 37
-                                }, void 0)
-                            }, void 0, false, {
-                                fileName: "src/components/main-view/main-view.jsx",
-                                lineNumber: 149,
-                                columnNumber: 33
-                            }, void 0)
-                        }, void 0, false, {
-                            fileName: "src/components/main-view/main-view.jsx",
-                            lineNumber: 143,
-                            columnNumber: 21
-                        }, undefined),
-                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
-                            path: "/login",
-                            element: user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
-                                to: "/"
-                            }, void 0, false, {
-                                fileName: "src/components/main-view/main-view.jsx",
-                                lineNumber: 159,
-                                columnNumber: 33
-                            }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                                md: 5,
-                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _loginView.LoginView), {
-                                    onLoggedIn: (user, token)=>{
-                                        setUser(user);
-                                        setToken(token);
-                                        (0, _reactToastify.toast).success("Logged in successfully");
-                                    }
-                                }, void 0, false, {
-                                    fileName: "src/components/main-view/main-view.jsx",
-                                    lineNumber: 162,
-                                    columnNumber: 37
-                                }, void 0)
-                            }, void 0, false, {
-                                fileName: "src/components/main-view/main-view.jsx",
-                                lineNumber: 161,
-                                columnNumber: 33
-                            }, void 0)
-                        }, void 0, false, {
-                            fileName: "src/components/main-view/main-view.jsx",
-                            lineNumber: 155,
-                            columnNumber: 21
-                        }, undefined),
-                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
-                            path: "/movies/:movieId",
-                            element: !user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
-                                to: "/login",
-                                replace: true
-                            }, void 0, false, {
-                                fileName: "src/components/main-view/main-view.jsx",
-                                lineNumber: 177,
-                                columnNumber: 33
-                            }, void 0) : movies.length === 0 ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                                children: "There are no movies"
-                            }, void 0, false, {
-                                fileName: "src/components/main-view/main-view.jsx",
-                                lineNumber: 179,
-                                columnNumber: 33
-                            }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                                md: 12,
-                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieView.MovieView), {
-                                    movies: movies,
-                                    addFav: addFav,
-                                    removeFav: removeFav,
-                                    user: user
-                                }, void 0, false, {
-                                    fileName: "src/components/main-view/main-view.jsx",
-                                    lineNumber: 182,
-                                    columnNumber: 37
-                                }, void 0)
-                            }, void 0, false, {
-                                fileName: "src/components/main-view/main-view.jsx",
-                                lineNumber: 181,
-                                columnNumber: 33
-                            }, void 0)
-                        }, void 0, false, {
-                            fileName: "src/components/main-view/main-view.jsx",
-                            lineNumber: 173,
-                            columnNumber: 21
-                        }, undefined),
-                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
-                            path: "/",
-                            element: !user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
-                                to: "/login",
-                                replace: true
-                            }, void 0, false, {
-                                fileName: "src/components/main-view/main-view.jsx",
-                                lineNumber: 196,
-                                columnNumber: 33
-                            }, void 0) : movies.length === 0 ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                                children: "The list is empty"
-                            }, void 0, false, {
-                                fileName: "src/components/main-view/main-view.jsx",
-                                lineNumber: 198,
-                                columnNumber: 33
-                            }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
-                                children: [
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form), {
-                                        className: "form-inline mt-5 d-flex justify-content-center",
-                                        children: [
-                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Control, {
-                                                className: "mx-5 mx-md-0",
-                                                type: "search",
-                                                id: "searchForm",
-                                                onChange: (e)=>setSearch(e.target.value),
-                                                placeholder: "Search for ...",
-                                                "aria-label": "Search"
-                                            }, void 0, false, {
-                                                fileName: "src/components/main-view/main-view.jsx",
-                                                lineNumber: 202,
-                                                columnNumber: 41
-                                            }, void 0),
-                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Select, {
-                                                className: "ms-3 w-25",
-                                                "aria-label": "Default select genre",
-                                                onChange: (e)=>setSelectedGenre(e.target.value),
-                                                children: [
-                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("option", {
-                                                        value: "",
-                                                        children: "Search by genre"
-                                                    }, void 0, false, {
-                                                        fileName: "src/components/main-view/main-view.jsx",
-                                                        lineNumber: 215,
-                                                        columnNumber: 45
-                                                    }, void 0),
-                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("option", {
-                                                        value: "Science Fiction",
-                                                        children: "Science Fiction"
-                                                    }, void 0, false, {
-                                                        fileName: "src/components/main-view/main-view.jsx",
-                                                        lineNumber: 216,
-                                                        columnNumber: 45
-                                                    }, void 0),
-                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("option", {
-                                                        value: "Horror",
-                                                        children: "Horror"
-                                                    }, void 0, false, {
-                                                        fileName: "src/components/main-view/main-view.jsx",
-                                                        lineNumber: 217,
-                                                        columnNumber: 45
-                                                    }, void 0),
-                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("option", {
-                                                        value: "Action",
-                                                        children: "Action"
-                                                    }, void 0, false, {
-                                                        fileName: "src/components/main-view/main-view.jsx",
-                                                        lineNumber: 218,
-                                                        columnNumber: 45
-                                                    }, void 0),
-                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("option", {
-                                                        value: "Fantasy",
-                                                        children: "Fantasy"
-                                                    }, void 0, false, {
-                                                        fileName: "src/components/main-view/main-view.jsx",
-                                                        lineNumber: 219,
-                                                        columnNumber: 45
-                                                    }, void 0),
-                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("option", {
-                                                        value: "Thriller",
-                                                        children: "Thriller"
-                                                    }, void 0, false, {
-                                                        fileName: "src/components/main-view/main-view.jsx",
-                                                        lineNumber: 220,
-                                                        columnNumber: 45
-                                                    }, void 0)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "src/components/main-view/main-view.jsx",
-                                                lineNumber: 210,
-                                                columnNumber: 41
-                                            }, void 0)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "src/components/main-view/main-view.jsx",
-                                        lineNumber: 201,
-                                        columnNumber: 37
-                                    }, void 0),
-                                    movies.filter((movie)=>selectedGenre === "" ? movie : movie.Genre.Name === selectedGenre).filter((movie)=>search === "" ? movie : movie.Title.toLowerCase().includes(search.toLowerCase())).map((movie)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                                            md: 6,
-                                            lg: 4,
-                                            xl: 3,
-                                            className: "mb-5 col-8",
-                                            children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieCard.MovieCard), {
-                                                movie: movie,
-                                                onAddToFavorites: addFav,
-                                                onRemoveFromFavorites: removeFav,
-                                                isFavorite: user.FavoriteMovies ? user.FavoriteMovies.includes(movie._id) : false,
-                                                onMovieClick: (movieId)=>navigate(`/movies/${movieId}`)
-                                            }, void 0, false, {
-                                                fileName: "src/components/main-view/main-view.jsx",
-                                                lineNumber: 242,
-                                                columnNumber: 49
-                                            }, void 0)
-                                        }, movie._id, false, {
-                                            fileName: "src/components/main-view/main-view.jsx",
-                                            lineNumber: 235,
-                                            columnNumber: 45
-                                        }, void 0))
-                                ]
-                            }, void 0, true)
-                        }, void 0, false, {
-                            fileName: "src/components/main-view/main-view.jsx",
-                            lineNumber: 192,
-                            columnNumber: 21
-                        }, undefined),
-                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
-                            path: "/profile",
-                            element: !user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
-                                to: "/login",
-                                replace: true
-                            }, void 0, false, {
-                                fileName: "src/components/main-view/main-view.jsx",
-                                lineNumber: 259,
-                                columnNumber: 33
-                            }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _profileViewDefault.default), {
-                                    user: user,
-                                    movies: movies,
-                                    removeFav: removeFav,
-                                    addFav: addFav,
-                                    setUser: setUser
-                                }, void 0, false, {
-                                    fileName: "src/components/main-view/main-view.jsx",
-                                    lineNumber: 262,
-                                    columnNumber: 37
-                                }, void 0)
-                            }, void 0, false, {
-                                fileName: "src/components/main-view/main-view.jsx",
-                                lineNumber: 261,
-                                columnNumber: 33
-                            }, void 0)
-                        }, void 0, false, {
-                            fileName: "src/components/main-view/main-view.jsx",
-                            lineNumber: 255,
-                            columnNumber: 21
-                        }, undefined)
-                    ]
-                }, void 0, true, {
-                    fileName: "src/components/main-view/main-view.jsx",
-                    lineNumber: 142,
-                    columnNumber: 17
-                }, undefined)
-            }, void 0, false, {
-                fileName: "src/components/main-view/main-view.jsx",
-                lineNumber: 141,
-                columnNumber: 13
-            }, undefined),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactToastify.ToastContainer), {}, void 0, false, {
-                fileName: "src/components/main-view/main-view.jsx",
-                lineNumber: 275,
-                columnNumber: 13
-            }, undefined)
-        ]
-    }, void 0, true, {
-        fileName: "src/components/main-view/main-view.jsx",
-        lineNumber: 131,
-        columnNumber: 9
-    }, undefined);
-};
-_s(MainView, "QhF/uqc111Oz4eGx5khtAXn+m1M=", false, function() {
-    return [
-        (0, _reactRouterDom.useNavigate)
-    ];
-});
-_c = MainView;
-var _c;
-$RefreshReg$(_c, "MainView");
-
-  $parcel$ReactRefreshHelpers$f7a6.postlude(module);
-} finally {
-  window.$RefreshReg$ = prevRefreshReg;
-  window.$RefreshSig$ = prevRefreshSig;
-}
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","../movie-card/movie-card":"bwuIu","../movie-view/movie-view":"ggaUx","../login-view/login-view":"9YtA0","../signup-view/signup-view":"4OGiN","../navigation-bar/navigation-bar":"bsPVM","../profile-view/profile-view":"2vVqf","react-bootstrap":"3AD9A","react-router-dom":"9xmpe","react-toastify":"kSvyQ","axios":"jo6P5","react-toastify/dist/ReactToastify.css":"gJP2Y","./main-view.scss":"eBaMl","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","../profile-view/favorite-movies":"dTTQH"}],"bwuIu":[function(require,module,exports) {
-var $parcel$ReactRefreshHelpers$67b2 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
-var prevRefreshReg = window.$RefreshReg$;
-var prevRefreshSig = window.$RefreshSig$;
-$parcel$ReactRefreshHelpers$67b2.prelude(module);
-
-try {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "MovieCard", ()=>MovieCard);
-var _jsxDevRuntime = require("react/jsx-dev-runtime");
-var _react = require("react");
-var _reactDefault = parcelHelpers.interopDefault(_react);
-var _propTypes = require("prop-types");
-var _propTypesDefault = parcelHelpers.interopDefault(_propTypes);
-var _reactBootstrap = require("react-bootstrap");
-var _reactRouterDom = require("react-router-dom");
-var _s = $RefreshSig$();
-const MovieCard = ({ movie, onAddToFavorites, onRemoveFromFavorites, isFavorite })=>{
-    _s();
-    const navigate = (0, _reactRouterDom.useNavigate)();
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card), {
-        className: "movie-card",
-        children: [
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Image), {
-                src: movie.ImagePath,
-                alt: movie.Title,
-                fluid: true
-            }, void 0, false, {
-                fileName: "src/components/movie-card/movie-card.jsx",
-                lineNumber: 11,
-                columnNumber: 7
-            }, undefined),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Body, {
-                children: [
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Title, {
-                        children: movie.Title
-                    }, void 0, false, {
-                        fileName: "src/components/movie-card/movie-card.jsx",
-                        lineNumber: 13,
-                        columnNumber: 9
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Text, {
-                        children: movie.Description
-                    }, void 0, false, {
-                        fileName: "src/components/movie-card/movie-card.jsx",
-                        lineNumber: 14,
-                        columnNumber: 9
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Text, {
-                        children: [
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("strong", {
-                                children: "Genre:"
-                            }, void 0, false, {
-                                fileName: "src/components/movie-card/movie-card.jsx",
-                                lineNumber: 15,
-                                columnNumber: 20
-                            }, undefined),
-                            " ",
-                            movie.Genre?.Name
-                        ]
-                    }, void 0, true, {
-                        fileName: "src/components/movie-card/movie-card.jsx",
-                        lineNumber: 15,
-                        columnNumber: 9
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Text, {
-                        children: [
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("strong", {
-                                children: "Director:"
-                            }, void 0, false, {
-                                fileName: "src/components/movie-card/movie-card.jsx",
-                                lineNumber: 16,
-                                columnNumber: 20
-                            }, undefined),
-                            " ",
-                            movie.Director?.Name
-                        ]
-                    }, void 0, true, {
-                        fileName: "src/components/movie-card/movie-card.jsx",
-                        lineNumber: 16,
-                        columnNumber: 9
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
-                        variant: "info",
-                        onClick: ()=>navigate(`/movies/${movie._id}`),
-                        children: "View Movie"
-                    }, void 0, false, {
-                        fileName: "src/components/movie-card/movie-card.jsx",
-                        lineNumber: 17,
-                        columnNumber: 9
-                    }, undefined),
-                    isFavorite ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
-                        variant: "danger",
-                        onClick: ()=>onRemoveFromFavorites(movie._id),
-                        children: "Remove from Favorites"
-                    }, void 0, false, {
-                        fileName: "src/components/movie-card/movie-card.jsx",
-                        lineNumber: 21,
-                        columnNumber: 11
-                    }, undefined) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
-                        variant: "primary",
-                        onClick: ()=>onAddToFavorites(movie._id),
-                        children: "Add to Favorites"
-                    }, void 0, false, {
-                        fileName: "src/components/movie-card/movie-card.jsx",
-                        lineNumber: 25,
-                        columnNumber: 11
-                    }, undefined)
-                ]
-            }, void 0, true, {
-                fileName: "src/components/movie-card/movie-card.jsx",
-                lineNumber: 12,
-                columnNumber: 7
-            }, undefined)
-        ]
-    }, void 0, true, {
-        fileName: "src/components/movie-card/movie-card.jsx",
-        lineNumber: 10,
-        columnNumber: 5
-    }, undefined);
-};
-_s(MovieCard, "CzcTeTziyjMsSrAVmHuCCb6+Bfg=", false, function() {
-    return [
-        (0, _reactRouterDom.useNavigate)
-    ];
-});
-_c = MovieCard;
-MovieCard.propTypes = {
-    movie: (0, _propTypesDefault.default).shape({
-        _id: (0, _propTypesDefault.default).string.isRequired,
-        Title: (0, _propTypesDefault.default).string.isRequired,
-        Description: (0, _propTypesDefault.default).string.isRequired,
-        ImagePath: (0, _propTypesDefault.default).string.isRequired,
-        Genre: (0, _propTypesDefault.default).shape({
-            Name: (0, _propTypesDefault.default).string
-        }),
-        Director: (0, _propTypesDefault.default).shape({
-            Name: (0, _propTypesDefault.default).string
-        })
-    }).isRequired,
-    onAddToFavorites: (0, _propTypesDefault.default).func.isRequired,
-    onRemoveFromFavorites: (0, _propTypesDefault.default).func.isRequired,
-    isFavorite: (0, _propTypesDefault.default).bool.isRequired
-};
-var _c;
-$RefreshReg$(_c, "MovieCard");
-
-  $parcel$ReactRefreshHelpers$67b2.postlude(module);
-} finally {
-  window.$RefreshReg$ = prevRefreshReg;
-  window.$RefreshSig$ = prevRefreshSig;
-}
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","prop-types":"7wKI2","react-bootstrap":"3AD9A","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","react-router-dom":"9xmpe"}],"7wKI2":[function(require,module,exports) {
-/**
- * Copyright (c) 2013-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */ var ReactIs = require("96e34ae03f5a2631");
-// By explicitly using `prop-types` you are opting into new development behavior.
-// http://fb.me/prop-types-in-prod
-var throwOnDirectAccess = true;
-module.exports = require("cb216452e2171041")(ReactIs.isElement, throwOnDirectAccess);
-
-},{"96e34ae03f5a2631":"7EuwB","cb216452e2171041":"bBUgD"}],"7EuwB":[function(require,module,exports) {
-"use strict";
-module.exports = require("2255125a8e8b1051");
-
-},{"2255125a8e8b1051":"5DsXl"}],"5DsXl":[function(require,module,exports) {
-/** @license React v16.13.1
- * react-is.development.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */ "use strict";
-(function() {
-    "use strict";
-    // The Symbol used to tag the ReactElement-like types. If there is no native Symbol
-    // nor polyfill, then a plain number is used for performance.
-    var hasSymbol = typeof Symbol === "function" && Symbol.for;
-    var REACT_ELEMENT_TYPE = hasSymbol ? Symbol.for("react.element") : 0xeac7;
-    var REACT_PORTAL_TYPE = hasSymbol ? Symbol.for("react.portal") : 0xeaca;
-    var REACT_FRAGMENT_TYPE = hasSymbol ? Symbol.for("react.fragment") : 0xeacb;
-    var REACT_STRICT_MODE_TYPE = hasSymbol ? Symbol.for("react.strict_mode") : 0xeacc;
-    var REACT_PROFILER_TYPE = hasSymbol ? Symbol.for("react.profiler") : 0xead2;
-    var REACT_PROVIDER_TYPE = hasSymbol ? Symbol.for("react.provider") : 0xeacd;
-    var REACT_CONTEXT_TYPE = hasSymbol ? Symbol.for("react.context") : 0xeace; // TODO: We don't use AsyncMode or ConcurrentMode anymore. They were temporary
-    // (unstable) APIs that have been removed. Can we remove the symbols?
-    var REACT_ASYNC_MODE_TYPE = hasSymbol ? Symbol.for("react.async_mode") : 0xeacf;
-    var REACT_CONCURRENT_MODE_TYPE = hasSymbol ? Symbol.for("react.concurrent_mode") : 0xeacf;
-    var REACT_FORWARD_REF_TYPE = hasSymbol ? Symbol.for("react.forward_ref") : 0xead0;
-    var REACT_SUSPENSE_TYPE = hasSymbol ? Symbol.for("react.suspense") : 0xead1;
-    var REACT_SUSPENSE_LIST_TYPE = hasSymbol ? Symbol.for("react.suspense_list") : 0xead8;
-    var REACT_MEMO_TYPE = hasSymbol ? Symbol.for("react.memo") : 0xead3;
-    var REACT_LAZY_TYPE = hasSymbol ? Symbol.for("react.lazy") : 0xead4;
-    var REACT_BLOCK_TYPE = hasSymbol ? Symbol.for("react.block") : 0xead9;
-    var REACT_FUNDAMENTAL_TYPE = hasSymbol ? Symbol.for("react.fundamental") : 0xead5;
-    var REACT_RESPONDER_TYPE = hasSymbol ? Symbol.for("react.responder") : 0xead6;
-    var REACT_SCOPE_TYPE = hasSymbol ? Symbol.for("react.scope") : 0xead7;
-    function isValidElementType(type) {
-        return typeof type === "string" || typeof type === "function" || // Note: its typeof might be other than 'symbol' or 'number' if it's a polyfill.
-        type === REACT_FRAGMENT_TYPE || type === REACT_CONCURRENT_MODE_TYPE || type === REACT_PROFILER_TYPE || type === REACT_STRICT_MODE_TYPE || type === REACT_SUSPENSE_TYPE || type === REACT_SUSPENSE_LIST_TYPE || typeof type === "object" && type !== null && (type.$$typeof === REACT_LAZY_TYPE || type.$$typeof === REACT_MEMO_TYPE || type.$$typeof === REACT_PROVIDER_TYPE || type.$$typeof === REACT_CONTEXT_TYPE || type.$$typeof === REACT_FORWARD_REF_TYPE || type.$$typeof === REACT_FUNDAMENTAL_TYPE || type.$$typeof === REACT_RESPONDER_TYPE || type.$$typeof === REACT_SCOPE_TYPE || type.$$typeof === REACT_BLOCK_TYPE);
-    }
-    function typeOf(object) {
-        if (typeof object === "object" && object !== null) {
-            var $$typeof = object.$$typeof;
-            switch($$typeof){
-                case REACT_ELEMENT_TYPE:
-                    var type = object.type;
-                    switch(type){
-                        case REACT_ASYNC_MODE_TYPE:
-                        case REACT_CONCURRENT_MODE_TYPE:
-                        case REACT_FRAGMENT_TYPE:
-                        case REACT_PROFILER_TYPE:
-                        case REACT_STRICT_MODE_TYPE:
-                        case REACT_SUSPENSE_TYPE:
-                            return type;
-                        default:
-                            var $$typeofType = type && type.$$typeof;
-                            switch($$typeofType){
-                                case REACT_CONTEXT_TYPE:
-                                case REACT_FORWARD_REF_TYPE:
-                                case REACT_LAZY_TYPE:
-                                case REACT_MEMO_TYPE:
-                                case REACT_PROVIDER_TYPE:
-                                    return $$typeofType;
-                                default:
-                                    return $$typeof;
-                            }
-                    }
-                case REACT_PORTAL_TYPE:
-                    return $$typeof;
-            }
-        }
-        return undefined;
-    } // AsyncMode is deprecated along with isAsyncMode
-    var AsyncMode = REACT_ASYNC_MODE_TYPE;
-    var ConcurrentMode = REACT_CONCURRENT_MODE_TYPE;
-    var ContextConsumer = REACT_CONTEXT_TYPE;
-    var ContextProvider = REACT_PROVIDER_TYPE;
-    var Element = REACT_ELEMENT_TYPE;
-    var ForwardRef = REACT_FORWARD_REF_TYPE;
-    var Fragment = REACT_FRAGMENT_TYPE;
-    var Lazy = REACT_LAZY_TYPE;
-    var Memo = REACT_MEMO_TYPE;
-    var Portal = REACT_PORTAL_TYPE;
-    var Profiler = REACT_PROFILER_TYPE;
-    var StrictMode = REACT_STRICT_MODE_TYPE;
-    var Suspense = REACT_SUSPENSE_TYPE;
-    var hasWarnedAboutDeprecatedIsAsyncMode = false; // AsyncMode should be deprecated
-    function isAsyncMode(object) {
-        if (!hasWarnedAboutDeprecatedIsAsyncMode) {
-            hasWarnedAboutDeprecatedIsAsyncMode = true; // Using console['warn'] to evade Babel and ESLint
-            console["warn"]("The ReactIs.isAsyncMode() alias has been deprecated, and will be removed in React 17+. Update your code to use ReactIs.isConcurrentMode() instead. It has the exact same API.");
-        }
-        return isConcurrentMode(object) || typeOf(object) === REACT_ASYNC_MODE_TYPE;
-    }
-    function isConcurrentMode(object) {
-        return typeOf(object) === REACT_CONCURRENT_MODE_TYPE;
-    }
-    function isContextConsumer(object) {
-        return typeOf(object) === REACT_CONTEXT_TYPE;
-    }
-    function isContextProvider(object) {
-        return typeOf(object) === REACT_PROVIDER_TYPE;
-    }
-    function isElement(object) {
-        return typeof object === "object" && object !== null && object.$$typeof === REACT_ELEMENT_TYPE;
-    }
-    function isForwardRef(object) {
-        return typeOf(object) === REACT_FORWARD_REF_TYPE;
-    }
-    function isFragment(object) {
-        return typeOf(object) === REACT_FRAGMENT_TYPE;
-    }
-    function isLazy(object) {
-        return typeOf(object) === REACT_LAZY_TYPE;
-    }
-    function isMemo(object) {
-        return typeOf(object) === REACT_MEMO_TYPE;
-    }
-    function isPortal(object) {
-        return typeOf(object) === REACT_PORTAL_TYPE;
-    }
-    function isProfiler(object) {
-        return typeOf(object) === REACT_PROFILER_TYPE;
-    }
-    function isStrictMode(object) {
-        return typeOf(object) === REACT_STRICT_MODE_TYPE;
-    }
-    function isSuspense(object) {
-        return typeOf(object) === REACT_SUSPENSE_TYPE;
-    }
-    exports.AsyncMode = AsyncMode;
-    exports.ConcurrentMode = ConcurrentMode;
-    exports.ContextConsumer = ContextConsumer;
-    exports.ContextProvider = ContextProvider;
-    exports.Element = Element;
-    exports.ForwardRef = ForwardRef;
-    exports.Fragment = Fragment;
-    exports.Lazy = Lazy;
-    exports.Memo = Memo;
-    exports.Portal = Portal;
-    exports.Profiler = Profiler;
-    exports.StrictMode = StrictMode;
-    exports.Suspense = Suspense;
-    exports.isAsyncMode = isAsyncMode;
-    exports.isConcurrentMode = isConcurrentMode;
-    exports.isContextConsumer = isContextConsumer;
-    exports.isContextProvider = isContextProvider;
-    exports.isElement = isElement;
-    exports.isForwardRef = isForwardRef;
-    exports.isFragment = isFragment;
-    exports.isLazy = isLazy;
-    exports.isMemo = isMemo;
-    exports.isPortal = isPortal;
-    exports.isProfiler = isProfiler;
-    exports.isStrictMode = isStrictMode;
-    exports.isSuspense = isSuspense;
-    exports.isValidElementType = isValidElementType;
-    exports.typeOf = typeOf;
-})();
-
-},{}],"bBUgD":[function(require,module,exports) {
-/**
- * Copyright (c) 2013-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */ "use strict";
-var ReactIs = require("c437388b089702c3");
-var assign = require("c067a60101d8520c");
-var ReactPropTypesSecret = require("74a0f89a70b9f3c2");
-var has = require("18441b11647bc78");
-var checkPropTypes = require("bec3f6ff89f0b072");
-var printWarning = function() {};
-printWarning = function(text) {
-    var message = "Warning: " + text;
-    if (typeof console !== "undefined") console.error(message);
-    try {
-        // --- Welcome to debugging React ---
-        // This error was thrown as a convenience so that you can use this stack
-        // to find the callsite that caused this warning to fire.
-        throw new Error(message);
-    } catch (x) {}
-};
-function emptyFunctionThatReturnsNull() {
-    return null;
-}
-module.exports = function(isValidElement, throwOnDirectAccess) {
-    /* global Symbol */ var ITERATOR_SYMBOL = typeof Symbol === "function" && Symbol.iterator;
-    var FAUX_ITERATOR_SYMBOL = "@@iterator"; // Before Symbol spec.
-    /**
-   * Returns the iterator method function contained on the iterable object.
-   *
-   * Be sure to invoke the function with the iterable as context:
-   *
-   *     var iteratorFn = getIteratorFn(myIterable);
-   *     if (iteratorFn) {
-   *       var iterator = iteratorFn.call(myIterable);
-   *       ...
-   *     }
-   *
-   * @param {?object} maybeIterable
-   * @return {?function}
-   */ function getIteratorFn(maybeIterable) {
-        var iteratorFn = maybeIterable && (ITERATOR_SYMBOL && maybeIterable[ITERATOR_SYMBOL] || maybeIterable[FAUX_ITERATOR_SYMBOL]);
-        if (typeof iteratorFn === "function") return iteratorFn;
-    }
-    /**
-   * Collection of methods that allow declaration and validation of props that are
-   * supplied to React components. Example usage:
-   *
-   *   var Props = require('ReactPropTypes');
-   *   var MyArticle = React.createClass({
-   *     propTypes: {
-   *       // An optional string prop named "description".
-   *       description: Props.string,
-   *
-   *       // A required enum prop named "category".
-   *       category: Props.oneOf(['News','Photos']).isRequired,
-   *
-   *       // A prop named "dialog" that requires an instance of Dialog.
-   *       dialog: Props.instanceOf(Dialog).isRequired
-   *     },
-   *     render: function() { ... }
-   *   });
-   *
-   * A more formal specification of how these methods are used:
-   *
-   *   type := array|bool|func|object|number|string|oneOf([...])|instanceOf(...)
-   *   decl := ReactPropTypes.{type}(.isRequired)?
-   *
-   * Each and every declaration produces a function with the same signature. This
-   * allows the creation of custom validation functions. For example:
-   *
-   *  var MyLink = React.createClass({
-   *    propTypes: {
-   *      // An optional string or URI prop named "href".
-   *      href: function(props, propName, componentName) {
-   *        var propValue = props[propName];
-   *        if (propValue != null && typeof propValue !== 'string' &&
-   *            !(propValue instanceof URI)) {
-   *          return new Error(
-   *            'Expected a string or an URI for ' + propName + ' in ' +
-   *            componentName
-   *          );
-   *        }
-   *      }
-   *    },
-   *    render: function() {...}
-   *  });
-   *
-   * @internal
-   */ var ANONYMOUS = "<<anonymous>>";
-    // Important!
-    // Keep this list in sync with production version in `./factoryWithThrowingShims.js`.
-    var ReactPropTypes = {
-        array: createPrimitiveTypeChecker("array"),
-        bigint: createPrimitiveTypeChecker("bigint"),
-        bool: createPrimitiveTypeChecker("boolean"),
-        func: createPrimitiveTypeChecker("function"),
-        number: createPrimitiveTypeChecker("number"),
-        object: createPrimitiveTypeChecker("object"),
-        string: createPrimitiveTypeChecker("string"),
-        symbol: createPrimitiveTypeChecker("symbol"),
-        any: createAnyTypeChecker(),
-        arrayOf: createArrayOfTypeChecker,
-        element: createElementTypeChecker(),
-        elementType: createElementTypeTypeChecker(),
-        instanceOf: createInstanceTypeChecker,
-        node: createNodeChecker(),
-        objectOf: createObjectOfTypeChecker,
-        oneOf: createEnumTypeChecker,
-        oneOfType: createUnionTypeChecker,
-        shape: createShapeTypeChecker,
-        exact: createStrictShapeTypeChecker
-    };
-    /**
-   * inlined Object.is polyfill to avoid requiring consumers ship their own
-   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is
-   */ /*eslint-disable no-self-compare*/ function is(x, y) {
-        // SameValue algorithm
-        if (x === y) // Steps 1-5, 7-10
-        // Steps 6.b-6.e: +0 != -0
-        return x !== 0 || 1 / x === 1 / y;
-        else // Step 6.a: NaN == NaN
-        return x !== x && y !== y;
-    }
-    /*eslint-enable no-self-compare*/ /**
-   * We use an Error-like object for backward compatibility as people may call
-   * PropTypes directly and inspect their output. However, we don't use real
-   * Errors anymore. We don't inspect their stack anyway, and creating them
-   * is prohibitively expensive if they are created too often, such as what
-   * happens in oneOfType() for any type before the one that matched.
-   */ function PropTypeError(message, data) {
-        this.message = message;
-        this.data = data && typeof data === "object" ? data : {};
-        this.stack = "";
-    }
-    // Make `instanceof Error` still work for returned errors.
-    PropTypeError.prototype = Error.prototype;
-    function createChainableTypeChecker(validate) {
-        var manualPropTypeCallCache = {};
-        var manualPropTypeWarningCount = 0;
-        function checkType(isRequired, props, propName, componentName, location, propFullName, secret) {
-            componentName = componentName || ANONYMOUS;
-            propFullName = propFullName || propName;
-            if (secret !== ReactPropTypesSecret) {
-                if (throwOnDirectAccess) {
-                    // New behavior only for users of `prop-types` package
-                    var err = new Error("Calling PropTypes validators directly is not supported by the `prop-types` package. Use `PropTypes.checkPropTypes()` to call them. Read more at http://fb.me/use-check-prop-types");
-                    err.name = "Invariant Violation";
-                    throw err;
-                } else if (typeof console !== "undefined") {
-                    // Old behavior for people using React.PropTypes
-                    var cacheKey = componentName + ":" + propName;
-                    if (!manualPropTypeCallCache[cacheKey] && // Avoid spamming the console because they are often not actionable except for lib authors
-                    manualPropTypeWarningCount < 3) {
-                        printWarning("You are manually calling a React.PropTypes validation function for the `" + propFullName + "` prop on `" + componentName + "`. This is deprecated " + "and will throw in the standalone `prop-types` package. " + "You may be seeing this warning due to a third-party PropTypes " + "library. See https://fb.me/react-warning-dont-call-proptypes " + "for details.");
-                        manualPropTypeCallCache[cacheKey] = true;
-                        manualPropTypeWarningCount++;
-                    }
-                }
-            }
-            if (props[propName] == null) {
-                if (isRequired) {
-                    if (props[propName] === null) return new PropTypeError("The " + location + " `" + propFullName + "` is marked as required " + ("in `" + componentName + "`, but its value is `null`."));
-                    return new PropTypeError("The " + location + " `" + propFullName + "` is marked as required in " + ("`" + componentName + "`, but its value is `undefined`."));
-                }
-                return null;
-            } else return validate(props, propName, componentName, location, propFullName);
-        }
-        var chainedCheckType = checkType.bind(null, false);
-        chainedCheckType.isRequired = checkType.bind(null, true);
-        return chainedCheckType;
-    }
-    function createPrimitiveTypeChecker(expectedType) {
-        function validate(props, propName, componentName, location, propFullName, secret) {
-            var propValue = props[propName];
-            var propType = getPropType(propValue);
-            if (propType !== expectedType) {
-                // `propValue` being instance of, say, date/regexp, pass the 'object'
-                // check, but we can offer a more precise error message here rather than
-                // 'of type `object`'.
-                var preciseType = getPreciseType(propValue);
-                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + preciseType + "` supplied to `" + componentName + "`, expected ") + ("`" + expectedType + "`."), {
-                    expectedType: expectedType
-                });
-            }
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createAnyTypeChecker() {
-        return createChainableTypeChecker(emptyFunctionThatReturnsNull);
-    }
-    function createArrayOfTypeChecker(typeChecker) {
-        function validate(props, propName, componentName, location, propFullName) {
-            if (typeof typeChecker !== "function") return new PropTypeError("Property `" + propFullName + "` of component `" + componentName + "` has invalid PropType notation inside arrayOf.");
-            var propValue = props[propName];
-            if (!Array.isArray(propValue)) {
-                var propType = getPropType(propValue);
-                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected an array."));
-            }
-            for(var i = 0; i < propValue.length; i++){
-                var error = typeChecker(propValue, i, componentName, location, propFullName + "[" + i + "]", ReactPropTypesSecret);
-                if (error instanceof Error) return error;
-            }
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createElementTypeChecker() {
-        function validate(props, propName, componentName, location, propFullName) {
-            var propValue = props[propName];
-            if (!isValidElement(propValue)) {
-                var propType = getPropType(propValue);
-                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected a single ReactElement."));
-            }
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createElementTypeTypeChecker() {
-        function validate(props, propName, componentName, location, propFullName) {
-            var propValue = props[propName];
-            if (!ReactIs.isValidElementType(propValue)) {
-                var propType = getPropType(propValue);
-                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected a single ReactElement type."));
-            }
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createInstanceTypeChecker(expectedClass) {
-        function validate(props, propName, componentName, location, propFullName) {
-            if (!(props[propName] instanceof expectedClass)) {
-                var expectedClassName = expectedClass.name || ANONYMOUS;
-                var actualClassName = getClassName(props[propName]);
-                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + actualClassName + "` supplied to `" + componentName + "`, expected ") + ("instance of `" + expectedClassName + "`."));
-            }
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createEnumTypeChecker(expectedValues) {
-        if (!Array.isArray(expectedValues)) {
-            {
-                if (arguments.length > 1) printWarning("Invalid arguments supplied to oneOf, expected an array, got " + arguments.length + " arguments. " + "A common mistake is to write oneOf(x, y, z) instead of oneOf([x, y, z]).");
-                else printWarning("Invalid argument supplied to oneOf, expected an array.");
-            }
-            return emptyFunctionThatReturnsNull;
-        }
-        function validate(props, propName, componentName, location, propFullName) {
-            var propValue = props[propName];
-            for(var i = 0; i < expectedValues.length; i++){
-                if (is(propValue, expectedValues[i])) return null;
-            }
-            var valuesString = JSON.stringify(expectedValues, function replacer(key, value) {
-                var type = getPreciseType(value);
-                if (type === "symbol") return String(value);
-                return value;
-            });
-            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of value `" + String(propValue) + "` " + ("supplied to `" + componentName + "`, expected one of " + valuesString + "."));
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createObjectOfTypeChecker(typeChecker) {
-        function validate(props, propName, componentName, location, propFullName) {
-            if (typeof typeChecker !== "function") return new PropTypeError("Property `" + propFullName + "` of component `" + componentName + "` has invalid PropType notation inside objectOf.");
-            var propValue = props[propName];
-            var propType = getPropType(propValue);
-            if (propType !== "object") return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected an object."));
-            for(var key in propValue)if (has(propValue, key)) {
-                var error = typeChecker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
-                if (error instanceof Error) return error;
-            }
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createUnionTypeChecker(arrayOfTypeCheckers) {
-        if (!Array.isArray(arrayOfTypeCheckers)) {
-            printWarning("Invalid argument supplied to oneOfType, expected an instance of array.");
-            return emptyFunctionThatReturnsNull;
-        }
-        for(var i = 0; i < arrayOfTypeCheckers.length; i++){
-            var checker = arrayOfTypeCheckers[i];
-            if (typeof checker !== "function") {
-                printWarning("Invalid argument supplied to oneOfType. Expected an array of check functions, but received " + getPostfixForTypeWarning(checker) + " at index " + i + ".");
-                return emptyFunctionThatReturnsNull;
-            }
-        }
-        function validate(props, propName, componentName, location, propFullName) {
-            var expectedTypes = [];
-            for(var i = 0; i < arrayOfTypeCheckers.length; i++){
-                var checker = arrayOfTypeCheckers[i];
-                var checkerResult = checker(props, propName, componentName, location, propFullName, ReactPropTypesSecret);
-                if (checkerResult == null) return null;
-                if (checkerResult.data && has(checkerResult.data, "expectedType")) expectedTypes.push(checkerResult.data.expectedType);
-            }
-            var expectedTypesMessage = expectedTypes.length > 0 ? ", expected one of type [" + expectedTypes.join(", ") + "]" : "";
-            return new PropTypeError("Invalid " + location + " `" + propFullName + "` supplied to " + ("`" + componentName + "`" + expectedTypesMessage + "."));
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createNodeChecker() {
-        function validate(props, propName, componentName, location, propFullName) {
-            if (!isNode(props[propName])) return new PropTypeError("Invalid " + location + " `" + propFullName + "` supplied to " + ("`" + componentName + "`, expected a ReactNode."));
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function invalidValidatorError(componentName, location, propFullName, key, type) {
-        return new PropTypeError((componentName || "React class") + ": " + location + " type `" + propFullName + "." + key + "` is invalid; " + "it must be a function, usually from the `prop-types` package, but received `" + type + "`.");
-    }
-    function createShapeTypeChecker(shapeTypes) {
-        function validate(props, propName, componentName, location, propFullName) {
-            var propValue = props[propName];
-            var propType = getPropType(propValue);
-            if (propType !== "object") return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type `" + propType + "` " + ("supplied to `" + componentName + "`, expected `object`."));
-            for(var key in shapeTypes){
-                var checker = shapeTypes[key];
-                if (typeof checker !== "function") return invalidValidatorError(componentName, location, propFullName, key, getPreciseType(checker));
-                var error = checker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
-                if (error) return error;
-            }
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function createStrictShapeTypeChecker(shapeTypes) {
-        function validate(props, propName, componentName, location, propFullName) {
-            var propValue = props[propName];
-            var propType = getPropType(propValue);
-            if (propType !== "object") return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type `" + propType + "` " + ("supplied to `" + componentName + "`, expected `object`."));
-            // We need to check all keys in case some are required but missing from props.
-            var allKeys = assign({}, props[propName], shapeTypes);
-            for(var key in allKeys){
-                var checker = shapeTypes[key];
-                if (has(shapeTypes, key) && typeof checker !== "function") return invalidValidatorError(componentName, location, propFullName, key, getPreciseType(checker));
-                if (!checker) return new PropTypeError("Invalid " + location + " `" + propFullName + "` key `" + key + "` supplied to `" + componentName + "`." + "\nBad object: " + JSON.stringify(props[propName], null, "  ") + "\nValid keys: " + JSON.stringify(Object.keys(shapeTypes), null, "  "));
-                var error = checker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
-                if (error) return error;
-            }
-            return null;
-        }
-        return createChainableTypeChecker(validate);
-    }
-    function isNode(propValue) {
-        switch(typeof propValue){
-            case "number":
-            case "string":
-            case "undefined":
-                return true;
-            case "boolean":
-                return !propValue;
-            case "object":
-                if (Array.isArray(propValue)) return propValue.every(isNode);
-                if (propValue === null || isValidElement(propValue)) return true;
-                var iteratorFn = getIteratorFn(propValue);
-                if (iteratorFn) {
-                    var iterator = iteratorFn.call(propValue);
-                    var step;
-                    if (iteratorFn !== propValue.entries) while(!(step = iterator.next()).done){
-                        if (!isNode(step.value)) return false;
-                    }
-                    else // Iterator will provide entry [k,v] tuples rather than values.
-                    while(!(step = iterator.next()).done){
-                        var entry = step.value;
-                        if (entry) {
-                            if (!isNode(entry[1])) return false;
-                        }
-                    }
-                } else return false;
-                return true;
-            default:
-                return false;
-        }
-    }
-    function isSymbol(propType, propValue) {
-        // Native Symbol.
-        if (propType === "symbol") return true;
-        // falsy value can't be a Symbol
-        if (!propValue) return false;
-        // 19.4.3.5 Symbol.prototype[@@toStringTag] === 'Symbol'
-        if (propValue["@@toStringTag"] === "Symbol") return true;
-        // Fallback for non-spec compliant Symbols which are polyfilled.
-        if (typeof Symbol === "function" && propValue instanceof Symbol) return true;
-        return false;
-    }
-    // Equivalent of `typeof` but with special handling for array and regexp.
-    function getPropType(propValue) {
-        var propType = typeof propValue;
-        if (Array.isArray(propValue)) return "array";
-        if (propValue instanceof RegExp) // Old webkits (at least until Android 4.0) return 'function' rather than
-        // 'object' for typeof a RegExp. We'll normalize this here so that /bla/
-        // passes PropTypes.object.
-        return "object";
-        if (isSymbol(propType, propValue)) return "symbol";
-        return propType;
-    }
-    // This handles more types than `getPropType`. Only used for error messages.
-    // See `createPrimitiveTypeChecker`.
-    function getPreciseType(propValue) {
-        if (typeof propValue === "undefined" || propValue === null) return "" + propValue;
-        var propType = getPropType(propValue);
-        if (propType === "object") {
-            if (propValue instanceof Date) return "date";
-            else if (propValue instanceof RegExp) return "regexp";
-        }
-        return propType;
-    }
-    // Returns a string that is postfixed to a warning about an invalid type.
-    // For example, "undefined" or "of type array"
-    function getPostfixForTypeWarning(value) {
-        var type = getPreciseType(value);
-        switch(type){
-            case "array":
-            case "object":
-                return "an " + type;
-            case "boolean":
-            case "date":
-            case "regexp":
-                return "a " + type;
-            default:
-                return type;
-        }
-    }
-    // Returns class name of the object, if any.
-    function getClassName(propValue) {
-        if (!propValue.constructor || !propValue.constructor.name) return ANONYMOUS;
-        return propValue.constructor.name;
-    }
-    ReactPropTypes.checkPropTypes = checkPropTypes;
-    ReactPropTypes.resetWarningCache = checkPropTypes.resetWarningCache;
-    ReactPropTypes.PropTypes = ReactPropTypes;
-    return ReactPropTypes;
-};
-
-},{"c437388b089702c3":"7EuwB","c067a60101d8520c":"7OXxh","74a0f89a70b9f3c2":"jZTZJ","18441b11647bc78":"fqKuf","bec3f6ff89f0b072":"5VwyJ"}],"7OXxh":[function(require,module,exports) {
-/*
-object-assign
-(c) Sindre Sorhus
-@license MIT
-*/ "use strict";
-/* eslint-disable no-unused-vars */ var getOwnPropertySymbols = Object.getOwnPropertySymbols;
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-function toObject(val) {
-    if (val === null || val === undefined) throw new TypeError("Object.assign cannot be called with null or undefined");
-    return Object(val);
-}
-function shouldUseNative() {
-    try {
-        if (!Object.assign) return false;
-        // Detect buggy property enumeration order in older V8 versions.
-        // https://bugs.chromium.org/p/v8/issues/detail?id=4118
-        var test1 = new String("abc"); // eslint-disable-line no-new-wrappers
-        test1[5] = "de";
-        if (Object.getOwnPropertyNames(test1)[0] === "5") return false;
-        // https://bugs.chromium.org/p/v8/issues/detail?id=3056
-        var test2 = {};
-        for(var i = 0; i < 10; i++)test2["_" + String.fromCharCode(i)] = i;
-        var order2 = Object.getOwnPropertyNames(test2).map(function(n) {
-            return test2[n];
-        });
-        if (order2.join("") !== "0123456789") return false;
-        // https://bugs.chromium.org/p/v8/issues/detail?id=3056
-        var test3 = {};
-        "abcdefghijklmnopqrst".split("").forEach(function(letter) {
-            test3[letter] = letter;
-        });
-        if (Object.keys(Object.assign({}, test3)).join("") !== "abcdefghijklmnopqrst") return false;
-        return true;
-    } catch (err) {
-        // We don't expect any of the above to throw, but better to be safe.
-        return false;
-    }
-}
-module.exports = shouldUseNative() ? Object.assign : function(target, source) {
-    var from;
-    var to = toObject(target);
-    var symbols;
-    for(var s = 1; s < arguments.length; s++){
-        from = Object(arguments[s]);
-        for(var key in from)if (hasOwnProperty.call(from, key)) to[key] = from[key];
-        if (getOwnPropertySymbols) {
-            symbols = getOwnPropertySymbols(from);
-            for(var i = 0; i < symbols.length; i++)if (propIsEnumerable.call(from, symbols[i])) to[symbols[i]] = from[symbols[i]];
-        }
-    }
-    return to;
-};
-
-},{}],"jZTZJ":[function(require,module,exports) {
-/**
- * Copyright (c) 2013-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */ "use strict";
-var ReactPropTypesSecret = "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED";
-module.exports = ReactPropTypesSecret;
-
-},{}],"fqKuf":[function(require,module,exports) {
-module.exports = Function.call.bind(Object.prototype.hasOwnProperty);
-
-},{}],"5VwyJ":[function(require,module,exports) {
-/**
- * Copyright (c) 2013-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */ "use strict";
-var printWarning = function() {};
-var ReactPropTypesSecret = require("24ba1e58d167a82c");
-var loggedTypeFailures = {};
-var has = require("898bc82f39d83f7c");
-printWarning = function(text) {
-    var message = "Warning: " + text;
-    if (typeof console !== "undefined") console.error(message);
-    try {
-        // --- Welcome to debugging React ---
-        // This error was thrown as a convenience so that you can use this stack
-        // to find the callsite that caused this warning to fire.
-        throw new Error(message);
-    } catch (x) {}
-};
-/**
- * Assert that the values match with the type specs.
- * Error messages are memorized and will only be shown once.
- *
- * @param {object} typeSpecs Map of name to a ReactPropType
- * @param {object} values Runtime values that need to be type-checked
- * @param {string} location e.g. "prop", "context", "child context"
- * @param {string} componentName Name of the component for error messages.
- * @param {?Function} getStack Returns the component stack.
- * @private
- */ function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
-    for(var typeSpecName in typeSpecs)if (has(typeSpecs, typeSpecName)) {
-        var error;
-        // Prop type validation may throw. In case they do, we don't want to
-        // fail the render phase where it didn't fail before. So we log it.
-        // After these have been cleaned up, we'll let them throw.
-        try {
-            // This is intentionally an invariant that gets caught. It's the same
-            // behavior as without this statement except with a better message.
-            if (typeof typeSpecs[typeSpecName] !== "function") {
-                var err = Error((componentName || "React class") + ": " + location + " type `" + typeSpecName + "` is invalid; " + "it must be a function, usually from the `prop-types` package, but received `" + typeof typeSpecs[typeSpecName] + "`." + "This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`.");
-                err.name = "Invariant Violation";
-                throw err;
-            }
-            error = typeSpecs[typeSpecName](values, typeSpecName, componentName, location, null, ReactPropTypesSecret);
-        } catch (ex) {
-            error = ex;
-        }
-        if (error && !(error instanceof Error)) printWarning((componentName || "React class") + ": type specification of " + location + " `" + typeSpecName + "` is invalid; the type checker " + "function must return `null` or an `Error` but returned a " + typeof error + ". " + "You may have forgotten to pass an argument to the type checker " + "creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and " + "shape all require an argument).");
-        if (error instanceof Error && !(error.message in loggedTypeFailures)) {
-            // Only monitor this failure once because there tends to be a lot of the
-            // same error.
-            loggedTypeFailures[error.message] = true;
-            var stack = getStack ? getStack() : "";
-            printWarning("Failed " + location + " type: " + error.message + (stack != null ? stack : ""));
-        }
-    }
-}
-/**
- * Resets warning cache when testing.
- *
- * @private
- */ checkPropTypes.resetWarningCache = function() {
-    loggedTypeFailures = {};
-};
-module.exports = checkPropTypes;
-
-},{"24ba1e58d167a82c":"jZTZJ","898bc82f39d83f7c":"fqKuf"}],"3AD9A":[function(require,module,exports) {
+},{}],"3AD9A":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Accordion", ()=>(0, _accordionDefault.default));
@@ -35984,7 +34732,7 @@ var _toggleButtonGroupDefault = parcelHelpers.interopDefault(_toggleButtonGroup)
 var _tooltip = require("./Tooltip");
 var _tooltipDefault = parcelHelpers.interopDefault(_tooltip);
 
-},{"./Accordion":false,"./AccordionContext":false,"./AccordionCollapse":false,"./AccordionButton":false,"./AccordionBody":false,"./AccordionHeader":false,"./AccordionItem":false,"./Alert":false,"./AlertHeading":false,"./AlertLink":false,"./Anchor":false,"./Badge":false,"./Breadcrumb":false,"./BreadcrumbItem":false,"./Button":"aPzUt","./ButtonGroup":false,"./ButtonToolbar":false,"./Card":"lAynp","./CardBody":false,"./CardFooter":false,"./CardGroup":false,"./CardHeader":false,"./CardImg":false,"./CardImgOverlay":false,"./CardLink":false,"./CardSubtitle":false,"./CardText":false,"./CardTitle":false,"./Carousel":false,"./CarouselCaption":false,"./CarouselItem":false,"./CloseButton":false,"./Col":"2L2I6","./Collapse":false,"./Container":"hEdsw","./Dropdown":false,"./DropdownButton":false,"./DropdownDivider":false,"./DropdownHeader":false,"./DropdownItem":false,"./DropdownItemText":false,"./DropdownMenu":false,"./DropdownToggle":false,"./Fade":false,"./Figure":false,"./FigureCaption":false,"./FigureImage":false,"./Form":"iBZ80","./FormControl":false,"./FormCheck":false,"./FormFloating":false,"./FloatingLabel":false,"./FormGroup":false,"./FormLabel":false,"./FormText":false,"./FormSelect":false,"./Image":"cyVPa","./InputGroup":false,"./ListGroup":false,"./ListGroupItem":false,"./Modal":false,"./ModalBody":false,"./ModalDialog":false,"./ModalFooter":false,"./ModalHeader":false,"./ModalTitle":false,"./Nav":"cXyL2","./Navbar":"1mHjo","./NavbarBrand":false,"./NavbarCollapse":false,"./NavbarOffcanvas":false,"./NavbarText":false,"./NavbarToggle":false,"./NavDropdown":false,"./NavItem":false,"./NavLink":false,"./Offcanvas":false,"./OffcanvasBody":false,"./OffcanvasHeader":false,"./OffcanvasTitle":false,"./OffcanvasToggling":false,"./Overlay":false,"./OverlayTrigger":false,"./PageItem":false,"./Pagination":false,"./Placeholder":false,"./PlaceholderButton":false,"./Popover":false,"./PopoverBody":false,"./PopoverHeader":false,"./ProgressBar":false,"./Ratio":false,"./Row":"cMC39","./Spinner":false,"./SplitButton":false,"./SSRProvider":false,"./Stack":false,"./Tab":false,"./TabContainer":false,"./TabContent":false,"./Table":false,"./TabPane":false,"./Tabs":false,"./ThemeProvider":false,"./Toast":false,"./ToastBody":false,"./ToastContainer":false,"./ToastHeader":false,"./ToggleButton":false,"./ToggleButtonGroup":false,"./Tooltip":false,"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"aPzUt":[function(require,module,exports) {
+},{"./Accordion":false,"./AccordionContext":false,"./AccordionCollapse":false,"./AccordionButton":false,"./AccordionBody":false,"./AccordionHeader":false,"./AccordionItem":false,"./Alert":false,"./AlertHeading":false,"./AlertLink":false,"./Anchor":false,"./Badge":false,"./Breadcrumb":false,"./BreadcrumbItem":false,"./Button":"aPzUt","./ButtonGroup":false,"./ButtonToolbar":false,"./Card":"lAynp","./CardBody":false,"./CardFooter":false,"./CardGroup":false,"./CardHeader":false,"./CardImg":false,"./CardImgOverlay":false,"./CardLink":false,"./CardSubtitle":false,"./CardText":false,"./CardTitle":false,"./Carousel":false,"./CarouselCaption":false,"./CarouselItem":false,"./CloseButton":false,"./Col":"2L2I6","./Collapse":false,"./Container":"hEdsw","./Dropdown":false,"./DropdownButton":false,"./DropdownDivider":false,"./DropdownHeader":false,"./DropdownItem":false,"./DropdownItemText":false,"./DropdownMenu":false,"./DropdownToggle":false,"./Fade":false,"./Figure":false,"./FigureCaption":false,"./FigureImage":false,"./Form":"iBZ80","./FormControl":false,"./FormCheck":false,"./FormFloating":false,"./FloatingLabel":false,"./FormGroup":false,"./FormLabel":false,"./FormText":false,"./FormSelect":false,"./Image":false,"./InputGroup":false,"./ListGroup":false,"./ListGroupItem":false,"./Modal":false,"./ModalBody":false,"./ModalDialog":false,"./ModalFooter":false,"./ModalHeader":false,"./ModalTitle":false,"./Nav":"cXyL2","./Navbar":"1mHjo","./NavbarBrand":false,"./NavbarCollapse":false,"./NavbarOffcanvas":false,"./NavbarText":false,"./NavbarToggle":false,"./NavDropdown":false,"./NavItem":false,"./NavLink":false,"./Offcanvas":false,"./OffcanvasBody":false,"./OffcanvasHeader":false,"./OffcanvasTitle":false,"./OffcanvasToggling":false,"./Overlay":false,"./OverlayTrigger":false,"./PageItem":false,"./Pagination":false,"./Placeholder":false,"./PlaceholderButton":false,"./Popover":false,"./PopoverBody":false,"./PopoverHeader":false,"./ProgressBar":false,"./Ratio":false,"./Row":"cMC39","./Spinner":"2r8jr","./SplitButton":false,"./SSRProvider":false,"./Stack":false,"./Tab":false,"./TabContainer":false,"./TabContent":false,"./Table":false,"./TabPane":false,"./Tabs":false,"./ThemeProvider":false,"./Toast":false,"./ToastBody":false,"./ToastContainer":false,"./ToastHeader":false,"./ToggleButton":false,"./ToggleButtonGroup":false,"./Tooltip":false,"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"aPzUt":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _classnames = require("classnames");
@@ -36064,17 +34812,14 @@ const _excluded = [
     "as",
     "disabled"
 ];
-function _objectWithoutPropertiesLoose(source, excluded) {
-    if (source == null) return {};
-    var target = {};
-    var sourceKeys = Object.keys(source);
-    var key, i;
-    for(i = 0; i < sourceKeys.length; i++){
-        key = sourceKeys[i];
-        if (excluded.indexOf(key) >= 0) continue;
-        target[key] = source[key];
+function _objectWithoutPropertiesLoose(r, e) {
+    if (null == r) return {};
+    var t = {};
+    for(var n in r)if (({}).hasOwnProperty.call(r, n)) {
+        if (e.indexOf(n) >= 0) continue;
+        t[n] = r[n];
     }
-    return target;
+    return t;
 }
 function isTrivialHref(href) {
     return !href || href.trim() === "#";
@@ -37390,7 +36135,754 @@ CloseButton.displayName = "CloseButton";
 CloseButton.propTypes = propTypes;
 exports.default = CloseButton;
 
-},{"prop-types":"7wKI2","react":"21dqq","classnames":"jocGM","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2L2I6":[function(require,module,exports) {
+},{"prop-types":"7wKI2","react":"21dqq","classnames":"jocGM","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"7wKI2":[function(require,module,exports) {
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */ var ReactIs = require("96e34ae03f5a2631");
+// By explicitly using `prop-types` you are opting into new development behavior.
+// http://fb.me/prop-types-in-prod
+var throwOnDirectAccess = true;
+module.exports = require("cb216452e2171041")(ReactIs.isElement, throwOnDirectAccess);
+
+},{"96e34ae03f5a2631":"7EuwB","cb216452e2171041":"bBUgD"}],"7EuwB":[function(require,module,exports) {
+"use strict";
+module.exports = require("2255125a8e8b1051");
+
+},{"2255125a8e8b1051":"5DsXl"}],"5DsXl":[function(require,module,exports) {
+/** @license React v16.13.1
+ * react-is.development.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */ "use strict";
+(function() {
+    "use strict";
+    // The Symbol used to tag the ReactElement-like types. If there is no native Symbol
+    // nor polyfill, then a plain number is used for performance.
+    var hasSymbol = typeof Symbol === "function" && Symbol.for;
+    var REACT_ELEMENT_TYPE = hasSymbol ? Symbol.for("react.element") : 0xeac7;
+    var REACT_PORTAL_TYPE = hasSymbol ? Symbol.for("react.portal") : 0xeaca;
+    var REACT_FRAGMENT_TYPE = hasSymbol ? Symbol.for("react.fragment") : 0xeacb;
+    var REACT_STRICT_MODE_TYPE = hasSymbol ? Symbol.for("react.strict_mode") : 0xeacc;
+    var REACT_PROFILER_TYPE = hasSymbol ? Symbol.for("react.profiler") : 0xead2;
+    var REACT_PROVIDER_TYPE = hasSymbol ? Symbol.for("react.provider") : 0xeacd;
+    var REACT_CONTEXT_TYPE = hasSymbol ? Symbol.for("react.context") : 0xeace; // TODO: We don't use AsyncMode or ConcurrentMode anymore. They were temporary
+    // (unstable) APIs that have been removed. Can we remove the symbols?
+    var REACT_ASYNC_MODE_TYPE = hasSymbol ? Symbol.for("react.async_mode") : 0xeacf;
+    var REACT_CONCURRENT_MODE_TYPE = hasSymbol ? Symbol.for("react.concurrent_mode") : 0xeacf;
+    var REACT_FORWARD_REF_TYPE = hasSymbol ? Symbol.for("react.forward_ref") : 0xead0;
+    var REACT_SUSPENSE_TYPE = hasSymbol ? Symbol.for("react.suspense") : 0xead1;
+    var REACT_SUSPENSE_LIST_TYPE = hasSymbol ? Symbol.for("react.suspense_list") : 0xead8;
+    var REACT_MEMO_TYPE = hasSymbol ? Symbol.for("react.memo") : 0xead3;
+    var REACT_LAZY_TYPE = hasSymbol ? Symbol.for("react.lazy") : 0xead4;
+    var REACT_BLOCK_TYPE = hasSymbol ? Symbol.for("react.block") : 0xead9;
+    var REACT_FUNDAMENTAL_TYPE = hasSymbol ? Symbol.for("react.fundamental") : 0xead5;
+    var REACT_RESPONDER_TYPE = hasSymbol ? Symbol.for("react.responder") : 0xead6;
+    var REACT_SCOPE_TYPE = hasSymbol ? Symbol.for("react.scope") : 0xead7;
+    function isValidElementType(type) {
+        return typeof type === "string" || typeof type === "function" || // Note: its typeof might be other than 'symbol' or 'number' if it's a polyfill.
+        type === REACT_FRAGMENT_TYPE || type === REACT_CONCURRENT_MODE_TYPE || type === REACT_PROFILER_TYPE || type === REACT_STRICT_MODE_TYPE || type === REACT_SUSPENSE_TYPE || type === REACT_SUSPENSE_LIST_TYPE || typeof type === "object" && type !== null && (type.$$typeof === REACT_LAZY_TYPE || type.$$typeof === REACT_MEMO_TYPE || type.$$typeof === REACT_PROVIDER_TYPE || type.$$typeof === REACT_CONTEXT_TYPE || type.$$typeof === REACT_FORWARD_REF_TYPE || type.$$typeof === REACT_FUNDAMENTAL_TYPE || type.$$typeof === REACT_RESPONDER_TYPE || type.$$typeof === REACT_SCOPE_TYPE || type.$$typeof === REACT_BLOCK_TYPE);
+    }
+    function typeOf(object) {
+        if (typeof object === "object" && object !== null) {
+            var $$typeof = object.$$typeof;
+            switch($$typeof){
+                case REACT_ELEMENT_TYPE:
+                    var type = object.type;
+                    switch(type){
+                        case REACT_ASYNC_MODE_TYPE:
+                        case REACT_CONCURRENT_MODE_TYPE:
+                        case REACT_FRAGMENT_TYPE:
+                        case REACT_PROFILER_TYPE:
+                        case REACT_STRICT_MODE_TYPE:
+                        case REACT_SUSPENSE_TYPE:
+                            return type;
+                        default:
+                            var $$typeofType = type && type.$$typeof;
+                            switch($$typeofType){
+                                case REACT_CONTEXT_TYPE:
+                                case REACT_FORWARD_REF_TYPE:
+                                case REACT_LAZY_TYPE:
+                                case REACT_MEMO_TYPE:
+                                case REACT_PROVIDER_TYPE:
+                                    return $$typeofType;
+                                default:
+                                    return $$typeof;
+                            }
+                    }
+                case REACT_PORTAL_TYPE:
+                    return $$typeof;
+            }
+        }
+        return undefined;
+    } // AsyncMode is deprecated along with isAsyncMode
+    var AsyncMode = REACT_ASYNC_MODE_TYPE;
+    var ConcurrentMode = REACT_CONCURRENT_MODE_TYPE;
+    var ContextConsumer = REACT_CONTEXT_TYPE;
+    var ContextProvider = REACT_PROVIDER_TYPE;
+    var Element = REACT_ELEMENT_TYPE;
+    var ForwardRef = REACT_FORWARD_REF_TYPE;
+    var Fragment = REACT_FRAGMENT_TYPE;
+    var Lazy = REACT_LAZY_TYPE;
+    var Memo = REACT_MEMO_TYPE;
+    var Portal = REACT_PORTAL_TYPE;
+    var Profiler = REACT_PROFILER_TYPE;
+    var StrictMode = REACT_STRICT_MODE_TYPE;
+    var Suspense = REACT_SUSPENSE_TYPE;
+    var hasWarnedAboutDeprecatedIsAsyncMode = false; // AsyncMode should be deprecated
+    function isAsyncMode(object) {
+        if (!hasWarnedAboutDeprecatedIsAsyncMode) {
+            hasWarnedAboutDeprecatedIsAsyncMode = true; // Using console['warn'] to evade Babel and ESLint
+            console["warn"]("The ReactIs.isAsyncMode() alias has been deprecated, and will be removed in React 17+. Update your code to use ReactIs.isConcurrentMode() instead. It has the exact same API.");
+        }
+        return isConcurrentMode(object) || typeOf(object) === REACT_ASYNC_MODE_TYPE;
+    }
+    function isConcurrentMode(object) {
+        return typeOf(object) === REACT_CONCURRENT_MODE_TYPE;
+    }
+    function isContextConsumer(object) {
+        return typeOf(object) === REACT_CONTEXT_TYPE;
+    }
+    function isContextProvider(object) {
+        return typeOf(object) === REACT_PROVIDER_TYPE;
+    }
+    function isElement(object) {
+        return typeof object === "object" && object !== null && object.$$typeof === REACT_ELEMENT_TYPE;
+    }
+    function isForwardRef(object) {
+        return typeOf(object) === REACT_FORWARD_REF_TYPE;
+    }
+    function isFragment(object) {
+        return typeOf(object) === REACT_FRAGMENT_TYPE;
+    }
+    function isLazy(object) {
+        return typeOf(object) === REACT_LAZY_TYPE;
+    }
+    function isMemo(object) {
+        return typeOf(object) === REACT_MEMO_TYPE;
+    }
+    function isPortal(object) {
+        return typeOf(object) === REACT_PORTAL_TYPE;
+    }
+    function isProfiler(object) {
+        return typeOf(object) === REACT_PROFILER_TYPE;
+    }
+    function isStrictMode(object) {
+        return typeOf(object) === REACT_STRICT_MODE_TYPE;
+    }
+    function isSuspense(object) {
+        return typeOf(object) === REACT_SUSPENSE_TYPE;
+    }
+    exports.AsyncMode = AsyncMode;
+    exports.ConcurrentMode = ConcurrentMode;
+    exports.ContextConsumer = ContextConsumer;
+    exports.ContextProvider = ContextProvider;
+    exports.Element = Element;
+    exports.ForwardRef = ForwardRef;
+    exports.Fragment = Fragment;
+    exports.Lazy = Lazy;
+    exports.Memo = Memo;
+    exports.Portal = Portal;
+    exports.Profiler = Profiler;
+    exports.StrictMode = StrictMode;
+    exports.Suspense = Suspense;
+    exports.isAsyncMode = isAsyncMode;
+    exports.isConcurrentMode = isConcurrentMode;
+    exports.isContextConsumer = isContextConsumer;
+    exports.isContextProvider = isContextProvider;
+    exports.isElement = isElement;
+    exports.isForwardRef = isForwardRef;
+    exports.isFragment = isFragment;
+    exports.isLazy = isLazy;
+    exports.isMemo = isMemo;
+    exports.isPortal = isPortal;
+    exports.isProfiler = isProfiler;
+    exports.isStrictMode = isStrictMode;
+    exports.isSuspense = isSuspense;
+    exports.isValidElementType = isValidElementType;
+    exports.typeOf = typeOf;
+})();
+
+},{}],"bBUgD":[function(require,module,exports) {
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */ "use strict";
+var ReactIs = require("c437388b089702c3");
+var assign = require("c067a60101d8520c");
+var ReactPropTypesSecret = require("74a0f89a70b9f3c2");
+var has = require("18441b11647bc78");
+var checkPropTypes = require("bec3f6ff89f0b072");
+var printWarning = function() {};
+printWarning = function(text) {
+    var message = "Warning: " + text;
+    if (typeof console !== "undefined") console.error(message);
+    try {
+        // --- Welcome to debugging React ---
+        // This error was thrown as a convenience so that you can use this stack
+        // to find the callsite that caused this warning to fire.
+        throw new Error(message);
+    } catch (x) {}
+};
+function emptyFunctionThatReturnsNull() {
+    return null;
+}
+module.exports = function(isValidElement, throwOnDirectAccess) {
+    /* global Symbol */ var ITERATOR_SYMBOL = typeof Symbol === "function" && Symbol.iterator;
+    var FAUX_ITERATOR_SYMBOL = "@@iterator"; // Before Symbol spec.
+    /**
+   * Returns the iterator method function contained on the iterable object.
+   *
+   * Be sure to invoke the function with the iterable as context:
+   *
+   *     var iteratorFn = getIteratorFn(myIterable);
+   *     if (iteratorFn) {
+   *       var iterator = iteratorFn.call(myIterable);
+   *       ...
+   *     }
+   *
+   * @param {?object} maybeIterable
+   * @return {?function}
+   */ function getIteratorFn(maybeIterable) {
+        var iteratorFn = maybeIterable && (ITERATOR_SYMBOL && maybeIterable[ITERATOR_SYMBOL] || maybeIterable[FAUX_ITERATOR_SYMBOL]);
+        if (typeof iteratorFn === "function") return iteratorFn;
+    }
+    /**
+   * Collection of methods that allow declaration and validation of props that are
+   * supplied to React components. Example usage:
+   *
+   *   var Props = require('ReactPropTypes');
+   *   var MyArticle = React.createClass({
+   *     propTypes: {
+   *       // An optional string prop named "description".
+   *       description: Props.string,
+   *
+   *       // A required enum prop named "category".
+   *       category: Props.oneOf(['News','Photos']).isRequired,
+   *
+   *       // A prop named "dialog" that requires an instance of Dialog.
+   *       dialog: Props.instanceOf(Dialog).isRequired
+   *     },
+   *     render: function() { ... }
+   *   });
+   *
+   * A more formal specification of how these methods are used:
+   *
+   *   type := array|bool|func|object|number|string|oneOf([...])|instanceOf(...)
+   *   decl := ReactPropTypes.{type}(.isRequired)?
+   *
+   * Each and every declaration produces a function with the same signature. This
+   * allows the creation of custom validation functions. For example:
+   *
+   *  var MyLink = React.createClass({
+   *    propTypes: {
+   *      // An optional string or URI prop named "href".
+   *      href: function(props, propName, componentName) {
+   *        var propValue = props[propName];
+   *        if (propValue != null && typeof propValue !== 'string' &&
+   *            !(propValue instanceof URI)) {
+   *          return new Error(
+   *            'Expected a string or an URI for ' + propName + ' in ' +
+   *            componentName
+   *          );
+   *        }
+   *      }
+   *    },
+   *    render: function() {...}
+   *  });
+   *
+   * @internal
+   */ var ANONYMOUS = "<<anonymous>>";
+    // Important!
+    // Keep this list in sync with production version in `./factoryWithThrowingShims.js`.
+    var ReactPropTypes = {
+        array: createPrimitiveTypeChecker("array"),
+        bigint: createPrimitiveTypeChecker("bigint"),
+        bool: createPrimitiveTypeChecker("boolean"),
+        func: createPrimitiveTypeChecker("function"),
+        number: createPrimitiveTypeChecker("number"),
+        object: createPrimitiveTypeChecker("object"),
+        string: createPrimitiveTypeChecker("string"),
+        symbol: createPrimitiveTypeChecker("symbol"),
+        any: createAnyTypeChecker(),
+        arrayOf: createArrayOfTypeChecker,
+        element: createElementTypeChecker(),
+        elementType: createElementTypeTypeChecker(),
+        instanceOf: createInstanceTypeChecker,
+        node: createNodeChecker(),
+        objectOf: createObjectOfTypeChecker,
+        oneOf: createEnumTypeChecker,
+        oneOfType: createUnionTypeChecker,
+        shape: createShapeTypeChecker,
+        exact: createStrictShapeTypeChecker
+    };
+    /**
+   * inlined Object.is polyfill to avoid requiring consumers ship their own
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is
+   */ /*eslint-disable no-self-compare*/ function is(x, y) {
+        // SameValue algorithm
+        if (x === y) // Steps 1-5, 7-10
+        // Steps 6.b-6.e: +0 != -0
+        return x !== 0 || 1 / x === 1 / y;
+        else // Step 6.a: NaN == NaN
+        return x !== x && y !== y;
+    }
+    /*eslint-enable no-self-compare*/ /**
+   * We use an Error-like object for backward compatibility as people may call
+   * PropTypes directly and inspect their output. However, we don't use real
+   * Errors anymore. We don't inspect their stack anyway, and creating them
+   * is prohibitively expensive if they are created too often, such as what
+   * happens in oneOfType() for any type before the one that matched.
+   */ function PropTypeError(message, data) {
+        this.message = message;
+        this.data = data && typeof data === "object" ? data : {};
+        this.stack = "";
+    }
+    // Make `instanceof Error` still work for returned errors.
+    PropTypeError.prototype = Error.prototype;
+    function createChainableTypeChecker(validate) {
+        var manualPropTypeCallCache = {};
+        var manualPropTypeWarningCount = 0;
+        function checkType(isRequired, props, propName, componentName, location, propFullName, secret) {
+            componentName = componentName || ANONYMOUS;
+            propFullName = propFullName || propName;
+            if (secret !== ReactPropTypesSecret) {
+                if (throwOnDirectAccess) {
+                    // New behavior only for users of `prop-types` package
+                    var err = new Error("Calling PropTypes validators directly is not supported by the `prop-types` package. Use `PropTypes.checkPropTypes()` to call them. Read more at http://fb.me/use-check-prop-types");
+                    err.name = "Invariant Violation";
+                    throw err;
+                } else if (typeof console !== "undefined") {
+                    // Old behavior for people using React.PropTypes
+                    var cacheKey = componentName + ":" + propName;
+                    if (!manualPropTypeCallCache[cacheKey] && // Avoid spamming the console because they are often not actionable except for lib authors
+                    manualPropTypeWarningCount < 3) {
+                        printWarning("You are manually calling a React.PropTypes validation function for the `" + propFullName + "` prop on `" + componentName + "`. This is deprecated " + "and will throw in the standalone `prop-types` package. " + "You may be seeing this warning due to a third-party PropTypes " + "library. See https://fb.me/react-warning-dont-call-proptypes " + "for details.");
+                        manualPropTypeCallCache[cacheKey] = true;
+                        manualPropTypeWarningCount++;
+                    }
+                }
+            }
+            if (props[propName] == null) {
+                if (isRequired) {
+                    if (props[propName] === null) return new PropTypeError("The " + location + " `" + propFullName + "` is marked as required " + ("in `" + componentName + "`, but its value is `null`."));
+                    return new PropTypeError("The " + location + " `" + propFullName + "` is marked as required in " + ("`" + componentName + "`, but its value is `undefined`."));
+                }
+                return null;
+            } else return validate(props, propName, componentName, location, propFullName);
+        }
+        var chainedCheckType = checkType.bind(null, false);
+        chainedCheckType.isRequired = checkType.bind(null, true);
+        return chainedCheckType;
+    }
+    function createPrimitiveTypeChecker(expectedType) {
+        function validate(props, propName, componentName, location, propFullName, secret) {
+            var propValue = props[propName];
+            var propType = getPropType(propValue);
+            if (propType !== expectedType) {
+                // `propValue` being instance of, say, date/regexp, pass the 'object'
+                // check, but we can offer a more precise error message here rather than
+                // 'of type `object`'.
+                var preciseType = getPreciseType(propValue);
+                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + preciseType + "` supplied to `" + componentName + "`, expected ") + ("`" + expectedType + "`."), {
+                    expectedType: expectedType
+                });
+            }
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createAnyTypeChecker() {
+        return createChainableTypeChecker(emptyFunctionThatReturnsNull);
+    }
+    function createArrayOfTypeChecker(typeChecker) {
+        function validate(props, propName, componentName, location, propFullName) {
+            if (typeof typeChecker !== "function") return new PropTypeError("Property `" + propFullName + "` of component `" + componentName + "` has invalid PropType notation inside arrayOf.");
+            var propValue = props[propName];
+            if (!Array.isArray(propValue)) {
+                var propType = getPropType(propValue);
+                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected an array."));
+            }
+            for(var i = 0; i < propValue.length; i++){
+                var error = typeChecker(propValue, i, componentName, location, propFullName + "[" + i + "]", ReactPropTypesSecret);
+                if (error instanceof Error) return error;
+            }
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createElementTypeChecker() {
+        function validate(props, propName, componentName, location, propFullName) {
+            var propValue = props[propName];
+            if (!isValidElement(propValue)) {
+                var propType = getPropType(propValue);
+                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected a single ReactElement."));
+            }
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createElementTypeTypeChecker() {
+        function validate(props, propName, componentName, location, propFullName) {
+            var propValue = props[propName];
+            if (!ReactIs.isValidElementType(propValue)) {
+                var propType = getPropType(propValue);
+                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected a single ReactElement type."));
+            }
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createInstanceTypeChecker(expectedClass) {
+        function validate(props, propName, componentName, location, propFullName) {
+            if (!(props[propName] instanceof expectedClass)) {
+                var expectedClassName = expectedClass.name || ANONYMOUS;
+                var actualClassName = getClassName(props[propName]);
+                return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + actualClassName + "` supplied to `" + componentName + "`, expected ") + ("instance of `" + expectedClassName + "`."));
+            }
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createEnumTypeChecker(expectedValues) {
+        if (!Array.isArray(expectedValues)) {
+            {
+                if (arguments.length > 1) printWarning("Invalid arguments supplied to oneOf, expected an array, got " + arguments.length + " arguments. " + "A common mistake is to write oneOf(x, y, z) instead of oneOf([x, y, z]).");
+                else printWarning("Invalid argument supplied to oneOf, expected an array.");
+            }
+            return emptyFunctionThatReturnsNull;
+        }
+        function validate(props, propName, componentName, location, propFullName) {
+            var propValue = props[propName];
+            for(var i = 0; i < expectedValues.length; i++){
+                if (is(propValue, expectedValues[i])) return null;
+            }
+            var valuesString = JSON.stringify(expectedValues, function replacer(key, value) {
+                var type = getPreciseType(value);
+                if (type === "symbol") return String(value);
+                return value;
+            });
+            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of value `" + String(propValue) + "` " + ("supplied to `" + componentName + "`, expected one of " + valuesString + "."));
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createObjectOfTypeChecker(typeChecker) {
+        function validate(props, propName, componentName, location, propFullName) {
+            if (typeof typeChecker !== "function") return new PropTypeError("Property `" + propFullName + "` of component `" + componentName + "` has invalid PropType notation inside objectOf.");
+            var propValue = props[propName];
+            var propType = getPropType(propValue);
+            if (propType !== "object") return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected an object."));
+            for(var key in propValue)if (has(propValue, key)) {
+                var error = typeChecker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
+                if (error instanceof Error) return error;
+            }
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createUnionTypeChecker(arrayOfTypeCheckers) {
+        if (!Array.isArray(arrayOfTypeCheckers)) {
+            printWarning("Invalid argument supplied to oneOfType, expected an instance of array.");
+            return emptyFunctionThatReturnsNull;
+        }
+        for(var i = 0; i < arrayOfTypeCheckers.length; i++){
+            var checker = arrayOfTypeCheckers[i];
+            if (typeof checker !== "function") {
+                printWarning("Invalid argument supplied to oneOfType. Expected an array of check functions, but received " + getPostfixForTypeWarning(checker) + " at index " + i + ".");
+                return emptyFunctionThatReturnsNull;
+            }
+        }
+        function validate(props, propName, componentName, location, propFullName) {
+            var expectedTypes = [];
+            for(var i = 0; i < arrayOfTypeCheckers.length; i++){
+                var checker = arrayOfTypeCheckers[i];
+                var checkerResult = checker(props, propName, componentName, location, propFullName, ReactPropTypesSecret);
+                if (checkerResult == null) return null;
+                if (checkerResult.data && has(checkerResult.data, "expectedType")) expectedTypes.push(checkerResult.data.expectedType);
+            }
+            var expectedTypesMessage = expectedTypes.length > 0 ? ", expected one of type [" + expectedTypes.join(", ") + "]" : "";
+            return new PropTypeError("Invalid " + location + " `" + propFullName + "` supplied to " + ("`" + componentName + "`" + expectedTypesMessage + "."));
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createNodeChecker() {
+        function validate(props, propName, componentName, location, propFullName) {
+            if (!isNode(props[propName])) return new PropTypeError("Invalid " + location + " `" + propFullName + "` supplied to " + ("`" + componentName + "`, expected a ReactNode."));
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function invalidValidatorError(componentName, location, propFullName, key, type) {
+        return new PropTypeError((componentName || "React class") + ": " + location + " type `" + propFullName + "." + key + "` is invalid; " + "it must be a function, usually from the `prop-types` package, but received `" + type + "`.");
+    }
+    function createShapeTypeChecker(shapeTypes) {
+        function validate(props, propName, componentName, location, propFullName) {
+            var propValue = props[propName];
+            var propType = getPropType(propValue);
+            if (propType !== "object") return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type `" + propType + "` " + ("supplied to `" + componentName + "`, expected `object`."));
+            for(var key in shapeTypes){
+                var checker = shapeTypes[key];
+                if (typeof checker !== "function") return invalidValidatorError(componentName, location, propFullName, key, getPreciseType(checker));
+                var error = checker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
+                if (error) return error;
+            }
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function createStrictShapeTypeChecker(shapeTypes) {
+        function validate(props, propName, componentName, location, propFullName) {
+            var propValue = props[propName];
+            var propType = getPropType(propValue);
+            if (propType !== "object") return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type `" + propType + "` " + ("supplied to `" + componentName + "`, expected `object`."));
+            // We need to check all keys in case some are required but missing from props.
+            var allKeys = assign({}, props[propName], shapeTypes);
+            for(var key in allKeys){
+                var checker = shapeTypes[key];
+                if (has(shapeTypes, key) && typeof checker !== "function") return invalidValidatorError(componentName, location, propFullName, key, getPreciseType(checker));
+                if (!checker) return new PropTypeError("Invalid " + location + " `" + propFullName + "` key `" + key + "` supplied to `" + componentName + "`." + "\nBad object: " + JSON.stringify(props[propName], null, "  ") + "\nValid keys: " + JSON.stringify(Object.keys(shapeTypes), null, "  "));
+                var error = checker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
+                if (error) return error;
+            }
+            return null;
+        }
+        return createChainableTypeChecker(validate);
+    }
+    function isNode(propValue) {
+        switch(typeof propValue){
+            case "number":
+            case "string":
+            case "undefined":
+                return true;
+            case "boolean":
+                return !propValue;
+            case "object":
+                if (Array.isArray(propValue)) return propValue.every(isNode);
+                if (propValue === null || isValidElement(propValue)) return true;
+                var iteratorFn = getIteratorFn(propValue);
+                if (iteratorFn) {
+                    var iterator = iteratorFn.call(propValue);
+                    var step;
+                    if (iteratorFn !== propValue.entries) while(!(step = iterator.next()).done){
+                        if (!isNode(step.value)) return false;
+                    }
+                    else // Iterator will provide entry [k,v] tuples rather than values.
+                    while(!(step = iterator.next()).done){
+                        var entry = step.value;
+                        if (entry) {
+                            if (!isNode(entry[1])) return false;
+                        }
+                    }
+                } else return false;
+                return true;
+            default:
+                return false;
+        }
+    }
+    function isSymbol(propType, propValue) {
+        // Native Symbol.
+        if (propType === "symbol") return true;
+        // falsy value can't be a Symbol
+        if (!propValue) return false;
+        // 19.4.3.5 Symbol.prototype[@@toStringTag] === 'Symbol'
+        if (propValue["@@toStringTag"] === "Symbol") return true;
+        // Fallback for non-spec compliant Symbols which are polyfilled.
+        if (typeof Symbol === "function" && propValue instanceof Symbol) return true;
+        return false;
+    }
+    // Equivalent of `typeof` but with special handling for array and regexp.
+    function getPropType(propValue) {
+        var propType = typeof propValue;
+        if (Array.isArray(propValue)) return "array";
+        if (propValue instanceof RegExp) // Old webkits (at least until Android 4.0) return 'function' rather than
+        // 'object' for typeof a RegExp. We'll normalize this here so that /bla/
+        // passes PropTypes.object.
+        return "object";
+        if (isSymbol(propType, propValue)) return "symbol";
+        return propType;
+    }
+    // This handles more types than `getPropType`. Only used for error messages.
+    // See `createPrimitiveTypeChecker`.
+    function getPreciseType(propValue) {
+        if (typeof propValue === "undefined" || propValue === null) return "" + propValue;
+        var propType = getPropType(propValue);
+        if (propType === "object") {
+            if (propValue instanceof Date) return "date";
+            else if (propValue instanceof RegExp) return "regexp";
+        }
+        return propType;
+    }
+    // Returns a string that is postfixed to a warning about an invalid type.
+    // For example, "undefined" or "of type array"
+    function getPostfixForTypeWarning(value) {
+        var type = getPreciseType(value);
+        switch(type){
+            case "array":
+            case "object":
+                return "an " + type;
+            case "boolean":
+            case "date":
+            case "regexp":
+                return "a " + type;
+            default:
+                return type;
+        }
+    }
+    // Returns class name of the object, if any.
+    function getClassName(propValue) {
+        if (!propValue.constructor || !propValue.constructor.name) return ANONYMOUS;
+        return propValue.constructor.name;
+    }
+    ReactPropTypes.checkPropTypes = checkPropTypes;
+    ReactPropTypes.resetWarningCache = checkPropTypes.resetWarningCache;
+    ReactPropTypes.PropTypes = ReactPropTypes;
+    return ReactPropTypes;
+};
+
+},{"c437388b089702c3":"7EuwB","c067a60101d8520c":"7OXxh","74a0f89a70b9f3c2":"jZTZJ","18441b11647bc78":"fqKuf","bec3f6ff89f0b072":"5VwyJ"}],"7OXxh":[function(require,module,exports) {
+/*
+object-assign
+(c) Sindre Sorhus
+@license MIT
+*/ "use strict";
+/* eslint-disable no-unused-vars */ var getOwnPropertySymbols = Object.getOwnPropertySymbols;
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+function toObject(val) {
+    if (val === null || val === undefined) throw new TypeError("Object.assign cannot be called with null or undefined");
+    return Object(val);
+}
+function shouldUseNative() {
+    try {
+        if (!Object.assign) return false;
+        // Detect buggy property enumeration order in older V8 versions.
+        // https://bugs.chromium.org/p/v8/issues/detail?id=4118
+        var test1 = new String("abc"); // eslint-disable-line no-new-wrappers
+        test1[5] = "de";
+        if (Object.getOwnPropertyNames(test1)[0] === "5") return false;
+        // https://bugs.chromium.org/p/v8/issues/detail?id=3056
+        var test2 = {};
+        for(var i = 0; i < 10; i++)test2["_" + String.fromCharCode(i)] = i;
+        var order2 = Object.getOwnPropertyNames(test2).map(function(n) {
+            return test2[n];
+        });
+        if (order2.join("") !== "0123456789") return false;
+        // https://bugs.chromium.org/p/v8/issues/detail?id=3056
+        var test3 = {};
+        "abcdefghijklmnopqrst".split("").forEach(function(letter) {
+            test3[letter] = letter;
+        });
+        if (Object.keys(Object.assign({}, test3)).join("") !== "abcdefghijklmnopqrst") return false;
+        return true;
+    } catch (err) {
+        // We don't expect any of the above to throw, but better to be safe.
+        return false;
+    }
+}
+module.exports = shouldUseNative() ? Object.assign : function(target, source) {
+    var from;
+    var to = toObject(target);
+    var symbols;
+    for(var s = 1; s < arguments.length; s++){
+        from = Object(arguments[s]);
+        for(var key in from)if (hasOwnProperty.call(from, key)) to[key] = from[key];
+        if (getOwnPropertySymbols) {
+            symbols = getOwnPropertySymbols(from);
+            for(var i = 0; i < symbols.length; i++)if (propIsEnumerable.call(from, symbols[i])) to[symbols[i]] = from[symbols[i]];
+        }
+    }
+    return to;
+};
+
+},{}],"jZTZJ":[function(require,module,exports) {
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */ "use strict";
+var ReactPropTypesSecret = "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED";
+module.exports = ReactPropTypesSecret;
+
+},{}],"fqKuf":[function(require,module,exports) {
+module.exports = Function.call.bind(Object.prototype.hasOwnProperty);
+
+},{}],"5VwyJ":[function(require,module,exports) {
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */ "use strict";
+var printWarning = function() {};
+var ReactPropTypesSecret = require("24ba1e58d167a82c");
+var loggedTypeFailures = {};
+var has = require("898bc82f39d83f7c");
+printWarning = function(text) {
+    var message = "Warning: " + text;
+    if (typeof console !== "undefined") console.error(message);
+    try {
+        // --- Welcome to debugging React ---
+        // This error was thrown as a convenience so that you can use this stack
+        // to find the callsite that caused this warning to fire.
+        throw new Error(message);
+    } catch (x) {}
+};
+/**
+ * Assert that the values match with the type specs.
+ * Error messages are memorized and will only be shown once.
+ *
+ * @param {object} typeSpecs Map of name to a ReactPropType
+ * @param {object} values Runtime values that need to be type-checked
+ * @param {string} location e.g. "prop", "context", "child context"
+ * @param {string} componentName Name of the component for error messages.
+ * @param {?Function} getStack Returns the component stack.
+ * @private
+ */ function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
+    for(var typeSpecName in typeSpecs)if (has(typeSpecs, typeSpecName)) {
+        var error;
+        // Prop type validation may throw. In case they do, we don't want to
+        // fail the render phase where it didn't fail before. So we log it.
+        // After these have been cleaned up, we'll let them throw.
+        try {
+            // This is intentionally an invariant that gets caught. It's the same
+            // behavior as without this statement except with a better message.
+            if (typeof typeSpecs[typeSpecName] !== "function") {
+                var err = Error((componentName || "React class") + ": " + location + " type `" + typeSpecName + "` is invalid; " + "it must be a function, usually from the `prop-types` package, but received `" + typeof typeSpecs[typeSpecName] + "`." + "This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`.");
+                err.name = "Invariant Violation";
+                throw err;
+            }
+            error = typeSpecs[typeSpecName](values, typeSpecName, componentName, location, null, ReactPropTypesSecret);
+        } catch (ex) {
+            error = ex;
+        }
+        if (error && !(error instanceof Error)) printWarning((componentName || "React class") + ": type specification of " + location + " `" + typeSpecName + "` is invalid; the type checker " + "function must return `null` or an `Error` but returned a " + typeof error + ". " + "You may have forgotten to pass an argument to the type checker " + "creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and " + "shape all require an argument).");
+        if (error instanceof Error && !(error.message in loggedTypeFailures)) {
+            // Only monitor this failure once because there tends to be a lot of the
+            // same error.
+            loggedTypeFailures[error.message] = true;
+            var stack = getStack ? getStack() : "";
+            printWarning("Failed " + location + " type: " + error.message + (stack != null ? stack : ""));
+        }
+    }
+}
+/**
+ * Resets warning cache when testing.
+ *
+ * @private
+ */ checkPropTypes.resetWarningCache = function() {
+    loggedTypeFailures = {};
+};
+module.exports = checkPropTypes;
+
+},{"24ba1e58d167a82c":"jZTZJ","898bc82f39d83f7c":"fqKuf"}],"2L2I6":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "useCol", ()=>useCol);
@@ -38160,7 +37652,7 @@ function _objectWithoutPropertiesLoose(r, e) {
     if (null == r) return {};
     var t = {};
     for(var n in r)if (({}).hasOwnProperty.call(r, n)) {
-        if (e.indexOf(n) >= 0) continue;
+        if (e.includes(n)) continue;
         t[n] = r[n];
     }
     return t;
@@ -39173,48 +38665,7 @@ const FloatingLabel = /*#__PURE__*/ _react.forwardRef(({ bsPrefix, className, ch
 FloatingLabel.displayName = "FloatingLabel";
 exports.default = FloatingLabel;
 
-},{"classnames":"jocGM","react":"21dqq","./FormGroup":"1qBHH","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"cyVPa":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "propTypes", ()=>propTypes);
-var _classnames = require("classnames");
-var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
-var _react = require("react");
-var _propTypes = require("prop-types");
-var _propTypesDefault = parcelHelpers.interopDefault(_propTypes);
-var _themeProvider = require("./ThemeProvider");
-var _jsxRuntime = require("react/jsx-runtime");
-"use client";
-const propTypes = {
-    /**
-   * @default 'img'
-   */ bsPrefix: (0, _propTypesDefault.default).string,
-    /**
-   * Sets image as fluid image.
-   */ fluid: (0, _propTypesDefault.default).bool,
-    /**
-   * Sets image shape as rounded.
-   */ rounded: (0, _propTypesDefault.default).bool,
-    /**
-   * Sets image shape as circle.
-   */ roundedCircle: (0, _propTypesDefault.default).bool,
-    /**
-   * Sets image shape as thumbnail.
-   */ thumbnail: (0, _propTypesDefault.default).bool
-};
-const Image = /*#__PURE__*/ _react.forwardRef(({ bsPrefix, className, fluid = false, rounded = false, roundedCircle = false, thumbnail = false, ...props }, ref)=>{
-    bsPrefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "img");
-    return /*#__PURE__*/ (0, _jsxRuntime.jsx)("img", {
-        // eslint-disable-line jsx-a11y/alt-text
-        ref: ref,
-        ...props,
-        className: (0, _classnamesDefault.default)(className, fluid && `${bsPrefix}-fluid`, rounded && `rounded`, roundedCircle && `rounded-circle`, thumbnail && `${bsPrefix}-thumbnail`)
-    });
-});
-Image.displayName = "Image";
-exports.default = Image;
-
-},{"classnames":"jocGM","react":"21dqq","prop-types":"7wKI2","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"cXyL2":[function(require,module,exports) {
+},{"classnames":"jocGM","react":"21dqq","./FormGroup":"1qBHH","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"cXyL2":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _classnames = require("classnames");
@@ -39777,17 +39228,14 @@ const _excluded = [
     "role",
     "onKeyDown"
 ];
-function _objectWithoutPropertiesLoose(source, excluded) {
-    if (source == null) return {};
-    var target = {};
-    var sourceKeys = Object.keys(source);
-    var key, i;
-    for(i = 0; i < sourceKeys.length; i++){
-        key = sourceKeys[i];
-        if (excluded.indexOf(key) >= 0) continue;
-        target[key] = source[key];
+function _objectWithoutPropertiesLoose(r, e) {
+    if (null == r) return {};
+    var t = {};
+    for(var n in r)if (({}).hasOwnProperty.call(r, n)) {
+        if (e.indexOf(n) >= 0) continue;
+        t[n] = r[n];
     }
-    return target;
+    return t;
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noop = ()=>{};
@@ -39967,17 +39415,14 @@ const _excluded = [
     "active",
     "eventKey"
 ];
-function _objectWithoutPropertiesLoose(source, excluded) {
-    if (source == null) return {};
-    var target = {};
-    var sourceKeys = Object.keys(source);
-    var key, i;
-    for(i = 0; i < sourceKeys.length; i++){
-        key = sourceKeys[i];
-        if (excluded.indexOf(key) >= 0) continue;
-        target[key] = source[key];
+function _objectWithoutPropertiesLoose(r, e) {
+    if (null == r) return {};
+    var t = {};
+    for(var n in r)if (({}).hasOwnProperty.call(r, n)) {
+        if (e.indexOf(n) >= 0) continue;
+        t[n] = r[n];
     }
-    return target;
+    return t;
 }
 function useNavItem({ key, onClick, active, id, role, disabled }) {
     const parentOnSelect = (0, _react.useContext)((0, _selectableContextDefault.default));
@@ -40153,17 +39598,14 @@ var _jsxRuntime = require("react/jsx-runtime");
 const _excluded = [
     "onKeyDown"
 ];
-function _objectWithoutPropertiesLoose(source, excluded) {
-    if (source == null) return {};
-    var target = {};
-    var sourceKeys = Object.keys(source);
-    var key, i;
-    for(i = 0; i < sourceKeys.length; i++){
-        key = sourceKeys[i];
-        if (excluded.indexOf(key) >= 0) continue;
-        target[key] = source[key];
+function _objectWithoutPropertiesLoose(r, e) {
+    if (null == r) return {};
+    var t = {};
+    for(var n in r)if (({}).hasOwnProperty.call(r, n)) {
+        if (e.indexOf(n) >= 0) continue;
+        t[n] = r[n];
     }
-    return target;
+    return t;
 }
 function isTrivialHref(href) {
     return !href || href.trim() === "#";
@@ -41109,20 +40551,20 @@ const _excluded = [
     "onEntering",
     "onEntered"
 ];
-function _objectWithoutPropertiesLoose(source, excluded) {
-    if (source == null) return {};
-    var target = {};
-    var sourceKeys = Object.keys(source);
-    var key, i;
-    for(i = 0; i < sourceKeys.length; i++){
-        key = sourceKeys[i];
-        if (excluded.indexOf(key) >= 0) continue;
-        target[key] = source[key];
+function _objectWithoutPropertiesLoose(r, e) {
+    if (null == r) return {};
+    var t = {};
+    for(var n in r)if (({}).hasOwnProperty.call(r, n)) {
+        if (e.indexOf(n) >= 0) continue;
+        t[n] = r[n];
     }
-    return target;
+    return t;
 }
 let manager;
-function getManager(window) {
+/*
+  Modal props are split into a version with and without index signature so that you can fully use them in another projects
+  This is due to Typescript not playing well with index signatures e.g. when using Omit
+*/ function getManager(window) {
     if (!manager) manager = new (0, _modalManagerDefault.default)({
         ownerDocument: window == null ? void 0 : window.document
     });
@@ -41635,17 +41077,14 @@ var _jsxRuntime = require("react/jsx-runtime");
 const _excluded = [
     "component"
 ];
-function _objectWithoutPropertiesLoose(source, excluded) {
-    if (source == null) return {};
-    var target = {};
-    var sourceKeys = Object.keys(source);
-    var key, i;
-    for(i = 0; i < sourceKeys.length; i++){
-        key = sourceKeys[i];
-        if (excluded.indexOf(key) >= 0) continue;
-        target[key] = source[key];
+function _objectWithoutPropertiesLoose(r, e) {
+    if (null == r) return {};
+    var t = {};
+    for(var n in r)if (({}).hasOwnProperty.call(r, n)) {
+        if (e.indexOf(n) >= 0) continue;
+        t[n] = r[n];
     }
-    return target;
+    return t;
 }
 // Normalizes Transition callbacks when nodeRef is used.
 const RTGTransition = /*#__PURE__*/ _react.forwardRef((_ref, ref)=>{
@@ -41675,17 +41114,14 @@ const _excluded = [
     "addEndListener",
     "children"
 ];
-function _objectWithoutPropertiesLoose(source, excluded) {
-    if (source == null) return {};
-    var target = {};
-    var sourceKeys = Object.keys(source);
-    var key, i;
-    for(i = 0; i < sourceKeys.length; i++){
-        key = sourceKeys[i];
-        if (excluded.indexOf(key) >= 0) continue;
-        target[key] = source[key];
+function _objectWithoutPropertiesLoose(r, e) {
+    if (null == r) return {};
+    var t = {};
+    for(var n in r)if (({}).hasOwnProperty.call(r, n)) {
+        if (e.indexOf(n) >= 0) continue;
+        t[n] = r[n];
     }
-    return target;
+    return t;
 }
 function useRTGTransitionProps(_ref) {
     let { onEnter, onEntering, onEntered, onExit, onExiting, onExited, addEndListener, children } = _ref, props = _objectWithoutPropertiesLoose(_ref, _excluded);
@@ -42072,7 +41508,1233 @@ as: Component = "div", ...props }, ref)=>{
 Row.displayName = "Row";
 exports.default = Row;
 
-},{"classnames":"jocGM","react":"21dqq","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"km3Ru":[function(require,module,exports) {
+},{"classnames":"jocGM","react":"21dqq","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2r8jr":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _classnames = require("classnames");
+var _classnamesDefault = parcelHelpers.interopDefault(_classnames);
+var _react = require("react");
+var _themeProvider = require("./ThemeProvider");
+var _jsxRuntime = require("react/jsx-runtime");
+"use client";
+const Spinner = /*#__PURE__*/ _react.forwardRef(({ bsPrefix, variant, animation = "border", size, // Need to define the default "as" during prop destructuring to be compatible with styled-components github.com/react-bootstrap/react-bootstrap/issues/3595
+as: Component = "div", className, ...props }, ref)=>{
+    bsPrefix = (0, _themeProvider.useBootstrapPrefix)(bsPrefix, "spinner");
+    const bsSpinnerPrefix = `${bsPrefix}-${animation}`;
+    return /*#__PURE__*/ (0, _jsxRuntime.jsx)(Component, {
+        ref: ref,
+        ...props,
+        className: (0, _classnamesDefault.default)(className, bsSpinnerPrefix, size && `${bsSpinnerPrefix}-${size}`, variant && `text-${variant}`)
+    });
+});
+Spinner.displayName = "Spinner";
+exports.default = Spinner;
+
+},{"classnames":"jocGM","react":"21dqq","./ThemeProvider":"dVixI","react/jsx-runtime":"6AEwr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4gflv":[function(require,module,exports) {
+var $parcel$ReactRefreshHelpers$f7a6 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
+var prevRefreshReg = window.$RefreshReg$;
+var prevRefreshSig = window.$RefreshSig$;
+$parcel$ReactRefreshHelpers$f7a6.prelude(module);
+
+try {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "MainView", ()=>MainView);
+var _jsxDevRuntime = require("react/jsx-dev-runtime");
+var _react = require("react");
+var _reactDefault = parcelHelpers.interopDefault(_react);
+var _reactRouterDom = require("react-router-dom");
+var _reactToastify = require("react-toastify");
+var _reactBootstrap = require("react-bootstrap");
+var _navigationBar = require("../navigation-bar/navigation-bar");
+var _movieCard = require("../movie-card/movie-card");
+var _movieCardDefault = parcelHelpers.interopDefault(_movieCard);
+var _movieView = require("../movie-view/movie-view");
+var _movieViewDefault = parcelHelpers.interopDefault(_movieView);
+var _loginView = require("../login-view/login-view");
+var _signupView = require("../signup-view/signup-view");
+var _profileView = require("../profile-view/profile-view");
+var _profileViewDefault = parcelHelpers.interopDefault(_profileView);
+var _reactToastifyCss = require("react-toastify/dist/ReactToastify.css");
+var _mainViewScss = require("./main-view.scss");
+var _s = $RefreshSig$();
+const MainView = ()=>{
+    _s();
+    const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("token");
+    let parsedUser = null;
+    try {
+        parsedUser = storedUser ? JSON.parse(storedUser) : null;
+    } catch (error) {
+        console.error("Error parsing stored user:", error);
+    }
+    const [user, setUser] = (0, _react.useState)(parsedUser);
+    const [token, setToken] = (0, _react.useState)(storedToken ? storedToken : null);
+    const [movies, setMovies] = (0, _react.useState)([]);
+    const [search, setSearch] = (0, _react.useState)("");
+    const [selectedGenre, setSelectedGenre] = (0, _react.useState)("");
+    const [loading, setLoading] = (0, _react.useState)(true);
+    const navigate = (0, _reactRouterDom.useNavigate)();
+    (0, _react.useEffect)(()=>{
+        if (!token) {
+            console.error("Token is missing");
+            navigate("/login");
+            return;
+        }
+        const fetchMovies = async ()=>{
+            try {
+                const response = await fetch("https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies", {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+                if (response.status === 401) {
+                    // Token might be invalid or expired
+                    (0, _reactToastify.toast).error("Session expired. Please log in again.");
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("user");
+                    setUser(null);
+                    setToken(null);
+                    navigate("/login");
+                    return;
+                }
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                if (!Array.isArray(data)) throw new Error("Expected an array of movies");
+            // ... rest of the code
+            } catch (error) {
+                console.error("Error fetching movies:", error.message);
+                (0, _reactToastify.toast).error("Failed to fetch movies");
+                setLoading(false);
+            }
+        };
+        fetchMovies();
+    }, [
+        token
+    ]);
+    const addFav = (id)=>{
+        if (!token) {
+            console.error("Token is missing");
+            return;
+        }
+        fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}/Movies/${id}`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }).then((response)=>{
+            if (!response.ok) throw new Error("Failed to add movie to favorites");
+            return response.json();
+        }).then((user)=>{
+            if (user) {
+                localStorage.setItem("user", JSON.stringify(user));
+                setUser(user);
+                (0, _reactToastify.toast).success("Added to favorites");
+            }
+        }).catch((error)=>{
+            console.error("Error: ", error);
+            (0, _reactToastify.toast).error("Failed to add to favorites");
+        });
+    };
+    const removeFav = (id)=>{
+        if (!token) {
+            console.error("Token is missing");
+            return;
+        }
+        fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}/Movies/${id}`, {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }).then((response)=>{
+            if (!response.ok) throw new Error("Failed to remove movie from favorites");
+            return response.json();
+        }).then((user)=>{
+            if (user) {
+                localStorage.setItem("user", JSON.stringify(user));
+                setUser(user);
+                (0, _reactToastify.toast).success("Removed from favorites");
+            }
+        }).catch((error)=>{
+            console.error("Error: ", error);
+            (0, _reactToastify.toast).error("Failed to remove from favorites");
+        });
+    };
+    if (loading) return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Spinner), {
+        animation: "border",
+        role: "status",
+        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
+            className: "visually-hidden",
+            children: "Loading..."
+        }, void 0, false, {
+            fileName: "src/components/main-view/main-view.jsx",
+            lineNumber: 156,
+            columnNumber: 17
+        }, undefined)
+    }, void 0, false, {
+        fileName: "src/components/main-view/main-view.jsx",
+        lineNumber: 155,
+        columnNumber: 13
+    }, undefined);
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+        className: "main-view",
+        children: [
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _navigationBar.NavigationBar), {
+                user: user,
+                onLoggedOut: ()=>{
+                    setUser(null);
+                    setToken(null);
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("user");
+                    (0, _reactToastify.toast).info("Logged out");
+                    navigate("/login");
+                }
+            }, void 0, false, {
+                fileName: "src/components/main-view/main-view.jsx",
+                lineNumber: 163,
+                columnNumber: 13
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Row), {
+                className: "justify-content-center my-5",
+                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Routes), {
+                    children: [
+                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
+                            path: "/signup",
+                            element: user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
+                                to: "/"
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 180,
+                                columnNumber: 33
+                            }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                                md: 5,
+                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _signupView.SignupView), {}, void 0, false, {
+                                    fileName: "src/components/main-view/main-view.jsx",
+                                    lineNumber: 183,
+                                    columnNumber: 37
+                                }, void 0)
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 182,
+                                columnNumber: 33
+                            }, void 0)
+                        }, void 0, false, {
+                            fileName: "src/components/main-view/main-view.jsx",
+                            lineNumber: 176,
+                            columnNumber: 21
+                        }, undefined),
+                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
+                            path: "/login",
+                            element: user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
+                                to: "/"
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 192,
+                                columnNumber: 33
+                            }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                                md: 5,
+                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _loginView.LoginView), {
+                                    onLoggedIn: (user, token)=>{
+                                        setUser(user);
+                                        setToken(token);
+                                        (0, _reactToastify.toast).success("Logged in successfully");
+                                    }
+                                }, void 0, false, {
+                                    fileName: "src/components/main-view/main-view.jsx",
+                                    lineNumber: 195,
+                                    columnNumber: 37
+                                }, void 0)
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 194,
+                                columnNumber: 33
+                            }, void 0)
+                        }, void 0, false, {
+                            fileName: "src/components/main-view/main-view.jsx",
+                            lineNumber: 188,
+                            columnNumber: 21
+                        }, undefined),
+                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
+                            path: "/movies/:movieId",
+                            element: !user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
+                                to: "/login",
+                                replace: true
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 210,
+                                columnNumber: 33
+                            }, void 0) : movies.length === 0 ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                                children: "There are no movies"
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 212,
+                                columnNumber: 33
+                            }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                                md: 12,
+                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieViewDefault.default), {
+                                    movies: movies,
+                                    addFav: addFav,
+                                    removeFav: removeFav,
+                                    user: user
+                                }, void 0, false, {
+                                    fileName: "src/components/main-view/main-view.jsx",
+                                    lineNumber: 215,
+                                    columnNumber: 37
+                                }, void 0)
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 214,
+                                columnNumber: 33
+                            }, void 0)
+                        }, void 0, false, {
+                            fileName: "src/components/main-view/main-view.jsx",
+                            lineNumber: 206,
+                            columnNumber: 21
+                        }, undefined),
+                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
+                            path: "/",
+                            element: !user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
+                                to: "/login",
+                                replace: true
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 229,
+                                columnNumber: 33
+                            }, void 0) : movies.length === 0 ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                                children: "There are no movies"
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 231,
+                                columnNumber: 33
+                            }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
+                                children: [
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Row), {
+                                        className: "justify-content-center mb-5",
+                                        children: [
+                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                                                md: 6,
+                                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Control, {
+                                                    type: "text",
+                                                    placeholder: "Search movies",
+                                                    value: search,
+                                                    onChange: (e)=>setSearch(e.target.value)
+                                                }, void 0, false, {
+                                                    fileName: "src/components/main-view/main-view.jsx",
+                                                    lineNumber: 236,
+                                                    columnNumber: 45
+                                                }, void 0)
+                                            }, void 0, false, {
+                                                fileName: "src/components/main-view/main-view.jsx",
+                                                lineNumber: 235,
+                                                columnNumber: 41
+                                            }, void 0),
+                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                                                md: 6,
+                                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Select, {
+                                                    value: selectedGenre,
+                                                    onChange: (e)=>setSelectedGenre(e.target.value),
+                                                    children: [
+                                                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("option", {
+                                                            value: "",
+                                                            children: "All genres"
+                                                        }, void 0, false, {
+                                                            fileName: "src/components/main-view/main-view.jsx",
+                                                            lineNumber: 248,
+                                                            columnNumber: 49
+                                                        }, void 0),
+                                                        [
+                                                            ...new Set(movies.map((m)=>m.Genre.Name))
+                                                        ].sort().map((genre)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("option", {
+                                                                value: genre,
+                                                                children: genre
+                                                            }, genre, false, {
+                                                                fileName: "src/components/main-view/main-view.jsx",
+                                                                lineNumber: 252,
+                                                                columnNumber: 57
+                                                            }, void 0))
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "src/components/main-view/main-view.jsx",
+                                                    lineNumber: 244,
+                                                    columnNumber: 45
+                                                }, void 0)
+                                            }, void 0, false, {
+                                                fileName: "src/components/main-view/main-view.jsx",
+                                                lineNumber: 243,
+                                                columnNumber: 41
+                                            }, void 0)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "src/components/main-view/main-view.jsx",
+                                        lineNumber: 234,
+                                        columnNumber: 37
+                                    }, void 0),
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Row), {
+                                        children: movies.filter((movie)=>(!search || movie.Title.toLowerCase().includes(search.toLowerCase())) && (!selectedGenre || movie.Genre.Name === selectedGenre)).map((movie)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                                                className: "mb-4",
+                                                xs: 12,
+                                                sm: 6,
+                                                md: 4,
+                                                lg: 3,
+                                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieCardDefault.default), {
+                                                    movie: movie,
+                                                    onAddToFavorites: ()=>addFav(movie._id),
+                                                    onRemoveFromFavorites: ()=>removeFav(movie._id),
+                                                    isFavorite: user && user.FavoriteMovies ? user.FavoriteMovies.includes(movie._id) : false,
+                                                    onMovieClick: ()=>navigate(`/movies/${movie._id}`)
+                                                }, void 0, false, {
+                                                    fileName: "src/components/main-view/main-view.jsx",
+                                                    lineNumber: 278,
+                                                    columnNumber: 53
+                                                }, void 0)
+                                            }, movie._id, false, {
+                                                fileName: "src/components/main-view/main-view.jsx",
+                                                lineNumber: 270,
+                                                columnNumber: 49
+                                            }, void 0))
+                                    }, void 0, false, {
+                                        fileName: "src/components/main-view/main-view.jsx",
+                                        lineNumber: 259,
+                                        columnNumber: 37
+                                    }, void 0)
+                                ]
+                            }, void 0, true)
+                        }, void 0, false, {
+                            fileName: "src/components/main-view/main-view.jsx",
+                            lineNumber: 225,
+                            columnNumber: 21
+                        }, undefined),
+                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Route), {
+                            path: "/profile",
+                            element: !user ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Navigate), {
+                                to: "/login",
+                                replace: true
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 300,
+                                columnNumber: 33
+                            }, void 0) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _profileViewDefault.default), {
+                                user: user,
+                                movies: movies,
+                                removeFav: removeFav,
+                                setUser: setUser
+                            }, void 0, false, {
+                                fileName: "src/components/main-view/main-view.jsx",
+                                lineNumber: 302,
+                                columnNumber: 33
+                            }, void 0)
+                        }, void 0, false, {
+                            fileName: "src/components/main-view/main-view.jsx",
+                            lineNumber: 296,
+                            columnNumber: 21
+                        }, undefined)
+                    ]
+                }, void 0, true, {
+                    fileName: "src/components/main-view/main-view.jsx",
+                    lineNumber: 175,
+                    columnNumber: 17
+                }, undefined)
+            }, void 0, false, {
+                fileName: "src/components/main-view/main-view.jsx",
+                lineNumber: 174,
+                columnNumber: 13
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactToastify.ToastContainer), {
+                position: "top-center"
+            }, void 0, false, {
+                fileName: "src/components/main-view/main-view.jsx",
+                lineNumber: 313,
+                columnNumber: 13
+            }, undefined)
+        ]
+    }, void 0, true, {
+        fileName: "src/components/main-view/main-view.jsx",
+        lineNumber: 162,
+        columnNumber: 9
+    }, undefined);
+};
+_s(MainView, "Pe6+MjsXYYtzcJ/b6grGSmvnBEA=", false, function() {
+    return [
+        (0, _reactRouterDom.useNavigate)
+    ];
+});
+_c = MainView;
+var _c;
+$RefreshReg$(_c, "MainView");
+
+  $parcel$ReactRefreshHelpers$f7a6.postlude(module);
+} finally {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-router-dom":"9xmpe","react-toastify":"kSvyQ","react-bootstrap":"3AD9A","../navigation-bar/navigation-bar":"bsPVM","../movie-card/movie-card":"bwuIu","../movie-view/movie-view":"ggaUx","../login-view/login-view":"9YtA0","../signup-view/signup-view":"4OGiN","../profile-view/profile-view":"2vVqf","react-toastify/dist/ReactToastify.css":"gJP2Y","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","./main-view.scss":"eBaMl"}],"kSvyQ":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Bounce", ()=>H);
+parcelHelpers.export(exports, "Flip", ()=>Y);
+parcelHelpers.export(exports, "Icons", ()=>z);
+parcelHelpers.export(exports, "Slide", ()=>F);
+parcelHelpers.export(exports, "ToastContainer", ()=>Q);
+parcelHelpers.export(exports, "Zoom", ()=>X);
+parcelHelpers.export(exports, "collapseToast", ()=>f);
+parcelHelpers.export(exports, "cssTransition", ()=>g);
+parcelHelpers.export(exports, "toast", ()=>B);
+parcelHelpers.export(exports, "useToast", ()=>N);
+parcelHelpers.export(exports, "useToastContainer", ()=>L);
+var _react = require("react");
+var _reactDefault = parcelHelpers.interopDefault(_react);
+var _clsx = require("clsx");
+var _clsxDefault = parcelHelpers.interopDefault(_clsx);
+"use client";
+const c = (e)=>"number" == typeof e && !isNaN(e), d = (e)=>"string" == typeof e, u = (e)=>"function" == typeof e, p = (e)=>d(e) || u(e) ? e : null, m = (e)=>(0, _react.isValidElement)(e) || d(e) || u(e) || c(e);
+function f(e, t, n) {
+    void 0 === n && (n = 300);
+    const { scrollHeight: o, style: s } = e;
+    requestAnimationFrame(()=>{
+        s.minHeight = "initial", s.height = o + "px", s.transition = `all ${n}ms`, requestAnimationFrame(()=>{
+            s.height = "0", s.padding = "0", s.margin = "0", setTimeout(t, n);
+        });
+    });
+}
+function g(t) {
+    let { enter: a, exit: r, appendPosition: i = !1, collapse: l = !0, collapseDuration: c = 300 } = t;
+    return function(t) {
+        let { children: d, position: u, preventExitTransition: p, done: m, nodeRef: g, isIn: y, playToast: v } = t;
+        const h = i ? `${a}--${u}` : a, T = i ? `${r}--${u}` : r, E = (0, _react.useRef)(0);
+        return (0, _react.useLayoutEffect)(()=>{
+            const e = g.current, t = h.split(" "), n = (o)=>{
+                o.target === g.current && (v(), e.removeEventListener("animationend", n), e.removeEventListener("animationcancel", n), 0 === E.current && "animationcancel" !== o.type && e.classList.remove(...t));
+            };
+            e.classList.add(...t), e.addEventListener("animationend", n), e.addEventListener("animationcancel", n);
+        }, []), (0, _react.useEffect)(()=>{
+            const e = g.current, t = ()=>{
+                e.removeEventListener("animationend", t), l ? f(e, m, c) : m();
+            };
+            y || (p ? t() : (E.current = 1, e.className += ` ${T}`, e.addEventListener("animationend", t)));
+        }, [
+            y
+        ]), (0, _reactDefault.default).createElement((0, _reactDefault.default).Fragment, null, d);
+    };
+}
+function y(e, t) {
+    return null != e ? {
+        content: e.content,
+        containerId: e.props.containerId,
+        id: e.props.toastId,
+        theme: e.props.theme,
+        type: e.props.type,
+        data: e.props.data || {},
+        isLoading: e.props.isLoading,
+        icon: e.props.icon,
+        status: t
+    } : {};
+}
+const v = new Map;
+let h = [];
+const T = new Set, E = (e)=>T.forEach((t)=>t(e)), b = ()=>v.size > 0;
+function I(e, t) {
+    var n;
+    if (t) return !(null == (n = v.get(t)) || !n.isToastActive(e));
+    let o = !1;
+    return v.forEach((t)=>{
+        t.isToastActive(e) && (o = !0);
+    }), o;
+}
+function _(e, t) {
+    m(e) && (b() || h.push({
+        content: e,
+        options: t
+    }), v.forEach((n)=>{
+        n.buildToast(e, t);
+    }));
+}
+function C(e, t) {
+    v.forEach((n)=>{
+        null != t && null != t && t.containerId ? (null == t ? void 0 : t.containerId) === n.id && n.toggle(e, null == t ? void 0 : t.id) : n.toggle(e, null == t ? void 0 : t.id);
+    });
+}
+function L(e) {
+    const { subscribe: o, getSnapshot: s, setProps: i } = (0, _react.useRef)(function(e) {
+        const n = e.containerId || 1;
+        return {
+            subscribe (o) {
+                const s = function(e, n, o) {
+                    let s = 1, r = 0, i = [], l = [], f = [], g = n;
+                    const v = new Map, h = new Set, T = ()=>{
+                        f = Array.from(v.values()), h.forEach((e)=>e());
+                    }, E = (e)=>{
+                        l = null == e ? [] : l.filter((t)=>t !== e), T();
+                    }, b = (e)=>{
+                        const { toastId: n, onOpen: s, updateId: a, children: r } = e.props, i = null == a;
+                        e.staleId && v.delete(e.staleId), v.set(n, e), l = [
+                            ...l,
+                            e.props.toastId
+                        ].filter((t)=>t !== e.staleId), T(), o(y(e, i ? "added" : "updated")), i && u(s) && s((0, _react.isValidElement)(r) && r.props);
+                    };
+                    return {
+                        id: e,
+                        props: g,
+                        observe: (e)=>(h.add(e), ()=>h.delete(e)),
+                        toggle: (e, t)=>{
+                            v.forEach((n)=>{
+                                null != t && t !== n.props.toastId || u(n.toggle) && n.toggle(e);
+                            });
+                        },
+                        removeToast: E,
+                        toasts: v,
+                        clearQueue: ()=>{
+                            r -= i.length, i = [];
+                        },
+                        buildToast: (n, l)=>{
+                            if (((t)=>{
+                                let { containerId: n, toastId: o, updateId: s } = t;
+                                const a = n ? n !== e : 1 !== e, r = v.has(o) && null == s;
+                                return a || r;
+                            })(l)) return;
+                            const { toastId: f, updateId: h, data: I, staleId: _, delay: C } = l, L = ()=>{
+                                E(f);
+                            }, N = null == h;
+                            N && r++;
+                            const $ = {
+                                ...g,
+                                style: g.toastStyle,
+                                key: s++,
+                                ...Object.fromEntries(Object.entries(l).filter((e)=>{
+                                    let [t, n] = e;
+                                    return null != n;
+                                })),
+                                toastId: f,
+                                updateId: h,
+                                data: I,
+                                closeToast: L,
+                                isIn: !1,
+                                className: p(l.className || g.toastClassName),
+                                bodyClassName: p(l.bodyClassName || g.bodyClassName),
+                                progressClassName: p(l.progressClassName || g.progressClassName),
+                                autoClose: !l.isLoading && (w = l.autoClose, k = g.autoClose, !1 === w || c(w) && w > 0 ? w : k),
+                                deleteToast () {
+                                    const e = v.get(f), { onClose: n, children: s } = e.props;
+                                    u(n) && n((0, _react.isValidElement)(s) && s.props), o(y(e, "removed")), v.delete(f), r--, r < 0 && (r = 0), i.length > 0 ? b(i.shift()) : T();
+                                }
+                            };
+                            var w, k;
+                            $.closeButton = g.closeButton, !1 === l.closeButton || m(l.closeButton) ? $.closeButton = l.closeButton : !0 === l.closeButton && ($.closeButton = !m(g.closeButton) || g.closeButton);
+                            let P = n;
+                            (0, _react.isValidElement)(n) && !d(n.type) ? P = (0, _react.cloneElement)(n, {
+                                closeToast: L,
+                                toastProps: $,
+                                data: I
+                            }) : u(n) && (P = n({
+                                closeToast: L,
+                                toastProps: $,
+                                data: I
+                            }));
+                            const M = {
+                                content: P,
+                                props: $,
+                                staleId: _
+                            };
+                            g.limit && g.limit > 0 && r > g.limit && N ? i.push(M) : c(C) ? setTimeout(()=>{
+                                b(M);
+                            }, C) : b(M);
+                        },
+                        setProps (e) {
+                            g = e;
+                        },
+                        setToggle: (e, t)=>{
+                            v.get(e).toggle = t;
+                        },
+                        isToastActive: (e)=>l.some((t)=>t === e),
+                        getSnapshot: ()=>g.newestOnTop ? f.reverse() : f
+                    };
+                }(n, e, E);
+                v.set(n, s);
+                const r = s.observe(o);
+                return h.forEach((e)=>_(e.content, e.options)), h = [], ()=>{
+                    r(), v.delete(n);
+                };
+            },
+            setProps (e) {
+                var t;
+                null == (t = v.get(n)) || t.setProps(e);
+            },
+            getSnapshot () {
+                var e;
+                return null == (e = v.get(n)) ? void 0 : e.getSnapshot();
+            }
+        };
+    }(e)).current;
+    i(e);
+    const l = (0, _react.useSyncExternalStore)(o, s, s);
+    return {
+        getToastToRender: function(e) {
+            if (!l) return [];
+            const t = new Map;
+            return l.forEach((e)=>{
+                const { position: n } = e.props;
+                t.has(n) || t.set(n, []), t.get(n).push(e);
+            }), Array.from(t, (t)=>e(t[0], t[1]));
+        },
+        isToastActive: I,
+        count: null == l ? void 0 : l.length
+    };
+}
+function N(e) {
+    const [t, o] = (0, _react.useState)(!1), [a, r] = (0, _react.useState)(!1), l = (0, _react.useRef)(null), c = (0, _react.useRef)({
+        start: 0,
+        delta: 0,
+        removalDistance: 0,
+        canCloseOnClick: !0,
+        canDrag: !1,
+        didMove: !1
+    }).current, { autoClose: d, pauseOnHover: u, closeToast: p, onClick: m, closeOnClick: f } = e;
+    var g, y;
+    function h() {
+        o(!0);
+    }
+    function T() {
+        o(!1);
+    }
+    function E(n) {
+        const o = l.current;
+        c.canDrag && o && (c.didMove = !0, t && T(), c.delta = "x" === e.draggableDirection ? n.clientX - c.start : n.clientY - c.start, c.start !== n.clientX && (c.canCloseOnClick = !1), o.style.transform = `translate3d(${"x" === e.draggableDirection ? `${c.delta}px, var(--y)` : `0, calc(${c.delta}px + var(--y))`},0)`, o.style.opacity = "" + (1 - Math.abs(c.delta / c.removalDistance)));
+    }
+    function b() {
+        document.removeEventListener("pointermove", E), document.removeEventListener("pointerup", b);
+        const t = l.current;
+        if (c.canDrag && c.didMove && t) {
+            if (c.canDrag = !1, Math.abs(c.delta) > c.removalDistance) return r(!0), e.closeToast(), void e.collapseAll();
+            t.style.transition = "transform 0.2s, opacity 0.2s", t.style.removeProperty("transform"), t.style.removeProperty("opacity");
+        }
+    }
+    null == (y = v.get((g = {
+        id: e.toastId,
+        containerId: e.containerId,
+        fn: o
+    }).containerId || 1)) || y.setToggle(g.id, g.fn), (0, _react.useEffect)(()=>{
+        if (e.pauseOnFocusLoss) return document.hasFocus() || T(), window.addEventListener("focus", h), window.addEventListener("blur", T), ()=>{
+            window.removeEventListener("focus", h), window.removeEventListener("blur", T);
+        };
+    }, [
+        e.pauseOnFocusLoss
+    ]);
+    const I = {
+        onPointerDown: function(t) {
+            if (!0 === e.draggable || e.draggable === t.pointerType) {
+                c.didMove = !1, document.addEventListener("pointermove", E), document.addEventListener("pointerup", b);
+                const n = l.current;
+                c.canCloseOnClick = !0, c.canDrag = !0, n.style.transition = "none", "x" === e.draggableDirection ? (c.start = t.clientX, c.removalDistance = n.offsetWidth * (e.draggablePercent / 100)) : (c.start = t.clientY, c.removalDistance = n.offsetHeight * (80 === e.draggablePercent ? 1.5 * e.draggablePercent : e.draggablePercent) / 100);
+            }
+        },
+        onPointerUp: function(t) {
+            const { top: n, bottom: o, left: s, right: a } = l.current.getBoundingClientRect();
+            "touchend" !== t.nativeEvent.type && e.pauseOnHover && t.clientX >= s && t.clientX <= a && t.clientY >= n && t.clientY <= o ? T() : h();
+        }
+    };
+    return d && u && (I.onMouseEnter = T, e.stacked || (I.onMouseLeave = h)), f && (I.onClick = (e)=>{
+        m && m(e), c.canCloseOnClick && p();
+    }), {
+        playToast: h,
+        pauseToast: T,
+        isRunning: t,
+        preventExitTransition: a,
+        toastRef: l,
+        eventHandlers: I
+    };
+}
+function $(t) {
+    let { delay: n, isRunning: o, closeToast: s, type: a = "default", hide: r, className: i, style: c, controlledProgress: d, progress: p, rtl: m, isIn: f, theme: g } = t;
+    const y = r || d && 0 === p, v = {
+        ...c,
+        animationDuration: `${n}ms`,
+        animationPlayState: o ? "running" : "paused"
+    };
+    d && (v.transform = `scaleX(${p})`);
+    const h = (0, _clsxDefault.default)("Toastify__progress-bar", d ? "Toastify__progress-bar--controlled" : "Toastify__progress-bar--animated", `Toastify__progress-bar-theme--${g}`, `Toastify__progress-bar--${a}`, {
+        "Toastify__progress-bar--rtl": m
+    }), T = u(i) ? i({
+        rtl: m,
+        type: a,
+        defaultClassName: h
+    }) : (0, _clsxDefault.default)(h, i), E = {
+        [d && p >= 1 ? "onTransitionEnd" : "onAnimationEnd"]: d && p < 1 ? null : ()=>{
+            f && s();
+        }
+    };
+    return (0, _reactDefault.default).createElement("div", {
+        className: "Toastify__progress-bar--wrp",
+        "data-hidden": y
+    }, (0, _reactDefault.default).createElement("div", {
+        className: `Toastify__progress-bar--bg Toastify__progress-bar-theme--${g} Toastify__progress-bar--${a}`
+    }), (0, _reactDefault.default).createElement("div", {
+        role: "progressbar",
+        "aria-hidden": y ? "true" : "false",
+        "aria-label": "notification timer",
+        className: T,
+        style: v,
+        ...E
+    }));
+}
+let w = 1;
+const k = ()=>"" + w++;
+function P(e) {
+    return e && (d(e.toastId) || c(e.toastId)) ? e.toastId : k();
+}
+function M(e, t) {
+    return _(e, t), t.toastId;
+}
+function x(e, t) {
+    return {
+        ...t,
+        type: t && t.type || e,
+        toastId: P(t)
+    };
+}
+function A(e) {
+    return (t, n)=>M(t, x(e, n));
+}
+function B(e, t) {
+    return M(e, x("default", t));
+}
+B.loading = (e, t)=>M(e, x("default", {
+        isLoading: !0,
+        autoClose: !1,
+        closeOnClick: !1,
+        closeButton: !1,
+        draggable: !1,
+        ...t
+    })), B.promise = function(e, t, n) {
+    let o, { pending: s, error: a, success: r } = t;
+    s && (o = d(s) ? B.loading(s, n) : B.loading(s.render, {
+        ...n,
+        ...s
+    }));
+    const i = {
+        isLoading: null,
+        autoClose: null,
+        closeOnClick: null,
+        closeButton: null,
+        draggable: null
+    }, l = (e, t, s)=>{
+        if (null == t) return void B.dismiss(o);
+        const a = {
+            type: e,
+            ...i,
+            ...n,
+            data: s
+        }, r = d(t) ? {
+            render: t
+        } : t;
+        return o ? B.update(o, {
+            ...a,
+            ...r
+        }) : B(r.render, {
+            ...a,
+            ...r
+        }), s;
+    }, c = u(e) ? e() : e;
+    return c.then((e)=>l("success", r, e)).catch((e)=>l("error", a, e)), c;
+}, B.success = A("success"), B.info = A("info"), B.error = A("error"), B.warning = A("warning"), B.warn = B.warning, B.dark = (e, t)=>M(e, x("default", {
+        theme: "dark",
+        ...t
+    })), B.dismiss = function(e) {
+    !function(e) {
+        var t;
+        if (b()) {
+            if (null == e || d(t = e) || c(t)) v.forEach((t)=>{
+                t.removeToast(e);
+            });
+            else if (e && ("containerId" in e || "id" in e)) {
+                const t = v.get(e.containerId);
+                t ? t.removeToast(e.id) : v.forEach((t)=>{
+                    t.removeToast(e.id);
+                });
+            }
+        } else h = h.filter((t)=>null != e && t.options.toastId !== e);
+    }(e);
+}, B.clearWaitingQueue = function(e) {
+    void 0 === e && (e = {}), v.forEach((t)=>{
+        !t.props.limit || e.containerId && t.id !== e.containerId || t.clearQueue();
+    });
+}, B.isActive = I, B.update = function(e, t) {
+    void 0 === t && (t = {});
+    const n = ((e, t)=>{
+        var n;
+        let { containerId: o } = t;
+        return null == (n = v.get(o || 1)) ? void 0 : n.toasts.get(e);
+    })(e, t);
+    if (n) {
+        const { props: o, content: s } = n, a = {
+            delay: 100,
+            ...o,
+            ...t,
+            toastId: t.toastId || e,
+            updateId: k()
+        };
+        a.toastId !== e && (a.staleId = e);
+        const r = a.render || s;
+        delete a.render, M(r, a);
+    }
+}, B.done = (e)=>{
+    B.update(e, {
+        progress: 1
+    });
+}, B.onChange = function(e) {
+    return T.add(e), ()=>{
+        T.delete(e);
+    };
+}, B.play = (e)=>C(!0, e), B.pause = (e)=>C(!1, e);
+const O = "undefined" != typeof window ? (0, _react.useLayoutEffect) : (0, _react.useEffect), D = (t)=>{
+    let { theme: n, type: o, isLoading: s, ...a } = t;
+    return (0, _reactDefault.default).createElement("svg", {
+        viewBox: "0 0 24 24",
+        width: "100%",
+        height: "100%",
+        fill: "colored" === n ? "currentColor" : `var(--toastify-icon-color-${o})`,
+        ...a
+    });
+}, z = {
+    info: function(t) {
+        return (0, _reactDefault.default).createElement(D, {
+            ...t
+        }, (0, _reactDefault.default).createElement("path", {
+            d: "M12 0a12 12 0 1012 12A12.013 12.013 0 0012 0zm.25 5a1.5 1.5 0 11-1.5 1.5 1.5 1.5 0 011.5-1.5zm2.25 13.5h-4a1 1 0 010-2h.75a.25.25 0 00.25-.25v-4.5a.25.25 0 00-.25-.25h-.75a1 1 0 010-2h1a2 2 0 012 2v4.75a.25.25 0 00.25.25h.75a1 1 0 110 2z"
+        }));
+    },
+    warning: function(t) {
+        return (0, _reactDefault.default).createElement(D, {
+            ...t
+        }, (0, _reactDefault.default).createElement("path", {
+            d: "M23.32 17.191L15.438 2.184C14.728.833 13.416 0 11.996 0c-1.42 0-2.733.833-3.443 2.184L.533 17.448a4.744 4.744 0 000 4.368C1.243 23.167 2.555 24 3.975 24h16.05C22.22 24 24 22.044 24 19.632c0-.904-.251-1.746-.68-2.44zm-9.622 1.46c0 1.033-.724 1.823-1.698 1.823s-1.698-.79-1.698-1.822v-.043c0-1.028.724-1.822 1.698-1.822s1.698.79 1.698 1.822v.043zm.039-12.285l-.84 8.06c-.057.581-.408.943-.897.943-.49 0-.84-.367-.896-.942l-.84-8.065c-.057-.624.25-1.095.779-1.095h1.91c.528.005.84.476.784 1.1z"
+        }));
+    },
+    success: function(t) {
+        return (0, _reactDefault.default).createElement(D, {
+            ...t
+        }, (0, _reactDefault.default).createElement("path", {
+            d: "M12 0a12 12 0 1012 12A12.014 12.014 0 0012 0zm6.927 8.2l-6.845 9.289a1.011 1.011 0 01-1.43.188l-4.888-3.908a1 1 0 111.25-1.562l4.076 3.261 6.227-8.451a1 1 0 111.61 1.183z"
+        }));
+    },
+    error: function(t) {
+        return (0, _reactDefault.default).createElement(D, {
+            ...t
+        }, (0, _reactDefault.default).createElement("path", {
+            d: "M11.983 0a12.206 12.206 0 00-8.51 3.653A11.8 11.8 0 000 12.207 11.779 11.779 0 0011.8 24h.214A12.111 12.111 0 0024 11.791 11.766 11.766 0 0011.983 0zM10.5 16.542a1.476 1.476 0 011.449-1.53h.027a1.527 1.527 0 011.523 1.47 1.475 1.475 0 01-1.449 1.53h-.027a1.529 1.529 0 01-1.523-1.47zM11 12.5v-6a1 1 0 012 0v6a1 1 0 11-2 0z"
+        }));
+    },
+    spinner: function() {
+        return (0, _reactDefault.default).createElement("div", {
+            className: "Toastify__spinner"
+        });
+    }
+}, R = (n)=>{
+    const { isRunning: o, preventExitTransition: s, toastRef: r, eventHandlers: i, playToast: c } = N(n), { closeButton: d, children: p, autoClose: m, onClick: f, type: g, hideProgressBar: y, closeToast: v, transition: h, position: T, className: E, style: b, bodyClassName: I, bodyStyle: _, progressClassName: C, progressStyle: L, updateId: w, role: k, progress: P, rtl: M, toastId: x, deleteToast: A, isIn: B, isLoading: O, closeOnClick: D, theme: R } = n, S = (0, _clsxDefault.default)("Toastify__toast", `Toastify__toast-theme--${R}`, `Toastify__toast--${g}`, {
+        "Toastify__toast--rtl": M
+    }, {
+        "Toastify__toast--close-on-click": D
+    }), H = u(E) ? E({
+        rtl: M,
+        position: T,
+        type: g,
+        defaultClassName: S
+    }) : (0, _clsxDefault.default)(S, E), F = function(e) {
+        let { theme: n, type: o, isLoading: s, icon: r } = e, i = null;
+        const l = {
+            theme: n,
+            type: o
+        };
+        return !1 === r || (u(r) ? i = r({
+            ...l,
+            isLoading: s
+        }) : (0, _react.isValidElement)(r) ? i = (0, _react.cloneElement)(r, l) : s ? i = z.spinner() : ((e)=>e in z)(o) && (i = z[o](l))), i;
+    }(n), X = !!P || !m, Y = {
+        closeToast: v,
+        type: g,
+        theme: R
+    };
+    let q = null;
+    return !1 === d || (q = u(d) ? d(Y) : (0, _react.isValidElement)(d) ? (0, _react.cloneElement)(d, Y) : function(t) {
+        let { closeToast: n, theme: o, ariaLabel: s = "close" } = t;
+        return (0, _reactDefault.default).createElement("button", {
+            className: `Toastify__close-button Toastify__close-button--${o}`,
+            type: "button",
+            onClick: (e)=>{
+                e.stopPropagation(), n(e);
+            },
+            "aria-label": s
+        }, (0, _reactDefault.default).createElement("svg", {
+            "aria-hidden": "true",
+            viewBox: "0 0 14 16"
+        }, (0, _reactDefault.default).createElement("path", {
+            fillRule: "evenodd",
+            d: "M7.71 8.23l3.75 3.75-1.48 1.48-3.75-3.75-3.75 3.75L1 11.98l3.75-3.75L1 4.48 2.48 3l3.75 3.75L9.98 3l1.48 1.48-3.75 3.75z"
+        })));
+    }(Y)), (0, _reactDefault.default).createElement(h, {
+        isIn: B,
+        done: A,
+        position: T,
+        preventExitTransition: s,
+        nodeRef: r,
+        playToast: c
+    }, (0, _reactDefault.default).createElement("div", {
+        id: x,
+        onClick: f,
+        "data-in": B,
+        className: H,
+        ...i,
+        style: b,
+        ref: r
+    }, (0, _reactDefault.default).createElement("div", {
+        ...B && {
+            role: k
+        },
+        className: u(I) ? I({
+            type: g
+        }) : (0, _clsxDefault.default)("Toastify__toast-body", I),
+        style: _
+    }, null != F && (0, _reactDefault.default).createElement("div", {
+        className: (0, _clsxDefault.default)("Toastify__toast-icon", {
+            "Toastify--animate-icon Toastify__zoom-enter": !O
+        })
+    }, F), (0, _reactDefault.default).createElement("div", null, p)), q, (0, _reactDefault.default).createElement($, {
+        ...w && !X ? {
+            key: `pb-${w}`
+        } : {},
+        rtl: M,
+        theme: R,
+        delay: m,
+        isRunning: o,
+        isIn: B,
+        closeToast: v,
+        hide: y,
+        type: g,
+        style: L,
+        className: C,
+        controlledProgress: X,
+        progress: P || 0
+    })));
+}, S = function(e, t) {
+    return void 0 === t && (t = !1), {
+        enter: `Toastify--animate Toastify__${e}-enter`,
+        exit: `Toastify--animate Toastify__${e}-exit`,
+        appendPosition: t
+    };
+}, H = g(S("bounce", !0)), F = g(S("slide", !0)), X = g(S("zoom")), Y = g(S("flip")), q = {
+    position: "top-right",
+    transition: H,
+    autoClose: 5e3,
+    closeButton: !0,
+    pauseOnHover: !0,
+    pauseOnFocusLoss: !0,
+    draggable: "touch",
+    draggablePercent: 80,
+    draggableDirection: "x",
+    role: "alert",
+    theme: "light"
+};
+function Q(t) {
+    let o = {
+        ...q,
+        ...t
+    };
+    const s = t.stacked, [a, r] = (0, _react.useState)(!0), c = (0, _react.useRef)(null), { getToastToRender: d, isToastActive: m, count: f } = L(o), { className: g, style: y, rtl: v, containerId: h } = o;
+    function T(e) {
+        const t = (0, _clsxDefault.default)("Toastify__toast-container", `Toastify__toast-container--${e}`, {
+            "Toastify__toast-container--rtl": v
+        });
+        return u(g) ? g({
+            position: e,
+            rtl: v,
+            defaultClassName: t
+        }) : (0, _clsxDefault.default)(t, p(g));
+    }
+    function E() {
+        s && (r(!0), B.play());
+    }
+    return O(()=>{
+        if (s) {
+            var e;
+            const t = c.current.querySelectorAll('[data-in="true"]'), n = 12, s = null == (e = o.position) ? void 0 : e.includes("top");
+            let r = 0, i = 0;
+            Array.from(t).reverse().forEach((e, t)=>{
+                const o = e;
+                o.classList.add("Toastify__toast--stacked"), t > 0 && (o.dataset.collapsed = `${a}`), o.dataset.pos || (o.dataset.pos = s ? "top" : "bot");
+                const l = r * (a ? .2 : 1) + (a ? 0 : n * t);
+                o.style.setProperty("--y", `${s ? l : -1 * l}px`), o.style.setProperty("--g", `${n}`), o.style.setProperty("--s", "" + (1 - (a ? i : 0))), r += o.offsetHeight, i += .025;
+            });
+        }
+    }, [
+        a,
+        f,
+        s
+    ]), (0, _reactDefault.default).createElement("div", {
+        ref: c,
+        className: "Toastify",
+        id: h,
+        onMouseEnter: ()=>{
+            s && (r(!1), B.pause());
+        },
+        onMouseLeave: E
+    }, d((t, n)=>{
+        const o = n.length ? {
+            ...y
+        } : {
+            ...y,
+            pointerEvents: "none"
+        };
+        return (0, _reactDefault.default).createElement("div", {
+            className: T(t),
+            style: o,
+            key: `container-${t}`
+        }, n.map((t)=>{
+            let { content: n, props: o } = t;
+            return (0, _reactDefault.default).createElement(R, {
+                ...o,
+                stacked: s,
+                collapseAll: E,
+                isIn: m(o.toastId, o.containerId),
+                style: o.style,
+                key: `toast-${o.key}`
+            }, n);
+        }));
+    }));
+}
+
+},{"react":"21dqq","clsx":"gocd3","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gocd3":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "clsx", ()=>clsx);
+function r(e) {
+    var t, f, n = "";
+    if ("string" == typeof e || "number" == typeof e) n += e;
+    else if ("object" == typeof e) {
+        if (Array.isArray(e)) {
+            var o = e.length;
+            for(t = 0; t < o; t++)e[t] && (f = r(e[t])) && (n && (n += " "), n += f);
+        } else for(f in e)e[f] && (n && (n += " "), n += f);
+    }
+    return n;
+}
+function clsx() {
+    for(var e, t, f = 0, n = "", o = arguments.length; f < o; f++)(e = arguments[f]) && (t = r(e)) && (n && (n += " "), n += t);
+    return n;
+}
+exports.default = clsx;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bsPVM":[function(require,module,exports) {
+var $parcel$ReactRefreshHelpers$abf5 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
+var prevRefreshReg = window.$RefreshReg$;
+var prevRefreshSig = window.$RefreshSig$;
+$parcel$ReactRefreshHelpers$abf5.prelude(module);
+
+try {
+// src/components/navigation-bar/navigation-bar.jsx
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "NavigationBar", ()=>NavigationBar);
+var _jsxDevRuntime = require("react/jsx-dev-runtime");
+var _react = require("react");
+var _reactDefault = parcelHelpers.interopDefault(_react);
+var _reactBootstrap = require("react-bootstrap");
+var _reactRouterDom = require("react-router-dom");
+const NavigationBar = ({ user, onLoggedOut })=>{
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Navbar), {
+        bg: "dark",
+        variant: "dark",
+        expand: "lg",
+        children: [
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Navbar).Brand, {
+                as: (0, _reactRouterDom.Link),
+                to: "/",
+                children: "MyFlix"
+            }, void 0, false, {
+                fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                lineNumber: 9,
+                columnNumber: 13
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Navbar).Toggle, {
+                "aria-controls": "basic-navbar-nav"
+            }, void 0, false, {
+                fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                lineNumber: 12,
+                columnNumber: 13
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Navbar).Collapse, {
+                id: "basic-navbar-nav",
+                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav), {
+                    className: "ml-auto",
+                    children: [
+                        user && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
+                            children: [
+                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
+                                    as: (0, _reactRouterDom.Link),
+                                    to: "/profile",
+                                    children: "Profile"
+                                }, void 0, false, {
+                                    fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                                    lineNumber: 17,
+                                    columnNumber: 29
+                                }, undefined),
+                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
+                                    onClick: onLoggedOut,
+                                    children: "Logout"
+                                }, void 0, false, {
+                                    fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                                    lineNumber: 20,
+                                    columnNumber: 29
+                                }, undefined)
+                            ]
+                        }, void 0, true),
+                        !user && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
+                            children: [
+                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
+                                    as: (0, _reactRouterDom.Link),
+                                    to: "/login",
+                                    children: "Login"
+                                }, void 0, false, {
+                                    fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                                    lineNumber: 25,
+                                    columnNumber: 29
+                                }, undefined),
+                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
+                                    as: (0, _reactRouterDom.Link),
+                                    to: "/signup",
+                                    children: "Signup"
+                                }, void 0, false, {
+                                    fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                                    lineNumber: 28,
+                                    columnNumber: 29
+                                }, undefined)
+                            ]
+                        }, void 0, true)
+                    ]
+                }, void 0, true, {
+                    fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                    lineNumber: 14,
+                    columnNumber: 17
+                }, undefined)
+            }, void 0, false, {
+                fileName: "src/components/navigation-bar/navigation-bar.jsx",
+                lineNumber: 13,
+                columnNumber: 13
+            }, undefined)
+        ]
+    }, void 0, true, {
+        fileName: "src/components/navigation-bar/navigation-bar.jsx",
+        lineNumber: 8,
+        columnNumber: 9
+    }, undefined);
+};
+_c = NavigationBar;
+var _c;
+$RefreshReg$(_c, "NavigationBar");
+
+  $parcel$ReactRefreshHelpers$abf5.postlude(module);
+} finally {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-bootstrap":"3AD9A","react-router-dom":"9xmpe","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"km3Ru":[function(require,module,exports) {
 "use strict";
 var Refresh = require("7422ead32dcc1e6b");
 function debounce(func, delay) {
@@ -42210,222 +42872,224 @@ function registerExportsForReactRefresh(module1) {
     }
 }
 
-},{"7422ead32dcc1e6b":"786KC"}],"ggaUx":[function(require,module,exports) {
+},{"7422ead32dcc1e6b":"786KC"}],"bwuIu":[function(require,module,exports) {
+var $parcel$ReactRefreshHelpers$67b2 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
+var prevRefreshReg = window.$RefreshReg$;
+var prevRefreshSig = window.$RefreshSig$;
+$parcel$ReactRefreshHelpers$67b2.prelude(module);
+
+try {
+// src/components/movie-card/movie-card.jsx
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _jsxDevRuntime = require("react/jsx-dev-runtime");
+var _react = require("react");
+var _reactDefault = parcelHelpers.interopDefault(_react);
+var _propTypes = require("prop-types");
+var _propTypesDefault = parcelHelpers.interopDefault(_propTypes);
+var _reactBootstrap = require("react-bootstrap");
+const MovieCard = ({ movie, onAddToFavorites, onRemoveFromFavorites, isFavorite, onMovieClick })=>{
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card), {
+        className: "mb-4",
+        children: [
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Img, {
+                variant: "top",
+                src: movie.ImagePath,
+                alt: `${movie.Title} image`
+            }, void 0, false, {
+                fileName: "src/components/movie-card/movie-card.jsx",
+                lineNumber: 9,
+                columnNumber: 7
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Body, {
+                children: [
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Title, {
+                        children: movie.Title
+                    }, void 0, false, {
+                        fileName: "src/components/movie-card/movie-card.jsx",
+                        lineNumber: 11,
+                        columnNumber: 9
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
+                        variant: "primary",
+                        onClick: onMovieClick,
+                        children: "View Movie"
+                    }, void 0, false, {
+                        fileName: "src/components/movie-card/movie-card.jsx",
+                        lineNumber: 12,
+                        columnNumber: 9
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
+                        variant: "secondary",
+                        onClick: isFavorite ? onRemoveFromFavorites : onAddToFavorites,
+                        children: isFavorite ? "Remove from Favorites" : "Add to Favorites"
+                    }, void 0, false, {
+                        fileName: "src/components/movie-card/movie-card.jsx",
+                        lineNumber: 13,
+                        columnNumber: 9
+                    }, undefined)
+                ]
+            }, void 0, true, {
+                fileName: "src/components/movie-card/movie-card.jsx",
+                lineNumber: 10,
+                columnNumber: 7
+            }, undefined)
+        ]
+    }, void 0, true, {
+        fileName: "src/components/movie-card/movie-card.jsx",
+        lineNumber: 8,
+        columnNumber: 5
+    }, undefined);
+};
+_c = MovieCard;
+MovieCard.propTypes = {
+    movie: (0, _propTypesDefault.default).shape({
+        Title: (0, _propTypesDefault.default).string.isRequired,
+        ImagePath: (0, _propTypesDefault.default).string.isRequired
+    }).isRequired,
+    onAddToFavorites: (0, _propTypesDefault.default).func.isRequired,
+    onRemoveFromFavorites: (0, _propTypesDefault.default).func.isRequired,
+    isFavorite: (0, _propTypesDefault.default).bool.isRequired,
+    onMovieClick: (0, _propTypesDefault.default).func.isRequired
+};
+exports.default = MovieCard;
+var _c;
+$RefreshReg$(_c, "MovieCard");
+
+  $parcel$ReactRefreshHelpers$67b2.postlude(module);
+} finally {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","prop-types":"7wKI2","react-bootstrap":"3AD9A","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"ggaUx":[function(require,module,exports) {
 var $parcel$ReactRefreshHelpers$e9f6 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
 $parcel$ReactRefreshHelpers$e9f6.prelude(module);
 
 try {
+// src/components/movie-view/movie-view.jsx
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "MovieView", ()=>MovieView);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _react = require("react");
 var _reactDefault = parcelHelpers.interopDefault(_react);
-var _reactRouterDom = require("react-router-dom"); // Corrected import for useParams
+var _propTypes = require("prop-types");
+var _propTypesDefault = parcelHelpers.interopDefault(_propTypes);
 var _reactBootstrap = require("react-bootstrap");
+var _reactRouterDom = require("react-router-dom");
+var _movieViewScss = require("./movie-view.scss"); // Import your SCSS file with styles
 var _s = $RefreshSig$();
-const MovieView = ({ movies, addFav, removeFav, user })=>{
+const MovieView = ({ movies, onAddToFavorites, onRemoveFromFavorites, isFavorite })=>{
     _s();
     const { movieId } = (0, _reactRouterDom.useParams)();
     const movie = movies.find((m)=>m._id === movieId);
-    // Check if the movie exists
     if (!movie) return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-        children: "Loading..."
+        children: "Movie not found"
     }, void 0, false, {
         fileName: "src/components/movie-view/movie-view.jsx",
-        lineNumber: 12,
+        lineNumber: 13,
         columnNumber: 16
     }, undefined);
-    const { Title, Description, Genre, Director, Year, ImagePath } = movie;
-    const isFavorite = user && user.FavoriteMovies && user.FavoriteMovies.includes(movie._id);
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Row), {
-        className: "my-5 justify-content-md-center",
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card), {
+        className: "mb-4 movie-view-card",
         children: [
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                md: 7,
-                className: "col-12",
-                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("img", {
-                    src: ImagePath,
-                    alt: "movie cover",
-                    className: "mx-auto w-100"
-                }, void 0, false, {
-                    fileName: "src/components/movie-view/movie-view.jsx",
-                    lineNumber: 21,
-                    columnNumber: 17
-                }, undefined)
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Img, {
+                className: "movie-view-img",
+                variant: "top",
+                src: movie.ImagePath,
+                alt: `${movie.Title} image`
             }, void 0, false, {
                 fileName: "src/components/movie-view/movie-view.jsx",
-                lineNumber: 20,
+                lineNumber: 18,
                 columnNumber: 13
             }, undefined),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                md: 5,
-                className: "col-12",
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Body, {
                 children: [
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                        className: "my-1",
-                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                            className: "h1",
-                            children: Title
-                        }, void 0, false, {
-                            fileName: "src/components/movie-view/movie-view.jsx",
-                            lineNumber: 25,
-                            columnNumber: 21
-                        }, undefined)
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Title, {
+                        children: movie.Title
                     }, void 0, false, {
+                        fileName: "src/components/movie-view/movie-view.jsx",
+                        lineNumber: 20,
+                        columnNumber: 17
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Text, {
+                        children: movie.Description
+                    }, void 0, false, {
+                        fileName: "src/components/movie-view/movie-view.jsx",
+                        lineNumber: 21,
+                        columnNumber: 17
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Text, {
+                        children: [
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("strong", {
+                                children: "Director:"
+                            }, void 0, false, {
+                                fileName: "src/components/movie-view/movie-view.jsx",
+                                lineNumber: 22,
+                                columnNumber: 28
+                            }, undefined),
+                            " ",
+                            movie.Director.Name
+                        ]
+                    }, void 0, true, {
+                        fileName: "src/components/movie-view/movie-view.jsx",
+                        lineNumber: 22,
+                        columnNumber: 17
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Text, {
+                        children: [
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("strong", {
+                                children: "Genre:"
+                            }, void 0, false, {
+                                fileName: "src/components/movie-view/movie-view.jsx",
+                                lineNumber: 23,
+                                columnNumber: 28
+                            }, undefined),
+                            " ",
+                            movie.Genre.Name
+                        ]
+                    }, void 0, true, {
+                        fileName: "src/components/movie-view/movie-view.jsx",
+                        lineNumber: 23,
+                        columnNumber: 17
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Text, {
+                        children: [
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("strong", {
+                                children: "Year:"
+                            }, void 0, false, {
+                                fileName: "src/components/movie-view/movie-view.jsx",
+                                lineNumber: 24,
+                                columnNumber: 28
+                            }, undefined),
+                            " ",
+                            movie.Year
+                        ]
+                    }, void 0, true, {
                         fileName: "src/components/movie-view/movie-view.jsx",
                         lineNumber: 24,
                         columnNumber: 17
                     }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                        className: "my-1",
-                        children: [
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                className: "h6",
-                                children: "Description: "
-                            }, void 0, false, {
-                                fileName: "src/components/movie-view/movie-view.jsx",
-                                lineNumber: 28,
-                                columnNumber: 21
-                            }, undefined),
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                children: Description
-                            }, void 0, false, {
-                                fileName: "src/components/movie-view/movie-view.jsx",
-                                lineNumber: 29,
-                                columnNumber: 21
-                            }, undefined)
-                        ]
-                    }, void 0, true, {
-                        fileName: "src/components/movie-view/movie-view.jsx",
-                        lineNumber: 27,
-                        columnNumber: 17
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                        className: "my-1",
-                        children: [
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                className: "h6",
-                                children: "Director: "
-                            }, void 0, false, {
-                                fileName: "src/components/movie-view/movie-view.jsx",
-                                lineNumber: 32,
-                                columnNumber: 21
-                            }, undefined),
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                children: Director ? Director.Name : "N/A"
-                            }, void 0, false, {
-                                fileName: "src/components/movie-view/movie-view.jsx",
-                                lineNumber: 33,
-                                columnNumber: 21
-                            }, undefined)
-                        ]
-                    }, void 0, true, {
-                        fileName: "src/components/movie-view/movie-view.jsx",
-                        lineNumber: 31,
-                        columnNumber: 17
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                        className: "my-1",
-                        children: [
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                className: "h6",
-                                children: "Genre: "
-                            }, void 0, false, {
-                                fileName: "src/components/movie-view/movie-view.jsx",
-                                lineNumber: 36,
-                                columnNumber: 21
-                            }, undefined),
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                children: Genre ? Genre.Name : "N/A"
-                            }, void 0, false, {
-                                fileName: "src/components/movie-view/movie-view.jsx",
-                                lineNumber: 37,
-                                columnNumber: 21
-                            }, undefined)
-                        ]
-                    }, void 0, true, {
-                        fileName: "src/components/movie-view/movie-view.jsx",
-                        lineNumber: 35,
-                        columnNumber: 17
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                        className: "my-1",
-                        children: [
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                className: "h6",
-                                children: "Year: "
-                            }, void 0, false, {
-                                fileName: "src/components/movie-view/movie-view.jsx",
-                                lineNumber: 40,
-                                columnNumber: 21
-                            }, undefined),
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                children: Year
-                            }, void 0, false, {
-                                fileName: "src/components/movie-view/movie-view.jsx",
-                                lineNumber: 41,
-                                columnNumber: 21
-                            }, undefined)
-                        ]
-                    }, void 0, true, {
-                        fileName: "src/components/movie-view/movie-view.jsx",
-                        lineNumber: 39,
-                        columnNumber: 17
-                    }, undefined),
-                    isFavorite ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
-                        variant: "outline-danger",
-                        className: "my-2 me-2",
-                        onClick: ()=>{
-                            console.log(`Removing movie with ID ${movie._id} from favorites`);
-                            removeFav(movie._id);
-                        },
-                        children: "Remove from Favorites"
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
+                        variant: "secondary",
+                        onClick: isFavorite ? onRemoveFromFavorites : onAddToFavorites,
+                        children: isFavorite ? "Remove from Favorites" : "Add to Favorites"
                     }, void 0, false, {
                         fileName: "src/components/movie-view/movie-view.jsx",
-                        lineNumber: 44,
-                        columnNumber: 21
-                    }, undefined) : /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
-                        variant: "outline-success",
-                        className: "my-2 me-2",
-                        onClick: ()=>{
-                            console.log(`Adding movie with ID ${movie._id} to favorites`);
-                            addFav(movie._id);
-                        },
-                        children: "Add to Favorites"
-                    }, void 0, false, {
-                        fileName: "src/components/movie-view/movie-view.jsx",
-                        lineNumber: 51,
-                        columnNumber: 21
-                    }, undefined),
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactRouterDom.Link), {
-                        to: `/`,
-                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
-                            variant: "outline-secondary",
-                            className: "my-2",
-                            children: "Back"
-                        }, void 0, false, {
-                            fileName: "src/components/movie-view/movie-view.jsx",
-                            lineNumber: 59,
-                            columnNumber: 21
-                        }, undefined)
-                    }, void 0, false, {
-                        fileName: "src/components/movie-view/movie-view.jsx",
-                        lineNumber: 58,
+                        lineNumber: 25,
                         columnNumber: 17
                     }, undefined)
                 ]
             }, void 0, true, {
                 fileName: "src/components/movie-view/movie-view.jsx",
-                lineNumber: 23,
+                lineNumber: 19,
                 columnNumber: 13
             }, undefined)
         ]
     }, void 0, true, {
         fileName: "src/components/movie-view/movie-view.jsx",
-        lineNumber: 19,
+        lineNumber: 17,
         columnNumber: 9
     }, undefined);
 };
@@ -42435,6 +43099,13 @@ _s(MovieView, "e2L2DPdRH1AShA7yIOCsYRlzvlI=", false, function() {
     ];
 });
 _c = MovieView;
+MovieView.propTypes = {
+    movies: (0, _propTypesDefault.default).array.isRequired,
+    onAddToFavorites: (0, _propTypesDefault.default).func.isRequired,
+    onRemoveFromFavorites: (0, _propTypesDefault.default).func.isRequired,
+    isFavorite: (0, _propTypesDefault.default).bool.isRequired
+};
+exports.default = MovieView;
 var _c;
 $RefreshReg$(_c, "MovieView");
 
@@ -42443,7 +43114,7 @@ $RefreshReg$(_c, "MovieView");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-bootstrap":"3AD9A","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","react-router-dom":"9xmpe"}],"9YtA0":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","prop-types":"7wKI2","react-bootstrap":"3AD9A","react-router-dom":"9xmpe","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","./movie-view.scss":"jnlR5"}],"jnlR5":[function() {},{}],"9YtA0":[function(require,module,exports) {
 var $parcel$ReactRefreshHelpers$9fee = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -42455,11 +43126,11 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "LoginView", ()=>LoginView);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _react = require("react");
-var _reactDefault = parcelHelpers.interopDefault(_react);
 var _button = require("react-bootstrap/Button");
 var _buttonDefault = parcelHelpers.interopDefault(_button);
 var _form = require("react-bootstrap/Form");
 var _formDefault = parcelHelpers.interopDefault(_form);
+var _reactToastify = require("react-toastify");
 var _s = $RefreshSig$();
 const LoginView = ({ onLoggedIn })=>{
     _s();
@@ -42482,9 +43153,9 @@ const LoginView = ({ onLoggedIn })=>{
                 localStorage.setItem("user", JSON.stringify(data.user));
                 localStorage.setItem("token", data.token);
                 onLoggedIn(data.user, data.token);
-            } else alert("No Such User");
+            } else (0, _reactToastify.toast).error("No Such User");
         }).catch((e)=>{
-            alert("Something went wrong");
+            (0, _reactToastify.toast).error("Something went wrong");
         });
     };
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("form", {
@@ -42494,7 +43165,7 @@ const LoginView = ({ onLoggedIn })=>{
                 children: "Login"
             }, void 0, false, {
                 fileName: "src/components/login-view/login-view.jsx",
-                lineNumber: 38,
+                lineNumber: 35,
                 columnNumber: 13
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _formDefault.default).Group, {
@@ -42504,7 +43175,7 @@ const LoginView = ({ onLoggedIn })=>{
                         children: "Username:"
                     }, void 0, false, {
                         fileName: "src/components/login-view/login-view.jsx",
-                        lineNumber: 40,
+                        lineNumber: 37,
                         columnNumber: 17
                     }, undefined),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _formDefault.default).Control, {
@@ -42515,13 +43186,13 @@ const LoginView = ({ onLoggedIn })=>{
                         minLength: 3
                     }, void 0, false, {
                         fileName: "src/components/login-view/login-view.jsx",
-                        lineNumber: 41,
+                        lineNumber: 38,
                         columnNumber: 17
                     }, undefined)
                 ]
             }, void 0, true, {
                 fileName: "src/components/login-view/login-view.jsx",
-                lineNumber: 39,
+                lineNumber: 36,
                 columnNumber: 13
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _formDefault.default).Group, {
@@ -42531,7 +43202,7 @@ const LoginView = ({ onLoggedIn })=>{
                         children: "Password:"
                     }, void 0, false, {
                         fileName: "src/components/login-view/login-view.jsx",
-                        lineNumber: 50,
+                        lineNumber: 47,
                         columnNumber: 17
                     }, undefined),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _formDefault.default).Control, {
@@ -42541,13 +43212,13 @@ const LoginView = ({ onLoggedIn })=>{
                         required: true
                     }, void 0, false, {
                         fileName: "src/components/login-view/login-view.jsx",
-                        lineNumber: 51,
+                        lineNumber: 48,
                         columnNumber: 17
                     }, undefined)
                 ]
             }, void 0, true, {
                 fileName: "src/components/login-view/login-view.jsx",
-                lineNumber: 49,
+                lineNumber: 46,
                 columnNumber: 13
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _buttonDefault.default), {
@@ -42556,13 +43227,13 @@ const LoginView = ({ onLoggedIn })=>{
                 children: "Submit"
             }, void 0, false, {
                 fileName: "src/components/login-view/login-view.jsx",
-                lineNumber: 58,
+                lineNumber: 55,
                 columnNumber: 13
             }, undefined)
         ]
     }, void 0, true, {
         fileName: "src/components/login-view/login-view.jsx",
-        lineNumber: 37,
+        lineNumber: 34,
         columnNumber: 9
     }, undefined);
 };
@@ -42576,7 +43247,7 @@ $RefreshReg$(_c, "LoginView");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-bootstrap/Button":"aPzUt","react-bootstrap/Form":"iBZ80","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"4OGiN":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-toastify":"kSvyQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","react-bootstrap/Button":"aPzUt","react-bootstrap/Form":"iBZ80"}],"4OGiN":[function(require,module,exports) {
 var $parcel$ReactRefreshHelpers$73d1 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -42637,7 +43308,7 @@ const SignupView = ()=>{
                     }, void 0, false, {
                         fileName: "src/components/signup-view/signup-view.jsx",
                         lineNumber: 46,
-                        columnNumber: 11
+                        columnNumber: 17
                     }, undefined),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _formDefault.default).Control, {
                         type: "text",
@@ -42648,13 +43319,13 @@ const SignupView = ()=>{
                     }, void 0, false, {
                         fileName: "src/components/signup-view/signup-view.jsx",
                         lineNumber: 47,
-                        columnNumber: 11
+                        columnNumber: 17
                     }, undefined)
                 ]
             }, void 0, true, {
                 fileName: "src/components/signup-view/signup-view.jsx",
                 lineNumber: 45,
-                columnNumber: 7
+                columnNumber: 13
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _formDefault.default).Group, {
                 controlId: "formPassword",
@@ -42664,7 +43335,7 @@ const SignupView = ()=>{
                     }, void 0, false, {
                         fileName: "src/components/signup-view/signup-view.jsx",
                         lineNumber: 56,
-                        columnNumber: 11
+                        columnNumber: 17
                     }, undefined),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _formDefault.default).Control, {
                         type: "password",
@@ -42674,13 +43345,13 @@ const SignupView = ()=>{
                     }, void 0, false, {
                         fileName: "src/components/signup-view/signup-view.jsx",
                         lineNumber: 57,
-                        columnNumber: 11
+                        columnNumber: 17
                     }, undefined)
                 ]
             }, void 0, true, {
                 fileName: "src/components/signup-view/signup-view.jsx",
                 lineNumber: 55,
-                columnNumber: 7
+                columnNumber: 13
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _formDefault.default).Group, {
                 controlId: "formEmail",
@@ -42690,7 +43361,7 @@ const SignupView = ()=>{
                     }, void 0, false, {
                         fileName: "src/components/signup-view/signup-view.jsx",
                         lineNumber: 65,
-                        columnNumber: 11
+                        columnNumber: 17
                     }, undefined),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _formDefault.default).Control, {
                         type: "email",
@@ -42700,13 +43371,13 @@ const SignupView = ()=>{
                     }, void 0, false, {
                         fileName: "src/components/signup-view/signup-view.jsx",
                         lineNumber: 66,
-                        columnNumber: 11
+                        columnNumber: 17
                     }, undefined)
                 ]
             }, void 0, true, {
                 fileName: "src/components/signup-view/signup-view.jsx",
                 lineNumber: 64,
-                columnNumber: 7
+                columnNumber: 13
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _formDefault.default).Group, {
                 controlId: "formBirthday",
@@ -42716,7 +43387,7 @@ const SignupView = ()=>{
                     }, void 0, false, {
                         fileName: "src/components/signup-view/signup-view.jsx",
                         lineNumber: 74,
-                        columnNumber: 11
+                        columnNumber: 17
                     }, undefined),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _formDefault.default).Control, {
                         type: "date",
@@ -42725,13 +43396,13 @@ const SignupView = ()=>{
                     }, void 0, false, {
                         fileName: "src/components/signup-view/signup-view.jsx",
                         lineNumber: 75,
-                        columnNumber: 11
+                        columnNumber: 17
                     }, undefined)
                 ]
             }, void 0, true, {
                 fileName: "src/components/signup-view/signup-view.jsx",
                 lineNumber: 73,
-                columnNumber: 7
+                columnNumber: 13
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _buttonDefault.default), {
                 type: "submit",
@@ -42741,13 +43412,13 @@ const SignupView = ()=>{
             }, void 0, false, {
                 fileName: "src/components/signup-view/signup-view.jsx",
                 lineNumber: 81,
-                columnNumber: 7
+                columnNumber: 13
             }, undefined)
         ]
     }, void 0, true, {
         fileName: "src/components/signup-view/signup-view.jsx",
         lineNumber: 44,
-        columnNumber: 3
+        columnNumber: 9
     }, undefined);
 };
 _s(SignupView, "jsOQN3GC2XlBG9ITlzCdpyJOnso=");
@@ -42760,138 +43431,14 @@ $RefreshReg$(_c, "SignupView");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-bootstrap/Button":"aPzUt","react-bootstrap/Form":"iBZ80","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"bsPVM":[function(require,module,exports) {
-var $parcel$ReactRefreshHelpers$abf5 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
-var prevRefreshReg = window.$RefreshReg$;
-var prevRefreshSig = window.$RefreshSig$;
-$parcel$ReactRefreshHelpers$abf5.prelude(module);
-
-try {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "NavigationBar", ()=>NavigationBar);
-var _jsxDevRuntime = require("react/jsx-dev-runtime");
-var _reactBootstrap = require("react-bootstrap");
-var _reactRouterDom = require("react-router-dom");
-const NavigationBar = ({ user, onLoggedOut })=>{
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Navbar), {
-        bg: "primary",
-        expand: "lg",
-        fixed: "top",
-        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Container), {
-            children: [
-                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Navbar).Brand, {
-                    as: (0, _reactRouterDom.Link),
-                    to: "/",
-                    children: "MyMovies"
-                }, void 0, false, {
-                    fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                    lineNumber: 8,
-                    columnNumber: 17
-                }, undefined),
-                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Navbar).Toggle, {
-                    "aria-controls": "basic-navbar-nav"
-                }, void 0, false, {
-                    fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                    lineNumber: 11,
-                    columnNumber: 17
-                }, undefined),
-                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Navbar).Collapse, {
-                    id: "-basic-navbar-nav",
-                    children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav), {
-                        className: "me-auto",
-                        children: [
-                            !user && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
-                                children: [
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
-                                        as: (0, _reactRouterDom.Link),
-                                        to: "/login",
-                                        children: "Login"
-                                    }, void 0, false, {
-                                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                                        lineNumber: 16,
-                                        columnNumber: 33
-                                    }, undefined),
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
-                                        as: (0, _reactRouterDom.Link),
-                                        to: "/signup",
-                                        children: "Signup"
-                                    }, void 0, false, {
-                                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                                        lineNumber: 19,
-                                        columnNumber: 33
-                                    }, undefined)
-                                ]
-                            }, void 0, true),
-                            user && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
-                                children: [
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
-                                        as: (0, _reactRouterDom.Link),
-                                        to: "/",
-                                        children: "Home"
-                                    }, void 0, false, {
-                                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                                        lineNumber: 26,
-                                        columnNumber: 33
-                                    }, undefined),
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
-                                        as: (0, _reactRouterDom.Link),
-                                        to: "/profile",
-                                        children: "Profile"
-                                    }, void 0, false, {
-                                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                                        lineNumber: 29,
-                                        columnNumber: 33
-                                    }, undefined),
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Nav).Link, {
-                                        onClick: onLoggedOut,
-                                        children: "Logout"
-                                    }, void 0, false, {
-                                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                                        lineNumber: 32,
-                                        columnNumber: 33
-                                    }, undefined)
-                                ]
-                            }, void 0, true)
-                        ]
-                    }, void 0, true, {
-                        fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                        lineNumber: 13,
-                        columnNumber: 21
-                    }, undefined)
-                }, void 0, false, {
-                    fileName: "src/components/navigation-bar/navigation-bar.jsx",
-                    lineNumber: 12,
-                    columnNumber: 17
-                }, undefined)
-            ]
-        }, void 0, true, {
-            fileName: "src/components/navigation-bar/navigation-bar.jsx",
-            lineNumber: 7,
-            columnNumber: 13
-        }, undefined)
-    }, void 0, false, {
-        fileName: "src/components/navigation-bar/navigation-bar.jsx",
-        lineNumber: 6,
-        columnNumber: 9
-    }, undefined);
-};
-_c = NavigationBar;
-var _c;
-$RefreshReg$(_c, "NavigationBar");
-
-  $parcel$ReactRefreshHelpers$abf5.postlude(module);
-} finally {
-  window.$RefreshReg$ = prevRefreshReg;
-  window.$RefreshSig$ = prevRefreshSig;
-}
-},{"react/jsx-dev-runtime":"iTorj","react-bootstrap":"3AD9A","react-router-dom":"9xmpe","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"2vVqf":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","react-bootstrap/Button":"aPzUt","react-bootstrap/Form":"iBZ80","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"2vVqf":[function(require,module,exports) {
 var $parcel$ReactRefreshHelpers$3c12 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
 $parcel$ReactRefreshHelpers$3c12.prelude(module);
 
 try {
+// src/components/profile-view/profile-view.jsx
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
@@ -42900,27 +43447,23 @@ var _reactDefault = parcelHelpers.interopDefault(_react);
 var _propTypes = require("prop-types");
 var _propTypesDefault = parcelHelpers.interopDefault(_propTypes);
 var _reactBootstrap = require("react-bootstrap");
+var _reactToastify = require("react-toastify");
 var _userInfo = require("./user-info");
-var _favoriteMovies = require("./favorite-movies");
+var _userInfoDefault = parcelHelpers.interopDefault(_userInfo);
+var _favoriteMovies = require("./favorite-movies"); // Assuming you have a default export
+var _updateUser = require("./update-user");
+var _updateUserDefault = parcelHelpers.interopDefault(_updateUser);
 var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
-var _reactToastify = require("react-toastify");
-var _s = $RefreshSig$();
 const ProfileView = ({ user, movies, removeFav, setUser })=>{
-    _s();
-    const [username, setUsername] = (0, _react.useState)(user.Username);
-    const [email, setEmail] = (0, _react.useState)(user.Email);
-    const [birthday, setBirthday] = (0, _react.useState)(user.Birthday);
-    const [password, setPassword] = (0, _react.useState)("");
-    const handleUpdate = (event)=>{
-        event.preventDefault();
+    const handleUpdate = async (updatedUser)=>{
         let token = localStorage.getItem("token");
         const url = `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}`;
         (0, _axiosDefault.default).put(url, {
-            Username: username,
-            Password: password,
-            Email: email,
-            Birthday: birthday
+            Username: updatedUser.Username,
+            Password: updatedUser.Password,
+            Email: updatedUser.Email,
+            Birthday: updatedUser.Birthday
         }, {
             headers: {
                 Authorization: `Bearer ${token}`
@@ -42935,209 +43478,127 @@ const ProfileView = ({ user, movies, removeFav, setUser })=>{
             (0, _reactToastify.toast).error("Failed to update profile");
         });
     };
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Row), {
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Container), {
         children: [
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                xs: 12,
-                md: 6,
-                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card), {
-                    children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Body, {
-                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _userInfo.UserInfo), {
-                            email: user.Email,
-                            name: user.Username,
-                            birthday: user.Birthday
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Row), {
+                className: "justify-content-md-center",
+                children: [
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                        xs: 12,
+                        md: 6,
+                        className: "mb-4",
+                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card), {
+                            children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Body, {
+                                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _userInfoDefault.default), {
+                                    email: user.Email,
+                                    name: user.Username,
+                                    birthday: user.Birthday
+                                }, void 0, false, {
+                                    fileName: "src/components/profile-view/profile-view.jsx",
+                                    lineNumber: 47,
+                                    columnNumber: 15
+                                }, undefined)
+                            }, void 0, false, {
+                                fileName: "src/components/profile-view/profile-view.jsx",
+                                lineNumber: 46,
+                                columnNumber: 13
+                            }, undefined)
                         }, void 0, false, {
                             fileName: "src/components/profile-view/profile-view.jsx",
-                            lineNumber: 51,
-                            columnNumber: 13
+                            lineNumber: 45,
+                            columnNumber: 11
                         }, undefined)
                     }, void 0, false, {
                         fileName: "src/components/profile-view/profile-view.jsx",
-                        lineNumber: 50,
-                        columnNumber: 11
-                    }, undefined)
-                }, void 0, false, {
-                    fileName: "src/components/profile-view/profile-view.jsx",
-                    lineNumber: 49,
-                    columnNumber: 9
-                }, undefined)
-            }, void 0, false, {
-                fileName: "src/components/profile-view/profile-view.jsx",
-                lineNumber: 48,
-                columnNumber: 7
-            }, undefined),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                xs: 12,
-                md: 6,
-                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _favoriteMovies.FavoriteMovies), {
-                    user: user,
-                    movies: movies,
-                    removeFav: removeFav
-                }, void 0, false, {
-                    fileName: "src/components/profile-view/profile-view.jsx",
-                    lineNumber: 56,
-                    columnNumber: 9
-                }, undefined)
-            }, void 0, false, {
-                fileName: "src/components/profile-view/profile-view.jsx",
-                lineNumber: 55,
-                columnNumber: 7
-            }, undefined),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
-                xs: 12,
-                md: 6,
-                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card), {
-                    children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Body, {
-                        children: [
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("h3", {
-                                children: "Update Profile"
-                            }, void 0, false, {
-                                fileName: "src/components/profile-view/profile-view.jsx",
-                                lineNumber: 61,
-                                columnNumber: 13
-                            }, undefined),
-                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form), {
-                                onSubmit: handleUpdate,
+                        lineNumber: 44,
+                        columnNumber: 9
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                        xs: 12,
+                        md: 6,
+                        className: "mb-4",
+                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card), {
+                            children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Body, {
                                 children: [
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Group, {
-                                        controlId: "formUsername",
-                                        children: [
-                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Label, {
-                                                children: "Username"
-                                            }, void 0, false, {
-                                                fileName: "src/components/profile-view/profile-view.jsx",
-                                                lineNumber: 64,
-                                                columnNumber: 17
-                                            }, undefined),
-                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Control, {
-                                                type: "text",
-                                                value: username,
-                                                onChange: (e)=>setUsername(e.target.value)
-                                            }, void 0, false, {
-                                                fileName: "src/components/profile-view/profile-view.jsx",
-                                                lineNumber: 65,
-                                                columnNumber: 17
-                                            }, undefined)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "src/components/profile-view/profile-view.jsx",
-                                        lineNumber: 63,
-                                        columnNumber: 15
-                                    }, undefined),
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Group, {
-                                        controlId: "formEmail",
-                                        children: [
-                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Label, {
-                                                children: "Email"
-                                            }, void 0, false, {
-                                                fileName: "src/components/profile-view/profile-view.jsx",
-                                                lineNumber: 73,
-                                                columnNumber: 17
-                                            }, undefined),
-                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Control, {
-                                                type: "email",
-                                                value: email,
-                                                onChange: (e)=>setEmail(e.target.value)
-                                            }, void 0, false, {
-                                                fileName: "src/components/profile-view/profile-view.jsx",
-                                                lineNumber: 74,
-                                                columnNumber: 17
-                                            }, undefined)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "src/components/profile-view/profile-view.jsx",
-                                        lineNumber: 72,
-                                        columnNumber: 15
-                                    }, undefined),
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Group, {
-                                        controlId: "formBirthday",
-                                        children: [
-                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Label, {
-                                                children: "Birthday"
-                                            }, void 0, false, {
-                                                fileName: "src/components/profile-view/profile-view.jsx",
-                                                lineNumber: 82,
-                                                columnNumber: 17
-                                            }, undefined),
-                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Control, {
-                                                type: "date",
-                                                value: birthday,
-                                                onChange: (e)=>setBirthday(e.target.value)
-                                            }, void 0, false, {
-                                                fileName: "src/components/profile-view/profile-view.jsx",
-                                                lineNumber: 83,
-                                                columnNumber: 17
-                                            }, undefined)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "src/components/profile-view/profile-view.jsx",
-                                        lineNumber: 81,
-                                        columnNumber: 15
-                                    }, undefined),
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Group, {
-                                        controlId: "formPassword",
-                                        children: [
-                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Label, {
-                                                children: "Password"
-                                            }, void 0, false, {
-                                                fileName: "src/components/profile-view/profile-view.jsx",
-                                                lineNumber: 91,
-                                                columnNumber: 17
-                                            }, undefined),
-                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Form).Control, {
-                                                type: "password",
-                                                value: password,
-                                                onChange: (e)=>setPassword(e.target.value)
-                                            }, void 0, false, {
-                                                fileName: "src/components/profile-view/profile-view.jsx",
-                                                lineNumber: 92,
-                                                columnNumber: 17
-                                            }, undefined)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "src/components/profile-view/profile-view.jsx",
-                                        lineNumber: 90,
-                                        columnNumber: 15
-                                    }, undefined),
-                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Button), {
-                                        variant: "primary",
-                                        type: "submit",
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("h3", {
                                         children: "Update Profile"
                                     }, void 0, false, {
                                         fileName: "src/components/profile-view/profile-view.jsx",
-                                        lineNumber: 99,
+                                        lineNumber: 54,
+                                        columnNumber: 15
+                                    }, undefined),
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _updateUserDefault.default), {
+                                        user: user,
+                                        handleUpdate: handleUpdate
+                                    }, void 0, false, {
+                                        fileName: "src/components/profile-view/profile-view.jsx",
+                                        lineNumber: 55,
                                         columnNumber: 15
                                     }, undefined)
                                 ]
                             }, void 0, true, {
                                 fileName: "src/components/profile-view/profile-view.jsx",
-                                lineNumber: 62,
+                                lineNumber: 53,
                                 columnNumber: 13
                             }, undefined)
-                        ]
-                    }, void 0, true, {
+                        }, void 0, false, {
+                            fileName: "src/components/profile-view/profile-view.jsx",
+                            lineNumber: 52,
+                            columnNumber: 11
+                        }, undefined)
+                    }, void 0, false, {
                         fileName: "src/components/profile-view/profile-view.jsx",
-                        lineNumber: 60,
+                        lineNumber: 51,
+                        columnNumber: 9
+                    }, undefined)
+                ]
+            }, void 0, true, {
+                fileName: "src/components/profile-view/profile-view.jsx",
+                lineNumber: 43,
+                columnNumber: 7
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Row), {
+                className: "justify-content-md-center",
+                children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Col), {
+                    xs: 12,
+                    children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card), {
+                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _reactBootstrap.Card).Body, {
+                            children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _favoriteMovies.FavoriteMovies), {
+                                user: user,
+                                movies: movies,
+                                removeFav: removeFav
+                            }, void 0, false, {
+                                fileName: "src/components/profile-view/profile-view.jsx",
+                                lineNumber: 64,
+                                columnNumber: 15
+                            }, undefined)
+                        }, void 0, false, {
+                            fileName: "src/components/profile-view/profile-view.jsx",
+                            lineNumber: 63,
+                            columnNumber: 13
+                        }, undefined)
+                    }, void 0, false, {
+                        fileName: "src/components/profile-view/profile-view.jsx",
+                        lineNumber: 62,
                         columnNumber: 11
                     }, undefined)
                 }, void 0, false, {
                     fileName: "src/components/profile-view/profile-view.jsx",
-                    lineNumber: 59,
+                    lineNumber: 61,
                     columnNumber: 9
                 }, undefined)
             }, void 0, false, {
                 fileName: "src/components/profile-view/profile-view.jsx",
-                lineNumber: 58,
+                lineNumber: 60,
                 columnNumber: 7
             }, undefined)
         ]
     }, void 0, true, {
         fileName: "src/components/profile-view/profile-view.jsx",
-        lineNumber: 47,
+        lineNumber: 42,
         columnNumber: 5
     }, undefined);
 };
-_s(ProfileView, "xsLoo3ioWRpO8Uqt+zdUOkkOa5E=");
 _c = ProfileView;
 ProfileView.propTypes = {
     user: (0, _propTypesDefault.default).object.isRequired,
@@ -43154,7 +43615,7 @@ $RefreshReg$(_c, "ProfileView");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","prop-types":"7wKI2","react-bootstrap":"3AD9A","./user-info":"66eot","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","./favorite-movies":"dTTQH","axios":"jo6P5","react-toastify":"kSvyQ"}],"66eot":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","prop-types":"7wKI2","react-bootstrap":"3AD9A","react-toastify":"kSvyQ","./user-info":"66eot","./favorite-movies":"dTTQH","./update-user":"2SBwg","axios":"jo6P5","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"66eot":[function(require,module,exports) {
 var $parcel$ReactRefreshHelpers$1330 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -43263,23 +43724,20 @@ parcelHelpers.export(exports, "FavoriteMovies", ()=>FavoriteMovies);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _react = require("react");
 var _reactDefault = parcelHelpers.interopDefault(_react);
+var _propTypes = require("prop-types");
+var _propTypesDefault = parcelHelpers.interopDefault(_propTypes);
 var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
 var _reactBootstrap = require("react-bootstrap");
 var _movieCard = require("../movie-card/movie-card");
+var _movieCardDefault = parcelHelpers.interopDefault(_movieCard);
+var _reactToastify = require("react-toastify"); // Assuming you're using react-toastify
 const FavoriteMovies = ({ movies, user, removeFav })=>{
     if (!movies || !user || !user.FavoriteMovies) return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
         children: "No favorite movies available"
     }, void 0, false, {
         fileName: "src/components/profile-view/favorite-movies.jsx",
-        lineNumber: 8,
-        columnNumber: 12
-    }, undefined);
-    if (!Array.isArray(movies)) return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-        children: "Invalid movies data"
-    }, void 0, false, {
-        fileName: "src/components/profile-view/favorite-movies.jsx",
-        lineNumber: 12,
+        lineNumber: 10,
         columnNumber: 12
     }, undefined);
     let favoriteMovies = movies.filter((movie)=>user.FavoriteMovies.includes(movie._id));
@@ -43291,8 +43749,10 @@ const FavoriteMovies = ({ movies, user, removeFav })=>{
                 Authorization: `Bearer ${token}`
             }
         }).then(()=>{
+            (0, _reactToastify.toast).success("Movie removed from favorites!");
             removeFav(id);
         }).catch((error)=>{
+            (0, _reactToastify.toast).error("Error removing movie from favorites.");
             console.error("Error removing movie from favorites:", error);
         });
     };
@@ -43311,9 +43771,10 @@ const FavoriteMovies = ({ movies, user, removeFav })=>{
                         sm: 6,
                         md: 4,
                         lg: 3,
-                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieCard.MovieCard), {
+                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _movieCardDefault.default), {
                             movie: movie,
-                            removeFav: ()=>removeFavHandler(movie._id)
+                            onRemoveFromFavorites: ()=>removeFavHandler(movie._id),
+                            isFavorite: true
                         }, void 0, false, {
                             fileName: "src/components/profile-view/favorite-movies.jsx",
                             lineNumber: 40,
@@ -43337,6 +43798,11 @@ const FavoriteMovies = ({ movies, user, removeFav })=>{
     }, undefined);
 };
 _c = FavoriteMovies;
+FavoriteMovies.propTypes = {
+    movies: (0, _propTypesDefault.default).array.isRequired,
+    user: (0, _propTypesDefault.default).object.isRequired,
+    removeFav: (0, _propTypesDefault.default).func.isRequired
+};
 var _c;
 $RefreshReg$(_c, "FavoriteMovies");
 
@@ -43345,7 +43811,7 @@ $RefreshReg$(_c, "FavoriteMovies");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","axios":"jo6P5","react-bootstrap":"3AD9A","../movie-card/movie-card":"bwuIu","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"jo6P5":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","prop-types":"7wKI2","axios":"jo6P5","react-bootstrap":"3AD9A","../movie-card/movie-card":"bwuIu","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","react-toastify":"kSvyQ"}],"jo6P5":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "default", ()=>(0, _axiosJsDefault.default));
@@ -43469,6 +43935,7 @@ parcelHelpers.defineInteropFlag(exports);
 var _bindJs = require("./helpers/bind.js");
 var _bindJsDefault = parcelHelpers.interopDefault(_bindJs);
 var global = arguments[3];
+var process = require("a8d2c3349c87a903");
 "use strict";
 // utils is a library of generic helper functions non-specific to axios
 const { toString } = Object.prototype;
@@ -43967,6 +44434,22 @@ const toJSONObject = (obj)=>{
 };
 const isAsyncFn = kindOfTest("AsyncFunction");
 const isThenable = (thing)=>thing && (isObject(thing) || isFunction(thing)) && isFunction(thing.then) && isFunction(thing.catch);
+// original code
+// https://github.com/DigitalBrainJS/AxiosPromise/blob/16deab13710ec09779922131f3fa5954320f83ab/lib/utils.js#L11-L34
+const _setImmediate = ((setImmediateSupported, postMessageSupported)=>{
+    if (setImmediateSupported) return setImmediate;
+    return postMessageSupported ? ((token, callbacks)=>{
+        _global.addEventListener("message", ({ source, data })=>{
+            if (source === _global && data === token) callbacks.length && callbacks.shift()();
+        }, false);
+        return (cb)=>{
+            callbacks.push(cb);
+            _global.postMessage(token, "*");
+        };
+    })(`axios@${Math.random()}`, []) : (cb)=>setTimeout(cb);
+})(typeof setImmediate === "function", isFunction(_global.postMessage));
+const asap = typeof queueMicrotask !== "undefined" ? queueMicrotask.bind(_global) : typeof process !== "undefined" && process.nextTick || _setImmediate;
+// *********************
 exports.default = {
     isArray,
     isArrayBuffer,
@@ -44022,10 +44505,12 @@ exports.default = {
     isSpecCompliantForm,
     toJSONObject,
     isAsyncFn,
-    isThenable
+    isThenable,
+    setImmediate: _setImmediate,
+    asap
 };
 
-},{"./helpers/bind.js":"haRQb","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"haRQb":[function(require,module,exports) {
+},{"a8d2c3349c87a903":"d5jf4","./helpers/bind.js":"haRQb","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"haRQb":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "default", ()=>bind);
@@ -46103,7 +46588,10 @@ var _utilsJsDefault = parcelHelpers.interopDefault(_utilsJs);
     code && (this.code = code);
     config && (this.config = config);
     request && (this.request = request);
-    response && (this.response = response);
+    if (response) {
+        this.response = response;
+        this.status = response.status ? response.status : null;
+    }
 }
 (0, _utilsJsDefault.default).inherits(AxiosError, Error, {
     toJSON: function toJSON() {
@@ -46122,7 +46610,7 @@ var _utilsJsDefault = parcelHelpers.interopDefault(_utilsJs);
             // Axios
             config: (0, _utilsJsDefault.default).toJSONObject(this.config),
             code: this.code,
-            status: this.response && this.response.status ? this.response.status : null
+            status: this.status
         };
     }
 });
@@ -46536,8 +47024,10 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "hasBrowserEnv", ()=>hasBrowserEnv);
 parcelHelpers.export(exports, "hasStandardBrowserWebWorkerEnv", ()=>hasStandardBrowserWebWorkerEnv);
 parcelHelpers.export(exports, "hasStandardBrowserEnv", ()=>hasStandardBrowserEnv);
+parcelHelpers.export(exports, "navigator", ()=>_navigator);
 parcelHelpers.export(exports, "origin", ()=>origin);
 const hasBrowserEnv = typeof window !== "undefined" && typeof document !== "undefined";
+const _navigator = typeof navigator === "object" && navigator || undefined;
 /**
  * Determine if we're running in a standard browser environment
  *
@@ -46554,13 +47044,11 @@ const hasBrowserEnv = typeof window !== "undefined" && typeof document !== "unde
  *  navigator.product -> 'NativeScript' or 'NS'
  *
  * @returns {boolean}
- */ const hasStandardBrowserEnv = ((product)=>{
-    return hasBrowserEnv && [
-        "ReactNative",
-        "NativeScript",
-        "NS"
-    ].indexOf(product) < 0;
-})(typeof navigator !== "undefined" && navigator.product);
+ */ const hasStandardBrowserEnv = hasBrowserEnv && (!_navigator || [
+    "ReactNative",
+    "NativeScript",
+    "NS"
+].indexOf(_navigator.product) < 0);
 /**
  * Determine if we're running in a standard browser webWorker environment
  *
@@ -47034,7 +47522,6 @@ var _indexJsDefault = parcelHelpers.interopDefault(_indexJs);
 var _axiosHeadersJs = require("../core/AxiosHeaders.js");
 var _axiosHeadersJsDefault = parcelHelpers.interopDefault(_axiosHeadersJs);
 var _progressEventReducerJs = require("../helpers/progressEventReducer.js");
-var _progressEventReducerJsDefault = parcelHelpers.interopDefault(_progressEventReducerJs);
 var _resolveConfigJs = require("../helpers/resolveConfig.js");
 var _resolveConfigJsDefault = parcelHelpers.interopDefault(_resolveConfigJs);
 const isXHRAdapterSupported = typeof XMLHttpRequest !== "undefined";
@@ -47043,11 +47530,15 @@ exports.default = isXHRAdapterSupported && function(config) {
         const _config = (0, _resolveConfigJsDefault.default)(config);
         let requestData = _config.data;
         const requestHeaders = (0, _axiosHeadersJsDefault.default).from(_config.headers).normalize();
-        let { responseType } = _config;
+        let { responseType, onUploadProgress, onDownloadProgress } = _config;
         let onCanceled;
+        let uploadThrottled, downloadThrottled;
+        let flushUpload, flushDownload;
         function done() {
-            if (_config.cancelToken) _config.cancelToken.unsubscribe(onCanceled);
-            if (_config.signal) _config.signal.removeEventListener("abort", onCanceled);
+            flushUpload && flushUpload(); // flush events
+            flushDownload && flushDownload(); // flush events
+            _config.cancelToken && _config.cancelToken.unsubscribe(onCanceled);
+            _config.signal && _config.signal.removeEventListener("abort", onCanceled);
         }
         let request = new XMLHttpRequest();
         request.open(_config.method.toUpperCase(), _config.url, true);
@@ -47093,7 +47584,7 @@ exports.default = isXHRAdapterSupported && function(config) {
         // Handle browser request cancellation (as opposed to a manual cancellation)
         request.onabort = function handleAbort() {
             if (!request) return;
-            reject(new (0, _axiosErrorJsDefault.default)("Request aborted", (0, _axiosErrorJsDefault.default).ECONNABORTED, _config, request));
+            reject(new (0, _axiosErrorJsDefault.default)("Request aborted", (0, _axiosErrorJsDefault.default).ECONNABORTED, config, request));
             // Clean up request
             request = null;
         };
@@ -47101,7 +47592,7 @@ exports.default = isXHRAdapterSupported && function(config) {
         request.onerror = function handleError() {
             // Real errors are hidden from us by the browser
             // onerror should only fire if it's a network error
-            reject(new (0, _axiosErrorJsDefault.default)("Network Error", (0, _axiosErrorJsDefault.default).ERR_NETWORK, _config, request));
+            reject(new (0, _axiosErrorJsDefault.default)("Network Error", (0, _axiosErrorJsDefault.default).ERR_NETWORK, config, request));
             // Clean up request
             request = null;
         };
@@ -47110,7 +47601,7 @@ exports.default = isXHRAdapterSupported && function(config) {
             let timeoutErrorMessage = _config.timeout ? "timeout of " + _config.timeout + "ms exceeded" : "timeout exceeded";
             const transitional = _config.transitional || (0, _transitionalJsDefault.default);
             if (_config.timeoutErrorMessage) timeoutErrorMessage = _config.timeoutErrorMessage;
-            reject(new (0, _axiosErrorJsDefault.default)(timeoutErrorMessage, transitional.clarifyTimeoutError ? (0, _axiosErrorJsDefault.default).ETIMEDOUT : (0, _axiosErrorJsDefault.default).ECONNABORTED, _config, request));
+            reject(new (0, _axiosErrorJsDefault.default)(timeoutErrorMessage, transitional.clarifyTimeoutError ? (0, _axiosErrorJsDefault.default).ETIMEDOUT : (0, _axiosErrorJsDefault.default).ECONNABORTED, config, request));
             // Clean up request
             request = null;
         };
@@ -47125,9 +47616,16 @@ exports.default = isXHRAdapterSupported && function(config) {
         // Add responseType to request if needed
         if (responseType && responseType !== "json") request.responseType = _config.responseType;
         // Handle progress if needed
-        if (typeof _config.onDownloadProgress === "function") request.addEventListener("progress", (0, _progressEventReducerJsDefault.default)(_config.onDownloadProgress, true));
+        if (onDownloadProgress) {
+            [downloadThrottled, flushDownload] = (0, _progressEventReducerJs.progressEventReducer)(onDownloadProgress, true);
+            request.addEventListener("progress", downloadThrottled);
+        }
         // Not all browsers support upload events
-        if (typeof _config.onUploadProgress === "function" && request.upload) request.upload.addEventListener("progress", (0, _progressEventReducerJsDefault.default)(_config.onUploadProgress));
+        if (onUploadProgress && request.upload) {
+            [uploadThrottled, flushUpload] = (0, _progressEventReducerJs.progressEventReducer)(onUploadProgress);
+            request.upload.addEventListener("progress", uploadThrottled);
+            request.upload.addEventListener("loadend", flushUpload);
+        }
         if (_config.cancelToken || _config.signal) {
             // Handle cancellation
             // eslint-disable-next-line func-names
@@ -47179,11 +47677,16 @@ function parseProtocol(url) {
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bN9Fp":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "progressEventReducer", ()=>progressEventReducer);
+parcelHelpers.export(exports, "progressEventDecorator", ()=>progressEventDecorator);
+parcelHelpers.export(exports, "asyncDecorator", ()=>asyncDecorator);
 var _speedometerJs = require("./speedometer.js");
 var _speedometerJsDefault = parcelHelpers.interopDefault(_speedometerJs);
 var _throttleJs = require("./throttle.js");
 var _throttleJsDefault = parcelHelpers.interopDefault(_throttleJs);
-exports.default = (listener, isDownloadStream, freq = 3)=>{
+var _utilsJs = require("../utils.js");
+var _utilsJsDefault = parcelHelpers.interopDefault(_utilsJs);
+const progressEventReducer = (listener, isDownloadStream, freq = 3)=>{
     let bytesNotified = 0;
     const _speedometer = (0, _speedometerJsDefault.default)(50, 250);
     return (0, _throttleJsDefault.default)((e)=>{
@@ -47201,14 +47704,26 @@ exports.default = (listener, isDownloadStream, freq = 3)=>{
             rate: rate ? rate : undefined,
             estimated: rate && total && inRange ? (total - loaded) / rate : undefined,
             event: e,
-            lengthComputable: total != null
+            lengthComputable: total != null,
+            [isDownloadStream ? "download" : "upload"]: true
         };
-        data[isDownloadStream ? "download" : "upload"] = true;
         listener(data);
     }, freq);
 };
+const progressEventDecorator = (total, throttled)=>{
+    const lengthComputable = total != null;
+    return [
+        (loaded)=>throttled[0]({
+                lengthComputable,
+                total,
+                loaded
+            }),
+        throttled[1]
+    ];
+};
+const asyncDecorator = (fn)=>(...args)=>(0, _utilsJsDefault.default).asap(()=>fn(...args));
 
-},{"./speedometer.js":"gQeo1","./throttle.js":"6fmRS","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gQeo1":[function(require,module,exports) {
+},{"./speedometer.js":"gQeo1","./throttle.js":"6fmRS","../utils.js":"5By4s","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gQeo1":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 "use strict";
@@ -47247,35 +47762,44 @@ parcelHelpers.defineInteropFlag(exports);
 exports.default = speedometer;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6fmRS":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-"use strict";
 /**
  * Throttle decorator
  * @param {Function} fn
  * @param {Number} freq
  * @return {Function}
- */ function throttle(fn, freq) {
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+function throttle(fn, freq) {
     let timestamp = 0;
-    const threshold = 1000 / freq;
-    let timer = null;
-    return function throttled() {
-        const force = this === true;
-        const now = Date.now();
-        if (force || now - timestamp > threshold) {
-            if (timer) {
-                clearTimeout(timer);
-                timer = null;
-            }
-            timestamp = now;
-            return fn.apply(null, arguments);
-        }
-        if (!timer) timer = setTimeout(()=>{
+    let threshold = 1000 / freq;
+    let lastArgs;
+    let timer;
+    const invoke = (args, now = Date.now())=>{
+        timestamp = now;
+        lastArgs = null;
+        if (timer) {
+            clearTimeout(timer);
             timer = null;
-            timestamp = Date.now();
-            return fn.apply(null, arguments);
-        }, threshold - (now - timestamp));
+        }
+        fn.apply(null, args);
     };
+    const throttled = (...args)=>{
+        const now = Date.now();
+        const passed = now - timestamp;
+        if (passed >= threshold) invoke(args, now);
+        else {
+            lastArgs = args;
+            if (!timer) timer = setTimeout(()=>{
+                timer = null;
+                invoke(lastArgs);
+            }, threshold - passed);
+        }
+    };
+    const flush = ()=>lastArgs && invoke(lastArgs);
+    return [
+        throttled,
+        flush
+    ];
 }
 exports.default = throttle;
 
@@ -47342,7 +47866,7 @@ var _indexJsDefault = parcelHelpers.interopDefault(_indexJs);
 exports.default = (0, _indexJsDefault.default).hasStandardBrowserEnv ? // Standard browser envs have full support of the APIs needed to test
 // whether the request URL is of the same origin as current location.
 function standardBrowserEnv() {
-    const msie = /(msie|trident)/i.test(navigator.userAgent);
+    const msie = (0, _indexJsDefault.default).navigator && /(msie|trident)/i.test((0, _indexJsDefault.default).navigator.userAgent);
     const urlParsingNode = document.createElement("a");
     let originURL;
     /**
@@ -47554,24 +48078,22 @@ var _trackStreamJs = require("../helpers/trackStream.js");
 var _axiosHeadersJs = require("../core/AxiosHeaders.js");
 var _axiosHeadersJsDefault = parcelHelpers.interopDefault(_axiosHeadersJs);
 var _progressEventReducerJs = require("../helpers/progressEventReducer.js");
-var _progressEventReducerJsDefault = parcelHelpers.interopDefault(_progressEventReducerJs);
 var _resolveConfigJs = require("../helpers/resolveConfig.js");
 var _resolveConfigJsDefault = parcelHelpers.interopDefault(_resolveConfigJs);
 var _settleJs = require("../core/settle.js");
 var _settleJsDefault = parcelHelpers.interopDefault(_settleJs);
-const fetchProgressDecorator = (total, fn)=>{
-    const lengthComputable = total != null;
-    return (loaded)=>setTimeout(()=>fn({
-                lengthComputable,
-                total,
-                loaded
-            }));
-};
 const isFetchSupported = typeof fetch === "function" && typeof Request === "function" && typeof Response === "function";
 const isReadableStreamSupported = isFetchSupported && typeof ReadableStream === "function";
 // used only inside the fetch adapter
 const encodeText = isFetchSupported && (typeof TextEncoder === "function" ? ((encoder)=>(str)=>encoder.encode(str))(new TextEncoder()) : async (str)=>new Uint8Array(await new Response(str).arrayBuffer()));
-const supportsRequestStream = isReadableStreamSupported && (()=>{
+const test = (fn, ...args)=>{
+    try {
+        return !!fn(...args);
+    } catch (e) {
+        return false;
+    }
+};
+const supportsRequestStream = isReadableStreamSupported && test(()=>{
     let duplexAccessed = false;
     const hasContentType = new Request((0, _indexJsDefault.default).origin, {
         body: new ReadableStream(),
@@ -47582,15 +48104,9 @@ const supportsRequestStream = isReadableStreamSupported && (()=>{
         }
     }).headers.has("Content-Type");
     return duplexAccessed && !hasContentType;
-})();
+});
 const DEFAULT_CHUNK_SIZE = 65536;
-const supportsResponseStream = isReadableStreamSupported && !!(()=>{
-    try {
-        return (0, _utilsJsDefault.default).isReadableStream(new Response("").body);
-    } catch (err) {
-    // return undefined
-    }
-})();
+const supportsResponseStream = isReadableStreamSupported && test(()=>(0, _utilsJsDefault.default).isReadableStream(new Response("").body));
 const resolvers = {
     stream: supportsResponseStream && ((res)=>res.body)
 };
@@ -47611,7 +48127,7 @@ const getBodyLength = async (body)=>{
     if (body == null) return 0;
     if ((0, _utilsJsDefault.default).isBlob(body)) return body.size;
     if ((0, _utilsJsDefault.default).isSpecCompliantForm(body)) return (await new Request(body).arrayBuffer()).byteLength;
-    if ((0, _utilsJsDefault.default).isArrayBufferView(body)) return body.byteLength;
+    if ((0, _utilsJsDefault.default).isArrayBufferView(body) || (0, _utilsJsDefault.default).isArrayBuffer(body)) return body.byteLength;
     if ((0, _utilsJsDefault.default).isURLSearchParams(body)) body = body + "";
     if ((0, _utilsJsDefault.default).isString(body)) return (await encodeText(body)).byteLength;
 };
@@ -47643,9 +48159,15 @@ exports.default = isFetchSupported && (async (config)=>{
             });
             let contentTypeHeader;
             if ((0, _utilsJsDefault.default).isFormData(data) && (contentTypeHeader = _request.headers.get("content-type"))) headers.setContentType(contentTypeHeader);
-            if (_request.body) data = (0, _trackStreamJs.trackStream)(_request.body, DEFAULT_CHUNK_SIZE, fetchProgressDecorator(requestContentLength, (0, _progressEventReducerJsDefault.default)(onUploadProgress)), null, encodeText);
+            if (_request.body) {
+                const [onProgress, flush] = (0, _progressEventReducerJs.progressEventDecorator)(requestContentLength, (0, _progressEventReducerJs.progressEventReducer)((0, _progressEventReducerJs.asyncDecorator)(onUploadProgress)));
+                data = (0, _trackStreamJs.trackStream)(_request.body, DEFAULT_CHUNK_SIZE, onProgress, flush, encodeText);
+            }
         }
-        if (!(0, _utilsJsDefault.default).isString(withCredentials)) withCredentials = withCredentials ? "cors" : "omit";
+        if (!(0, _utilsJsDefault.default).isString(withCredentials)) withCredentials = withCredentials ? "include" : "omit";
+        // Cloudflare Workers throws when credentials are defined
+        // see https://github.com/cloudflare/workerd/issues/902
+        const isCredentialsSupported = "credentials" in Request.prototype;
         request = new Request(url, {
             ...fetchOptions,
             signal: composedSignal,
@@ -47653,7 +48175,7 @@ exports.default = isFetchSupported && (async (config)=>{
             headers: headers.normalize().toJSON(),
             body: data,
             duplex: "half",
-            withCredentials
+            credentials: isCredentialsSupported ? withCredentials : undefined
         });
         let response = await fetch(request);
         const isStreamResponse = supportsResponseStream && (responseType === "stream" || responseType === "response");
@@ -47667,7 +48189,11 @@ exports.default = isFetchSupported && (async (config)=>{
                 options[prop] = response[prop];
             });
             const responseContentLength = (0, _utilsJsDefault.default).toFiniteNumber(response.headers.get("content-length"));
-            response = new Response((0, _trackStreamJs.trackStream)(response.body, DEFAULT_CHUNK_SIZE, onDownloadProgress && fetchProgressDecorator(responseContentLength, (0, _progressEventReducerJsDefault.default)(onDownloadProgress, true)), isStreamResponse && onFinish, encodeText), options);
+            const [onProgress, flush] = onDownloadProgress && (0, _progressEventReducerJs.progressEventDecorator)(responseContentLength, (0, _progressEventReducerJs.progressEventReducer)((0, _progressEventReducerJs.asyncDecorator)(onDownloadProgress), true)) || [];
+            response = new Response((0, _trackStreamJs.trackStream)(response.body, DEFAULT_CHUNK_SIZE, onProgress, ()=>{
+                flush && flush();
+                isStreamResponse && onFinish();
+            }, encodeText), options);
         }
         responseType = responseType || "text";
         let responseData = await resolvers[(0, _utilsJsDefault.default).findKey(resolvers, responseType) || "text"](response, config);
@@ -47762,21 +48288,35 @@ const readBytes = async function*(iterable, chunkSize, encode) {
 const trackStream = (stream, chunkSize, onProgress, onFinish, encode)=>{
     const iterator = readBytes(stream, chunkSize, encode);
     let bytes = 0;
+    let done;
+    let _onFinish = (e)=>{
+        if (!done) {
+            done = true;
+            onFinish && onFinish(e);
+        }
+    };
     return new ReadableStream({
-        type: "bytes",
         async pull (controller) {
-            const { done, value } = await iterator.next();
-            if (done) {
-                controller.close();
-                onFinish();
-                return;
+            try {
+                const { done, value } = await iterator.next();
+                if (done) {
+                    _onFinish();
+                    controller.close();
+                    return;
+                }
+                let len = value.byteLength;
+                if (onProgress) {
+                    let loadedBytes = bytes += len;
+                    onProgress(loadedBytes);
+                }
+                controller.enqueue(new Uint8Array(value));
+            } catch (err) {
+                _onFinish(err);
+                throw err;
             }
-            let len = value.byteLength;
-            onProgress && onProgress(bytes += len);
-            controller.enqueue(new Uint8Array(value));
         },
         cancel (reason) {
-            onFinish(reason);
+            _onFinish(reason);
             return iterator.return();
         }
     }, {
@@ -47862,7 +48402,7 @@ exports.default = {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "VERSION", ()=>VERSION);
-const VERSION = "1.7.2";
+const VERSION = "1.7.5";
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"45wzn":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -48046,660 +48586,205 @@ Object.entries(HttpStatusCode).forEach(([key, value])=>{
 });
 exports.default = HttpStatusCode;
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kSvyQ":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2SBwg":[function(require,module,exports) {
+var $parcel$ReactRefreshHelpers$95d1 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
+var prevRefreshReg = window.$RefreshReg$;
+var prevRefreshSig = window.$RefreshSig$;
+$parcel$ReactRefreshHelpers$95d1.prelude(module);
+
+try {
+// src/components/update-user/update-user.jsx
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Bounce", ()=>H);
-parcelHelpers.export(exports, "Flip", ()=>Y);
-parcelHelpers.export(exports, "Icons", ()=>z);
-parcelHelpers.export(exports, "Slide", ()=>F);
-parcelHelpers.export(exports, "ToastContainer", ()=>Q);
-parcelHelpers.export(exports, "Zoom", ()=>X);
-parcelHelpers.export(exports, "collapseToast", ()=>f);
-parcelHelpers.export(exports, "cssTransition", ()=>g);
-parcelHelpers.export(exports, "toast", ()=>B);
-parcelHelpers.export(exports, "useToast", ()=>N);
-parcelHelpers.export(exports, "useToastContainer", ()=>L);
+var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _react = require("react");
 var _reactDefault = parcelHelpers.interopDefault(_react);
-var _clsx = require("clsx");
-var _clsxDefault = parcelHelpers.interopDefault(_clsx);
-"use client";
-const c = (e)=>"number" == typeof e && !isNaN(e), d = (e)=>"string" == typeof e, u = (e)=>"function" == typeof e, p = (e)=>d(e) || u(e) ? e : null, m = (e)=>(0, _react.isValidElement)(e) || d(e) || u(e) || c(e);
-function f(e, t, n) {
-    void 0 === n && (n = 300);
-    const { scrollHeight: o, style: s } = e;
-    requestAnimationFrame(()=>{
-        s.minHeight = "initial", s.height = o + "px", s.transition = `all ${n}ms`, requestAnimationFrame(()=>{
-            s.height = "0", s.padding = "0", s.margin = "0", setTimeout(t, n);
+var _propTypes = require("prop-types");
+var _propTypesDefault = parcelHelpers.interopDefault(_propTypes);
+var _axios = require("axios");
+var _axiosDefault = parcelHelpers.interopDefault(_axios);
+var _reactToastify = require("react-toastify");
+var _s = $RefreshSig$();
+const UpdateUser = ({ user, handleUpdate })=>{
+    _s();
+    const [username, setUsername] = (0, _react.useState)(user.Username);
+    const [email, setEmail] = (0, _react.useState)(user.Email);
+    const [birthday, setBirthday] = (0, _react.useState)(user.Birthday);
+    const [password, setPassword] = (0, _react.useState)("");
+    const handleSubmit = (event)=>{
+        event.preventDefault();
+        const token = localStorage.getItem("token");
+        if (!token) {
+            (0, _reactToastify.toast).error("You are not authorized");
+            return;
+        }
+        const updatedUser = {
+            Username: username,
+            Email: email,
+            Birthday: birthday,
+            Password: password
+        };
+        const url = `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user.Username}`;
+        (0, _axiosDefault.default).put(url, updatedUser, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }).then((response)=>{
+            const updatedUser = response.data;
+            handleUpdate(updatedUser);
+            localStorage.setItem("user", JSON.stringify(updatedUser));
+            (0, _reactToastify.toast).success("Profile updated successfully");
+        }).catch((error)=>{
+            console.error("Error updating profile:", error);
+            (0, _reactToastify.toast).error("Failed to update profile");
         });
-    });
-}
-function g(t) {
-    let { enter: a, exit: r, appendPosition: i = !1, collapse: l = !0, collapseDuration: c = 300 } = t;
-    return function(t) {
-        let { children: d, position: u, preventExitTransition: p, done: m, nodeRef: g, isIn: y, playToast: v } = t;
-        const h = i ? `${a}--${u}` : a, T = i ? `${r}--${u}` : r, E = (0, _react.useRef)(0);
-        return (0, _react.useLayoutEffect)(()=>{
-            const e = g.current, t = h.split(" "), n = (o)=>{
-                o.target === g.current && (v(), e.removeEventListener("animationend", n), e.removeEventListener("animationcancel", n), 0 === E.current && "animationcancel" !== o.type && e.classList.remove(...t));
-            };
-            e.classList.add(...t), e.addEventListener("animationend", n), e.addEventListener("animationcancel", n);
-        }, []), (0, _react.useEffect)(()=>{
-            const e = g.current, t = ()=>{
-                e.removeEventListener("animationend", t), l ? f(e, m, c) : m();
-            };
-            y || (p ? t() : (E.current = 1, e.className += ` ${T}`, e.addEventListener("animationend", t)));
-        }, [
-            y
-        ]), (0, _reactDefault.default).createElement((0, _reactDefault.default).Fragment, null, d);
     };
-}
-function y(e, t) {
-    return null != e ? {
-        content: e.content,
-        containerId: e.props.containerId,
-        id: e.props.toastId,
-        theme: e.props.theme,
-        type: e.props.type,
-        data: e.props.data || {},
-        isLoading: e.props.isLoading,
-        icon: e.props.icon,
-        status: t
-    } : {};
-}
-const v = new Map;
-let h = [];
-const T = new Set, E = (e)=>T.forEach((t)=>t(e)), b = ()=>v.size > 0;
-function I(e, t) {
-    var n;
-    if (t) return !(null == (n = v.get(t)) || !n.isToastActive(e));
-    let o = !1;
-    return v.forEach((t)=>{
-        t.isToastActive(e) && (o = !0);
-    }), o;
-}
-function _(e, t) {
-    m(e) && (b() || h.push({
-        content: e,
-        options: t
-    }), v.forEach((n)=>{
-        n.buildToast(e, t);
-    }));
-}
-function C(e, t) {
-    v.forEach((n)=>{
-        null != t && null != t && t.containerId ? (null == t ? void 0 : t.containerId) === n.id && n.toggle(e, null == t ? void 0 : t.id) : n.toggle(e, null == t ? void 0 : t.id);
-    });
-}
-function L(e) {
-    const { subscribe: o, getSnapshot: s, setProps: i } = (0, _react.useRef)(function(e) {
-        const n = e.containerId || 1;
-        return {
-            subscribe (o) {
-                const s = function(e, n, o) {
-                    let s = 1, r = 0, i = [], l = [], f = [], g = n;
-                    const v = new Map, h = new Set, T = ()=>{
-                        f = Array.from(v.values()), h.forEach((e)=>e());
-                    }, E = (e)=>{
-                        l = null == e ? [] : l.filter((t)=>t !== e), T();
-                    }, b = (e)=>{
-                        const { toastId: n, onOpen: s, updateId: a, children: r } = e.props, i = null == a;
-                        e.staleId && v.delete(e.staleId), v.set(n, e), l = [
-                            ...l,
-                            e.props.toastId
-                        ].filter((t)=>t !== e.staleId), T(), o(y(e, i ? "added" : "updated")), i && u(s) && s((0, _react.isValidElement)(r) && r.props);
-                    };
-                    return {
-                        id: e,
-                        props: g,
-                        observe: (e)=>(h.add(e), ()=>h.delete(e)),
-                        toggle: (e, t)=>{
-                            v.forEach((n)=>{
-                                null != t && t !== n.props.toastId || u(n.toggle) && n.toggle(e);
-                            });
-                        },
-                        removeToast: E,
-                        toasts: v,
-                        clearQueue: ()=>{
-                            r -= i.length, i = [];
-                        },
-                        buildToast: (n, l)=>{
-                            if (((t)=>{
-                                let { containerId: n, toastId: o, updateId: s } = t;
-                                const a = n ? n !== e : 1 !== e, r = v.has(o) && null == s;
-                                return a || r;
-                            })(l)) return;
-                            const { toastId: f, updateId: h, data: I, staleId: _, delay: C } = l, L = ()=>{
-                                E(f);
-                            }, N = null == h;
-                            N && r++;
-                            const $ = {
-                                ...g,
-                                style: g.toastStyle,
-                                key: s++,
-                                ...Object.fromEntries(Object.entries(l).filter((e)=>{
-                                    let [t, n] = e;
-                                    return null != n;
-                                })),
-                                toastId: f,
-                                updateId: h,
-                                data: I,
-                                closeToast: L,
-                                isIn: !1,
-                                className: p(l.className || g.toastClassName),
-                                bodyClassName: p(l.bodyClassName || g.bodyClassName),
-                                progressClassName: p(l.progressClassName || g.progressClassName),
-                                autoClose: !l.isLoading && (w = l.autoClose, k = g.autoClose, !1 === w || c(w) && w > 0 ? w : k),
-                                deleteToast () {
-                                    const e = v.get(f), { onClose: n, children: s } = e.props;
-                                    u(n) && n((0, _react.isValidElement)(s) && s.props), o(y(e, "removed")), v.delete(f), r--, r < 0 && (r = 0), i.length > 0 ? b(i.shift()) : T();
-                                }
-                            };
-                            var w, k;
-                            $.closeButton = g.closeButton, !1 === l.closeButton || m(l.closeButton) ? $.closeButton = l.closeButton : !0 === l.closeButton && ($.closeButton = !m(g.closeButton) || g.closeButton);
-                            let P = n;
-                            (0, _react.isValidElement)(n) && !d(n.type) ? P = (0, _react.cloneElement)(n, {
-                                closeToast: L,
-                                toastProps: $,
-                                data: I
-                            }) : u(n) && (P = n({
-                                closeToast: L,
-                                toastProps: $,
-                                data: I
-                            }));
-                            const M = {
-                                content: P,
-                                props: $,
-                                staleId: _
-                            };
-                            g.limit && g.limit > 0 && r > g.limit && N ? i.push(M) : c(C) ? setTimeout(()=>{
-                                b(M);
-                            }, C) : b(M);
-                        },
-                        setProps (e) {
-                            g = e;
-                        },
-                        setToggle: (e, t)=>{
-                            v.get(e).toggle = t;
-                        },
-                        isToastActive: (e)=>l.some((t)=>t === e),
-                        getSnapshot: ()=>g.newestOnTop ? f.reverse() : f
-                    };
-                }(n, e, E);
-                v.set(n, s);
-                const r = s.observe(o);
-                return h.forEach((e)=>_(e.content, e.options)), h = [], ()=>{
-                    r(), v.delete(n);
-                };
-            },
-            setProps (e) {
-                var t;
-                null == (t = v.get(n)) || t.setProps(e);
-            },
-            getSnapshot () {
-                var e;
-                return null == (e = v.get(n)) ? void 0 : e.getSnapshot();
-            }
-        };
-    }(e)).current;
-    i(e);
-    const l = (0, _react.useSyncExternalStore)(o, s, s);
-    return {
-        getToastToRender: function(e) {
-            if (!l) return [];
-            const t = new Map;
-            return l.forEach((e)=>{
-                const { position: n } = e.props;
-                t.has(n) || t.set(n, []), t.get(n).push(e);
-            }), Array.from(t, (t)=>e(t[0], t[1]));
-        },
-        isToastActive: I,
-        count: null == l ? void 0 : l.length
-    };
-}
-function N(e) {
-    const [t, o] = (0, _react.useState)(!1), [a, r] = (0, _react.useState)(!1), l = (0, _react.useRef)(null), c = (0, _react.useRef)({
-        start: 0,
-        delta: 0,
-        removalDistance: 0,
-        canCloseOnClick: !0,
-        canDrag: !1,
-        didMove: !1
-    }).current, { autoClose: d, pauseOnHover: u, closeToast: p, onClick: m, closeOnClick: f } = e;
-    var g, y;
-    function h() {
-        o(!0);
-    }
-    function T() {
-        o(!1);
-    }
-    function E(n) {
-        const o = l.current;
-        c.canDrag && o && (c.didMove = !0, t && T(), c.delta = "x" === e.draggableDirection ? n.clientX - c.start : n.clientY - c.start, c.start !== n.clientX && (c.canCloseOnClick = !1), o.style.transform = `translate3d(${"x" === e.draggableDirection ? `${c.delta}px, var(--y)` : `0, calc(${c.delta}px + var(--y))`},0)`, o.style.opacity = "" + (1 - Math.abs(c.delta / c.removalDistance)));
-    }
-    function b() {
-        document.removeEventListener("pointermove", E), document.removeEventListener("pointerup", b);
-        const t = l.current;
-        if (c.canDrag && c.didMove && t) {
-            if (c.canDrag = !1, Math.abs(c.delta) > c.removalDistance) return r(!0), e.closeToast(), void e.collapseAll();
-            t.style.transition = "transform 0.2s, opacity 0.2s", t.style.removeProperty("transform"), t.style.removeProperty("opacity");
-        }
-    }
-    null == (y = v.get((g = {
-        id: e.toastId,
-        containerId: e.containerId,
-        fn: o
-    }).containerId || 1)) || y.setToggle(g.id, g.fn), (0, _react.useEffect)(()=>{
-        if (e.pauseOnFocusLoss) return document.hasFocus() || T(), window.addEventListener("focus", h), window.addEventListener("blur", T), ()=>{
-            window.removeEventListener("focus", h), window.removeEventListener("blur", T);
-        };
-    }, [
-        e.pauseOnFocusLoss
-    ]);
-    const I = {
-        onPointerDown: function(t) {
-            if (!0 === e.draggable || e.draggable === t.pointerType) {
-                c.didMove = !1, document.addEventListener("pointermove", E), document.addEventListener("pointerup", b);
-                const n = l.current;
-                c.canCloseOnClick = !0, c.canDrag = !0, n.style.transition = "none", "x" === e.draggableDirection ? (c.start = t.clientX, c.removalDistance = n.offsetWidth * (e.draggablePercent / 100)) : (c.start = t.clientY, c.removalDistance = n.offsetHeight * (80 === e.draggablePercent ? 1.5 * e.draggablePercent : e.draggablePercent) / 100);
-            }
-        },
-        onPointerUp: function(t) {
-            const { top: n, bottom: o, left: s, right: a } = l.current.getBoundingClientRect();
-            "touchend" !== t.nativeEvent.type && e.pauseOnHover && t.clientX >= s && t.clientX <= a && t.clientY >= n && t.clientY <= o ? T() : h();
-        }
-    };
-    return d && u && (I.onMouseEnter = T, e.stacked || (I.onMouseLeave = h)), f && (I.onClick = (e)=>{
-        m && m(e), c.canCloseOnClick && p();
-    }), {
-        playToast: h,
-        pauseToast: T,
-        isRunning: t,
-        preventExitTransition: a,
-        toastRef: l,
-        eventHandlers: I
-    };
-}
-function $(t) {
-    let { delay: n, isRunning: o, closeToast: s, type: a = "default", hide: r, className: i, style: c, controlledProgress: d, progress: p, rtl: m, isIn: f, theme: g } = t;
-    const y = r || d && 0 === p, v = {
-        ...c,
-        animationDuration: `${n}ms`,
-        animationPlayState: o ? "running" : "paused"
-    };
-    d && (v.transform = `scaleX(${p})`);
-    const h = (0, _clsxDefault.default)("Toastify__progress-bar", d ? "Toastify__progress-bar--controlled" : "Toastify__progress-bar--animated", `Toastify__progress-bar-theme--${g}`, `Toastify__progress-bar--${a}`, {
-        "Toastify__progress-bar--rtl": m
-    }), T = u(i) ? i({
-        rtl: m,
-        type: a,
-        defaultClassName: h
-    }) : (0, _clsxDefault.default)(h, i), E = {
-        [d && p >= 1 ? "onTransitionEnd" : "onAnimationEnd"]: d && p < 1 ? null : ()=>{
-            f && s();
-        }
-    };
-    return (0, _reactDefault.default).createElement("div", {
-        className: "Toastify__progress-bar--wrp",
-        "data-hidden": y
-    }, (0, _reactDefault.default).createElement("div", {
-        className: `Toastify__progress-bar--bg Toastify__progress-bar-theme--${g} Toastify__progress-bar--${a}`
-    }), (0, _reactDefault.default).createElement("div", {
-        role: "progressbar",
-        "aria-hidden": y ? "true" : "false",
-        "aria-label": "notification timer",
-        className: T,
-        style: v,
-        ...E
-    }));
-}
-let w = 1;
-const k = ()=>"" + w++;
-function P(e) {
-    return e && (d(e.toastId) || c(e.toastId)) ? e.toastId : k();
-}
-function M(e, t) {
-    return _(e, t), t.toastId;
-}
-function x(e, t) {
-    return {
-        ...t,
-        type: t && t.type || e,
-        toastId: P(t)
-    };
-}
-function A(e) {
-    return (t, n)=>M(t, x(e, n));
-}
-function B(e, t) {
-    return M(e, x("default", t));
-}
-B.loading = (e, t)=>M(e, x("default", {
-        isLoading: !0,
-        autoClose: !1,
-        closeOnClick: !1,
-        closeButton: !1,
-        draggable: !1,
-        ...t
-    })), B.promise = function(e, t, n) {
-    let o, { pending: s, error: a, success: r } = t;
-    s && (o = d(s) ? B.loading(s, n) : B.loading(s.render, {
-        ...n,
-        ...s
-    }));
-    const i = {
-        isLoading: null,
-        autoClose: null,
-        closeOnClick: null,
-        closeButton: null,
-        draggable: null
-    }, l = (e, t, s)=>{
-        if (null == t) return void B.dismiss(o);
-        const a = {
-            type: e,
-            ...i,
-            ...n,
-            data: s
-        }, r = d(t) ? {
-            render: t
-        } : t;
-        return o ? B.update(o, {
-            ...a,
-            ...r
-        }) : B(r.render, {
-            ...a,
-            ...r
-        }), s;
-    }, c = u(e) ? e() : e;
-    return c.then((e)=>l("success", r, e)).catch((e)=>l("error", a, e)), c;
-}, B.success = A("success"), B.info = A("info"), B.error = A("error"), B.warning = A("warning"), B.warn = B.warning, B.dark = (e, t)=>M(e, x("default", {
-        theme: "dark",
-        ...t
-    })), B.dismiss = function(e) {
-    !function(e) {
-        var t;
-        if (b()) {
-            if (null == e || d(t = e) || c(t)) v.forEach((t)=>{
-                t.removeToast(e);
-            });
-            else if (e && ("containerId" in e || "id" in e)) {
-                const t = v.get(e.containerId);
-                t ? t.removeToast(e.id) : v.forEach((t)=>{
-                    t.removeToast(e.id);
-                });
-            }
-        } else h = h.filter((t)=>null != e && t.options.toastId !== e);
-    }(e);
-}, B.clearWaitingQueue = function(e) {
-    void 0 === e && (e = {}), v.forEach((t)=>{
-        !t.props.limit || e.containerId && t.id !== e.containerId || t.clearQueue();
-    });
-}, B.isActive = I, B.update = function(e, t) {
-    void 0 === t && (t = {});
-    const n = ((e, t)=>{
-        var n;
-        let { containerId: o } = t;
-        return null == (n = v.get(o || 1)) ? void 0 : n.toasts.get(e);
-    })(e, t);
-    if (n) {
-        const { props: o, content: s } = n, a = {
-            delay: 100,
-            ...o,
-            ...t,
-            toastId: t.toastId || e,
-            updateId: k()
-        };
-        a.toastId !== e && (a.staleId = e);
-        const r = a.render || s;
-        delete a.render, M(r, a);
-    }
-}, B.done = (e)=>{
-    B.update(e, {
-        progress: 1
-    });
-}, B.onChange = function(e) {
-    return T.add(e), ()=>{
-        T.delete(e);
-    };
-}, B.play = (e)=>C(!0, e), B.pause = (e)=>C(!1, e);
-const O = "undefined" != typeof window ? (0, _react.useLayoutEffect) : (0, _react.useEffect), D = (t)=>{
-    let { theme: n, type: o, isLoading: s, ...a } = t;
-    return (0, _reactDefault.default).createElement("svg", {
-        viewBox: "0 0 24 24",
-        width: "100%",
-        height: "100%",
-        fill: "colored" === n ? "currentColor" : `var(--toastify-icon-color-${o})`,
-        ...a
-    });
-}, z = {
-    info: function(t) {
-        return (0, _reactDefault.default).createElement(D, {
-            ...t
-        }, (0, _reactDefault.default).createElement("path", {
-            d: "M12 0a12 12 0 1012 12A12.013 12.013 0 0012 0zm.25 5a1.5 1.5 0 11-1.5 1.5 1.5 1.5 0 011.5-1.5zm2.25 13.5h-4a1 1 0 010-2h.75a.25.25 0 00.25-.25v-4.5a.25.25 0 00-.25-.25h-.75a1 1 0 010-2h1a2 2 0 012 2v4.75a.25.25 0 00.25.25h.75a1 1 0 110 2z"
-        }));
-    },
-    warning: function(t) {
-        return (0, _reactDefault.default).createElement(D, {
-            ...t
-        }, (0, _reactDefault.default).createElement("path", {
-            d: "M23.32 17.191L15.438 2.184C14.728.833 13.416 0 11.996 0c-1.42 0-2.733.833-3.443 2.184L.533 17.448a4.744 4.744 0 000 4.368C1.243 23.167 2.555 24 3.975 24h16.05C22.22 24 24 22.044 24 19.632c0-.904-.251-1.746-.68-2.44zm-9.622 1.46c0 1.033-.724 1.823-1.698 1.823s-1.698-.79-1.698-1.822v-.043c0-1.028.724-1.822 1.698-1.822s1.698.79 1.698 1.822v.043zm.039-12.285l-.84 8.06c-.057.581-.408.943-.897.943-.49 0-.84-.367-.896-.942l-.84-8.065c-.057-.624.25-1.095.779-1.095h1.91c.528.005.84.476.784 1.1z"
-        }));
-    },
-    success: function(t) {
-        return (0, _reactDefault.default).createElement(D, {
-            ...t
-        }, (0, _reactDefault.default).createElement("path", {
-            d: "M12 0a12 12 0 1012 12A12.014 12.014 0 0012 0zm6.927 8.2l-6.845 9.289a1.011 1.011 0 01-1.43.188l-4.888-3.908a1 1 0 111.25-1.562l4.076 3.261 6.227-8.451a1 1 0 111.61 1.183z"
-        }));
-    },
-    error: function(t) {
-        return (0, _reactDefault.default).createElement(D, {
-            ...t
-        }, (0, _reactDefault.default).createElement("path", {
-            d: "M11.983 0a12.206 12.206 0 00-8.51 3.653A11.8 11.8 0 000 12.207 11.779 11.779 0 0011.8 24h.214A12.111 12.111 0 0024 11.791 11.766 11.766 0 0011.983 0zM10.5 16.542a1.476 1.476 0 011.449-1.53h.027a1.527 1.527 0 011.523 1.47 1.475 1.475 0 01-1.449 1.53h-.027a1.529 1.529 0 01-1.523-1.47zM11 12.5v-6a1 1 0 012 0v6a1 1 0 11-2 0z"
-        }));
-    },
-    spinner: function() {
-        return (0, _reactDefault.default).createElement("div", {
-            className: "Toastify__spinner"
-        });
-    }
-}, R = (n)=>{
-    const { isRunning: o, preventExitTransition: s, toastRef: r, eventHandlers: i, playToast: c } = N(n), { closeButton: d, children: p, autoClose: m, onClick: f, type: g, hideProgressBar: y, closeToast: v, transition: h, position: T, className: E, style: b, bodyClassName: I, bodyStyle: _, progressClassName: C, progressStyle: L, updateId: w, role: k, progress: P, rtl: M, toastId: x, deleteToast: A, isIn: B, isLoading: O, closeOnClick: D, theme: R } = n, S = (0, _clsxDefault.default)("Toastify__toast", `Toastify__toast-theme--${R}`, `Toastify__toast--${g}`, {
-        "Toastify__toast--rtl": M
-    }, {
-        "Toastify__toast--close-on-click": D
-    }), H = u(E) ? E({
-        rtl: M,
-        position: T,
-        type: g,
-        defaultClassName: S
-    }) : (0, _clsxDefault.default)(S, E), F = function(e) {
-        let { theme: n, type: o, isLoading: s, icon: r } = e, i = null;
-        const l = {
-            theme: n,
-            type: o
-        };
-        return !1 === r || (u(r) ? i = r({
-            ...l,
-            isLoading: s
-        }) : (0, _react.isValidElement)(r) ? i = (0, _react.cloneElement)(r, l) : s ? i = z.spinner() : ((e)=>e in z)(o) && (i = z[o](l))), i;
-    }(n), X = !!P || !m, Y = {
-        closeToast: v,
-        type: g,
-        theme: R
-    };
-    let q = null;
-    return !1 === d || (q = u(d) ? d(Y) : (0, _react.isValidElement)(d) ? (0, _react.cloneElement)(d, Y) : function(t) {
-        let { closeToast: n, theme: o, ariaLabel: s = "close" } = t;
-        return (0, _reactDefault.default).createElement("button", {
-            className: `Toastify__close-button Toastify__close-button--${o}`,
-            type: "button",
-            onClick: (e)=>{
-                e.stopPropagation(), n(e);
-            },
-            "aria-label": s
-        }, (0, _reactDefault.default).createElement("svg", {
-            "aria-hidden": "true",
-            viewBox: "0 0 14 16"
-        }, (0, _reactDefault.default).createElement("path", {
-            fillRule: "evenodd",
-            d: "M7.71 8.23l3.75 3.75-1.48 1.48-3.75-3.75-3.75 3.75L1 11.98l3.75-3.75L1 4.48 2.48 3l3.75 3.75L9.98 3l1.48 1.48-3.75 3.75z"
-        })));
-    }(Y)), (0, _reactDefault.default).createElement(h, {
-        isIn: B,
-        done: A,
-        position: T,
-        preventExitTransition: s,
-        nodeRef: r,
-        playToast: c
-    }, (0, _reactDefault.default).createElement("div", {
-        id: x,
-        onClick: f,
-        "data-in": B,
-        className: H,
-        ...i,
-        style: b,
-        ref: r
-    }, (0, _reactDefault.default).createElement("div", {
-        ...B && {
-            role: k
-        },
-        className: u(I) ? I({
-            type: g
-        }) : (0, _clsxDefault.default)("Toastify__toast-body", I),
-        style: _
-    }, null != F && (0, _reactDefault.default).createElement("div", {
-        className: (0, _clsxDefault.default)("Toastify__toast-icon", {
-            "Toastify--animate-icon Toastify__zoom-enter": !O
-        })
-    }, F), (0, _reactDefault.default).createElement("div", null, p)), q, (0, _reactDefault.default).createElement($, {
-        ...w && !X ? {
-            key: `pb-${w}`
-        } : {},
-        rtl: M,
-        theme: R,
-        delay: m,
-        isRunning: o,
-        isIn: B,
-        closeToast: v,
-        hide: y,
-        type: g,
-        style: L,
-        className: C,
-        controlledProgress: X,
-        progress: P || 0
-    })));
-}, S = function(e, t) {
-    return void 0 === t && (t = !1), {
-        enter: `Toastify--animate Toastify__${e}-enter`,
-        exit: `Toastify--animate Toastify__${e}-exit`,
-        appendPosition: t
-    };
-}, H = g(S("bounce", !0)), F = g(S("slide", !0)), X = g(S("zoom")), Y = g(S("flip")), q = {
-    position: "top-right",
-    transition: H,
-    autoClose: 5e3,
-    closeButton: !0,
-    pauseOnHover: !0,
-    pauseOnFocusLoss: !0,
-    draggable: "touch",
-    draggablePercent: 80,
-    draggableDirection: "x",
-    role: "alert",
-    theme: "light"
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("form", {
+        onSubmit: handleSubmit,
+        children: [
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                className: "form-group",
+                children: [
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("label", {
+                        htmlFor: "username",
+                        children: "Username"
+                    }, void 0, false, {
+                        fileName: "src/components/profile-view/update-user.jsx",
+                        lineNumber: 50,
+                        columnNumber: 9
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
+                        type: "text",
+                        className: "form-control",
+                        id: "username",
+                        value: username,
+                        onChange: (e)=>setUsername(e.target.value)
+                    }, void 0, false, {
+                        fileName: "src/components/profile-view/update-user.jsx",
+                        lineNumber: 51,
+                        columnNumber: 9
+                    }, undefined)
+                ]
+            }, void 0, true, {
+                fileName: "src/components/profile-view/update-user.jsx",
+                lineNumber: 49,
+                columnNumber: 7
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                className: "form-group",
+                children: [
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("label", {
+                        htmlFor: "email",
+                        children: "Email"
+                    }, void 0, false, {
+                        fileName: "src/components/profile-view/update-user.jsx",
+                        lineNumber: 60,
+                        columnNumber: 9
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
+                        type: "email",
+                        className: "form-control",
+                        id: "email",
+                        value: email,
+                        onChange: (e)=>setEmail(e.target.value)
+                    }, void 0, false, {
+                        fileName: "src/components/profile-view/update-user.jsx",
+                        lineNumber: 61,
+                        columnNumber: 9
+                    }, undefined)
+                ]
+            }, void 0, true, {
+                fileName: "src/components/profile-view/update-user.jsx",
+                lineNumber: 59,
+                columnNumber: 7
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                className: "form-group",
+                children: [
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("label", {
+                        htmlFor: "birthday",
+                        children: "Birthday"
+                    }, void 0, false, {
+                        fileName: "src/components/profile-view/update-user.jsx",
+                        lineNumber: 70,
+                        columnNumber: 9
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
+                        type: "date",
+                        className: "form-control",
+                        id: "birthday",
+                        value: birthday,
+                        onChange: (e)=>setBirthday(e.target.value)
+                    }, void 0, false, {
+                        fileName: "src/components/profile-view/update-user.jsx",
+                        lineNumber: 71,
+                        columnNumber: 9
+                    }, undefined)
+                ]
+            }, void 0, true, {
+                fileName: "src/components/profile-view/update-user.jsx",
+                lineNumber: 69,
+                columnNumber: 7
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                className: "form-group",
+                children: [
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("label", {
+                        htmlFor: "password",
+                        children: "Password"
+                    }, void 0, false, {
+                        fileName: "src/components/profile-view/update-user.jsx",
+                        lineNumber: 80,
+                        columnNumber: 9
+                    }, undefined),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
+                        type: "password",
+                        className: "form-control",
+                        id: "password",
+                        value: password,
+                        onChange: (e)=>setPassword(e.target.value)
+                    }, void 0, false, {
+                        fileName: "src/components/profile-view/update-user.jsx",
+                        lineNumber: 81,
+                        columnNumber: 9
+                    }, undefined)
+                ]
+            }, void 0, true, {
+                fileName: "src/components/profile-view/update-user.jsx",
+                lineNumber: 79,
+                columnNumber: 7
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
+                type: "submit",
+                className: "btn btn-primary",
+                children: "Update Profile"
+            }, void 0, false, {
+                fileName: "src/components/profile-view/update-user.jsx",
+                lineNumber: 89,
+                columnNumber: 7
+            }, undefined)
+        ]
+    }, void 0, true, {
+        fileName: "src/components/profile-view/update-user.jsx",
+        lineNumber: 48,
+        columnNumber: 5
+    }, undefined);
 };
-function Q(t) {
-    let o = {
-        ...q,
-        ...t
-    };
-    const s = t.stacked, [a, r] = (0, _react.useState)(!0), c = (0, _react.useRef)(null), { getToastToRender: d, isToastActive: m, count: f } = L(o), { className: g, style: y, rtl: v, containerId: h } = o;
-    function T(e) {
-        const t = (0, _clsxDefault.default)("Toastify__toast-container", `Toastify__toast-container--${e}`, {
-            "Toastify__toast-container--rtl": v
-        });
-        return u(g) ? g({
-            position: e,
-            rtl: v,
-            defaultClassName: t
-        }) : (0, _clsxDefault.default)(t, p(g));
-    }
-    function E() {
-        s && (r(!0), B.play());
-    }
-    return O(()=>{
-        if (s) {
-            var e;
-            const t = c.current.querySelectorAll('[data-in="true"]'), n = 12, s = null == (e = o.position) ? void 0 : e.includes("top");
-            let r = 0, i = 0;
-            Array.from(t).reverse().forEach((e, t)=>{
-                const o = e;
-                o.classList.add("Toastify__toast--stacked"), t > 0 && (o.dataset.collapsed = `${a}`), o.dataset.pos || (o.dataset.pos = s ? "top" : "bot");
-                const l = r * (a ? .2 : 1) + (a ? 0 : n * t);
-                o.style.setProperty("--y", `${s ? l : -1 * l}px`), o.style.setProperty("--g", `${n}`), o.style.setProperty("--s", "" + (1 - (a ? i : 0))), r += o.offsetHeight, i += .025;
-            });
-        }
-    }, [
-        a,
-        f,
-        s
-    ]), (0, _reactDefault.default).createElement("div", {
-        ref: c,
-        className: "Toastify",
-        id: h,
-        onMouseEnter: ()=>{
-            s && (r(!1), B.pause());
-        },
-        onMouseLeave: E
-    }, d((t, n)=>{
-        const o = n.length ? {
-            ...y
-        } : {
-            ...y,
-            pointerEvents: "none"
-        };
-        return (0, _reactDefault.default).createElement("div", {
-            className: T(t),
-            style: o,
-            key: `container-${t}`
-        }, n.map((t)=>{
-            let { content: n, props: o } = t;
-            return (0, _reactDefault.default).createElement(R, {
-                ...o,
-                stacked: s,
-                collapseAll: E,
-                isIn: m(o.toastId, o.containerId),
-                style: o.style,
-                key: `toast-${o.key}`
-            }, n);
-        }));
-    }));
-}
+_s(UpdateUser, "91Edp/v4DzveKSbiAsjOVfRMIUA=");
+_c = UpdateUser;
+UpdateUser.propTypes = {
+    user: (0, _propTypesDefault.default).object.isRequired,
+    handleUpdate: (0, _propTypesDefault.default).func.isRequired
+};
+exports.default = UpdateUser;
+var _c;
+$RefreshReg$(_c, "UpdateUser");
 
-},{"react":"21dqq","clsx":"gocd3","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gocd3":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "clsx", ()=>clsx);
-function r(e) {
-    var t, f, n = "";
-    if ("string" == typeof e || "number" == typeof e) n += e;
-    else if ("object" == typeof e) {
-        if (Array.isArray(e)) {
-            var o = e.length;
-            for(t = 0; t < o; t++)e[t] && (f = r(e[t])) && (n && (n += " "), n += f);
-        } else for(f in e)e[f] && (n && (n += " "), n += f);
-    }
-    return n;
+  $parcel$ReactRefreshHelpers$95d1.postlude(module);
+} finally {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
 }
-function clsx() {
-    for(var e, t, f = 0, n = "", o = arguments.length; f < o; f++)(e = arguments[f]) && (t = r(e)) && (n && (n += " "), n += t);
-    return n;
-}
-exports.default = clsx;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gJP2Y":[function() {},{}],"eBaMl":[function() {},{}],"lJZlQ":[function() {},{}]},["gjUm6","1xC6H","d8Dch"], "d8Dch", "parcelRequireaec4")
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","prop-types":"7wKI2","axios":"jo6P5","react-toastify":"kSvyQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"gJP2Y":[function() {},{}],"eBaMl":[function() {},{}],"lJZlQ":[function() {},{}]},["gjUm6","1xC6H","d8Dch"], "d8Dch", "parcelRequireaec4")
 
 //# sourceMappingURL=index.b4b6dfad.js.map
