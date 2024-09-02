@@ -1,9 +1,9 @@
+// src/components/favorite-movies/favorite-movies.jsx
 import React from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { Row, Col, Button } from "react-bootstrap";
+import { Row, Col, Card, Button } from "react-bootstrap";
 import MovieCard from "../movie-card/movie-card";
-import { toast } from "react-toastify"; // Assuming you're using react-toastify
 
 export const FavoriteMovies = ({ movies, user, removeFav }) => {
   if (!movies || !user || !user.FavoriteMovies) {
@@ -22,11 +22,9 @@ export const FavoriteMovies = ({ movies, user, removeFav }) => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
-        toast.success("Movie removed from favorites!");
         removeFav(id);
       })
       .catch((error) => {
-        toast.error("Error removing movie from favorites.");
         console.error("Error removing movie from favorites:", error);
       });
   };
@@ -45,7 +43,6 @@ export const FavoriteMovies = ({ movies, user, removeFav }) => {
           </Col>
         ))}
       </Row>
-      {/* If you have a large number of favorite movies, consider adding pagination here */}
     </div>
   );
 };

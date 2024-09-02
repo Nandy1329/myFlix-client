@@ -1,75 +1,8 @@
-// src/index.scss
-
+$color: #5d9c6817;
 $primary: #012a57;
-$body-bg: #f8f9fa;
+$body-bg: #f8f9fa;  
+
+
+
 $deprecation-warnings: false;
-
 @import "~bootstrap/scss/bootstrap";
-
-// Common styles abstracted for reuse
-@mixin center-content {
-  display: block;
-  margin: auto;
-}
-
-@mixin card-spacing {
-  margin-bottom: 15px;
-}
-
-.fav-movie {
-  @include card-spacing;
-
-  figure {
-    position: relative;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    @include center-content;
-    width: 100%;
-
-    img {
-      display: block;
-      height: 400px;
-      margin: auto;
-    }
-
-    figcaption {
-      text-align: center;
-    }
-  }
-
-  button.btn {
-    @include center-content;
-  }
-}
-
-.card {
-  @include card-spacing;
-}
-
-/* src/components/movie-view/movie-view.scss */
-
-.back-button {
-  padding: 4px 12px;
-  color: whitesmoke;
-  background-color: dodgerblue;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  text-align: center;
-}
-
-.movie-view-card {
-  max-width: 800px;
-  margin: auto;
-  overflow: hidden;
-}
-
-.movie-view-img {
-  width: 100%;
-  height: auto;
-  max-height: 500px;
-  object-fit: cover;
-  padding: 10px;
-  box-sizing: border-box;
-}

@@ -31,32 +31,21 @@ export const MainView = () => {
 
     const navigate = useNavigate();
 
-
     useEffect(() => {
         if (!token) {
             console.error("Token is missing");
-            navigate("/login");
             return;
         }
 
         const fetchMovies = async () => {
             try {
+                console.log('Token used for fetch:', token);
+
                 const response = await fetch('https://myflixdb1329-efa9ef3dfc08.herokuapp.com/movies', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
-
-                if (response.status === 401) {
-                    // Token might be invalid or expired
-                    toast.error('Session expired. Please log in again.');
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
-                    setUser(null);
-                    setToken(null);
-                    navigate('/login');
-                    return;
-                }
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -68,7 +57,38 @@ export const MainView = () => {
                     throw new Error("Expected an array of movies");
                 }
 
-                // ... rest of the code
+                const fetchDirectorDetails = async (directorId) => {
+                    const directorResponse = await fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/directors/${directorId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        },
+                    });
+
+                    if (!directorResponse.ok) {
+                        throw new Error(`HTTP error! status: ${directorResponse.status}`);
+                    }
+
+                    return await directorResponse.json();
+                };
+
+                const moviesFromApi = await Promise.all(data.map(async (movie) => {
+                    let directorDetails = { Name: "Unknown" };
+                    if (movie.Director && typeof movie.Director === 'string') {
+                        directorDetails = await fetchDirectorDetails(movie.Director);
+                    } else if (movie.Director && typeof movie.Director === 'object') {
+                        directorDetails = movie.Director;
+                    }
+
+                    return {
+                        ...movie,
+                        Director: {
+                            Name: directorDetails.Name,
+                        },
+                    };
+                }));
+
+                setMovies(moviesFromApi);
+                setLoading(false);
             } catch (error) {
                 console.error('Error fetching movies:', error.message);
                 toast.error('Failed to fetch movies');
@@ -78,9 +98,6 @@ export const MainView = () => {
 
         fetchMovies();
     }, [token]);
-
-
-
 
     const addFav = (id) => {
         if (!token) {
@@ -164,11 +181,9 @@ export const MainView = () => {
                 user={user}
                 onLoggedOut={() => {
                     setUser(null);
-                    setToken(null);
                     localStorage.removeItem("token");
                     localStorage.removeItem("user");
                     toast.info("Logged out");
-                    navigate("/login");
                 }}
             />
             <Row className="justify-content-center my-5">

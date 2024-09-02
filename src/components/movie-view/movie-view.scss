@@ -1,38 +1,3 @@
-$color: #5d9c6817;
-$primary: #012a57;
-$body-bg: #f8f9fa;
-
-$deprecation-warnings: false;
-@import "~bootstrap/scss/bootstrap"; // src/index.scss
-
-.fav-movie {
-    margin-bottom: 15px;
-    figure {
-        position: relative;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        margin: auto;
-        width: 100%;
-        img {
-            display: block;
-            height: 400px;
-            margin: auto;
-        }
-        figcaption {
-            text-align: center;
-        }
-    }
-    button.btn {
-        display: block;
-        margin: auto;
-    }
-}
-
-.card {
-    margin-bottom: 15px;
-}
-
 /* src/components/movie-view/movie-view.scss */
 
 /* Styles for the back button */
@@ -56,7 +21,7 @@ $deprecation-warnings: false;
     width: 100%;
     height: auto;
     max-height: 500px; /* Set a max-height to ensure the image doesn’t get too large */
-    object-fit: cover; /* Use cover if you want to fill the container */
+    object-fit: contain; /* Maintain aspect ratio */
     padding: 10px; /* Add padding for better spacing */
     box-sizing: border-box; /* Include padding in the width and height */
 }

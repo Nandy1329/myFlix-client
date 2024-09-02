@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
+import "./user-deregister.scss";
 
 export const DeleteUser = () => {
   const [message, setMessage] = useState("");
@@ -19,7 +20,7 @@ export const DeleteUser = () => {
 
     try {
       const response = await fetch(
-        `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${storedUser.Username}`, // Ensure this is the correct endpoint
+        `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${storedUser.Username}`,
         {
           method: "DELETE",
           headers: {
