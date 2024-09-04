@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 export const LoginView = ({ onLoggedIn }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+
     const handleSubmit = (event) => {
         event.preventDefault();
 
@@ -31,7 +32,7 @@ export const LoginView = ({ onLoggedIn }) => {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit}>
             <h1>Login</h1>
             <Form.Group controlId='formUsername'>
                 <Form.Label>Username:</Form.Label>
@@ -55,6 +56,6 @@ export const LoginView = ({ onLoggedIn }) => {
             <Button variant="primary" type="submit">
                 Submit
             </Button>
-        </form>
+        </Form>
     );
 };
