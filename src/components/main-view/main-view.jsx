@@ -13,7 +13,9 @@ import "./main-view.scss";
 
 export const MainView = () => {
     const storedToken = localStorage.getItem("token");
-    const [user, setUser] = useState(storedUser ? storedUser : null);
+    const storedUser = localStorage.getItem("user");
+    const navigate = useNavigate();
+    const [user, setUser] = useState(storedUser ? JSON.parse(storedUser) : null);
     const [token, setToken] = useState(storedToken ? storedToken : null);
     const [movies, setMovies] = useState([]);
     const [search, setSearch] = useState("");
@@ -36,14 +38,11 @@ export const MainView = () => {
                     },
                 });
 
-
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-
                 const data = await response.json();
-
 
                 if (!Array.isArray(data)) {
                     throw new Error("Expected an array of movies");
@@ -73,38 +72,9 @@ export const MainView = () => {
 
                     return {
                         ...movie,
-
-                const fetchDirectorDetails = async (directorId) => {
-                    const directorResponse = await fetch(`https://myflixdb1329-efa9ef3dfc08.herokuapp.com/directors/${directorId}`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                        },
-                    });
-
-                    if (!directorResponse.ok) {
-                        throw new Error(`HTTP error! status: ${directorResponse.status}`);
-                    }
-
-                    return await directorResponse.json();
-                };
-
-                const moviesFromApi = await Promise.all(data.map(async (movie) => {
-                    let directorDetails = { Name: "Unknown" };
-                    if (movie.Director && typeof movie.Director === 'string') {
-                        directorDetails = await fetchDirectorDetails(movie.Director);
-                    } else if (movie.Director && typeof movie.Director === 'object') {
-                        directorDetails = movie.Director;
-                    }
-
-                    return {
-                        ...movie,
                         Director: {
                             Name: directorDetails.Name,
-                            Name: directorDetails.Name,
                         },
-                    };
-                }));
-
                     };
                 }));
 
@@ -113,10 +83,6 @@ export const MainView = () => {
                 console.error('Error fetching movies:', error.message);
                 toast.error('Failed to fetch movies');
             } finally {
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching movies:', error.message);
-                toast.error('Failed to fetch movies');
                 setLoading(false);
             }
         };
@@ -130,26 +96,19 @@ export const MainView = () => {
             return;
         }
 
-        if (!token) {
-            console.error("Token is missing");
-            return;
-        }
-
         fetch(
             `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user?.Username}/Movies/${id}`,
             {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,
-                },
+                } ,
             }
         )
             .then((response) => {
                 if (!response.ok) {
-                if (!response.ok) {
                     throw new Error("Failed to add movie to favorites");
                 }
-                return response.json();
                 return response.json();
             })
             .then((user) => {
@@ -171,11 +130,6 @@ export const MainView = () => {
             return;
         }
 
-        if (!token) {
-            console.error("Token is missing");
-            return;
-        }
-
         fetch(
             `https://myflixdb1329-efa9ef3dfc08.herokuapp.com/users/${user?.Username}/Movies/${id}`,
             {
@@ -187,10 +141,8 @@ export const MainView = () => {
         )
             .then((response) => {
                 if (!response.ok) {
-                if (!response.ok) {
                     throw new Error("Failed to remove movie from favorites");
                 }
-                return response.json();
                 return response.json();
             })
             .then((user) => {
@@ -225,6 +177,6 @@ export const MainView = () => {
                 ))}
             </Row>
             <ToastContainer />
-        </Router>
+        </div>
     );
 };
