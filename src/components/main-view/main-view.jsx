@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import { Row, Col, Spinner, Form } from "react-bootstrap";
 import { NavigationBar } from "../navigation-bar/navigation-bar";
@@ -14,7 +14,6 @@ import "./main-view.scss";
 export const MainView = () => {
     const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
-    const navigate = useNavigate();
     const [user, setUser] = useState(storedUser ? JSON.parse(storedUser) : null);
     const [token, setToken] = useState(storedToken ? storedToken : null);
     const [movies, setMovies] = useState([]);
@@ -25,7 +24,7 @@ export const MainView = () => {
     useEffect(() => {
         if (!token) {
             console.error("Token is missing, redirecting to login...");
-            navigate("/login");
+            setLoading(false);
             return;
         }
 
@@ -88,7 +87,7 @@ export const MainView = () => {
         };
 
         fetchMovies();
-    }, [token, navigate]);
+    }, [token]);
 
     const addFav = (id) => {
         if (!token) {
@@ -102,7 +101,7 @@ export const MainView = () => {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,
-                } ,
+                },
             }
         )
             .then((response) => {
@@ -167,16 +166,158 @@ export const MainView = () => {
     }
 
     return (
-        <div>
-            <NavigationBar user={user} />
-            <Row>
-                {movies.map((movie) => (
-                    <Col key={movie._id} md={3}>
-                        <MovieCard movie={movie} addFav={addFav} removeFav={removeFav} />
-                    </Col>
-                ))}
-            </Row>
-            <ToastContainer />
-        </div>
+        <BrowserRouter>
+            <div className="main-view">
+                <NavigationBar
+                    user={user}
+                    onLoggedOut={() => {
+                        setUser(null);
+                        localStorage.removeItem("token");
+                        localStorage.removeItem("user");
+                        toast.info("Logged out");
+                    }}
+                />
+                <Row className="justify-content-center my-5">
+                    <Routes>
+                        <Route
+                            path="/signup"
+                            element={
+                                user ? (
+                                    <Navigate to="/" />
+                                ) : (
+                                    <Col md={5}>
+                                        <SignupView />
+                                    </Col>
+                                )
+                            }
+                        />
+                        <Route
+                            path="/login"
+                            element={
+                                user ? (
+                                    <Navigate to="/" />
+                                ) : (
+                                    <Col md={5}>
+                                        <LoginView
+                                            onLoggedIn={(user, token) => {
+                                                setUser(user);
+                                                setToken(token);
+                                                toast.success("Logged in successfully");
+                                            }}
+                                        />
+                                    </Col>
+                                )
+                            }
+                        />
+                        <Route
+                            path="/movies/:movieId"
+                            element={
+                                !user ? (
+                                    <Navigate to="/login" replace />
+                                ) : movies.length === 0 ? (
+                                    <Col>There are no movies</Col>
+                                ) : (
+                                    <Col md={12}>
+                                        <MovieView
+                                            movies={movies}
+                                            addFav={addFav}
+                                            removeFav={removeFav}
+                                            user={user}
+                                        />
+                                    </Col>
+                                )
+                            }
+                        />
+                        <Route
+                            path="/"
+                            element={
+                                !user ? (
+                                    <Navigate to="/login" replace />
+                                ) : movies.length === 0 ? (
+                                    <Col>There are no movies</Col>
+                                ) : (
+                                    <>
+                                        <Row className="justify-content-center mb-5">
+                                            <Col md={6}>
+                                                <Form.Control
+                                                    type="text"
+                                                    placeholder="Search movies"
+                                                    value={search}
+                                                    onChange={(e) => setSearch(e.target.value)}
+                                                />
+                                            </Col>
+                                            <Col md={6}>
+                                                <Form.Select
+                                                    value={selectedGenre}
+                                                    onChange={(e) => setSelectedGenre(e.target.value)}
+                                                >
+                                                    <option value="">All genres</option>
+                                                    {[...new Set(movies.map((m) => m.Genre.Name))]
+                                                        .sort()
+                                                        .map((genre) => (
+                                                            <option key={genre} value={genre}>
+                                                                {genre}
+                                                            </option>
+                                                        ))}
+                                                </Form.Select>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            {movies
+                                                .filter(
+                                                    (movie) =>
+                                                        (!search ||
+                                                            movie.Title.toLowerCase().includes(
+                                                                search.toLowerCase()
+                                                            )) &&
+                                                        (!selectedGenre ||
+                                                            movie.Genre.Name === selectedGenre)
+                                                )
+                                                .map((movie) => (
+                                                    <Col
+                                                        className="mb-4"
+                                                        key={movie._id}
+                                                        xs={12}
+                                                        sm={6}
+                                                        md={4}
+                                                        lg={3}
+                                                    >
+                                                        <MovieCard
+                                                            movie={movie}
+                                                            onAddToFavorites={() => addFav(movie._id)}
+                                                            onRemoveFromFavorites={() => removeFav(movie._id)}
+                                                            isFavorite={
+                                                                user && user.FavoriteMovies
+                                                                    ? user.FavoriteMovies.includes(movie._id)
+                                                                    : false
+                                                            }
+                                                        />
+                                                    </Col>
+                                                ))}
+                                        </Row>
+                                    </>
+                                )
+                            }
+                        />
+                        <Route
+                            path="/profile"
+                            element={
+                                !user ? (
+                                    <Navigate to="/login" replace />
+                                ) : (
+                                    <ProfileView
+                                        user={user}
+                                        movies={movies}
+                                        removeFav={removeFav}
+                                        setUser={setUser}
+                                    />
+                                )
+                            }
+                        />
+                    </Routes>
+                </Row>
+                <ToastContainer position="top-center" />
+            </div>
+        </BrowserRouter>
     );
 };

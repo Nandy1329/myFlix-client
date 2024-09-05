@@ -1,6 +1,5 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
 import { MainView } from './components/main-view/main-view';
 import { Container } from 'react-bootstrap';
 import './index.scss'; 
@@ -8,9 +7,7 @@ import './index.scss';
 const MyMovies = () => {
     return (
         <Container>
-            <BrowserRouter>
                 <MainView />
-            </BrowserRouter>
         </Container>
     );
 }

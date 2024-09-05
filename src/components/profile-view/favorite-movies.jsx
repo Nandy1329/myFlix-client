@@ -1,8 +1,7 @@
-// src/components/favorite-movies/favorite-movies.jsx
 import React from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { Row, Col, Card, Button } from "react-bootstrap";
+import { Row, Col, } from "react-bootstrap";
 import MovieCard from "../movie-card/movie-card";
 
 export const FavoriteMovies = ({ movies, user, removeFav }) => {

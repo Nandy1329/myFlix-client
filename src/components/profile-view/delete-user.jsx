@@ -28,6 +28,7 @@ export const DeleteUser = () => {
           },
         }
       );
+
       if (response.ok) {
         setMessage("User deleted successfully");
         localStorage.removeItem("user");
@@ -40,6 +41,7 @@ export const DeleteUser = () => {
       setMessage("Error deleting user");
     }
   };
+
   return (
     <div className="delete-user">
       <h1 className="delete-account">Delete Account</h1>
